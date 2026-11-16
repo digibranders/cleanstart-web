@@ -9,58 +9,63 @@ import { DotField } from "./visuals";
 
 const COLUMNS = buildDotColumns(46, 16, 31, 2026);
 
-const PAGE =
-  "absolute w-full overflow-hidden rounded-[8px] bg-white shadow-[0_30px_60px_-24px_rgba(7,6,40,0.75)] ring-1 ring-white/20";
+const PAGE_CLASS =
+  "absolute w-[56%] overflow-hidden rounded-[8px] bg-white ring-1 ring-white/25 shadow-[0_34px_64px_-20px_rgba(7,6,40,0.7),0_10px_20px_rgba(7,6,40,0.35)] origin-bottom-left transition-transform duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none";
 
 /**
- * The report as an object, turned a little on its plane. Two inner pages show
- * behind the cover and the whole stack levels out on hover, so it reads as
- * something with pages in it.
+ * The report as an object: the real cover with two of its inner pages fanned
+ * behind it. The fan opens a little on hover, which says "there are pages
+ * inside" before anyone reads a word.
  */
-function ReportObject(): React.ReactElement {
+function ReportStack(): React.ReactElement {
   return (
-    <div className="group relative ml-auto mr-[clamp(24px,3.5vw,56px)] w-full max-w-[280px] [perspective:1400px] xl:max-w-[300px]">
+    <div className="group relative mx-auto aspect-[1/1.04] w-[90%] max-w-[440px] lg:max-w-[500px]">
       <div
         aria-hidden
-        className="pointer-events-none absolute -inset-[14%] rounded-full opacity-80 blur-[70px]"
+        className="pointer-events-none absolute -left-[12%] top-[2%] h-[62%] w-[62%] rounded-full opacity-90 blur-[56px]"
         style={{
           background:
-            "radial-gradient(closest-side, rgba(106,61,240,0.55) 0%, rgba(44,193,235,0.18) 55%, rgba(44,193,235,0) 100%)",
+            "radial-gradient(closest-side, rgba(192,59,255,0.5) 0%, rgba(192,59,255,0) 70%)",
         }}
       />
       <div
-        className="relative aspect-[910/1287] w-[87%] transition-transform duration-[700ms] ease-[cubic-bezier(0.16,1,0.3,1)] [transform-style:preserve-3d] [transform:rotateY(-12deg)_rotateX(4deg)_rotateZ(1.5deg)] group-hover:[transform:rotateY(-5deg)_rotateX(2deg)_rotateZ(1deg)] motion-reduce:transition-none"
-      >
-        <div className={`${PAGE} left-[9%] top-[-5%] opacity-80 [transform:translateZ(-60px)]`}>
-          <Image
-            src="/images/resources/dependency-trust/report-page-chart.webp"
-            alt=""
-            width={910}
-            height={1287}
-            sizes="270px"
-            className="h-auto w-full"
-          />
-        </div>
-        <div className={`${PAGE} left-[4.5%] top-[-2.5%] opacity-90 [transform:translateZ(-30px)]`}>
-          <Image
-            src="/images/resources/dependency-trust/report-page-glance.webp"
-            alt=""
-            width={910}
-            height={1287}
-            sizes="270px"
-            className="h-auto w-full"
-          />
-        </div>
-        <div className={`${PAGE} left-0 top-0`}>
-          <Image
-            src="/images/resources/dependency-trust/report-cover.webp"
-            alt="Cover of the State of Software Dependency Trust 2026 research report"
-            width={910}
-            height={1287}
-            sizes="270px"
-            className="h-auto w-full"
-          />
-        </div>
+        aria-hidden
+        className="pointer-events-none absolute -right-[10%] bottom-[0%] h-[62%] w-[62%] rounded-full opacity-90 blur-[56px]"
+        style={{
+          background:
+            "radial-gradient(closest-side, rgba(44,193,235,0.45) 0%, rgba(44,193,235,0) 70%)",
+        }}
+      />
+
+      <div className={`${PAGE_CLASS} left-[36%] top-[5%] rotate-[10deg] group-hover:rotate-[14deg]`}>
+        <Image
+          src="/images/resources/dependency-trust/report-page-chart.webp"
+          alt=""
+          width={910}
+          height={1287}
+          sizes="(min-width: 1024px) 280px, 50vw"
+          className="h-auto w-full"
+        />
+      </div>
+      <div className={`${PAGE_CLASS} left-[20%] top-[3%] rotate-[4deg] group-hover:rotate-[7deg]`}>
+        <Image
+          src="/images/resources/dependency-trust/report-page-glance.webp"
+          alt=""
+          width={910}
+          height={1287}
+          sizes="(min-width: 1024px) 280px, 50vw"
+          className="h-auto w-full"
+        />
+      </div>
+      <div className={`${PAGE_CLASS} left-[3%] top-[8%] -rotate-[4deg] group-hover:-rotate-[6deg]`}>
+        <Image
+          src="/images/resources/dependency-trust/report-cover.webp"
+          alt="Cover of the State of Software Dependency Trust 2026 research report"
+          width={910}
+          height={1287}
+          sizes="(min-width: 1024px) 280px, 50vw"
+          className="h-auto w-full"
+        />
       </div>
     </div>
   );
@@ -91,13 +96,13 @@ export function Hero(): React.ReactElement {
       </div>
 
       <div
-        className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 lg:flex lg:min-h-[732px] lg:items-center"
+        className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10"
         style={{
           paddingTop: "calc(clamp(88px, 7.5vw, 112px) + var(--cs-header-extra))",
           paddingBottom: "clamp(48px, 5vw, 80px)",
         }}
       >
-        <div className="grid items-center gap-16 lg:w-full lg:grid-cols-[1.05fr_0.95fr] lg:gap-10">
+        <div className="grid items-center gap-14 lg:grid-cols-[1.06fr_0.94fr] lg:gap-8">
           <div className="flex flex-col items-start">
             <HeroReveal y={30} delay={0} duration={0.8}>
               <p
@@ -146,7 +151,7 @@ export function Hero(): React.ReactElement {
           </div>
 
           <HeroReveal y={40} delay={0.2} duration={1} className="hidden w-full lg:block">
-            <ReportObject />
+            <ReportStack />
           </HeroReveal>
         </div>
       </div>
