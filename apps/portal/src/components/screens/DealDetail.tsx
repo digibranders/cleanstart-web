@@ -14,7 +14,7 @@ import { ROUTES } from "@/lib/routes";
 import { requestExtensionAction } from "@/server/actions/extension";
 import { postMessageAction } from "@/server/actions/registrations";
 import { daysLeft, fmtLong, fmtShort, plural, PROTECTION_DAYS } from "../deals/dates";
-import { acceptedOn, firstWord, initialsOf, stageTrack, waitDays } from "../deals/derive";
+import { acceptedOn, firstWord, initialsOf, protectionLength, stageTrack, waitDays } from "../deals/derive";
 import { ManagerMessageDrawer } from "../deals/ManagerMessageDrawer";
 import { ProductMark, StatusBadge } from "../deals/parts";
 import { RejectedDealDrawer } from "../deals/RejectedDealDrawer";
@@ -46,6 +46,7 @@ function summaryFor(deal: RegistrationDetailDto, today: string): SummaryKpi[] {
       const end = deal.protectionEnd ?? deal.registeredOn;
       const left = daysLeft(end, today);
       const accepted = acceptedOn(deal);
+      const total = protectionLength(deal);
       return [
         { label: "Protected until", value: fmtLong(end), foot: accepted ? `Accepted ${fmtLong(accepted)}` : "Protected" },
         {
@@ -53,12 +54,12 @@ function summaryFor(deal: RegistrationDetailDto, today: string): SummaryKpi[] {
           value: (
             <>
               {left}{" "}
-              <span style={{ fontSize: 13, fontWeight: 600, color: "#6B687D" }}>of {PROTECTION_DAYS}</span>
+              <span style={{ fontSize: 13, fontWeight: 600, color: "#6B687D" }}>of {total}</span>
             </>
           ),
           foot: (
             <span className="bar" style={{ marginTop: 4, display: "block" }}>
-              <span style={{ width: `${Math.max(0, Math.min(100, Math.round((left / PROTECTION_DAYS) * 100)))}%` }} />
+              <span style={{ width: `${Math.max(0, Math.min(100, Math.round((left / total) * 100)))}%` }} />
             </span>
           ),
         },

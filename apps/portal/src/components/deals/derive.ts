@@ -1,8 +1,8 @@
 import type { Product as ChipProduct, BadgeTone } from "../ui/badge";
 import { sameCustomer } from "@/lib/customer";
-import { acceptedOnFor, EXPIRING_SOON_DAYS, isOverSla, REVIEW_SLA_BUSINESS_DAYS, waitingBusinessDays } from "@/lib/deal-rules";
+import { acceptedOnFor, EXPIRING_SOON_DAYS, isOverSla, PROTECTION_DAYS, REVIEW_SLA_BUSINESS_DAYS, waitingBusinessDays } from "@/lib/deal-rules";
 import { DEAL_REGIONS, type DealRegion, PARTNER_REGION_LABEL, PRODUCT_LABEL, type Product, type RegistrationStatus } from "@/lib/domain";
-import type { ManagerOptionDto, RegistrationCheckDto, RegistrationListItem } from "@/lib/dto";
+import type { ManagerOptionDto, RegistrationCheckDto, RegistrationDetailDto, RegistrationListItem } from "@/lib/dto";
 import { daysLeft, daysLeftLabel, fmtLong, fmtShort, plural } from "./dates";
 import type { HubspotHintDto } from "./types";
 
@@ -51,9 +51,13 @@ export const waitDays = (deal: Reviewable, today: string): number => waitingBusi
 export const isOverTarget = (deal: Reviewable & Pick<RegistrationListItem, "status">, today: string): boolean =>
   deal.status === "pending" && isOverSla(reviewSince(deal), today);
 
-/** The day protection started: the last day minus 89, because the acceptance day counts. */
-export const acceptedOn = (deal: Pick<RegistrationListItem, "protectionEnd">): string | null =>
-  deal.protectionEnd ? acceptedOnFor(deal.protectionEnd) : null;
+/** The day protection started: the decision day, else the last day minus 89 (the acceptance day counts). An extension moves the end, never the start. */
+export const acceptedOn = (deal: Pick<RegistrationListItem, "protectionEnd" | "decidedOn">): string | null =>
+  deal.decidedOn ?? (deal.protectionEnd ? acceptedOnFor(deal.protectionEnd) : null);
+
+/** Days of protection in all: 90, plus the days of a granted extension. */
+export const protectionLength = (deal: Pick<RegistrationDetailDto, "extensionStatus" | "extensionDays">): number =>
+  PROTECTION_DAYS + (deal.extensionStatus === "granted" ? (deal.extensionDays ?? 0) : 0);
 
 export interface ProtectionView {
   until: string;
