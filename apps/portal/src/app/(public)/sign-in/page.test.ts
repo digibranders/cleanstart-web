@@ -7,7 +7,10 @@ import { auth } from '@/server/auth/auth';
 import Page from './page';
 
 const mocks = vi.hoisted(() => ({ requestHeaders: new Headers() }));
-vi.mock('next/headers', () => ({ headers: async () => mocks.requestHeaders }));
+vi.mock('next/headers', () => ({
+  headers: async () => mocks.requestHeaders,
+  cookies: async () => ({ toString: () => mocks.requestHeaders.get('cookie') ?? '' }),
+}));
 vi.mock('next/navigation', () => ({
   redirect: (url: string) => {
     throw new Error(`REDIRECT ${url}`);

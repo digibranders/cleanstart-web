@@ -117,10 +117,11 @@ export async function acceptInvite(tx: Tx, _actor: SystemActor, input: AcceptInv
   const [existing] = await tx.select().from(users).where(eq(users.email, invite.email)).limit(1).for('update');
   let userId: string;
   if (existing) {
-    if (existing.status !== 'disabled') {
+    if (existing.status === 'active') {
       throw new ConflictError('already_has_login', 'This email already has a portal login. Sign in instead.');
     }
-    // A removed person invited again gets the same account back, with a new password and no old two-step secret.
+    // A removed person invited again, or a pending person whose users row was created with the invite (the dev seed),
+    // gets that account back, with a new password and no old two-step secret.
     await tx
       .update(users)
       .set({

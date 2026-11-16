@@ -25,11 +25,12 @@ export async function listStaff(tx: Tx, viewer: Viewer): Promise<StaffMemberDto[
     .from(invites)
     .where(and(eq(invites.kind, 'staff'), isNull(invites.acceptedAt), isNull(invites.revokedAt)))
     .orderBy(asc(invites.createdAt));
-  const managerIds = rows.filter((r) => r.user.role === 'partner_manager').map((r) => r.user.id);
+  // Every person, not only partner managers: a demoted manager keeps the partners until they are reassigned.
+  const staffIds = rows.map((r) => r.user.id);
   const managed =
-    managerIds.length === 0
+    staffIds.length === 0
       ? []
-      : await tx.select({ managerId: partners.managerId, name: partners.name }).from(partners).where(inArray(partners.managerId, managerIds)).orderBy(asc(partners.name));
+      : await tx.select({ managerId: partners.managerId, name: partners.name }).from(partners).where(inArray(partners.managerId, staffIds)).orderBy(asc(partners.name));
 
   const members: StaffMemberDto[] = rows.map(({ user, region }) => ({
     id: user.id,
@@ -140,6 +141,11 @@ export async function removeStaff(
     if (target.id === viewer.id) throw new ConflictError('cannot_remove_self', 'You cannot remove yourself.');
     if (target.role === 'partner_manager') await assertAnotherManager(tx, target.id);
     await tx.update(users).set({ status: 'disabled', removedAt: clock.now() }).where(eq(users.id, target.id));
+    // A teammate who was only invited still has an open invite; leaving it would keep the row and the link alive.
+    await tx
+      .update(invites)
+      .set({ revokedAt: clock.now() })
+      .where(and(eq(invites.email, target.email), eq(invites.kind, 'staff'), isNull(invites.acceptedAt), isNull(invites.revokedAt)));
     return { userId: target.id, name: target.name, email: target.email };
   }
   const [invite] = await tx
