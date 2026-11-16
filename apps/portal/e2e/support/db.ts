@@ -1,6 +1,7 @@
 // Must be first: sets the database and the fakes before any src/ module reads the environment.
 import './env';
 import { eq } from 'drizzle-orm';
+import { Client } from 'pg';
 import type { Db } from '@/db/client';
 import { auditLog, documents, hubspotOutbox, partners, registrations, users } from '@/db/schema';
 import { makeDocument, makeInvite, makePartner, makeRegistration, makeUser, resetDb, testDb } from '@/db/test-helpers';
@@ -10,10 +11,25 @@ import { ARBOR, assertE2eDatabase, E2E, KESTREL, OPEN_DOC, PERSONAS, RESTRICTED_
 
 export const db = (): Db => testDb();
 
+/** The URL check is on a string the run wrote; this asks the server which database that connection really reached. */
+async function assertConnectedToE2eDatabase(url: string): Promise<void> {
+  const client = new Client({ connectionString: url });
+  await client.connect();
+  try {
+    const { rows } = await client.query<{ current_database: string }>('select current_database()');
+    if (rows[0]?.current_database !== E2E.database) {
+      throw new Error(`Refusing to reset: connected to ${rows[0]?.current_database ?? 'no database'}, the e2e run only touches ${E2E.database}.`);
+    }
+  } finally {
+    await client.end();
+  }
+}
+
 /** Two partners, their people, two staff, two documents and a few audit rows. Runs once, before the browser tests. */
 export async function seedBase(): Promise<void> {
   assertE2eDatabase(process.env.PORTAL_TEST_DATABASE_URL ?? '');
   assertE2eDatabase(process.env.PORTAL_TEST_OWNER_URL ?? '');
+  await assertConnectedToE2eDatabase(process.env.PORTAL_TEST_OWNER_URL ?? '');
   const d = db();
   await resetDb(d);
 
