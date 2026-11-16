@@ -14,6 +14,7 @@ import {
   acceptButton,
   acceptInvite,
   fillApplication,
+  hydrated,
   openApplicationsTab,
   registerDeal,
   signInThroughTheForm,
@@ -23,6 +24,8 @@ import {
  * The whole partner lifecycle in one serial run, each actor in their own browser context:
  * apply, approve, invite, accept, register a deal, accept the deal, then a stage change made in HubSpot (the
  * in-memory FakeHubspot) reaches the partner's deal page. One test per step so a failure names the step.
+ * The steps depend on each other and on the rows global setup seeds; it writes its own partner, deal and audit rows
+ * into the shared database, so its checks are scoped to COMPANY and CUSTOMER and never count rows.
  */
 const COMPANY = 'Lattice Cloud Services E2E';
 const APPLICANT = { name: 'Rohan Mehta', email: 'rohan@lattice-cloud-e2e.test' };
@@ -110,6 +113,7 @@ test.describe('@portal partner lifecycle', () => {
 
   test('staff accept the deal and protection starts', async () => {
     await staffPage.goto('/admin/approvals');
+    await hydrated(staffPage);
     await acceptButton(staffPage, CUSTOMER, COMPANY).click();
     await expect.poll(async () => (await registrationByCustomer(CUSTOMER)).status).toBe('accepted');
     expect((await registrationByCustomer(CUSTOMER)).protectionEnd).not.toBeNull();
@@ -128,12 +132,14 @@ test.describe('@portal partner lifecycle', () => {
     expect((await registrationByCustomer(CUSTOMER)).stage).toBe('Technical evaluation');
 
     await partnerPage.goto(`/partner/deals/${registrationId}`);
-    await expect(partnerPage.getByText('Technical evaluation').first()).toBeVisible();
+    // The tracker lists every stage, so the text alone is always there; the current one carries aria-current.
+    await expect(partnerPage.getByRole('list', { name: 'Deal stage' }).locator('[aria-current="step"]')).toHaveText('Technical evaluation');
   });
 
   test('the partner asks for an extension, staff grant it, the end date moves and HubSpot is told', async () => {
     const before = await registrationByCustomer(CUSTOMER);
     await partnerPage.goto(`/partner/deals/${registrationId}`);
+    await hydrated(partnerPage);
     await partnerPage.getByRole('button', { name: 'Request extension' }).click();
     await partnerPage.getByLabel('Why do you need more time?').fill('The customer security review runs past the protection window.');
     await partnerPage.getByRole('button', { name: 'Send request' }).click();
@@ -141,19 +147,29 @@ test.describe('@portal partner lifecycle', () => {
     expect((await registrationByCustomer(CUSTOMER)).extensionStatus).toBe('requested');
 
     await staffPage.goto('/admin/approvals');
+    await hydrated(staffPage);
     await staffPage.getByRole('button', { name: /^Grant \d+ days$/ }).click();
     await expect.poll(async () => (await registrationByCustomer(CUSTOMER)).extensionStatus).toBe('granted');
     const after = await registrationByCustomer(CUSTOMER);
     expect(after.protectionEnd).not.toBe(before.protectionEnd);
     expect(new Date(after.protectionEnd ?? '').getTime()).toBeGreaterThan(new Date(before.protectionEnd ?? '').getTime());
     expect(await outboxRowsFor(registrationId, 'registration.update_end')).toBe(1);
+
+    await drainOutboxNow();
+    const dealId = after.hubspotDealId;
+    if (!dealId) throw new Error('the registration has no HubSpot deal');
+    expect(hubspot.deals.get(dealId)?.properties.protection_end_date).toBe(after.protectionEnd);
   });
 
   test('every step left an audit entry that the partner manager can read', async () => {
-    await staffPage.goto('/admin/audit');
-    await expect(staffPage.getByRole('button', { name: 'Approved an application' }).first()).toBeVisible();
-    await expect(staffPage.getByRole('button', { name: 'Accepted a registration' }).first()).toBeVisible();
-    await expect(staffPage.getByRole('button', { name: 'Stage changed' }).first()).toBeVisible();
+    // The seed already holds rows with the same actions, so each check is narrowed to this journey's own company or customer.
+    const forTarget = async (query: string, action: string): Promise<void> => {
+      await staffPage.goto(`/admin/audit?q=${encodeURIComponent(query)}`);
+      await expect(staffPage.getByRole('button', { name: action }).first()).toBeVisible();
+    };
+    await forTarget(COMPANY, 'Approved an application');
+    await forTarget(CUSTOMER, 'Accepted a registration');
+    await forTarget(CUSTOMER, 'Stage changed');
   });
 });
 
