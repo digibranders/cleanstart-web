@@ -69,7 +69,10 @@
   aspect-ratio: 1;
   border-radius: 50%;
   translate: -50% -50%;
-  border: 1px solid rgba(177, 156, 255, 0.22);
+  border: 1px solid rgba(177, 156, 255, 0.16);
+  opacity: calc(0.85 - var(--r) * 0.28);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 30%, transparent 78%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 30%, transparent 78%);
 }
 
 .portrait {
@@ -92,8 +95,8 @@
   font-family: var(--font-display);
   font-size: clamp(72px, 8vw, 128px);
   font-weight: 700;
-  line-height: 0.62;
-  height: 0.5em;
+  line-height: 1;
+  margin-bottom: -0.42em;
   background: linear-gradient(160deg, #b19cff 0%, #2cc1eb 100%);
   -webkit-background-clip: text;
   background-clip: text;
