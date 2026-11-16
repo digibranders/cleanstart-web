@@ -2,8 +2,8 @@ import { PortalError } from '@/server/errors';
 import { isSafeEmailUrl } from '../layout';
 import type { EmailAddress } from '../transport';
 
-/** Collapses every run of whitespace and every C0 or C1 control character (NUL, ESC, DEL and the rest) to one space, so visitor text cannot add a line break or a control byte to a subject. */
-export const oneLine = (text: string): string => text.replace(/[\s\p{Cc}]+/gu, ' ').trim();
+/** Removes Unicode format characters (bidi overrides, zero width space) and collapses every run of whitespace and every C0 or C1 control character (NUL, ESC, DEL and the rest) to one space, so visitor text cannot add a line break or a control byte to a subject. */
+export const oneLine = (text: string): string => text.replace(/\p{Cf}/gu, '').replace(/[\s\p{Cc}]+/gu, ' ').trim();
 
 /** The longest subject line sendEmail passes on. */
 export const MAX_SUBJECT_LENGTH = 200;
@@ -28,7 +28,11 @@ export const orNotGiven = (value: string | null): string => (value && value.trim
 
 export const truncate = (text: string, max: number): string => {
   const flat = oneLine(text);
-  return flat.length <= max ? flat : `${flat.slice(0, max - 3).trimEnd()}...`;
+  if (flat.length <= max) return flat;
+  const cut = flat.slice(0, max - 3);
+  // A cut between the two halves of an emoji would leave a lone high surrogate, which Brevo rejects as invalid UTF-8.
+  const whole = /[\uD800-\uDBFF]$/.test(cut) ? cut.slice(0, -1) : cut;
+  return `${whole.trimEnd()}...`;
 };
 
 export const FOOTNOTES = {

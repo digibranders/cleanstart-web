@@ -43,13 +43,18 @@ function reviewGate(request: NextRequest): NextResponse | null {
 
 const PROTECTED_AREA = /^\/(partner|admin)(\/|$)/;
 
-/** One round of percent decoding, the way Next.js matches routes; a malformed escape leaves the path as it is. */
+/** One round of percent decoding, the way Next.js matches routes. Per segment, so one malformed escape leaves only its own segment as it is. */
 function decodePath(pathname: string): string {
-  try {
-    return decodeURIComponent(pathname);
-  } catch {
-    return pathname;
-  }
+  return pathname
+    .split("/")
+    .map((segment) => {
+      try {
+        return decodeURIComponent(segment);
+      } catch {
+        return segment;
+      }
+    })
+    .join("/");
 }
 
 /**

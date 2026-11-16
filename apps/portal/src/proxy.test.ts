@@ -200,7 +200,14 @@ describe("odd path variants", () => {
     expect(proxy(request("/Partner/overview")).status).toBe(200);
   });
 
-  it("does not redirect a malformed percent escape, and does not throw", () => {
-    expect(() => proxy(request("/%E0%A4%A"))).not.toThrow();
+  it("leaves a path with only a malformed percent escape public, and answers it rather than throwing", () => {
+    expect(proxy(request("/%E0%A4%A")).status).toBe(200);
+  });
+
+  it("decodes per segment, so one malformed escape does not hide the protected area from the check", () => {
+    expect(isProtectedPath("/%61dmin/x%zz")).toBe(true);
+    const response = proxy(request("/%61dmin/x%zz"));
+    expect(response.status).toBe(307);
+    expect(new URL(response.headers.get("location") ?? "").pathname).toBe("/sign-in");
   });
 });

@@ -13,6 +13,10 @@ describe('oneLine', () => {
     }
   });
 
+  it('removes Unicode format characters such as bidi overrides and the zero width space', () => {
+    expect(oneLine('pay\u202Eoof\u200Bx\u2066y')).toBe('payoofxy');
+  });
+
   it('keeps ordinary text, accents and emoji', () => {
     expect(oneLine('Zoë and 日本 \u{1F600}')).toBe('Zoë and 日本 \u{1F600}');
   });
@@ -21,6 +25,15 @@ describe('oneLine', () => {
 describe('truncate', () => {
   it('cuts at the limit with an ellipsis and never exceeds it', () => {
     const out = truncate('word '.repeat(100), 200);
+    expect(out.length).toBeLessThanOrEqual(200);
+    expect(out.endsWith('...')).toBe(true);
+  });
+
+  it('never cuts an emoji in half: no lone surrogate at the cut', () => {
+    // 196 letters then an emoji (2 UTF-16 units): the 197 character cut for max 200 would end on the high surrogate.
+    const out = truncate(`${'a'.repeat(196)}\u{1F600}${'b'.repeat(20)}`, 200);
+    // encodeURIComponent throws URIError on a lone surrogate.
+    expect(() => encodeURIComponent(out)).not.toThrow();
     expect(out.length).toBeLessThanOrEqual(200);
     expect(out.endsWith('...')).toBe(true);
   });

@@ -15,7 +15,7 @@ Date: 2026-11-13. Branch `feat/portal-build`. Run by the orchestrator (Wave 2, W
 | Session fixation and logout | `auth-session.test.ts` "session fixation and logout" | passed |
 | No account discovery | `auth.test.ts` "sign in gate" (W0-f) | passed |
 | Rate limits: sign in, second step, per email | `auth.test.ts` "rate limits" (W0-f), `auth-session.test.ts` "which client address is trusted" | passed |
-| Rate limits: public actions | `rate-limit-coverage.test.ts` | 5 passed |
+| Rate limits: public actions | `rate-limit-coverage.test.ts` | 20 passed on 2026-11-16 (the stricter round 2 version: comments stripped, every `ctx.ip` use checked, `invite-preview.ts` scanned, bypass fixtures) |
 | Client address is not spoofable | `client-ip.test.ts`, `proxy.test.ts` "client address header", production smoke (below) | passed |
 | Isolation matrix | `vitest run src/server/repo/isolation.test.ts` | 31 tests passed, measured again on 2026-11-16 (portal round 2, branch `feat/portal-s` cut from `47cc7d4a`). The global setup migrates the test database with `migrate.ts` and `rls.sql`, the same inputs as production; there is no staging database (CLAUDE.md deploy rules). |
 | Tracked env files, secret scan | the two greps in plan 06 M5.1 step 9 | both print nothing, `exit=1` |
