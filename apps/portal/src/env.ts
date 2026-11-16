@@ -24,11 +24,6 @@ const schema = z
 
     // Auth (Better Auth)
     AUTH_SECRET: z.string().min(32),
-    GOOGLE_CLIENT_ID: optionalString,
-    GOOGLE_CLIENT_SECRET: optionalString,
-    MICROSOFT_CLIENT_ID: optionalString,
-    MICROSOFT_CLIENT_SECRET: optionalString,
-    MICROSOFT_TENANT_ID: z.string().min(1).default('common'),
 
     // Agreement. 'draft-0' is the placeholder until legal supplies the text (BUILD-HANDOFF).
     PARTNER_AGREEMENT_VERSION: z.string().min(1).default('draft-0'),

@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Icon } from "@/components/icon";
 import {
   BulletList,
   CHECK_D,
@@ -29,16 +28,6 @@ function failMessage(error: { status?: number }, fallback: string): string {
   return error.status === NETWORK_FAILURE_STATUS ? NETWORK : fallback;
 }
 
-/** Which social buttons to show: only providers whose keys are configured on the server. */
-interface SocialAvailability {
-  google: boolean;
-  microsoft: boolean;
-}
-
-const GOOGLE_D =
-  "M222,128a94,94,0,1,1-21.49-59.82,6,6,0,1,1-9.25,7.64A82,82,0,1,0,209.78,134H128a6,6,0,0,1,0-12h88A6,6,0,0,1,222,128Z";
-const MICROSOFT_D =
-  "M208,138H128a6,6,0,0,0-6,6v57.45a6,6,0,0,0,4.93,5.91l80,14.54a5.46,5.46,0,0,0,1.07.1,6,6,0,0,0,6-6V144A6,6,0,0,0,208,138Zm-6,70.81-68-12.36V150h68ZM96,138H32a6,6,0,0,0-6,6v40a6,6,0,0,0,4.93,5.9l64,11.64a6.36,6.36,0,0,0,1.07.1,6,6,0,0,0,6-6V144A6,6,0,0,0,96,138Zm-6,50.45L38,179V150H90ZM211.84,35.39a6,6,0,0,0-4.91-1.29l-80,14.54A6,6,0,0,0,122,54.55V112a6,6,0,0,0,6,6h80a6,6,0,0,0,6-6V40A6,6,0,0,0,211.84,35.39ZM202,106H134V59.55l68-12.36Z";
 const PHONE_D =
   "M176,18H80A22,22,0,0,0,58,40V216a22,22,0,0,0,22,22h96a22,22,0,0,0,22-22V40A22,22,0,0,0,176,18ZM70,62H186V194H70ZM80,30h96a10,10,0,0,1,10,10V50H70V40A10,10,0,0,1,80,30Zm96,196H80a10,10,0,0,1-10-10V206H186v10A10,10,0,0,1,176,226Z";
 
@@ -53,14 +42,14 @@ const FORM_STYLE: React.CSSProperties = {
 
 const BTN_BIG: React.CSSProperties = { height: 38, fontSize: 13.5 };
 
-export function SignIn({ providers }: { providers: SocialAvailability }): React.JSX.Element {
+export function SignIn(): React.JSX.Element {
   const [view, setView] = useState<View>("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [keepSignedIn, setKeepSignedIn] = useState(true);
   const [busy, setBusy] = useState(false);
   const [signinError, setSigninError] = useState("");
-  const [socialError, setSocialError] = useState(false);
+  const [urlError, setUrlError] = useState(false);
   const [codeError, setCodeError] = useState("");
   const [resetError, setResetError] = useState("");
   const [signinTried, setSigninTried] = useState(false);
@@ -74,24 +63,12 @@ export function SignIn({ providers }: { providers: SocialAvailability }): React.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("request") === "1") setView("request");
-    if (params.get("error")) setSocialError(true);
+    if (params.get("error")) setUrlError(true);
   }, []);
 
   // A full navigation: the session cookie was just set, and "/" sends each role to its own home.
   const enter = (): void => {
     window.location.assign(safeNext(new URLSearchParams(window.location.search).get("next")) ?? "/");
-  };
-
-  const signInWith = async (provider: "google" | "microsoft"): Promise<void> => {
-    setSocialError(false);
-    const { error } = await settleAuth(() =>
-      authClient.signIn.social({
-        provider,
-        callbackURL: safeNext(new URLSearchParams(window.location.search).get("next")) ?? "/",
-        errorCallbackURL: ROUTES.signIn,
-      }),
-    );
-    if (error) setSocialError(true);
   };
 
   const emailBad = !isValidEmail(email);
@@ -208,37 +185,10 @@ export function SignIn({ providers }: { providers: SocialAvailability }): React.
         {view === "signin" ? (
           <form onSubmit={submitSignin} noValidate style={FORM_STYLE}>
             <PublicHeading title="Sign in">Use the work email your partner admin invited.</PublicHeading>
-            {socialError ? (
+            {urlError ? (
               <span className="err" role="alert">
-                That sign-in did not work. Use the email your partner admin invited, or sign in with your password.
+                That sign-in did not work. Use the email your partner admin invited and your password.
               </span>
-            ) : null}
-            {providers.google || providers.microsoft ? (
-              <>
-                <div style={{ display: "grid", gap: 8 }}>
-                  {providers.google ? (
-                    <button type="button" className="btn btn-s" style={BTN_BIG} onClick={() => void signInWith("google")}>
-                      <Icon d={GOOGLE_D} />
-                      Continue with Google
-                    </button>
-                  ) : null}
-                  {providers.microsoft ? (
-                    <button type="button" className="btn btn-s" style={BTN_BIG} onClick={() => void signInWith("microsoft")}>
-                      <Icon d={MICROSOFT_D} />
-                      Continue with Microsoft
-                    </button>
-                  ) : null}
-                </div>
-                {/* biome-ignore lint/a11y/useFocusableInteractive: a static divider, not a focusable separator widget */}
-                <div
-                  role="separator"
-                  style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 12, color: "#6B687D" }}
-                >
-                  <span style={{ flex: 1, height: 1, background: "#ECEBF1" }} />
-                  or with your work email
-                  <span style={{ flex: 1, height: 1, background: "#ECEBF1" }} />
-                </div>
-              </>
             ) : null}
             <div className="fg">
               <label htmlFor="email" className="lbl">
