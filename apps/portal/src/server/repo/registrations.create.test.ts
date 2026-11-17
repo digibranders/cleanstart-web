@@ -32,7 +32,7 @@ const input = (over: Partial<NewRegistrationsInput> = {}): NewRegistrationsInput
 
 describe('createRegistrations', () => {
   it('creates one pending registration per product, routed to the manager of the region, and activates an onboarding partner', async () => {
-    const farhan = await asStaff(db, 'partner_manager', 'india');
+    const gaurav = await asStaff(db, 'partner_manager', 'india');
     await asStaff(db, 'partner_manager', 'middle_east');
     const partner = await makePartner(db, { status: 'onboarding', region: 'india' });
     const viewer = await asPartner(db, { partnerId: partner.id, role: 'partner_admin' });
@@ -47,7 +47,7 @@ describe('createRegistrations', () => {
         status: 'pending',
         stage: 'Awaiting review',
         registeredOn: '2026-11-06',
-        managerId: farhan.id,
+        managerId: gaurav.id,
         registeredByName: viewer.name,
         customer: 'Vardhan Capital',
         website: 'vardhancapital.in',
@@ -67,11 +67,11 @@ describe('createRegistrations', () => {
     const viewer = await asPartner(db, { role: 'partner_admin' });
     const [routed] = await withViewer(viewer, (tx) => createRegistrations(tx, viewer, input({ region: 'middle_east' }), clock));
     expect(routed?.managerId).toBe(omar.id);
-    const farhan = await asStaff(db, 'partner_manager', 'india');
+    const gaurav = await asStaff(db, 'partner_manager', 'india');
     const [chosen] = await withViewer(viewer, (tx) =>
-      createRegistrations(tx, viewer, input({ customer: 'Gulfway Freight', managerId: farhan.id }), clock),
+      createRegistrations(tx, viewer, input({ customer: 'Gulfway Freight', managerId: gaurav.id }), clock),
     );
-    expect(chosen?.managerId).toBe(farhan.id);
+    expect(chosen?.managerId).toBe(gaurav.id);
   });
 
   it('refuses a manager that is not offered to partners', async () => {

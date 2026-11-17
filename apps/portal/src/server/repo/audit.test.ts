@@ -71,13 +71,13 @@ describe('listAudit', () => {
     const staff = await asStaff(db);
     await insertRows([
       { at: daysAgo(1), target: 'Pearl 100% Gulf Bank' },
-      { at: daysAgo(2), target: 'Dunes Networks', actorLabel: 'Farhan Qureshi' },
+      { at: daysAgo(2), target: 'Dunes Networks', actorLabel: 'Gaurav Jadhav' },
       { at: daysAgo(3), target: 'Plain name' },
     ]);
     const run = (q: string) =>
       withViewer(staff, async (tx) => (await listAudit(tx, staff, { period: '30d', q }, clock)).rows.map((r) => r.target));
     expect(await run('100%')).toEqual(['Pearl 100% Gulf Bank']);
-    expect(await run('farhan')).toEqual(['Dunes Networks']);
+    expect(await run('gaurav')).toEqual(['Dunes Networks']);
     expect(await run('_')).toEqual([]);
     expect(await run('accepted a reg')).toHaveLength(3);
   });

@@ -5,8 +5,8 @@ const manager = (id: string, name: string, team: string) => ({ id, name, region:
 
 describe('managerChoices', () => {
   it('uses the name as the label and keeps the id for each choice', () => {
-    expect(managerChoices([manager('a', 'Farhan Qureshi', 'CleanStart India'), manager('b', 'Omar Nasser', 'CleanStart Middle East')])).toEqual([
-      { id: 'a', label: 'Farhan Qureshi' },
+    expect(managerChoices([manager('a', 'Gaurav Jadhav', 'CleanStart India'), manager('b', 'Omar Nasser', 'CleanStart Middle East')])).toEqual([
+      { id: 'a', label: 'Gaurav Jadhav' },
       { id: 'b', label: 'Omar Nasser' },
     ]);
   });

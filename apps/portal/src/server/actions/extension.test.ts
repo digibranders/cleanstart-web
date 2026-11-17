@@ -32,25 +32,25 @@ beforeEach(async () => {
 });
 
 const setup = async () => {
-  const farhan = await asStaff(db, 'partner_manager', 'india');
+  const gaurav = await asStaff(db, 'partner_manager', 'india');
   const partner = await makePartner(db, { name: 'Kestrel Systems' });
   const salesUser = await makeUser(db, { partnerId: partner.id, role: 'sales', email: 'karan@kestrel.example' });
   const reg = await makeRegistration(db, {
     partnerId: partner.id, customerName: 'Vardhan Capital', product: 'cleansight', status: 'accepted',
-    protectionEnd: '2027-01-12', registeredBy: salesUser.id, managerId: farhan.id, region: 'india',
+    protectionEnd: '2027-01-12', registeredBy: salesUser.id, managerId: gaurav.id, region: 'india',
   });
-  return { farhan, partner, salesUser, reg };
+  return { gaurav, partner, salesUser, reg };
 };
 
 describe('requestExtensionAction', () => {
   it('records the request, audits it and tells the deal manager in the app and by email', async () => {
-    const { farhan, salesUser, reg } = await setup();
+    const { gaurav, salesUser, reg } = await setup();
     session.viewer = await viewerFor(db, salesUser);
     const result = await requestExtensionAction({ id: reg.id, reason: 'Procurement is slow' });
     expect(result).toMatchObject({ ok: true, data: { extensionStatus: 'requested' } });
     expect((await db.select().from(auditLog).where(eq(auditLog.event, 'registration.extension_requested')))[0]).toMatchObject({ note: 'Procurement is slow', kind: 'deal_decisions' });
-    expect((await db.select().from(notifications).where(eq(notifications.userId, farhan.id)))[0]).toMatchObject({ kind: 'extension_requested', link: '/admin/approvals' });
-    expect(mail.transport!.to(farhan.email)).toHaveLength(1);
+    expect((await db.select().from(notifications).where(eq(notifications.userId, gaurav.id)))[0]).toMatchObject({ kind: 'extension_requested', link: '/admin/approvals' });
+    expect(mail.transport!.to(gaurav.email)).toHaveLength(1);
     expect(await db.select().from(hubspotOutbox)).toHaveLength(0);
   });
 
@@ -77,8 +77,8 @@ describe('decideExtensionAction', () => {
   };
 
   it('grants: moves the end date, queues one update_end with the new date as its version, tells the registrant', async () => {
-    const { farhan, salesUser, reg } = await asked();
-    session.viewer = farhan;
+    const { gaurav, salesUser, reg } = await asked();
+    session.viewer = gaurav;
     const result = await decideExtensionAction({ id: reg.id, decision: 'grant', note: 'Happy to help' });
     expect(result).toMatchObject({ ok: true, data: { protectionEnd: '2027-02-11', extensionStatus: 'granted' } });
     const outbox = await db.select().from(hubspotOutbox);
@@ -90,8 +90,8 @@ describe('decideExtensionAction', () => {
   });
 
   it('declines without an outbox row, and refuses to decide twice', async () => {
-    const { farhan, reg } = await asked();
-    session.viewer = farhan;
+    const { gaurav, reg } = await asked();
+    session.viewer = gaurav;
     expect(await decideExtensionAction({ id: reg.id, decision: 'decline', note: null })).toMatchObject({ ok: true, data: { extensionStatus: 'declined', protectionEnd: '2027-01-12' } });
     expect((await db.select().from(auditLog).where(eq(auditLog.event, 'registration.extension_declined')))).toHaveLength(1);
     expect(await db.select().from(hubspotOutbox)).toHaveLength(0);

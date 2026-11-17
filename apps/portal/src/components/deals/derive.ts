@@ -199,7 +199,7 @@ export function defaultRejectReason(deal: CheckedDeal, check: Check): string {
   return "";
 }
 
-/** "India goes to Farhan, Middle East to Omar." from the managers partners can pick. */
+/** "India goes to Gaurav, Middle East to Omar." from the managers partners can pick. */
 export function routingText(managers: readonly ManagerOptionDto[]): string {
   const parts = DEAL_REGIONS.flatMap((region) => {
     const manager = managers.find((m) => m.region === region);

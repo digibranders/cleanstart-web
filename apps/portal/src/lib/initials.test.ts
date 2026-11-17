@@ -6,7 +6,7 @@ describe("initialsOf", () => {
     ["Aditi Rao", "AR"],
     ["Kestrel Systems", "KS"],
     ["Coralbay Technologies Pvt Ltd", "CT"],
-    ["  Farhan   Qureshi ", "FQ"],
+    ["  Gaurav   Jadhav ", "GJ"],
     ["CleanStart", "C"],
     ["", ""],
   ])("%j becomes %j", (name, expected) => {

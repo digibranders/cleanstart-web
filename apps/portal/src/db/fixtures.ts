@@ -213,7 +213,7 @@ export async function seedMockData(db: Db, opts: SeedOptions): Promise<SeedSumma
       await db.insert(invites).values({
         email: member.email, kind: 'staff', partnerId: null, role, staffRegion: lookup(STAFF_REGION, member.region, 'staff region'),
         tokenHash: sha256Hex(`seed-staff-invite:${member.email}`), expiresAt: new Date((invitedAt ?? clock.now()).getTime() + 7 * 86_400_000),
-        invitedBy: staffIdByName.get('Farhan Qureshi') ?? null,
+        invitedBy: staffIdByName.get('Gaurav Jadhav') ?? null,
       });
     }
   }
@@ -277,7 +277,7 @@ export async function seedMockData(db: Db, opts: SeedOptions): Promise<SeedSumma
     const row = first(
       await db.insert(partners).values({
         name: `Seed partner ${label}`, domain: `seed-partner-${label}.example.com`, category, region: (['india', 'middle_east', 'elsewhere'] as const)[i % 3] ?? 'india',
-        status: 'active', managerId: staffIdByName.get(i % 2 === 1 ? 'Farhan Qureshi' : 'Omar Nasser') ?? null,
+        status: 'active', managerId: staffIdByName.get(i % 2 === 1 ? 'Gaurav Jadhav' : 'Omar Nasser') ?? null,
         agreementVersion: 'v1.2', agreementAcceptedAt: at('2026-06-01'), createdAt: at('2026-06-01'),
       }).returning({ id: partners.id }),
       'filler partner',

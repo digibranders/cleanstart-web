@@ -198,15 +198,15 @@ describe('partner management actions', () => {
 
   it('changes manager and category with audit notes and a fresh outbox key each time', async () => {
     harness.viewer = await manager();
-    const farhan = await makeUser(db, { kind: 'staff', role: 'partner_manager', region: 'india', name: 'Farhan Qureshi' });
+    const gaurav = await makeUser(db, { kind: 'staff', role: 'partner_manager', region: 'india', name: 'Gaurav Jadhav' });
     const omar = await makeUser(db, { kind: 'staff', role: 'partner_manager', region: 'middle_east', name: 'Omar Nasser' });
-    const partner = await makePartner(db, { name: 'Arbor Cyber', managerId: farhan.id, category: 'integrator' });
+    const partner = await makePartner(db, { name: 'Arbor Cyber', managerId: gaurav.id, category: 'integrator' });
     expect(await setPartnerManagerAction({ id: partner.id, managerId: omar.id })).toMatchObject({ ok: true, data: { managerName: 'Omar Nasser' } });
     await new Promise((resolve) => setTimeout(resolve, 5));
     expect(await setPartnerCategoryAction({ id: partner.id, category: 'distributor' })).toMatchObject({ ok: true, data: { category: 'distributor' } });
     expect((await db.select().from(auditLog)).map((a) => [a.event, a.note]).sort()).toEqual([
       ['partner.category_changed', 'System integrator to Distributor'],
-      ['partner.manager_changed', 'Farhan Qureshi to Omar Nasser'],
+      ['partner.manager_changed', 'Gaurav Jadhav to Omar Nasser'],
     ]);
     const keys = (await db.select().from(hubspotOutbox)).map((o) => o.idempotencyKey);
     expect(keys).toHaveLength(2);
@@ -215,9 +215,9 @@ describe('partner management actions', () => {
 
   it('does not audit or queue anything when nothing changes', async () => {
     harness.viewer = await manager();
-    const farhan = await makeUser(db, { kind: 'staff', role: 'partner_manager', region: 'india' });
-    const partner = await makePartner(db, { managerId: farhan.id, category: 'channel' });
-    await setPartnerManagerAction({ id: partner.id, managerId: farhan.id });
+    const gaurav = await makeUser(db, { kind: 'staff', role: 'partner_manager', region: 'india' });
+    const partner = await makePartner(db, { managerId: gaurav.id, category: 'channel' });
+    await setPartnerManagerAction({ id: partner.id, managerId: gaurav.id });
     await setPartnerCategoryAction({ id: partner.id, category: 'channel' });
     expect(await db.select().from(auditLog)).toHaveLength(0);
     expect(await db.select().from(hubspotOutbox)).toHaveLength(0);

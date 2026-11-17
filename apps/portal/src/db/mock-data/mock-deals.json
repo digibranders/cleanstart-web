@@ -7,7 +7,7 @@
     "partnerCategory": "Channel partner",
     "product": "Clean Libraries",
     "region": "India",
-    "manager": "Farhan Qureshi",
+    "manager": "Gaurav Jadhav",
     "registeredBy": "Aditi Rao",
     "registered": "2026-11-04",
     "status": "Pending",
@@ -66,14 +66,14 @@
     "partnerCategory": "Channel partner",
     "product": "CleanSight",
     "region": "India",
-    "manager": "Farhan Qureshi",
+    "manager": "Gaurav Jadhav",
     "registeredBy": "Aditi Rao",
     "registered": "2026-08-17",
     "status": "Accepted",
     "stage": "Technical evaluation",
     "protectionEnd": "2026-11-15",
     "decidedOn": "2026-08-18",
-    "decidedBy": "Farhan Qureshi",
+    "decidedBy": "Gaurav Jadhav",
     "crmRef": "HS-47866",
     "contacts": [],
     "thread": [],
@@ -81,7 +81,7 @@
       {
         "when": "18 Aug 2026",
         "text": "Accepted, protected until 15 Nov 2026",
-        "by": "Farhan Qureshi",
+        "by": "Gaurav Jadhav",
         "source": "Portal"
       },
       {
@@ -134,7 +134,7 @@
     "partnerCategory": "Channel partner",
     "product": "CleanSight",
     "region": "India",
-    "manager": "Farhan Qureshi",
+    "manager": "Gaurav Jadhav",
     "registeredBy": "Aditi Rao",
     "registered": "2026-10-14",
     "registeredTime": "11:42",
@@ -142,7 +142,7 @@
     "stage": "Proposal sent",
     "protectionEnd": "2027-01-12",
     "decidedOn": "2026-10-15",
-    "decidedBy": "Farhan Qureshi",
+    "decidedBy": "Gaurav Jadhav",
     "crmRef": "HS-48213",
     "crmSynced": "Synced 6 Nov, 14:02",
     "notes": "Security team wants vulnerability detection across the payments cluster ahead of the Q1 audit.",
@@ -170,9 +170,9 @@
       },
       {
         "id": "vardhan-capital-m2",
-        "who": "Farhan Qureshi",
+        "who": "Gaurav Jadhav",
         "org": "CleanStart",
-        "initials": "FQ",
+        "initials": "GJ",
         "self": false,
         "when": "29 Oct, 15:40",
         "text": "Yes. I will set up a reference call with one of our bank customers next week and send you two dates."
@@ -182,19 +182,19 @@
       {
         "when": "6 Nov 2026",
         "text": "Stage moved to Proposal sent",
-        "by": "Farhan Qureshi",
+        "by": "Gaurav Jadhav",
         "source": "CRM"
       },
       {
         "when": "18 Oct 2026",
         "text": "Stage moved to Technical evaluation",
-        "by": "Farhan Qureshi",
+        "by": "Gaurav Jadhav",
         "source": "CRM"
       },
       {
         "when": "15 Oct 2026",
         "text": "Accepted, protected until 12 Jan 2027",
-        "by": "Farhan Qureshi",
+        "by": "Gaurav Jadhav",
         "source": "Portal"
       },
       {
@@ -219,13 +219,13 @@
     "partnerCategory": "Channel partner",
     "product": "CleanStart Images",
     "region": "India",
-    "manager": "Farhan Qureshi",
+    "manager": "Gaurav Jadhav",
     "registeredBy": "Karan Malhotra",
     "registered": "2026-09-09",
     "status": "Rejected",
     "stage": "Not accepted",
     "decidedOn": "2026-09-10",
-    "decidedBy": "Farhan Qureshi",
+    "decidedBy": "Gaurav Jadhav",
     "rejectionReason": "We could not confirm the opportunity. Add the person who owns the security budget at Saffron Retail Group, with their work email, and resubmit.",
     "contacts": [],
     "thread": [],
@@ -233,7 +233,7 @@
       {
         "when": "10 Sep 2026",
         "text": "Not accepted: we could not confirm the opportunity",
-        "by": "Farhan Qureshi",
+        "by": "Gaurav Jadhav",
         "source": "Portal"
       },
       {
@@ -252,7 +252,7 @@
     "partnerCategory": "Channel partner",
     "product": "CleanStart Images",
     "region": "India",
-    "manager": "Farhan Qureshi",
+    "manager": "Gaurav Jadhav",
     "registeredBy": "Aditi Rao",
     "registered": "2026-07-02",
     "status": "Won",
@@ -265,7 +265,7 @@
       {
         "when": "19 Sep 2026",
         "text": "Stage moved to Closed won",
-        "by": "Farhan Qureshi",
+        "by": "Gaurav Jadhav",
         "source": "CRM"
       },
       {
@@ -284,7 +284,7 @@
     "partnerCategory": "Channel partner",
     "product": "CleanStart Images",
     "region": "India",
-    "manager": "Farhan Qureshi",
+    "manager": "Gaurav Jadhav",
     "registeredBy": "Sneha Iyer",
     "registered": "2026-05-28",
     "status": "Won",
@@ -297,7 +297,7 @@
       {
         "when": "11 Aug 2026",
         "text": "Stage moved to Closed won",
-        "by": "Farhan Qureshi",
+        "by": "Gaurav Jadhav",
         "source": "CRM"
       },
       {
@@ -316,7 +316,7 @@
     "partnerCategory": "Channel partner",
     "product": "Clean Libraries",
     "region": "India",
-    "manager": "Farhan Qureshi",
+    "manager": "Gaurav Jadhav",
     "registeredBy": "Karan Malhotra",
     "registered": "2026-06-12",
     "status": "Lost",
@@ -328,7 +328,7 @@
       {
         "when": "2 Oct 2026",
         "text": "Stage moved to Closed lost",
-        "by": "Farhan Qureshi",
+        "by": "Gaurav Jadhav",
         "source": "CRM"
       },
       {
@@ -403,7 +403,7 @@
     "partnerCategory": "Distributor",
     "product": "CleanSight",
     "region": "India",
-    "manager": "Farhan Qureshi",
+    "manager": "Gaurav Jadhav",
     "registered": "2026-11-05",
     "status": "Pending",
     "stage": "Awaiting review",
@@ -461,13 +461,13 @@
     "partnerCategory": "Distributor",
     "product": "Clean Libraries",
     "region": "India",
-    "manager": "Farhan Qureshi",
+    "manager": "Gaurav Jadhav",
     "registered": "2026-11-02",
     "status": "Accepted",
     "stage": "Accepted",
     "protectionEnd": "2027-02-01",
     "decidedOn": "2026-11-04",
-    "decidedBy": "Farhan Qureshi",
+    "decidedBy": "Gaurav Jadhav",
     "crmRef": "HS-48352",
     "contacts": [],
     "thread": [],
@@ -475,7 +475,7 @@
       {
         "when": "4 Nov 2026",
         "text": "Accepted, protected until 1 Feb 2027",
-        "by": "Farhan Qureshi",
+        "by": "Gaurav Jadhav",
         "source": "Portal"
       },
       {

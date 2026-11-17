@@ -189,12 +189,12 @@ describe('listApplications and friends (staff only)', () => {
 
 describe('approveApplication', () => {
   it('creates an onboarding partner routed to the regional manager and a partner admin invite', async () => {
-    const india = await makeUser(db, { kind: 'staff', role: 'partner_manager', region: 'india', name: 'Farhan Qureshi' });
+    const india = await makeUser(db, { kind: 'staff', role: 'partner_manager', region: 'india', name: 'Gaurav Jadhav' });
     await makeUser(db, { kind: 'staff', role: 'partner_manager', region: 'middle_east', name: 'Omar Nasser' });
     const app = await makeApplication(db, { company: 'Tidewater Infosec', domain: 'tidewaterinfosec.in', applicantName: 'Neha Joshi', email: 'neha.joshi@tidewaterinfosec.in', source: 'portal' });
     const result = await approve({ id: app.id, category: 'channel', region: 'india' });
     expect(result.application).toMatchObject({ status: 'approved', category: 'channel', region: 'india', declineReason: null });
-    expect(result.partner).toMatchObject({ name: 'Tidewater Infosec', status: 'onboarding', managerId: india.id, managerName: 'Farhan Qureshi', adminName: 'Neha Joshi', users: 1, agreementAcceptedAt: null });
+    expect(result.partner).toMatchObject({ name: 'Tidewater Infosec', status: 'onboarding', managerId: india.id, managerName: 'Gaurav Jadhav', adminName: 'Neha Joshi', users: 1, agreementAcceptedAt: null });
     expect(result.application.partnerId).toBe(result.partner.id);
     expect(result.invite.invite).toMatchObject({ kind: 'partner', role: 'partner_admin', email: 'neha.joshi@tidewaterinfosec.in', state: 'ok' });
     const [row] = await db.select().from(invites).where(eq(invites.id, result.invite.invite.id));

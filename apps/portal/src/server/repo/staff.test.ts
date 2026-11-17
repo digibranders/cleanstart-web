@@ -16,15 +16,15 @@ beforeEach(async () => {
 
 describe('listStaff', () => {
   it('lists people with their region, the partners a manager manages, and invited teammates', async () => {
-    const farhan = await asStaff(db, 'partner_manager', 'india');
-    await makePartner(db, { name: 'Saffron Secure', managerId: farhan.id });
-    await makePartner(db, { name: 'Kestrel Systems', managerId: farhan.id });
+    const gaurav = await asStaff(db, 'partner_manager', 'india');
+    await makePartner(db, { name: 'Saffron Secure', managerId: gaurav.id });
+    await makePartner(db, { name: 'Kestrel Systems', managerId: gaurav.id });
     const rahul = await makeUser(db, { kind: 'staff', role: 'sales', region: 'india', name: 'Rahul Menon', email: 'rahul@cleanstart.com' });
     await makeUser(db, { kind: 'staff', role: 'sales', status: 'disabled', region: 'india' });
     const { invite } = await makeInvite(db, { kind: 'staff', partnerId: null, role: 'sales', staffRegion: 'india', email: 'kunal.shah@cleanstart.com', expiresAt: future });
-    const list = await withViewer(farhan, (tx) => listStaff(tx, farhan));
+    const list = await withViewer(gaurav, (tx) => listStaff(tx, gaurav));
     expect(list.map((p) => [p.name, p.role, p.region, p.status, p.isYou])).toEqual([
-      [farhan.name, 'partner_manager', 'india', 'active', true],
+      [gaurav.name, 'partner_manager', 'india', 'active', true],
       ['Rahul Menon', 'sales', 'india', 'active', false],
       ['Kunal Shah', 'sales', 'india', 'invited', false],
     ]);
@@ -41,14 +41,14 @@ describe('listStaff', () => {
 
 describe('listManagerOptions', () => {
   it('offers the active partner managers with their team, to partners and staff alike', async () => {
-    const india = await makeUser(db, { kind: 'staff', role: 'partner_manager', region: 'india', name: 'Farhan Qureshi' });
+    const india = await makeUser(db, { kind: 'staff', role: 'partner_manager', region: 'india', name: 'Gaurav Jadhav' });
     const gulf = await makeUser(db, { kind: 'staff', role: 'partner_manager', region: 'middle_east', name: 'Omar Nasser' });
     await makeUser(db, { kind: 'staff', role: 'sales', region: 'india' });
     await makeUser(db, { kind: 'staff', role: 'partner_manager', region: 'india', status: 'disabled' });
     const partner = await asPartner(db, { role: 'sales' });
     const options = await withViewer(partner, (tx) => listManagerOptions(tx, partner));
     expect(options).toEqual([
-      { id: india.id, name: 'Farhan Qureshi', region: 'india', team: 'CleanStart India' },
+      { id: india.id, name: 'Gaurav Jadhav', region: 'india', team: 'CleanStart India' },
       { id: gulf.id, name: 'Omar Nasser', region: 'middle_east', team: 'CleanStart Middle East' },
     ]);
   });
