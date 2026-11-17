@@ -98,7 +98,7 @@ describe('getShell, staff viewer', () => {
   it('counts the pending registrations in the staff scope for the nav badge', async () => {
     await seedQueue();
     const db = testDb();
-    const india = await makeUser(db, { kind: 'staff', role: 'partner_manager', region: 'india', name: 'Farhan Qureshi' });
+    const india = await makeUser(db, { kind: 'staff', role: 'partner_manager', region: 'india', name: 'Gaurav Jadhav' });
     const all = await makeUser(db, { kind: 'staff', role: 'partner_manager', region: 'all' });
     const sales = await makeUser(db, { kind: 'staff', role: 'sales', region: 'middle_east' });
     expect((await shellOf(india.id)).waitingApprovals).toBe(2);
@@ -108,7 +108,7 @@ describe('getShell, staff viewer', () => {
 
   it('labels the role with the region and names CleanStart as the organisation', async () => {
     const db = testDb();
-    const india = await makeUser(db, { kind: 'staff', role: 'partner_manager', region: 'india', name: 'Farhan Qureshi' });
+    const india = await makeUser(db, { kind: 'staff', role: 'partner_manager', region: 'india', name: 'Gaurav Jadhav' });
     const all = await makeUser(db, { kind: 'staff', role: 'marketing', region: 'all' });
     expect(await shellOf(india.id)).toMatchObject({
       roleLabel: 'Partner manager, India',

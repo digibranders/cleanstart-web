@@ -13,7 +13,7 @@ import {
 } from './index';
 
 const PERSON = { email: 'person@example.com', name: 'Person' };
-const STAFF = [{ email: 'farhan@cleanstart.example' }, { email: 'omar@cleanstart.example' }];
+const STAFF = [{ email: 'gaurav@cleanstart.example' }, { email: 'omar@cleanstart.example' }];
 
 const CASES: TemplateCase[] = [
   {
@@ -57,7 +57,7 @@ const CASES: TemplateCase[] = [
       'href="https://partners.example.com/admin/partners"',
       'Review the application',
     ],
-    to: ['farhan@cleanstart.example', 'omar@cleanstart.example'],
+    to: ['gaurav@cleanstart.example', 'omar@cleanstart.example'],
   },
   {
     name: 'buildApplicationApproved',
@@ -68,13 +68,13 @@ const CASES: TemplateCase[] = [
         company: f('company', 'Lattice Cloud Services'),
         inviteUrl: 'https://partners.example.com/accept-invite?token=abc',
         expiresOn: '2026-11-19',
-        managerName: f('managerName', 'Farhan Qureshi'),
+        managerName: f('managerName', 'Gaurav Jadhav'),
       }),
     subject: 'Your CleanStart partner application is approved',
     contains: [
       'You are approved',
       'Lattice Cloud Services is now a CleanStart partner',
-      'Your CleanStart partner manager is Farhan Qureshi.',
+      'Your CleanStart partner manager is Gaurav Jadhav.',
       'href="https://partners.example.com/accept-invite?token=abc"',
       'expires on 19 Nov 2026',
     ],
@@ -116,14 +116,14 @@ const CASES: TemplateCase[] = [
       buildTeamInvite({
         to: PERSON,
         inviteeName: null,
-        inviterName: f('inviterName', 'Farhan Qureshi'),
+        inviterName: f('inviterName', 'Gaurav Jadhav'),
         audience: 'staff',
         companyName: null,
         roleLabel: f('roleLabel', 'Marketing'),
         inviteUrl: 'https://partners.example.com/accept-invite?token=abc',
         expiresOn: '2026-11-19',
       }),
-    subject: 'Farhan Qureshi invited you to the CleanStart Partner Portal',
+    subject: 'Gaurav Jadhav invited you to the CleanStart Partner Portal',
     contains: ['Hello,', 'as Marketing', 'You will use it to work with CleanStart'],
     to: ['person@example.com'],
   },

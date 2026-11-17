@@ -21,8 +21,8 @@ const staff: Viewer = {
   partnerId: null,
   partnerName: null,
   region: 'all',
-  email: 'farhan@cleanstart.com',
-  name: 'Farhan Qureshi',
+  email: 'gaurav@cleanstart.com',
+  name: 'Gaurav Jadhav',
 };
 
 const schema = z.object({ id: z.string().uuid() });
@@ -51,7 +51,7 @@ describe('runViewerAction', () => {
 
   it('passes the viewer, a clock and the parsed input to the handler and returns its data', async () => {
     const result = await runViewerAction(spec, goodInput, async (ctx, input) => ({ who: ctx.viewer.name, today: ctx.clock.today().length, id: input.id }));
-    expect(result).toEqual({ ok: true, data: { who: 'Farhan Qureshi', today: 10, id: goodInput.id } });
+    expect(result).toEqual({ ok: true, data: { who: 'Gaurav Jadhav', today: 10, id: goodInput.id } });
   });
 
   it('runs after commit effects only once the handler has returned, in order', async () => {

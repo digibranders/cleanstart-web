@@ -20,23 +20,23 @@ const actor = SYSTEM_ACTORS.portal;
 beforeEach(() => resetDb(db));
 
 const setup = async () => {
-  const farhan = await asStaff(db, 'partner_manager', 'india');
+  const gaurav = await asStaff(db, 'partner_manager', 'india');
   const partner = await makePartner(db, { name: 'Kestrel Systems' });
   const sales = await makeUser(db, { partnerId: partner.id, role: 'sales' });
   const admin = await makeUser(db, { partnerId: partner.id, role: 'partner_admin' });
   const reg = await makeRegistration(db, {
     partnerId: partner.id, customerName: 'Vardhan Capital', product: 'cleansight', status: 'accepted',
-    protectionEnd: '2027-01-12', registeredBy: sales.id, managerId: farhan.id, region: 'india',
+    protectionEnd: '2027-01-12', registeredBy: sales.id, managerId: gaurav.id, region: 'india',
   });
-  return { farhan, partner, sales, admin, reg };
+  return { gaurav, partner, sales, admin, reg };
 };
 
 describe('requestExtension', () => {
   it('marks the registration requested, stores the reason, writes the timeline event and names the manager to notify', async () => {
-    const { farhan, partner, reg } = await setup();
+    const { gaurav, partner, reg } = await setup();
     const viewer = await asPartner(db, { partnerId: partner.id, role: 'partner_admin' });
     const result = await withViewer(viewer, (tx) => requestExtension(tx, viewer, { id: reg.id, reason: '  Procurement is slow  ' }, clock));
-    expect(result.managerUserId).toBe(farhan.id);
+    expect(result.managerUserId).toBe(gaurav.id);
     expect(result.partnerName).toBe('Kestrel Systems');
     expect(result.registration).toMatchObject({
       extensionStatus: 'requested', extensionReason: 'Procurement is slow', extensionRequestedAt: '2026-11-06T14:02:00.000Z',
@@ -83,29 +83,29 @@ describe('decideExtension', () => {
   };
 
   it('grants 30 more days, returns the new end as the outbox version and the recipients', async () => {
-    const { farhan, sales, reg } = await requested();
-    const result = await withViewer(farhan, (tx) => decideExtension(tx, farhan, { id: reg.id, decision: 'grant', note: ' Happy to help ' }, clock));
+    const { gaurav, sales, reg } = await requested();
+    const result = await withViewer(gaurav, (tx) => decideExtension(tx, gaurav, { id: reg.id, decision: 'grant', note: ' Happy to help ' }, clock));
     expect(result).toMatchObject({ granted: true, newProtectionEnd: '2027-02-11', partnerName: 'Kestrel Systems', recipientUserIds: [sales.id] });
     expect(result.registration).toMatchObject({
       protectionEnd: '2027-02-11', extensionStatus: 'granted', extensionDays: 30, extensionGrantedAt: '2026-11-06T14:02:00.000Z',
     });
-    expect(result.registration.history[0]).toMatchObject({ text: 'Extension granted, protected until 11 Feb 2027: Happy to help', byLabel: farhan.name });
+    expect(result.registration.history[0]).toMatchObject({ text: 'Extension granted, protected until 11 Feb 2027: Happy to help', byLabel: gaurav.name });
   });
 
   it('declines without moving the end date', async () => {
-    const { farhan, reg } = await requested();
-    const result = await withViewer(farhan, (tx) => decideExtension(tx, farhan, { id: reg.id, decision: 'decline', note: null }, clock));
+    const { gaurav, reg } = await requested();
+    const result = await withViewer(gaurav, (tx) => decideExtension(tx, gaurav, { id: reg.id, decision: 'decline', note: null }, clock));
     expect(result).toMatchObject({ granted: false, newProtectionEnd: null });
     expect(result.registration).toMatchObject({ extensionStatus: 'declined', protectionEnd: '2027-01-12', extensionDays: null });
     expect(result.registration.history[0]?.text).toBe('Extension declined');
   });
 
   it('only decides a requested extension, once', async () => {
-    const { farhan, reg } = await setup();
-    await expect(withViewer(farhan, (tx) => decideExtension(tx, farhan, { id: reg.id, decision: 'grant', note: null }, clock))).rejects.toMatchObject({ reason: 'extension_not_requested' });
+    const { gaurav, reg } = await setup();
+    await expect(withViewer(gaurav, (tx) => decideExtension(tx, gaurav, { id: reg.id, decision: 'grant', note: null }, clock))).rejects.toMatchObject({ reason: 'extension_not_requested' });
     await db.update(registrations).set({ extensionStatus: 'requested' }).where(eq(registrations.id, reg.id));
-    await withViewer(farhan, (tx) => decideExtension(tx, farhan, { id: reg.id, decision: 'grant', note: null }, clock));
-    await expect(withViewer(farhan, (tx) => decideExtension(tx, farhan, { id: reg.id, decision: 'grant', note: null }, clock))).rejects.toMatchObject({ reason: 'extension_not_requested' });
+    await withViewer(gaurav, (tx) => decideExtension(tx, gaurav, { id: reg.id, decision: 'grant', note: null }, clock));
+    await expect(withViewer(gaurav, (tx) => decideExtension(tx, gaurav, { id: reg.id, decision: 'grant', note: null }, clock))).rejects.toMatchObject({ reason: 'extension_not_requested' });
   });
 
   it('is staff only and limited to the staff sales region', async () => {
@@ -158,12 +158,12 @@ describe('reminder candidates', () => {
 
 describe('listExtensionRequests', () => {
   it('lists only requested extensions, oldest request first, for the staff scope', async () => {
-    const { farhan, partner, reg } = await setup();
+    const { gaurav, partner, reg } = await setup();
     const other = await makeRegistration(db, { partnerId: partner.id, customerName: 'Gulf Co', status: 'accepted', region: 'middle_east' });
     await makeRegistration(db, { partnerId: partner.id, customerName: 'No request', status: 'accepted' });
     await db.update(registrations).set({ extensionStatus: 'requested', extensionRequestedAt: new Date('2026-11-05T10:00:00Z'), extensionReason: 'later' }).where(eq(registrations.id, reg.id));
     await db.update(registrations).set({ extensionStatus: 'requested', extensionRequestedAt: new Date('2026-11-04T10:00:00Z'), extensionReason: 'earlier' }).where(eq(registrations.id, other.id));
-    const all = await withViewer(farhan, (tx) => listExtensionRequests(tx, farhan));
+    const all = await withViewer(gaurav, (tx) => listExtensionRequests(tx, gaurav));
     expect(all.map((r) => r.extensionReason)).toEqual(['earlier', 'later']);
     const staffIndia = await asStaff(db, 'sales', 'india');
     const seen = await withViewer(staffIndia, (tx) => listExtensionRequests(tx, staffIndia));

@@ -49,24 +49,24 @@ beforeEach(async () => {
 });
 
 const setup = async () => {
-  const farhan = await asStaff(db, 'partner_manager', 'india');
+  const gaurav = await asStaff(db, 'partner_manager', 'india');
   const partner = await makePartner(db, { name: 'Kestrel Systems' });
   const sales = await makeUser(db, { partnerId: partner.id, role: 'sales', email: 'karan@kestrel.example', name: 'Karan Malhotra' });
-  const reg = await makeRegistration(db, { partnerId: partner.id, customerName: 'Vardhan Capital', product: 'cleansight', registeredBy: sales.id, managerId: farhan.id, region: 'india' });
-  return { farhan, partner, sales, reg };
+  const reg = await makeRegistration(db, { partnerId: partner.id, customerName: 'Vardhan Capital', product: 'cleansight', registeredBy: sales.id, managerId: gaurav.id, region: 'india' });
+  return { gaurav, partner, sales, reg };
 };
 
 describe('acceptRegistrationAction', () => {
   it('accepts, audits once, queues exactly one HubSpot create, notifies and emails the registrant', async () => {
-    const { farhan, sales, reg } = await setup();
-    session.viewer = farhan;
+    const { gaurav, sales, reg } = await setup();
+    session.viewer = gaurav;
     const result = await acceptRegistrationAction({ id: reg.id });
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.data).toMatchObject({ status: 'accepted', protectionEnd: protectionEndFor(systemClock.today()) });
     const audit = await db.select().from(auditLog).where(eq(auditLog.event, 'registration.accepted'));
     expect(audit).toHaveLength(1);
-    expect(audit[0]).toMatchObject({ kind: 'deal_decisions', who: 'staff', actorLabel: farhan.name, subjectId: reg.id, target: 'Vardhan Capital, CleanSight, from Kestrel Systems' });
+    expect(audit[0]).toMatchObject({ kind: 'deal_decisions', who: 'staff', actorLabel: gaurav.name, subjectId: reg.id, target: 'Vardhan Capital, CleanSight, from Kestrel Systems' });
     const outbox = await db.select().from(hubspotOutbox);
     expect(outbox).toHaveLength(1);
     expect(outbox[0]).toMatchObject({ op: 'registration.create', subjectId: reg.id, status: 'pending' });
@@ -77,8 +77,8 @@ describe('acceptRegistrationAction', () => {
   });
 
   it('is a conflict the second time and leaves one outbox row', async () => {
-    const { farhan, reg } = await setup();
-    session.viewer = farhan;
+    const { gaurav, reg } = await setup();
+    session.viewer = gaurav;
     await acceptRegistrationAction({ id: reg.id });
     expect(await acceptRegistrationAction({ id: reg.id })).toMatchObject({ ok: false, error: { code: 'conflict' } });
     expect(await db.select().from(hubspotOutbox)).toHaveLength(1);
@@ -96,8 +96,8 @@ describe('acceptRegistrationAction', () => {
 
 describe('simultaneous decisions', () => {
   it('give exactly one success and one already_decided, and one outbox row', async () => {
-    const { farhan, reg } = await setup();
-    session.viewer = farhan;
+    const { gaurav, reg } = await setup();
+    session.viewer = gaurav;
     const results = await Promise.all([acceptRegistrationAction({ id: reg.id }), rejectRegistrationAction({ id: reg.id, reason: 'Duplicate.' })]);
     expect(results.filter((r) => r.ok)).toHaveLength(1);
     const failed = results.find((r) => !r.ok);
@@ -110,8 +110,8 @@ describe('simultaneous decisions', () => {
 
 describe('rejectRegistrationAction', () => {
   it('needs a reason, then rejects with the reason in the audit entry, the notification and the email', async () => {
-    const { farhan, sales, reg } = await setup();
-    session.viewer = farhan;
+    const { gaurav, sales, reg } = await setup();
+    session.viewer = gaurav;
     expect(await rejectRegistrationAction({ id: reg.id, reason: '  ' })).toMatchObject({ ok: false, error: { code: 'validation', issues: [{ path: 'reason' }] } });
     const result = await rejectRegistrationAction({ id: reg.id, reason: 'Add the budget owner.' });
     expect(result.ok).toBe(true);
@@ -124,8 +124,8 @@ describe('rejectRegistrationAction', () => {
 
 describe('undoDecisionAction', () => {
   it('undoes a fresh decision and writes an audit entry', async () => {
-    const { farhan, reg } = await setup();
-    session.viewer = farhan;
+    const { gaurav, reg } = await setup();
+    session.viewer = gaurav;
     await acceptRegistrationAction({ id: reg.id });
     const result = await undoDecisionAction({ id: reg.id });
     expect(result).toMatchObject({ ok: true, data: { status: 'pending', protectionEnd: null } });
@@ -133,8 +133,8 @@ describe('undoDecisionAction', () => {
   });
 
   it('queues a second create under its own key when a decision is undone and taken again (HubSpot checklist line 7)', async () => {
-    const { farhan, reg } = await setup();
-    session.viewer = farhan;
+    const { gaurav, reg } = await setup();
+    session.viewer = gaurav;
     expect((await acceptRegistrationAction({ id: reg.id })).ok).toBe(true);
     expect((await undoDecisionAction({ id: reg.id })).ok).toBe(true);
     await new Promise((resolve) => setTimeout(resolve, 5));
@@ -146,8 +146,8 @@ describe('undoDecisionAction', () => {
   });
 
   it('is refused after the window and once a deal exists, with a message the screen can show', async () => {
-    const { farhan, reg } = await setup();
-    session.viewer = farhan;
+    const { gaurav, reg } = await setup();
+    session.viewer = gaurav;
     await acceptRegistrationAction({ id: reg.id });
     await db.update(registrations).set({ decidedAt: new Date(Date.now() - 11 * 60_000) }).where(eq(registrations.id, reg.id));
     const late = await undoDecisionAction({ id: reg.id });
@@ -161,8 +161,8 @@ describe('undoDecisionAction', () => {
 
 describe('hubspotConflictHintsAction', () => {
   it('names another partner\'s open HubSpot deal for waiting registrations', async () => {
-    const { farhan, reg } = await setup();
-    session.viewer = farhan;
+    const { gaurav, reg } = await setup();
+    session.viewer = gaurav;
     const hs = new FakeHubspot();
     const customer = await hs.createOrUpdateCompany({ existingId: null, name: 'Vardhan Capital', domain: null, properties: {} });
     const theirs = await hs.createDeal({ pipeline: 'pipe-1', dealstage: hs.stageIds.Discovery, partner_company_id: '2', partner_name: 'Arbor Cyber' });
@@ -175,8 +175,8 @@ describe('hubspotConflictHintsAction', () => {
   });
 
   it('returns no hints when HubSpot is not configured and is not for partners', async () => {
-    const { farhan, partner, reg } = await setup();
-    session.viewer = farhan;
+    const { gaurav, partner, reg } = await setup();
+    session.viewer = gaurav;
     expect(await hubspotConflictHintsAction({ ids: [reg.id] })).toEqual({ ok: true, data: {} });
     session.viewer = await asPartner(db, { partnerId: partner.id, role: 'partner_admin' });
     expect(await hubspotConflictHintsAction({ ids: [reg.id] })).toMatchObject({ ok: false, error: { code: 'forbidden' } });

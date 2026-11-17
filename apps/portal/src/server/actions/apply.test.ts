@@ -71,7 +71,7 @@ beforeEach(async () => {
 
 describe('submitApplicationAction', () => {
   it('creates a portal application, audits it, notifies managers and emails everyone', async () => {
-    const manager = await makeUser(db, { kind: 'staff', role: 'partner_manager', region: 'india', email: 'farhan@cleanstart.com' });
+    const manager = await makeUser(db, { kind: 'staff', role: 'partner_manager', region: 'india', email: 'gaurav@cleanstart.com' });
     const result = await submitApplicationAction(form());
     expect(result).toMatchObject({ ok: true, data: { outcome: 'submitted', reference: expect.stringMatching(/^APP-\d{4}-0001$/u) } });
     const [row] = await db.select().from(applications);
@@ -80,7 +80,7 @@ describe('submitApplicationAction', () => {
     expect(audit.map((a) => a.event)).toEqual(['application.submitted']);
     expect((await db.select().from(notifications)).map((n) => [n.userId, n.kind])).toEqual([[manager.id, 'application_new']]);
     expect(fake.to('neha.joshi@tidewaterinfosec.in')).toHaveLength(1);
-    expect(fake.to('farhan@cleanstart.com')).toHaveLength(1);
+    expect(fake.to('gaurav@cleanstart.com')).toHaveLength(1);
     const receipt = verifyApplyReceipt(harness.cookieJar.get(APPLY_RECEIPT_COOKIE) ?? '', new Date());
     expect(receipt).toMatchObject({ company: 'Tidewater Infosec', firstName: 'Neha', category: 'channel', region: 'india' });
   });

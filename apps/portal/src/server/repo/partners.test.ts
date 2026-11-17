@@ -31,7 +31,7 @@ beforeEach(async () => {
 
 describe('getCompany', () => {
   it('returns the company with its manager, agreement and the not-assigned tier', async () => {
-    const manager = await makeUser(db, { kind: 'staff', role: 'partner_manager', region: 'india', name: 'Farhan Qureshi', email: 'farhan@cleanstart.com' });
+    const manager = await makeUser(db, { kind: 'staff', role: 'partner_manager', region: 'india', name: 'Gaurav Jadhav', email: 'gaurav@cleanstart.com' });
     const partner = await makePartner(db, { name: 'Kestrel Systems', domain: 'kestrelsystems.in', category: 'channel', region: 'india', managerId: manager.id });
     await db.update(partners).set({ website: 'kestrelsystems.in', phone: '+91 80 4718 2290', about: 'Security reseller.', agreementVersion: '1.2', agreementAcceptedAt: new Date('2026-03-12T14:06:00Z') }).where(eq(partners.id, partner.id));
     const viewer = await asPartner(db, { partnerId: partner.id, role: 'partner_admin' });
@@ -49,7 +49,7 @@ describe('getCompany', () => {
       tier: null,
       agreementVersion: '1.2',
       agreementAcceptedAt: '2026-03-12T14:06:00.000Z',
-      manager: { id: manager.id, name: 'Farhan Qureshi', email: 'farhan@cleanstart.com', team: 'CleanStart India' },
+      manager: { id: manager.id, name: 'Gaurav Jadhav', email: 'gaurav@cleanstart.com', team: 'CleanStart India' },
     });
   });
 
@@ -244,11 +244,11 @@ describe('createPartner', () => {
 describe('partner mutations', () => {
   it('sets the partner manager and reports the previous one', async () => {
     const actor = await asStaff(db, 'partner_manager', 'india');
-    const farhan = await makeUser(db, { kind: 'staff', role: 'partner_manager', region: 'india', name: 'Farhan Qureshi' });
+    const gaurav = await makeUser(db, { kind: 'staff', role: 'partner_manager', region: 'india', name: 'Gaurav Jadhav' });
     const omar = await makeUser(db, { kind: 'staff', role: 'partner_manager', region: 'middle_east', name: 'Omar Nasser' });
-    const partner = await makePartner(db, { managerId: farhan.id });
+    const partner = await makePartner(db, { managerId: gaurav.id });
     const result = await withViewer(actor, (tx) => setPartnerManager(tx, actor, { id: partner.id, managerId: omar.id }, clock));
-    expect(result).toMatchObject({ partner: { managerId: omar.id, managerName: 'Omar Nasser' }, previousManagerName: 'Farhan Qureshi' });
+    expect(result).toMatchObject({ partner: { managerId: omar.id, managerName: 'Omar Nasser' }, previousManagerName: 'Gaurav Jadhav' });
     const sales = await makeUser(db, { kind: 'staff', role: 'sales', region: 'india' });
     await expect(withViewer(actor, (tx) => setPartnerManager(tx, actor, { id: partner.id, managerId: sales.id }, clock))).rejects.toMatchObject({ code: 'validation' });
   });

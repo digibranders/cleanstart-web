@@ -19,8 +19,8 @@ const staff = (role: StaffViewer["role"]): StaffViewer => ({
   partnerId: null,
   partnerName: null,
   region: "india",
-  email: "farhan@example.com",
-  name: "Farhan Qureshi",
+  email: "gaurav@example.com",
+  name: "Gaurav Jadhav",
 });
 
 const labels = (viewer: PartnerViewer | StaffViewer): string[] => navFor(viewer).map((item) => item.label);
