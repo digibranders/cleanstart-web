@@ -59,12 +59,12 @@ export function BlogDetailFAQ({ faqs }: BlogDetailFAQProps): React.ReactElement 
 
   return (
     <section className="relative w-full bg-white" data-section="BlogDetailFAQ">
-      <div className="relative mx-auto max-w-[1120px] px-6 pb-20">
-        <div className="relative flex gap-12">
-          {/* Spacer matches the TOC sidebar width so the FAQ aligns with the article body. */}
-          <div className="hidden xl:block shrink-0" style={{ width: "260px" }} aria-hidden />
+      {/* Mirrors BlogDetailContent's rail layout (TOC | article | rail) so the FAQ lines up with the body column. */}
+      <div className="relative mx-auto max-w-[1120px] xl:max-w-[1340px] px-6 pb-20">
+        <div className="relative flex gap-12 xl:gap-10">
+          <div className="hidden lg:block shrink-0 w-[260px] xl:w-[224px]" aria-hidden />
 
-          <div className="min-w-0 flex-1 mx-auto xl:mx-0" style={{ maxWidth: "680px" }}>
+          <div className="min-w-0 flex-1 mx-auto lg:mx-0" style={{ maxWidth: "680px" }}>
             <Reveal header>
               <h2
                 className="font-display font-semibold leading-[1.1] tracking-[-0.04em]"
@@ -196,6 +196,8 @@ export function BlogDetailFAQ({ faqs }: BlogDetailFAQProps): React.ReactElement 
               })}
             </div>
           </div>
+
+          <div className="hidden xl:block shrink-0 w-[272px]" aria-hidden />
         </div>
       </div>
     </section>

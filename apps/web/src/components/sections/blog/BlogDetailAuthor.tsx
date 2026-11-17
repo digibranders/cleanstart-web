@@ -15,13 +15,10 @@ export function BlogDetailAuthor({
 
   return (
     <section className="relative w-full bg-white" data-section="BlogDetailAuthor">
-      <div className="relative mx-auto max-w-[1120px] px-6">
-        <div className="flex gap-12 pb-16">
-          <div
-            className="hidden lg:block shrink-0"
-            style={{ width: "260px" }}
-            aria-hidden
-          />
+      {/* Mirrors BlogDetailContent's rail layout (TOC | article | rail) so the card lines up with the body column. */}
+      <div className="relative mx-auto max-w-[1120px] xl:max-w-[1340px] px-6">
+        <div className="flex gap-12 xl:gap-10 pb-16">
+          <div className="hidden lg:block shrink-0 w-[260px] xl:w-[224px]" aria-hidden />
           <div
             className="min-w-0 flex-1 mx-auto lg:mx-0 flex flex-col gap-6"
             style={{ maxWidth: "680px" }}
@@ -30,6 +27,7 @@ export function BlogDetailAuthor({
               <AuthorCard key={author.id} author={author} />
             ))}
           </div>
+          <div className="hidden xl:block shrink-0 w-[272px]" aria-hidden />
         </div>
       </div>
     </section>
