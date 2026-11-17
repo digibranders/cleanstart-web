@@ -145,7 +145,7 @@ export function PqcIndustries(): React.ReactElement {
           <div
             ref={rootRef}
             data-paused={paused}
-            className="mx-auto grid max-w-[1200px] grid-cols-1 items-stretch gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-[clamp(32px,4vw,64px)]"
+            className="mx-auto grid max-w-[1200px] grid-cols-1 items-stretch gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-[clamp(32px,4vw,64px)]"
             onPointerEnter={() => setHovered(true)}
             onPointerLeave={() => setHovered(false)}
             onFocus={() => setFocused(true)}
@@ -154,7 +154,7 @@ export function PqcIndustries(): React.ReactElement {
             }}
           >
             <div
-              className="cs-pqc-ind-stage relative order-first aspect-[6/5] w-full lg:order-last"
+              className="cs-pqc-ind-stage relative order-first aspect-[6/5] w-full lg:order-last lg:max-w-[540px] lg:justify-self-end"
               onPointerMove={tilt}
               onPointerLeave={level}
             >
