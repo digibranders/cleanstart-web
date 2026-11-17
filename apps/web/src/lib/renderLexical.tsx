@@ -483,11 +483,23 @@ export function RenderLexical({
 }: RenderLexicalProps): React.ReactElement | null {
   if (!content?.root?.children?.length) return null;
 
+  // Trailing empty paragraphs are leftover editor spacers: rendered as <br>
+  // they defeat the last-paragraph margin reset and push the next section down.
+  const nodes = content.root.children;
+  let end = nodes.length;
+  while (end > 0 && isEmptyParagraph(nodes[end - 1])) end--;
+  if (end === 0) return null;
+
   return (
     <div className={`${wrapperClassName} ${className}`}>
-      {renderNodes(content.root.children, "root")}
+      {renderNodes(nodes.slice(0, end), "root")}
     </div>
   );
+}
+
+function isEmptyParagraph(node: LexicalNode | undefined): boolean {
+  if (node?.type !== "paragraph") return false;
+  return !(node as Extract<LexicalNode, { type: "paragraph" }>).children?.length;
 }
 
 const BLOCK_TYPES = new Set(["paragraph", "listitem", "heading", "quote"]);

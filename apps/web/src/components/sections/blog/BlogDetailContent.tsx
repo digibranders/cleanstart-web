@@ -58,7 +58,7 @@ export function BlogDetailContent({
       <div className={`relative mx-auto max-w-[1120px] px-6 ${rail ? "xl:max-w-[1340px]" : ""}`}>
         {/* Mobile uses a tighter top padding so the abstract sits closer to the
             hero's meta/share row; lg+ keeps the original 64px breathing room. */}
-        <div className={`relative flex gap-12 pt-6 sm:pt-10 lg:pt-16 pb-28 ${rail ? "xl:gap-10" : ""}`}>
+        <div className={`relative flex gap-12 pt-6 sm:pt-10 lg:pt-16 pb-20${rail ? "xl:gap-10" : ""}`}>
 
           {/* ── LEFT: Table of Contents (sticky below header) ── */}
           <aside className={`hidden lg:block shrink-0 w-[260px] ${rail ? "xl:w-[224px]" : ""}`}>

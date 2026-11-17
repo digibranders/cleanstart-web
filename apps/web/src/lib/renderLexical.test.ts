@@ -278,3 +278,28 @@ describe("video blocks", () => {
     expect(render(videoBlock({ video: 7 }))).not.toContain("article-figure");
   });
 });
+
+describe("trailing empty paragraphs", () => {
+  const p = (text?: string): LexicalNode =>
+    ({
+      type: "paragraph",
+      version: 1,
+      children: text ? [{ type: "text", text, format: 0, version: 1 }] : [],
+    }) as unknown as LexicalNode;
+  const render = (...children: LexicalNode[]): string =>
+    renderToStaticMarkup(
+      createElement(RenderLexical, { content: { root: { type: "root", children } } as unknown as LexicalRoot }),
+    );
+
+  it("drops empty paragraphs at the end so the last paragraph keeps its zero bottom margin", () => {
+    expect(render(p("Body"), p(), p())).toBe('<div class="article-body "><p class="article-paragraph">Body</p></div>');
+  });
+
+  it("keeps empty paragraphs between content as spacers", () => {
+    expect(render(p("One"), p(), p("Two"))).toContain("<br/>");
+  });
+
+  it("renders nothing when every paragraph is empty", () => {
+    expect(render(p(), p())).toBe("");
+  });
+});
