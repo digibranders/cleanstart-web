@@ -2,8 +2,8 @@ import { isDemoMode } from '@/server/demo';
 
 const DEFAULT_REQUEST_POOL_MAX = 6;
 const DEFAULT_SYSTEM_POOL_MAX = 8;
-/** A serverless instance holds two pools; three each keeps a handful of warm instances well under a hosted free tier. */
-const DEMO_POOL_MAX = 3;
+/** A serverless instance holds two pools; one connection each is two per instance, so a small demo server (max_connections 40) serves many warm instances. */
+const DEMO_POOL_MAX = 1;
 const POOL_MAX_LIMIT = 50;
 
 /** Connections per pool. PORTAL_DB_POOL_MAX sizes both pools; unset, demo mode is small and everything else keeps the long lived container's sizes. */

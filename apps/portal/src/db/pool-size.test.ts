@@ -7,8 +7,8 @@ describe('poolSizes', () => {
     expect(poolSizes({ PORTAL_DEMO_MODE: '0' })).toEqual({ request: 6, system: 8 });
   });
 
-  it('uses a small pool in demo mode', () => {
-    expect(poolSizes({ PORTAL_DEMO_MODE: '1' })).toEqual({ request: 3, system: 3 });
+  it('uses one connection per pool in demo mode: two per serverless instance against a 40 connection server', () => {
+    expect(poolSizes({ PORTAL_DEMO_MODE: '1' })).toEqual({ request: 1, system: 1 });
   });
 
   it('lets PORTAL_DB_POOL_MAX size both pools, in demo mode or not', () => {

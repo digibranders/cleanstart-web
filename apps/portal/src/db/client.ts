@@ -1,6 +1,7 @@
 import { drizzle, type NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import { env } from '@/env';
+import { poolConnection } from './connection';
 import { poolSizes } from './pool-size';
 import * as schema from './schema';
 
@@ -13,9 +14,9 @@ const CONNECTION_TIMEOUT_MS = 30_000;
 const globalForDb = globalThis as unknown as { portalPools?: { app: Pool; system: Pool } };
 
 const createPools = (): { app: Pool; system: Pool } => ({
-  app: new Pool({ connectionString: env.DATABASE_URL, max: POOL_SIZES.request, connectionTimeoutMillis: CONNECTION_TIMEOUT_MS }),
+  app: new Pool({ ...poolConnection(env.DATABASE_URL), max: POOL_SIZES.request, connectionTimeoutMillis: CONNECTION_TIMEOUT_MS }),
   system: new Pool({
-    connectionString: env.DATABASE_URL,
+    ...poolConnection(env.DATABASE_URL),
     max: POOL_SIZES.system,
     connectionTimeoutMillis: CONNECTION_TIMEOUT_MS,
     options: '-c app.kind=system',

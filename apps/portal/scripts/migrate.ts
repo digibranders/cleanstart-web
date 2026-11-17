@@ -4,6 +4,7 @@ import { pathToFileURL } from 'node:url';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import { Pool } from 'pg';
+import { poolConnection } from '../src/db/connection';
 
 export interface MigrateInput {
   /** Connection string of the owner role (portal_owner), never the runtime role. */
@@ -15,7 +16,7 @@ export interface MigrateInput {
 
 /** Drizzle migrations, then rls.sql in one transaction. Safe to run any number of times. */
 export async function migrateDatabase(input: MigrateInput): Promise<void> {
-  const pool = new Pool({ connectionString: input.url, max: 1 });
+  const pool = new Pool({ ...poolConnection(input.url), max: 1 });
   try {
     await migrate(drizzle(pool), { migrationsFolder: input.migrationsFolder });
     const client = await pool.connect();

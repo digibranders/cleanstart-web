@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { Pool } from 'pg';
+import { poolConnection } from '../src/db/connection';
 import { DemoModeError, assertDemoModeAllowed, isDemoMode } from '../src/server/demo';
 import { DEMO_FILES_DDL } from '../src/server/files/demo-store';
 import { migrateDatabase } from './migrate';
@@ -23,7 +24,7 @@ async function setup(ownerUrl: string): Promise<void> {
     migrationsFolder: join(process.cwd(), 'drizzle'),
     rlsSql: readFileSync(join(process.cwd(), 'src/db/rls.sql'), 'utf8'),
   });
-  const owner = new Pool({ connectionString: ownerUrl, max: 1 });
+  const owner = new Pool({ ...poolConnection(ownerUrl), max: 1 });
   try {
     await owner.query(DEMO_FILES_DDL);
   } finally {
@@ -51,7 +52,7 @@ async function setup(ownerUrl: string): Promise<void> {
 
 /** Empties every table of the public schema (drizzle's migration history lives in its own schema and stays) and restarts the sequences. */
 async function truncateAll(ownerUrl: string): Promise<void> {
-  const owner = new Pool({ connectionString: ownerUrl, max: 1 });
+  const owner = new Pool({ ...poolConnection(ownerUrl), max: 1 });
   try {
     const { rows } = await owner.query<{ tablename: string }>("select tablename from pg_tables where schemaname = 'public'");
     if (rows.length > 0) {
