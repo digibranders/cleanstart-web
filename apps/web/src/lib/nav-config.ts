@@ -154,6 +154,12 @@ export const NAV_TREE: NavItem[] = [
             description: "Signed SBOMs. Provenance for every artifact.",
             icon: "doc-signed",
           },
+          {
+            label: "Post-Quantum Cryptography",
+            href: "/post-quantum-cryptography",
+            description: "Verifiable software foundations for the post-quantum era.",
+            icon: "lock",
+          },
         ],
       },
       {
