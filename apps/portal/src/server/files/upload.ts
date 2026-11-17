@@ -51,6 +51,21 @@ async function readPrefix(response: Response, length: number): Promise<number[]>
   return bytes.slice(0, length);
 }
 
+/** The first bytes of the stored object through a presigned GET with a Range header. */
+async function rangeRead(storage: FileStorage, input: { key: string; originalName: string }, fetchImpl: typeof fetch): Promise<number[]> {
+  const { url } = await storage.presignGet({ key: input.key, filename: input.originalName });
+  let response: Response;
+  try {
+    response = await fetchImpl(url, { headers: { Range: `bytes=0-${PEEK_BYTES - 1}` } });
+  } catch (cause) {
+    throw new IntegrationError('r2', 'could not read the start of the upload', { cause });
+  }
+  if (!response.ok) {
+    throw new IntegrationError('r2', `range read answered ${response.status}`, { status: response.status });
+  }
+  return readPrefix(response, PEEK_BYTES);
+}
+
 export interface VerifyUploadOptions {
   /** Defaults to the global fetch. Tests pass fakeRangeFetch. */
   fetchImpl?: typeof fetch;
@@ -80,19 +95,9 @@ export async function verifyUpload(
     throw new ConflictError('file_type_not_allowed', TYPE_MESSAGE);
   }
 
-  const fetchImpl = options.fetchImpl ?? fetch;
-  const { url } = await storage.presignGet({ key: input.key, filename: input.originalName });
-  let response: Response;
-  try {
-    response = await fetchImpl(url, { headers: { Range: `bytes=0-${PEEK_BYTES - 1}` } });
-  } catch (cause) {
-    throw new IntegrationError('r2', 'could not read the start of the upload', { cause });
-  }
-  if (!response.ok) {
-    throw new IntegrationError('r2', `range read answered ${response.status}`, { status: response.status });
-  }
   const ext = extensionOf(input.originalName);
-  if (!matchesMagic(ext, await readPrefix(response, PEEK_BYTES))) {
+  const prefix = storage.peek ? await storage.peek(input.key, PEEK_BYTES) : await rangeRead(storage, input, options.fetchImpl ?? fetch);
+  if (!matchesMagic(ext, prefix)) {
     throw new ConflictError('file_type_not_allowed', `That file is not a valid ${ext.toUpperCase()}.`);
   }
   return { key: input.key, size: stored.size, mime: input.mime, originalName: cleanOriginalName(input.originalName) };

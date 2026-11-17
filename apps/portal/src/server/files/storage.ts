@@ -18,4 +18,6 @@ export interface FileStorage {
   /** Size and content type of the stored object, or null when it does not exist. */
   head(key: string): Promise<{ size: number; contentType: string } | null>;
   delete(key: string): Promise<void>;
+  /** The first `length` bytes of the object, for storage that can read them without an HTTP request. R2 does not have it: the upload check then range reads a presigned URL. */
+  peek?(key: string, length: number): Promise<number[]>;
 }
