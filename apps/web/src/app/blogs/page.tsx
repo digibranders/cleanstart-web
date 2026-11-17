@@ -17,7 +17,7 @@ import { JsonLd, breadcrumbSchema, itemListSchema } from "@/lib/seo/jsonld";
 
 export const revalidate = 21600; // 6h ISR fallback — on-demand publish revalidation keeps this fresh
 
-const TITLE = "Blogs";
+const TITLE = "Container Security and Supply Chain Blog";
 const DESCRIPTION =
   "Expert insights on container security, software supply chain threats, CVE management, SBOM, and building trust in cloud-native environments.";
 
