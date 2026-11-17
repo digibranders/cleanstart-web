@@ -14,6 +14,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx --env-file=.env scripts/migrate.ts",
     "db:seed": "tsx --env-file=.env scripts/seed-dev.ts",
+    "demo:setup": "tsx --env-file-if-exists=.env.demo.local scripts/demo.ts setup",
+    "demo:reset": "tsx --env-file-if-exists=.env.demo.local scripts/demo.ts reset",
     "e2e": "playwright test",
     "e2e:install": "playwright install chromium",
     "verify:copy": "node scripts/verify-copy.mjs",
