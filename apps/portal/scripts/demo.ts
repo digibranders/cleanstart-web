@@ -17,6 +17,26 @@ export function assertDemoScriptAllowed(command: Command, source: Source): void 
   if (!source.DATABASE_OWNER_URL) throw new DemoModeError(`demo:${command} refused: DATABASE_OWNER_URL is not set (the scripts migrate and truncate as the owner role).`);
 }
 
+/**
+ * Positive proof that the database is a demo one, from the database itself (the host check cannot see an alias):
+ * reset needs "demo" in the database name, and either command refuses a public schema that has tables but no
+ * demo_files table (the table `demo:setup` creates is the sentinel). An empty schema is a fresh demo database.
+ */
+export async function assertDemoDatabase(command: Command, owner: Pick<Pool, 'query'>): Promise<void> {
+  if (command === 'reset') {
+    const { rows } = await owner.query<{ name: string }>('select current_database() as name');
+    const name = rows[0]?.name ?? '';
+    if (!/demo/i.test(name)) throw new DemoModeError(`demo:reset refused: the database "${name}" does not have "demo" in its name.`);
+  }
+  const { rows } = await owner.query<{ tables: number; sentinel: boolean }>(
+    "select count(*)::int as tables, coalesce(bool_or(tablename = 'demo_files'), false) as sentinel from pg_tables where schemaname = 'public'",
+  );
+  const { tables = 0, sentinel = false } = rows[0] ?? {};
+  if (tables > 0 && !sentinel) {
+    throw new DemoModeError(`demo:${command} refused: the public schema has ${tables} tables but no demo_files table, so this database was not set up by demo:setup.`);
+  }
+}
+
 /** Migrate, create the demo upload table, then seed the mock data once. Safe to run any number of times. */
 async function setup(ownerUrl: string): Promise<void> {
   await migrateDatabase({
@@ -68,6 +88,12 @@ async function truncateAll(ownerUrl: string): Promise<void> {
 export async function runDemoCommand(command: Command, source: Source = process.env): Promise<void> {
   assertDemoScriptAllowed(command, source);
   const ownerUrl = source.DATABASE_OWNER_URL ?? '';
+  const owner = new Pool({ ...poolConnection(ownerUrl), max: 1 });
+  try {
+    await assertDemoDatabase(command, owner);
+  } finally {
+    await owner.end();
+  }
   if (command === 'reset') await truncateAll(ownerUrl);
   await setup(ownerUrl);
 }

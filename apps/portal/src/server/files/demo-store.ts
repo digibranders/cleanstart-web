@@ -29,6 +29,10 @@ export function createDatabaseDemoStore(pool: Pick<Pool, 'query'>): DemoFileStor
     async delete(key) {
       await pool.query('delete from demo_files where key = $1', [key]);
     },
+    async totalBytes() {
+      const { rows } = await pool.query<{ total: string }>('select coalesce(sum(length(bytes)), 0)::text as total from demo_files');
+      return Number(rows[0]?.total ?? 0);
+    },
     async titleForKey(key) {
       const { rows } = await pool.query<{ title: string }>('select title from documents where file_key = $1 limit 1', [key]);
       return rows[0]?.title ?? null;

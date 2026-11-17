@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { assertDemoModeAllowed, isDemoMode } from './server/demo';
+import { TURNSTILE_TEST_SECRET_KEY, TURNSTILE_TEST_SITE_KEY, assertDemoModeAllowed, isDemoMode } from './server/demo';
 import { isHttpsOrLoopback } from './server/security/app-url';
 
 const bool = z
@@ -7,10 +7,6 @@ const bool = z
   .transform((v) => v === 'true' || v === '1');
 
 const optionalString = z.string().min(1).optional();
-
-/** Cloudflare's published always-pass Turnstile test keys. Used only when NODE_ENV is not 'production'. */
-const TURNSTILE_TEST_SITE_KEY = '1x00000000000000000000AA';
-const TURNSTILE_TEST_SECRET_KEY = '1x0000000000000000000000000000000AA';
 
 const schema = z
   .object({
@@ -73,8 +69,10 @@ const schema = z
     PORTAL_REVIEW_PASSWORD: optionalString,
 
     // Demo mode (docs/partner-portal/DEMO.md). Read from the process environment by server/demo.ts; listed here so the variables are documented in one place.
-    PORTAL_DEMO_MODE: optionalString,
-    PORTAL_DEMO_DENY_HOSTS: optionalString,
+    // Plain optional strings: an empty value means off or unset, never a parse failure in the real portal.
+    PORTAL_DEMO_MODE: z.string().optional(),
+    PORTAL_DEMO_DENY_HOSTS: z.string().optional(),
+    PORTAL_DEMO_DATABASE_HOSTS: z.string().optional(),
 
     // Tests only. Never read by application code.
     PORTAL_TEST_DATABASE_URL: z.string().url().optional(),
@@ -85,18 +83,7 @@ const schema = z
       if (!value[key]) ctx.addIssue({ code: z.ZodIssueCode.custom, path: [key], message: `${key} is required` });
     }
     const demo = isDemoMode({ PORTAL_DEMO_MODE: value.PORTAL_DEMO_MODE });
-    if (demo) {
-      if (value.TURNSTILE_SECRET_KEY !== undefined && value.TURNSTILE_SECRET_KEY !== TURNSTILE_TEST_SECRET_KEY) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['TURNSTILE_SECRET_KEY'], message: "TURNSTILE_SECRET_KEY must be Cloudflare's test key in demo mode" });
-      }
-      if (value.NEXT_PUBLIC_TURNSTILE_SITE_KEY !== undefined && value.NEXT_PUBLIC_TURNSTILE_SITE_KEY !== TURNSTILE_TEST_SITE_KEY) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['NEXT_PUBLIC_TURNSTILE_SITE_KEY'], message: "NEXT_PUBLIC_TURNSTILE_SITE_KEY must be Cloudflare's test key in demo mode" });
-      }
-    }
     if (value.NODE_ENV !== 'production') return;
-    if (demo && !value.PORTAL_REVIEW_PASSWORD) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['PORTAL_REVIEW_PASSWORD'], message: 'PORTAL_REVIEW_PASSWORD is required in demo mode, so a hosted demo is never open' });
-    }
     if (value.APP_URL !== undefined && !isHttpsOrLoopback(value.APP_URL)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -104,9 +91,11 @@ const schema = z
         message: `APP_URL must start with https:// in production (got ${value.APP_URL}); cookies, invite links and reset links would travel in the clear. Loopback hosts (localhost, 127.0.0.1, [::1]) are the only exception.`,
       });
     }
-    // The demo swaps every outside service for a fake, so only what the app itself needs stays required.
+    // The demo swaps every outside service for a fake, so only what the app itself needs stays required. The running app
+    // never uses DATABASE_OWNER_URL: demo mode leaves it optional (the guard still checks it when present, demo:setup requires it).
+    // The review password and the Turnstile test keys are enforced by assertDemoModeAllowed, which also runs under SKIP_ENV_VALIDATION.
     const required = demo
-      ? (['APP_URL', 'DATABASE_OWNER_URL'] as const)
+      ? (['APP_URL'] as const)
       : ([
           'APP_URL', 'DATABASE_OWNER_URL', 'BREVO_API_KEY', 'BREVO_SENDER_EMAIL', 'R2_ENDPOINT', 'R2_BUCKET', 'R2_ACCESS_KEY_ID',
           'R2_SECRET_ACCESS_KEY', 'HUBSPOT_PORTAL_TOKEN', 'HUBSPOT_PARTNER_PIPELINE_ID',

@@ -1,7 +1,7 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { z } from 'zod';
 import { type Clock, systemClock } from '@/lib/clock';
-import { ConflictError, NotFoundError, ValidationError } from '@/server/errors';
+import { ConflictError, NotFoundError, PortalError, ValidationError } from '@/server/errors';
 import { placeholderFile } from './demo-placeholder';
 import { DOCUMENT_MAX_BYTES } from './rules';
 import type { FileStorage, PresignedPut } from './storage';
@@ -12,6 +12,8 @@ const GET_SECONDS = 60;
 const SEED_PREFIX = 'seed/';
 /** Uploads are kept in the demo database, so they stay small (a Vercel function body is 4.5 MB anyway). */
 export const DEMO_UPLOAD_MAX_BYTES = 8 * 1024 * 1024;
+/** All uploads together: a stranger holding a review password could otherwise fill the demo database. */
+export const DEMO_STORE_MAX_BYTES = 200 * 1024 * 1024;
 
 /** Where uploaded demo files live. The database one is shared by every serverless instance; tests use a Map. */
 export interface DemoFileStore {
@@ -20,6 +22,8 @@ export interface DemoFileStore {
   delete(key: string): Promise<void>;
   /** The title of the document a seeded key belongs to, for the placeholder text. */
   titleForKey(key: string): Promise<string | null>;
+  /** The size of every stored upload together. */
+  totalBytes(): Promise<number>;
 }
 
 const putClaims = z.object({ m: z.literal('put'), k: z.string(), c: z.string(), l: z.number().int().min(0).max(DOCUMENT_MAX_BYTES), e: z.number() });
@@ -91,6 +95,18 @@ export class DemoFileStorage implements FileStorage {
     await this.deps.store.delete(key);
   }
 
+  /**
+   * The PUT route calls this before it reads the body: the token must be live and the declared Content-Length must be
+   * the ticket's length and within the demo limit, so an oversized request is refused without buffering it.
+   */
+  precheckUpload(token: string, contentLength: string | null): void {
+    const claims = putClaims.safeParse(unseal(this.deps.secret, token, this.clock.now())).data;
+    if (!claims) throw new NotFoundError('demo file');
+    if (contentLength === null) throw new PortalError('validation', 411, 'The upload must declare its length.');
+    const declared = /^\d+$/.test(contentLength) ? Number(contentLength) : Number.NaN;
+    if (!(declared === claims.l && declared <= DEMO_UPLOAD_MAX_BYTES)) throw new PortalError('validation', 413, 'The file is larger than the upload ticket allows, or the demo limit of 8 MB.');
+  }
+
   /** The PUT route: the token must be a live put token and the request must match the ticket exactly (type and length). */
   async acceptUpload(token: string, contentType: string | null, bytes: Uint8Array): Promise<void> {
     const claims = putClaims.safeParse(unseal(this.deps.secret, token, this.clock.now())).data;
@@ -100,6 +116,9 @@ export class DemoFileStorage implements FileStorage {
     }
     if (bytes.length > DEMO_UPLOAD_MAX_BYTES) throw new ValidationError([{ path: 'file', message: 'Files in the demo are limited to 8 MB.' }]);
     if (bytes.length !== claims.l) throw new ConflictError('file_missing', 'The file size does not match the upload ticket.');
+    if ((await this.deps.store.totalBytes()) + bytes.length > DEMO_STORE_MAX_BYTES) {
+      throw new PortalError('validation', 413, 'The demo has reached its storage limit. Ask for the demo to be reset.');
+    }
     await this.deps.store.put(claims.k, { contentType: claims.c, bytes });
   }
 

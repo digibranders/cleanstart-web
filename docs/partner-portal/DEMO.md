@@ -23,15 +23,22 @@ Not simulated: the database (real Postgres, real row level security, real sign i
 
 ## Guard rails
 
-1. **Deployment guard** (`assertDemoModeAllowed`, `src/server/demo.ts`). It runs first thing in `register()` (`src/instrumentation.ts`, from the raw process environment, so it holds even with `SKIP_ENV_VALIDATION`), again in `loadEnv`, and at the start of both scripts. In production it refuses a `DATABASE_URL` or `DATABASE_OWNER_URL` whose host is loopback or a bare internal name (the droplet's database is `postgres` on the compose network). In every environment it refuses a host under `cleanstart.com`, a host on `PORTAL_DEMO_DENY_HOSTS` (comma separated hosts or parent domains) and an `APP_URL` of `partners.cleanstart.com`. It never prints a password. A refusal prints `Demo mode refused: ...` and exits non-zero in production (it throws elsewhere, like an invalid environment). Limit: it checks host names, so an IP alias of a denied host is not seen: put such an address on `PORTAL_DEMO_DENY_HOSTS`.
-2. **Relaxed checks only for the demo.** With the switch on, `R2_*`, `BREVO_*`, `HUBSPOT_*` and `SENTRY_DSN` are not required in production. With the switch off nothing is relaxed (tested).
-3. **Review gate.** In demo mode in production `PORTAL_REVIEW_PASSWORD` is required, so a hosted demo can never start open. It is the existing HTTP Basic gate in `src/proxy.ts`: everything is behind it except `/api/health`, `/api/hubspot/webhook` (answers 404, no secret is set), `robots.txt` and static assets.
+1. **Deployment guard** (`assertDemoModeAllowed`, `src/server/demo.ts`). It runs first thing in `register()` (`src/instrumentation.ts`, from the raw process environment, so it holds even with `SKIP_ENV_VALIDATION=1`), again in `loadEnv`, and at the start of both scripts. It never prints a password. A refusal prints `Demo mode refused: ...` and exits non-zero in production (it throws elsewhere, like an invalid environment). It checks, in this order:
+   - **No real service credentials.** `HUBSPOT_PORTAL_TOKEN`, `HUBSPOT_WEBHOOK_SECRET`, `R2_ENDPOINT`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `BREVO_API_KEY` and `CMS_INTAKE_API_KEY` must be unset (an empty value counts as unset).
+   - **The review password.** In production `PORTAL_REVIEW_PASSWORD` is required and must be at least 16 characters. The Turnstile keys, when set, must be Cloudflare's test keys.
+   - **A positive allow list.** In production `PORTAL_DEMO_DATABASE_HOSTS` is required (comma separated hosts or parent domains) and the host of `DATABASE_URL` and of `DATABASE_OWNER_URL` must match an entry. Unset or empty, a hosted demo does not start. Set in another environment, it is enforced there too.
+   - **The deny rules, as a second check.** A host under `cleanstart.com` or on `PORTAL_DEMO_DENY_HOSTS` (comma separated hosts or parent domains) is refused in every environment, and an `APP_URL` of `partners.cleanstart.com` too. In production a loopback host or a bare internal name is refused as well (the droplet's database is `postgres` on the compose network).
+   - **One database.** `DATABASE_URL` and `DATABASE_OWNER_URL` must name the same host, port and database (only the user and password may differ).
+   - **Hosts are read the way `pg` reads them.** A URL with a `host`, `hostaddr`, `port` or `dbname` query parameter is refused (`pg` lets those override the address), and so is a `%` in the host (`pg` decodes it, so `%63leanstart.com` is `cleanstart.com`) and any host that is not a plain name, a dotted address or a bracketed IPv6 address. Before any comparison a host is written one way: lower case, every trailing dot removed, IPv4 in dotted decimal whatever the input (`0x7f.0.0.1`, `0177.0.0.1` and `2130706433` are `127.0.0.1`), IPv6 compressed, an IPv4 mapped IPv6 address as IPv4. The deny list entries get the same treatment. Limit: a DNS name that points at a denied address is not seen (it is not resolved); the allow list is what closes that gap.
+2. **Relaxed checks only for the demo.** With the switch on, `R2_*`, `BREVO_*`, `HUBSPOT_*`, `SENTRY_DSN` and `DATABASE_OWNER_URL` are not required in production (the running app does not use the owner URL; the guard still checks it when it is set, and the scripts require it). With the switch off nothing is relaxed (tested). An empty `PORTAL_DEMO_MODE`, `PORTAL_DEMO_DENY_HOSTS` or `PORTAL_DEMO_DATABASE_HOSTS` means off or unset, in every mode.
+3. **Review gate.** In demo mode in production `PORTAL_REVIEW_PASSWORD` is required, at least 16 characters, so a hosted demo can never start open (this is checked by the guard, so `SKIP_ENV_VALIDATION=1` does not skip it). It is the existing HTTP Basic gate in `src/proxy.ts`: everything is behind it except `/api/health`, `/api/hubspot/webhook` (answers 404, no secret is set), `robots.txt` and static assets. The sign in password of the seeded accounts is in this repository, so it is public: the review gate is the protection, which makes its password the one that matters. Put a rate limit in front of it (see "Vercel project").
 4. **Never indexed.** Every response carries `X-Robots-Tag: noindex, nofollow` (`next.config.ts` sets it on every route and, in demo mode, the proxy sets it again on its own answers: the 401, redirects and health). `robots.txt` is `Disallow: /`. The real portal's output is unchanged.
-5. **Reset needs the same guard.** `demo:reset` truncates every table, so it refuses unless `PORTAL_DEMO_MODE=1` and the deployment guard passes for both database URLs.
+5. **Reset and setup prove the database is a demo one.** Both scripts need `PORTAL_DEMO_MODE=1` and the guard for both URLs. Then, asking the database itself as the owner, `demo:reset` refuses unless `current_database()` has "demo" in its name (any case), and both commands refuse a `public` schema that has tables but no `demo_files` table (the table `demo:setup` creates is the marker: an empty database is a fresh one). Nothing is truncated before these checks pass.
+6. **Uploads are bounded.** The PUT route checks the declared `Content-Length` against the ticket and the 8 MB limit before it reads the body (413; 411 when none is declared), and all stored uploads together may not exceed 200 MB (413 until `demo:reset`). A file that is stored and then fails the type check stays in `demo_files` until the next reset: the 200 MB total bounds it.
 
 ## Accounts
 
-One shared demo password for every account: `Portal-dev-2026!` (the dev seed password, `DEV_SEED_PASSWORD` in `src/db/fixtures.ts`). It is demo only and not a secret; the review password in front of the site is the real gate. Role (screen set) in brackets.
+One shared demo password for every account: `Portal-dev-2026!` (the dev seed password, `DEV_SEED_PASSWORD` in `src/db/fixtures.ts`). It is demo only and public (it is in this repository); the review password in front of the site is the real gate. Role (screen set) in brackets.
 
 Staff (CleanStart):
 
@@ -57,7 +64,7 @@ Sign in is limited to 10 attempts a minute for the whole site (one shared bucket
 
 ## Setup and reset
 
-Both read the environment of the shell, and `.env.demo.local` (git ignored) if it exists. Set `PORTAL_DEMO_MODE=1`, `DATABASE_URL`, `DATABASE_OWNER_URL` and `AUTH_SECRET` first.
+Both read the environment of the shell, and `.env.demo.local` (git ignored) if it exists. Set `PORTAL_DEMO_MODE=1`, `DATABASE_URL`, `DATABASE_OWNER_URL` and `AUTH_SECRET` first (in production also `PORTAL_DEMO_DATABASE_HOSTS` and `PORTAL_REVIEW_PASSWORD`, which the guard requires).
 
 ```bash
 pnpm --filter @cleanstart/portal demo:setup   # migrate, create demo_files, seed once
@@ -66,13 +73,13 @@ pnpm --filter @cleanstart/portal demo:reset   # truncate every table, then the s
 
 - `demo:setup` runs the migrations and `rls.sql` as `portal_owner` (`DATABASE_OWNER_URL`), creates the `demo_files` table with a grant to `portal_app`, then seeds the mock data (the dev seed, 21 partners, 15 registrations, 12 documents) if the `partners` table is empty. A second run seeds nothing. It creates no role and no extension: `portal_owner`, `portal_app` and `pg_trgm` must already exist (the first migration runs `CREATE EXTENSION IF NOT EXISTS pg_trgm`, which does nothing when the extension is there).
 - `demo:reset` empties every table in the `public` schema (drizzle's migration history is kept), restarts the sequences, then runs setup. Run it before a review session to put the demo back to the seed.
-- Both refuse unless `PORTAL_DEMO_MODE=1` and the deployment guard passes.
+- Both refuse unless `PORTAL_DEMO_MODE=1` and the deployment guard passes, and `demo:reset` also refuses a database that does not have "demo" in its name. `demo:setup` refuses a database that already has tables but no `demo_files` table.
 
 ## The demo database
 
 A Postgres 16 server with a database `portal_demo`, the roles `portal_owner` (owns the schema, used for setup and reset) and `portal_app` (what the running app uses; neither is a superuser and neither bypasses row level security) and `pg_trgm` installed. No hosted database service is involved.
 
-- **TLS only.** The URLs carry `?sslmode=require` and the server certificate is self signed. The installed `pg` (8.21, `pg-connection-string` 2.13) reads `sslmode=require` as `verify-full`, which would refuse that certificate. `src/db/connection.ts` (`poolConnection`) therefore turns `sslmode=require` into an encrypted connection with `rejectUnauthorized: false`, which is what `require` means in libpq. It is used by the app's pools, `scripts/migrate.ts`, `scripts/demo.ts` and `drizzle.config.ts`. A URL without `sslmode`, or with any other mode, is passed through unchanged. Trade-off: the link is encrypted but the server is not authenticated, which is acceptable for a database of mock data and not for anything else; never use `verify-full` here without a CA file.
+- **TLS only.** The URLs carry `?sslmode=require` and the server certificate is self signed. The installed `pg` (8.21, `pg-connection-string` 2.13) reads `sslmode=require` as `verify-full`, which would refuse that certificate. `src/db/connection.ts` (`poolConnection`) therefore turns `sslmode=require` into an encrypted connection with `rejectUnauthorized: false`, which is what `require` means in libpq. It does this only when `PORTAL_DEMO_MODE=1`: with the switch off every URL is passed through unchanged, so the real portal's TLS handling is the driver's. It is used by the app's pools, `scripts/migrate.ts`, `scripts/demo.ts` and `drizzle.config.ts`. A URL without `sslmode`, or with any other mode (`verify-full` is never downgraded), is passed through unchanged. Trade-off: the link is encrypted but the server is not authenticated, which is acceptable for a database of mock data and not for anything else; never use `verify-full` here without a CA file.
 - **Direct connection, no connection pooler.** The system pool sets its role with a startup option (`-c app.kind=system`), and every request transaction sets `app.kind`, `app.partner_id` and `app.user_id` with `set_config(..., true)` for row level security. A transaction pooler (pgbouncer in transaction mode, Neon's pooled host) does not accept the startup option and must not be put between the app and the database: use the server's own host and port.
 - **Connections.** The server allows 40. In demo mode each serverless instance holds two pools of one connection each (`src/db/pool-size.ts`), so two connections per warm instance. `PORTAL_DB_POOL_MAX` overrides both pools.
 
@@ -98,10 +105,11 @@ Environment variables (Production, and Preview if previews are used; all are run
 | Name | Value or source | Required |
 | --- | --- | --- |
 | `PORTAL_DEMO_MODE` | `1` | Yes |
-| `PORTAL_REVIEW_PASSWORD` | a password you choose; reviewers type it in the browser prompt | Yes (the app refuses to start without it in demo mode) |
+| `PORTAL_REVIEW_PASSWORD` | a password you choose, at least 16 random characters; reviewers type it in the browser prompt | Yes (the app refuses to start without it in demo mode, or with a shorter one) |
+| `PORTAL_DEMO_DATABASE_HOSTS` | the demo database host (or its parent domain), for example `<demo-vm-host>`: the Postgres in Docker on the Azure test VM. Placeholder: the real host name is the product owner's to fill in. Both database URLs must match it | Yes, a hosted demo does not start without it |
 | `PORTAL_DEMO_DENY_HOSTS` | the production database hosts and addresses, comma separated (for example the droplet's IP and `cleanstart.com`) | Yes, as a second line of defence |
 | `DATABASE_URL` | `postgresql://portal_app:<password>@<demo-vm-host>:5432/portal_demo?sslmode=require` (direct, see above) | Yes |
-| `DATABASE_OWNER_URL` | `postgresql://portal_owner:<password>@<demo-vm-host>:5432/portal_demo?sslmode=require`. The running app does not use it; it is required in production and the guard checks it. Needed by `demo:setup` and `demo:reset` wherever they run. | Yes |
+| `DATABASE_OWNER_URL` | `postgresql://portal_owner:<password>@<demo-vm-host>:5432/portal_demo?sslmode=require`. The running app does not use it, so it may be left out of the Vercel project; when it is set the guard checks it (same host, port and database as `DATABASE_URL`). Needed by `demo:setup` and `demo:reset` wherever they run. | No (yes for the scripts) |
 | `AUTH_SECRET` | at least 32 random characters (`openssl rand -base64 32`); signs sessions and the demo file tokens | Yes |
 | `APP_URL` | the demo's public https address, no trailing slash, for example `https://portal-demo.example.net`; it must not be `https://partners.cleanstart.com` | Yes |
 | `PORTAL_TRUSTED_PROXY_HOPS` | `1`: Vercel writes the visitor address as the last `x-forwarded-for` entry; without it all visitors share one sign in rate limit bucket | Yes |
@@ -109,7 +117,9 @@ Environment variables (Production, and Preview if previews are used; all are run
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` | leave unset (the test keys above are the default); if set, only the test values are accepted | No |
 | `LOG_LEVEL` | `info` (default) | No |
 
-Do not set: `HUBSPOT_*`, `BREVO_*`, `R2_*`, `SENTRY_*`, `CMS_*`, `PORTAL_JOBS_ENABLED`, `NEXT_OUTPUT`. They are ignored or refused in demo mode and must never carry real credentials.
+Do not set: `HUBSPOT_*`, `BREVO_*`, `R2_*`, `SENTRY_*`, `CMS_*`, `PORTAL_JOBS_ENABLED`, `NEXT_OUTPUT`. The guard refuses a start with `HUBSPOT_PORTAL_TOKEN`, `HUBSPOT_WEBHOOK_SECRET`, `R2_ENDPOINT`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `BREVO_API_KEY` or `CMS_INTAKE_API_KEY` set; the others are ignored. None may carry real credentials.
+
+Rate limit the review gate. The gate is the only protection of a demo whose sign in password is public, and a 16 character password can still be guessed at unlimited speed. In the Vercel dashboard add a Firewall rate limit rule (Project, Firewall, Custom Rules, action Rate Limit) that matches every path and limits one IP address to about 20 requests a minute, with a Deny or a Challenge when it is exceeded. Keep `/api/health` out of the rule if an uptime check polls it from a fixed address.
 
 Setting the database side: the demo database needs the two roles and `pg_trgm` once (`apps/portal/scripts/db-bootstrap.sql` is the reference for the grants: `portal_app` gets `CONNECT` and schema `USAGE` only, the tables and their grants come from the migrations and `rls.sql` that `demo:setup` runs as `portal_owner`). Then run `demo:setup` from any machine that can reach the server, with the two URLs above.
 

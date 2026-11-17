@@ -5,7 +5,9 @@ import { getDemoFileStorage } from '@/server/files/instance';
 export async function PUT(request: Request): Promise<Response> {
   try {
     const storage = getDemoFileStorage();
-    await storage.acceptUpload(new URL(request.url).searchParams.get('t') ?? '', request.headers.get('content-type'), new Uint8Array(await request.arrayBuffer()));
+    const token = new URL(request.url).searchParams.get('t') ?? '';
+    storage.precheckUpload(token, request.headers.get('content-length'));
+    await storage.acceptUpload(token, request.headers.get('content-type'), new Uint8Array(await request.arrayBuffer()));
     return new Response(null, { status: 200, headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
     return fileErrorResponse(error);

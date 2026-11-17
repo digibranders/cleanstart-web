@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { fixedClock } from '@/lib/clock';
 import { NotFoundError } from '@/server/errors';
-import { DemoFileStorage, type DemoFileStore } from './demo';
+import { DEMO_STORE_MAX_BYTES, DemoFileStorage, type DemoFileStore } from './demo';
 import { placeholderFile } from './demo-placeholder';
 import { documentKey } from './rules';
 import { verifyUpload } from './upload';
@@ -18,6 +18,7 @@ const memoryStore = (titles: Record<string, string> = {}): DemoFileStore & { fil
     put: async (key, file) => void files.set(key, file),
     delete: async (key) => void files.delete(key),
     titleForKey: async (key) => titles[key] ?? null,
+    totalBytes: async () => [...files.values()].reduce((sum, file) => sum + file.bytes.length, 0),
   };
 };
 
@@ -110,5 +111,31 @@ describe('DemoFileStorage', () => {
     const fake = await storage.presignPut({ key: wrongType, contentType: 'application/pdf', contentLength: 3 });
     await storage.acceptUpload(tokenOf(fake.url), 'application/pdf', Uint8Array.from([1, 2, 3]));
     await expect(verifyUpload(storage, { key: wrongType, size: 3, mime: 'application/pdf', originalName: 'x.pdf' }, { fetchImpl: noNetwork })).rejects.toMatchObject({ reason: 'file_type_not_allowed' });
+  });
+
+  it('checks the declared length against the ticket and the demo limit before the body is read', async () => {
+    const { storage } = build();
+    const { url } = await storage.presignPut({ key: KEY, contentType: 'application/pdf', contentLength: 11 });
+    const token = tokenOf(url);
+    expect(() => storage.precheckUpload(token, '11')).not.toThrow();
+    expect(() => storage.precheckUpload(token, '12')).toThrow(expect.objectContaining({ httpStatus: 413 }));
+    expect(() => storage.precheckUpload(token, 'abc')).toThrow(expect.objectContaining({ httpStatus: 413 }));
+    expect(() => storage.precheckUpload(token, null)).toThrow(expect.objectContaining({ httpStatus: 411 }));
+    expect(() => storage.precheckUpload(`${token}x`, '11')).toThrow(NotFoundError);
+    const big = 9 * 1024 * 1024;
+    const bigTicket = await storage.presignPut({ key: KEY, contentType: 'application/pdf', contentLength: big });
+    expect(() => storage.precheckUpload(tokenOf(bigTicket.url), String(big))).toThrow(expect.objectContaining({ httpStatus: 413 }));
+  });
+
+  it('stops storing once the demo holds its total, so the database cannot be filled', async () => {
+    const full = memoryStore();
+    full.totalBytes = async () => DEMO_STORE_MAX_BYTES - 5;
+    const { storage } = build(undefined, full);
+    const { url } = await storage.presignPut({ key: KEY, contentType: 'application/pdf', contentLength: 11 });
+    await expect(storage.acceptUpload(tokenOf(url), 'application/pdf', pdf())).rejects.toMatchObject({ httpStatus: 413 });
+    expect(full.files.has(KEY)).toBe(false);
+    full.totalBytes = async () => DEMO_STORE_MAX_BYTES - 11;
+    await storage.acceptUpload(tokenOf(url), 'application/pdf', pdf());
+    expect(full.files.has(KEY)).toBe(true);
   });
 });

@@ -144,7 +144,8 @@ describe('loadEnv in demo mode', () => {
     APP_URL: 'https://portal-demo.example.net',
     DATABASE_URL: hosted,
     DATABASE_OWNER_URL: hosted,
-    PORTAL_REVIEW_PASSWORD: 'review-password',
+    PORTAL_REVIEW_PASSWORD: 'review-password-16',
+    PORTAL_DEMO_DATABASE_HOSTS: 'neon.tech',
   };
 
   it('needs none of the real integrations in production', () => {
@@ -163,14 +164,41 @@ describe('loadEnv in demo mode', () => {
   });
 
   it('still requires what the demo itself uses', () => {
-    const { APP_URL: _app, DATABASE_OWNER_URL: _owner, ...rest } = demo;
-    expect(() => loadEnv(rest)).toThrow(/APP_URL is required in production[\s\S]*DATABASE_OWNER_URL is required in production/);
+    const { APP_URL: _app, ...rest } = demo;
+    expect(() => loadEnv(rest)).toThrow(/APP_URL is required in production/);
     expect(() => loadEnv({ ...demo, APP_URL: 'http://portal-demo.example.net' })).toThrow(/APP_URL must start with https/);
+  });
+
+  it('does not need DATABASE_OWNER_URL to run, but the real portal still does', () => {
+    const { DATABASE_OWNER_URL: _owner, ...rest } = demo;
+    expect(loadEnv(rest).DATABASE_OWNER_URL).toBeUndefined();
+    const { DATABASE_OWNER_URL: _realOwner, ...realRest } = production;
+    expect(() => loadEnv(realRest)).toThrow(/DATABASE_OWNER_URL is required in production/);
+  });
+
+  it('checks a DATABASE_OWNER_URL that is present', () => {
+    expect(() => loadEnv({ ...demo, DATABASE_OWNER_URL: 'postgresql://portal_owner:pw@elsewhere.neon.tech/portal' })).toThrow(/same host, port and database/);
+  });
+
+  it('treats an empty switch or host list as off in every mode, never as a parse failure', () => {
+    expect(loadEnv({ ...production, PORTAL_DEMO_MODE: '', PORTAL_DEMO_DENY_HOSTS: '', PORTAL_DEMO_DATABASE_HOSTS: '' }).NODE_ENV).toBe('production');
+    expect(loadEnv({ ...base, PORTAL_DEMO_MODE: '', PORTAL_DEMO_DENY_HOSTS: '', PORTAL_DEMO_DATABASE_HOSTS: '' }).NODE_ENV).toBe('development');
+  });
+
+  it('refuses real service credentials in demo mode', () => {
+    expect(() => loadEnv({ ...demo, BREVO_API_KEY: 'k' })).toThrow(/BREVO_API_KEY is set/);
   });
 
   it('requires the review password in production, so a hosted demo is never open', () => {
     const { PORTAL_REVIEW_PASSWORD: _password, ...rest } = demo;
     expect(() => loadEnv(rest)).toThrow(/PORTAL_REVIEW_PASSWORD is required in demo mode/);
+    expect(() => loadEnv({ ...demo, PORTAL_REVIEW_PASSWORD: 'x'.repeat(15) })).toThrow(/at least 16 characters/);
+  });
+
+  it('enforces the guard rules even with SKIP_ENV_VALIDATION, because the guard reads the raw environment', async () => {
+    const { assertDemoModeAllowed } = await import('./server/demo');
+    expect(() => assertDemoModeAllowed({ ...demo, SKIP_ENV_VALIDATION: '1', PORTAL_REVIEW_PASSWORD: 'short' })).toThrow(/PORTAL_REVIEW_PASSWORD/);
+    expect(() => assertDemoModeAllowed({ ...demo, SKIP_ENV_VALIDATION: '1', TURNSTILE_SECRET_KEY: 'real' })).toThrow(/TURNSTILE_SECRET_KEY/);
   });
 
   it('uses Cloudflare test Turnstile keys and refuses any other', () => {

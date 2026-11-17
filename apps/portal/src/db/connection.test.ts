@@ -1,7 +1,10 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { poolConnection } from './connection';
 
 describe('poolConnection', () => {
+  beforeEach(() => vi.stubEnv('PORTAL_DEMO_MODE', '1'));
+  afterEach(() => vi.unstubAllEnvs());
+
   it('leaves a URL without sslmode exactly as it was, so nothing changes for the real portal', () => {
     for (const url of ['postgresql://portal_app:pw@localhost:5432/cleanstart_portal', 'postgresql://u:p%40ss@db.internal/d?application_name=portal']) {
       expect(poolConnection(url)).toEqual({ connectionString: url });
@@ -36,5 +39,20 @@ describe('poolConnection', () => {
 
   it('passes something that is not a URL through unchanged and lets the driver report it', () => {
     expect(poolConnection('not a url')).toEqual({ connectionString: 'not a url' });
+  });
+
+  it('never touches sslmode=require unless demo mode is exactly 1, so the real portal keeps the driver behaviour', () => {
+    const url = 'postgresql://portal_app:pw@db.example.net:5432/portal?sslmode=require';
+    for (const value of [undefined, '', '0', 'true']) {
+      vi.stubEnv('PORTAL_DEMO_MODE', value as string);
+      expect(poolConnection(url), String(value)).toEqual({ connectionString: url });
+    }
+  });
+
+  it('never downgrades verify-full, with demo mode on or off', () => {
+    const url = 'postgresql://u:p@db.example.net/d?sslmode=verify-full';
+    expect(poolConnection(url)).toEqual({ connectionString: url });
+    vi.stubEnv('PORTAL_DEMO_MODE', '');
+    expect(poolConnection(url)).toEqual({ connectionString: url });
   });
 });
