@@ -19,7 +19,7 @@ export function PodcastEpisodeCard({
   const videoId = resolveVideoId(episode);
   if (!videoId) return null;
 
-  const thumb = episode.thumbnailOverride?.url ?? null;
+  const thumb = episode.thumbnailOverride?.url ?? episode.resolvedThumbnailUrl ?? null;
 
   if (size === "featured") {
     return (

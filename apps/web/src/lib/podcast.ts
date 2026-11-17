@@ -1,4 +1,6 @@
 import { fetchCMS } from "./cms-fetch";
+import { resolveVideoId } from "./podcast-utils";
+import { bestYoutubeThumbnail } from "./youtube-thumbnail";
 
 export type PodcastMediaImage = {
   url?: string | null;
@@ -15,6 +17,8 @@ export type PodcastEpisode = {
   youtubeUrl: string;
   youtubeVideoId?: string | null;
   thumbnailOverride?: PodcastMediaImage | null;
+  /** Server-resolved YouTube thumbnail, set only when no `thumbnailOverride` exists. */
+  resolvedThumbnailUrl?: string | undefined;
   abstract?: string | null;
   featured?: boolean | null;
   heroEpisode?: boolean | null;
@@ -43,6 +47,13 @@ type PayloadListResponse<T> = {
 export type PodcastListResponse = PayloadListResponse<PodcastEpisode>;
 
 
+async function withResolvedThumbnail(episode: PodcastEpisode): Promise<PodcastEpisode> {
+  if (episode.thumbnailOverride?.url) return episode;
+  const videoId = resolveVideoId(episode);
+  if (!videoId) return episode;
+  return { ...episode, resolvedThumbnailUrl: await bestYoutubeThumbnail(videoId) };
+}
+
 /**
  * The single episode flagged `heroEpisode` in the CMS (the Introduction video).
  * If several are flagged the most recent wins; callers fall back to the newest
@@ -59,7 +70,8 @@ export async function getHeroEpisode(): Promise<PodcastEpisode | null> {
   const data = await fetchCMS<PodcastListResponse>(
     `/api/podcastEpisodes?${params.toString()}`,
   );
-  return data.docs[0] ?? null;
+  const episode = data.docs[0];
+  return episode ? withResolvedThumbnail(episode) : null;
 }
 
 export async function getPodcastEpisodes({
@@ -76,9 +88,10 @@ export async function getPodcastEpisodes({
     page: String(page),
     sort: "-publicationDate",
   });
-  return fetchCMS<PodcastListResponse>(
+  const data = await fetchCMS<PodcastListResponse>(
     `/api/podcastEpisodes?${params.toString()}`,
   );
+  return { ...data, docs: await Promise.all(data.docs.map(withResolvedThumbnail)) };
 }
 
 export async function getFeaturedPodcastEpisodes(
@@ -94,7 +107,7 @@ export async function getFeaturedPodcastEpisodes(
   const data = await fetchCMS<PodcastListResponse>(
     `/api/podcastEpisodes?${params.toString()}`,
   );
-  return data.docs;
+  return Promise.all(data.docs.map(withResolvedThumbnail));
 }
 
 // Client-safe helpers live in `podcast-utils.ts` so client components

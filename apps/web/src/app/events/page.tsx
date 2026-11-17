@@ -25,7 +25,7 @@ import { JsonLd, breadcrumbSchema, itemListSchema } from "@/lib/seo/jsonld";
 // on the Events collection) handles instant updates when an event is published.
 export const revalidate = 21600; // 6h ISR fallback — on-demand publish revalidation keeps this fresh
 
-const TITLE = "Events";
+const TITLE = "DevSecOps and Cybersecurity Events";
 const DESCRIPTION =
   "Explore CleanStart's past and upcoming events including DevOps, DevSecOps, and cybersecurity conferences, summits, and meetups across India and beyond.";
 

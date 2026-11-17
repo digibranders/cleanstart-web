@@ -121,7 +121,7 @@ export function PodcastHero({ featuredHero }: Props): React.ReactElement {
             <YouTubeEmbed
               videoId={heroVideoId}
               title={featuredHero.title}
-              thumbnailUrl={featuredHero.thumbnailOverride?.url ?? null}
+              thumbnailUrl={featuredHero.thumbnailOverride?.url ?? featuredHero.resolvedThumbnailUrl ?? null}
               rounded="16px"
               className="ring-1 ring-white/10 shadow-[0_30px_80px_rgba(0,0,0,0.45)]"
             />
