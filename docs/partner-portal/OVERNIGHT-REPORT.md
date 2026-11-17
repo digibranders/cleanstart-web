@@ -2,6 +2,8 @@
 
 Written on 2026-11-13 (IST) by the Wave 2 final verification session (task V). Branch `feat/portal-build`. The code state checked below is `8d5f7bf5` (the last code commit; `43f5cbad` plus one test). The last good tag is `portal-w2`, on the commit that adds this report (`git rev-parse --short portal-w2`). Nothing was pushed.
 
+Hosted demo on mock data (round 3, task D): see `DEMO.md`.
+
 ## Summary
 
 The portal is built and runs locally end to end against a fake HubSpot: apply, approve, invite, accept, register a deal, accept the deal, create it in HubSpot, move its stage there and see it on the partner page, request and grant an extension. Every check in step 1 passes on the final tree (1682 unit tests, 78 browser tests, 0 dependency advisories). It has never run against anything real: not HubSpot, R2, Brevo, Turnstile, Google or Microsoft sign in, the droplet, Caddy, Cloudflare, or GitHub Actions. A person must do the droplet and key work first (section "What a person must do next"), then run the HubSpot checklist against a developer account, then the pilot.

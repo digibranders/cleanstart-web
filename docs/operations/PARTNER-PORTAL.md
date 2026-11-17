@@ -4,6 +4,8 @@ The partner portal is `apps/portal`: one Next.js container on the production dro
 
 Sections 1 to 3 are written by the build (M0.6). Sections 4 to 11 are the operations half (M5.9).
 
+A hosted demo of the same app on mock data (`PORTAL_DEMO_MODE=1`, fake HubSpot, files and email, no jobs) is described in `docs/partner-portal/DEMO.md`. It never runs on the droplet: the app refuses to start in demo mode against this database.
+
 ## 1. One-time droplet setup (a person, once)
 
 Nothing here is automated. Read each command before you run it. Take a droplet snapshot first.
