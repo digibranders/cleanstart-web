@@ -68,9 +68,9 @@ export function GuideDetailFAQ({
       <div className="relative mx-auto max-w-[1120px] px-6 pb-20">
         <div className="relative flex gap-12">
           {/* Spacer matches the TOC sidebar width so the FAQ aligns with the article body. */}
-          <div className="hidden xl:block shrink-0" style={{ width: "260px" }} aria-hidden />
+          <div className="hidden lg:block shrink-0" style={{ width: "260px" }} aria-hidden />
 
-          <div className="min-w-0 flex-1 mx-auto xl:mx-0" style={{ maxWidth: "680px" }}>
+          <div className="min-w-0 flex-1 mx-auto lg:mx-0" style={{ maxWidth: "680px" }}>
             <Reveal header>
               <h2
                 className="font-display font-semibold leading-[1.1] tracking-[-0.04em]"
