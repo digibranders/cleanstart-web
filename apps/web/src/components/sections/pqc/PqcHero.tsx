@@ -10,8 +10,9 @@ import { PqcHeroArt } from './PqcHeroArt';
  *
  * Unlike the telecom hero the artifact is not hidden on phones: it drops in
  * below the button at a smaller size, so the first screen on a phone still has
- * the page's one visual. The H1 carries `lcp`; the artifact is decorative and
- * is not a preload candidate.
+ * the page's one visual. The H1 carries `lcp`; the padlock is the first visible
+ * image on every screen, so it loads eagerly at high priority instead of waiting
+ * on the default lazy-load.
  *
  * Headline, supporting line and button label are the brief's, verbatim.
  */

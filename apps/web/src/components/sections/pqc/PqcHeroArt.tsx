@@ -109,6 +109,8 @@ export function PqcHeroArt({ className }: { className?: string }): React.ReactEl
           alt="A padlock set into a glass cube on a glowing platform, ringed by three orbits"
           fill
           sizes="(min-width: 1280px) 560px, (min-width: 1024px) 40vw, 72vw"
+          loading="eager"
+          fetchPriority="high"
           className="z-[1] object-contain"
         />
         <OrbitLayer half="front" />
