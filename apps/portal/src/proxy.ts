@@ -2,6 +2,7 @@ import { createHash, timingSafeEqual } from "node:crypto";
 import { getSessionCookie } from "better-auth/cookies";
 import { type NextRequest, NextResponse } from "next/server";
 import { PATH_HEADER } from "@/lib/next-path";
+import { isDemoMode } from "@/server/demo";
 import { ROUTES } from "@/lib/routes";
 import { buildCsp, createNonce, originsFromEnv } from "@/server/security/csp";
 import { CLIENT_IP_HEADER, clientIpFromForwardedFor, parseTrustedProxyHops } from "@/server/security/client-ip";
@@ -85,7 +86,7 @@ function requestHeadersFor(request: NextRequest): Headers {
  * so the header goes on the request as well as the response (Next docs, "Content Security Policy"). API routes
  * return JSON, so next.config.ts gives them a closed policy instead.
  */
-export function proxy(request: NextRequest): NextResponse {
+function handle(request: NextRequest): NextResponse {
   const requestHeaders = requestHeadersFor(request);
   const { pathname, search } = request.nextUrl;
   // The container health check, the deploy smoke probe and `compose --wait` must not need the review password (plan 06 M0.6).
@@ -110,6 +111,13 @@ export function proxy(request: NextRequest): NextResponse {
   requestHeaders.set("Content-Security-Policy", csp);
   const response = NextResponse.next({ request: { headers: requestHeaders } });
   response.headers.set("Content-Security-Policy", csp);
+  return response;
+}
+
+/** The proxy. In demo mode every answer, the 401 and the redirects included, also says noindex: the demo must never be indexed (next.config.ts sets the same header on pages). */
+export function proxy(request: NextRequest): NextResponse {
+  const response = handle(request);
+  if (isDemoMode()) response.headers.set("X-Robots-Tag", "noindex, nofollow");
   return response;
 }
 

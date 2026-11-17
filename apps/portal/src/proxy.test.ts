@@ -211,3 +211,30 @@ describe("odd path variants", () => {
     expect(new URL(response.headers.get("location") ?? "").pathname).toBe("/sign-in");
   });
 });
+
+describe("demo mode", () => {
+  const paths = ["/sign-in", "/partner/deals", "/api/health", "/api/auth/get-session", "/api/hubspot/webhook"];
+
+  it("marks every response noindex, whatever the proxy answered", () => {
+    vi.stubEnv("PORTAL_DEMO_MODE", "1");
+    vi.stubEnv("PORTAL_REVIEW_PASSWORD", "open-sesame");
+    for (const path of paths) {
+      expect(proxy(request(path)).headers.get("x-robots-tag"), `${path} without a password`).toBe("noindex, nofollow");
+      expect(proxy(request(path, { authorization: basic("open-sesame"), cookie: "better-auth.session_token=a.b" })).headers.get("x-robots-tag"), path).toBe("noindex, nofollow");
+    }
+  });
+
+  it("still asks for the review password and still leaves the health check open", () => {
+    vi.stubEnv("PORTAL_DEMO_MODE", "1");
+    vi.stubEnv("PORTAL_REVIEW_PASSWORD", "open-sesame");
+    expect(proxy(request("/sign-in")).status).toBe(401);
+    expect(proxy(request("/sign-in", { authorization: basic("wrong") })).status).toBe(401);
+    expect(proxy(request("/sign-in", { authorization: basic("open-sesame") })).status).toBe(200);
+    expect(proxy(request("/api/health")).status).toBe(200);
+  });
+
+  it("adds nothing when the switch is off: the real portal answers exactly as before", () => {
+    vi.stubEnv("PORTAL_DEMO_MODE", "true");
+    for (const path of paths) expect(proxy(request(path)).headers.get("x-robots-tag"), path).toBeNull();
+  });
+});
