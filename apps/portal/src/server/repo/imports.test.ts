@@ -27,6 +27,8 @@ const SERVER_OWNERS: ReadonlyArray<{ match: RegExp; names: readonly string[] }> 
   { match: /^server\/repo\/context\.ts$/, names: ['appDb', 'systemDb'] },
   { match: /^server\/notify\.ts$/, names: ['db'] },
   { match: /^server\/(jobs|hubspot|auth|intake)\//, names: ['db', 'systemDb', 'pool'] },
+  // Demo mode only: the upload store of the generated placeholder storage (docs/partner-portal/DEMO.md) is not a table of the real schema.
+  { match: /^server\/files\/instance\.ts$/, names: ['pool'] },
 ];
 
 interface ClientImports {
