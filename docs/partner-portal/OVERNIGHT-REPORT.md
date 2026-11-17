@@ -22,6 +22,32 @@ A second round ran on `feat/portal-build` after the product owner's decisions. N
 - **Final checks on the merged tree (2026-11-16):** lint, typecheck and 1831 unit tests pass, the build exits 0, `verify-copy` is ok, the dependency audit reports 0 advisories, and the Playwright suite passes 116 of 116 (after the animation fix it was run on the final tree). The isolation matrix is part of the unit run. Docker and CI were not re-run.
 - **Still needs a person:** everything in "What a person must do next" (droplet, GitHub settings, real keys, HubSpot smoke and provisioning against portal 245478611, backups, legal text, screen reader pass), plus: a real R2 bucket for M3.2 Step 41; `HUBSPOT_WEBHOOK_SECRET` is still required in production by `env.ts` although nothing subscribes (make it optional if you want); delete any unused `PORTAL_GOOGLE_*` and `PORTAL_MICROSOFT_*` GitHub settings; the "Keep me signed in" default stays ticked (the product owner chose).
 
+## Round 3 update (2026-11-17)
+
+Round 3 ran on `feat/portal-r3` (cut from `origin/development`, nothing pushed). The Mac was overloaded part of the way through, so the second half ran under the owner's light-load rule: one agent at a time, targeted tests on one worker, no Playwright suite, one build per task at most.
+
+**Verified this round**
+- **Real docker build and run:** the image built (345 MB), the container started against local Postgres, reached healthy, and `/api/health` answered 200 with the security headers. The run also exposed a defect: a production start with an invalid environment kept serving 500s. It now prints the combined message and exits non-zero (`instrumentation.env-failure.test.ts`).
+- **`HUBSPOT_WEBHOOK_SECRET` is optional in production** (`env.ts`, `deploy-portal.yml`, `.env.example`, runbook). The webhook route answers an empty 404 and reads nothing while it is unset. Tests cover both.
+- **Last Google and Microsoft traces removed** from the plan snippets. Only the dated historical notes in this report remain.
+- **R2 adapter against a real S3 server (local MinIO), `PORTAL_S3_TEST=1`:** 9 of 9 pass (presigned PUT, wrong type and length refused, attachment GET, ranged read, `verifyUpload`, URL expiry, missing key, tampered signature, delete). Skipped by default, so CI is unchanged.
+- **Backup and restore on real local Postgres 16 and MinIO:** `backup.sh` dumped and uploaded the CMS and portal databases to separate buckets and fired the heartbeat once (stub URL). `restore-portal-drill.sh` restored the portal dump into a scratch database: all eight drill tables and the 62 row-level-security policies match the live copy. Logged in `docs/operations/RESTORE-LOG.md` as a local rehearsal.
+- **`actionlint` (with its shellcheck and pyflakes integrations off, which hung under load) and `shellcheck` on both scripts:** clean.
+- **Lockfile and the Vitest 4 overrides:** compared before and after for every non-portal importer; the same resolved closure except three optional-peer re-resolutions. The earlier "no version moves" claim is corrected in `SECURITY-PASS.md`.
+- **Plan step statuses:** reconciled (K). 22 steps stay unticked, nearly all because they need a person, a real service or the droplet.
+- **Persona rename:** the India partner manager is now Gaurav Jadhav (GJ, `gaurav.jadhav@cleanstart.com`) in the seed, mock data, fixtures, tests and routing copy.
+- **Demo mode** (`DEMO.md`): `PORTAL_DEMO_MODE=1` runs the real app on mock data with a fake HubSpot, generated placeholder files, a log email transport and no jobs. A guard refuses it against a production-looking database or app URL. Same build, same screens: 8 of 10 pages byte-identical with demo on and off (the other two differ only by a document open counter), 52 pages across 6 roles at 1440 and 393 returned 200, axe 0 violations on 3 screens. Reviewed by an independent security reviewer (see below).
+
+**Not run this round (load rule)**
+- The full Playwright suite and the full unit suite on the merged tree. Last full green: 116 of 116 e2e and 1831 unit tests on the round 2 tree. Round 3 changes were checked with targeted files only.
+- The role-by-role walkthrough of the non-demo app (the demo walk covers the same screens on the same build).
+
+**Corrected UNVERIFIED list (still needs a person)**
+- Real R2: the bucket CORS rule (MinIO ignores it), and M3.2 Step 41 items 4, 9, 10, 11 (browser save, real upload, replace, delete).
+- The first restore drill against real R2 and the droplet.
+- HubSpot items c and e in `HUBSPOT-CAPABILITIES.md`, real Brevo and Turnstile, and anything on the droplet or in GitHub settings.
+- Demo: a real Vercel build and deploy, TLS to the Azure database (unit-tested only), uploads over 4.5 MB on Vercel.
+
 ## Step 1: checks on the final tree
 
 Run in the worktree on 2026-11-13 between 14:03 and 14:15 IST. The unit run, lint, typecheck and build were repeated after the last test commit (`8d5f7bf5`); the other commands ran on `43f5cbad`, which differs only by that one test.
