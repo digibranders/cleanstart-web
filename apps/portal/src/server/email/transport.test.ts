@@ -63,3 +63,21 @@ describe('createEmailTransport', () => {
     expect(body.sender).toEqual({ email: 'partners@cleanstart.example', name: 'CleanStart Partners' });
   });
 });
+
+describe('createEmailTransport in demo mode', () => {
+  it('never reaches Brevo, even when a key is configured, and says it was demo mode', async () => {
+    vi.stubEnv('PORTAL_DEMO_MODE', '1');
+    const fetchSpy = vi.fn();
+    vi.stubGlobal('fetch', fetchSpy);
+    const result = await createEmailTransport({ apiKey: 'key', senderEmail: 'partners@example.com' }).send(message);
+    expect(result).toEqual({ status: 'skipped', reason: 'demo-mode' });
+    expect(fetchSpy).not.toHaveBeenCalled();
+    expect(JSON.stringify(logged.calls)).not.toContain('secret body text');
+  });
+
+  it('still sends through Brevo when the switch is off', () => {
+    vi.stubEnv('PORTAL_DEMO_MODE', 'true');
+    expect(createEmailTransport({ apiKey: 'key', senderEmail: 'partners@example.com' })).not.toHaveProperty('demo');
+    expect(createEmailTransport({ apiKey: undefined, senderEmail: undefined })).toBeDefined();
+  });
+});

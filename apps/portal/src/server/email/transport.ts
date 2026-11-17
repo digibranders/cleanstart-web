@@ -1,4 +1,5 @@
 import { env } from '@/env';
+import { isDemoMode } from '@/server/demo';
 import { log } from '@/server/log';
 import { createBrevoTransport } from './brevo';
 
@@ -42,7 +43,7 @@ const linksIn = (html: string): string[] =>
  * What development uses when Brevo is not configured. It logs the subject and, only when NODE_ENV is development, the links in the
  * message, so an invite or a reset link can be followed without sending anything. It never logs the body.
  */
-export function createLogTransport(): EmailTransport {
+export function createLogTransport(reason: 'brevo-not-configured' | 'demo-mode' = 'brevo-not-configured'): EmailTransport {
   return {
     async send(message) {
       log.info(
@@ -51,9 +52,9 @@ export function createLogTransport(): EmailTransport {
           recipients: message.to.length,
           ...(process.env.NODE_ENV === 'development' ? { links: linksIn(message.htmlContent) } : {}),
         },
-        'email skipped: Brevo is not configured',
+        reason === 'demo-mode' ? 'email skipped: demo mode' : 'email skipped: Brevo is not configured',
       );
-      return { status: 'skipped', reason: 'brevo-not-configured' };
+      return { status: 'skipped', reason };
     },
   };
 }
@@ -63,10 +64,11 @@ export interface EmailTransportConfig {
   senderEmail: string | undefined;
 }
 
-/** Brevo (/v3/smtp/email) when BREVO_API_KEY and BREVO_SENDER_EMAIL are set; otherwise the log transport. */
+/** Brevo (/v3/smtp/email) when BREVO_API_KEY and BREVO_SENDER_EMAIL are set; otherwise the log transport. Demo mode always logs, whatever is configured. */
 export function createEmailTransport(
   config: EmailTransportConfig = { apiKey: env.BREVO_API_KEY, senderEmail: env.BREVO_SENDER_EMAIL },
 ): EmailTransport {
+  if (isDemoMode()) return createLogTransport('demo-mode');
   if (!config.apiKey || !config.senderEmail) return createLogTransport();
   return createBrevoTransport({ apiKey: config.apiKey, senderEmail: config.senderEmail, senderName: PORTAL_SENDER_NAME });
 }

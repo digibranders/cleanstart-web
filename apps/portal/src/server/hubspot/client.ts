@@ -1,7 +1,9 @@
 // client.ts
 import { Client } from '@hubspot/api-client';
 import { env } from '@/env';
+import { isDemoMode } from '@/server/demo';
 import { IntegrationError } from '@/server/errors';
+import { DEMO_PIPELINE_ID, demoHubspot } from './demo';
 import {
   type AssociationRole, type DealSearchPage, type HsCompany, type HsDeal, type HubspotApi,
   HubspotError, STAGE_LABELS, type StageIds,
@@ -227,12 +229,14 @@ export interface HubspotConfig { token: string; pipelineId: string }
 
 /** null when the portal token or the partner pipeline id is unset (development, tests, a fresh environment). Jobs use it to skip with a warning. */
 export const readHubspotConfig = (): HubspotConfig | null => {
+  if (isDemoMode()) return { token: 'demo', pipelineId: DEMO_PIPELINE_ID };
   const token = env.HUBSPOT_PORTAL_TOKEN;
   const pipelineId = env.HUBSPOT_PARTNER_PIPELINE_ID;
   return token && pipelineId ? { token, pipelineId } : null;
 };
 
 export const createHubspot = (): HubspotApi => {
+  if (isDemoMode()) return demoHubspot();
   const token = env.HUBSPOT_PORTAL_TOKEN;
   if (!token) throw new IntegrationError('hubspot', 'HUBSPOT_PORTAL_TOKEN is not set');
   const client = new Client({ accessToken: token, numberOfApiCallRetries: 3 });
