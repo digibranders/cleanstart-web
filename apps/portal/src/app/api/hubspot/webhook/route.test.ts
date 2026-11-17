@@ -33,11 +33,16 @@ beforeEach(() => {
 });
 
 describe('POST /api/hubspot/webhook', () => {
-  it('answers 503 and does not poll while the secret is not configured', async () => {
+  it('answers 404 with an empty body, reads nothing and does not poll while the secret is not configured', async () => {
     mocks.env.HUBSPOT_WEBHOOK_SECRET = undefined;
-    const res = await POST(signed(BODY));
-    expect(res.status).toBe(503);
+    const req = signed(BODY);
+    const text = vi.spyOn(req, 'text');
+    const res = await POST(req);
+    expect(res.status).toBe(404);
+    expect(await res.text()).toBe('');
+    expect(text).not.toHaveBeenCalled();
     expect(mocks.triggerPoll).not.toHaveBeenCalled();
+    expect(mocks.captureException).not.toHaveBeenCalled();
   });
 
   it('answers 401 and does not poll for a bad signature', async () => {

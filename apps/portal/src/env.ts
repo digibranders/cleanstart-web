@@ -48,6 +48,7 @@ const schema = z
     HUBSPOT_PORTAL_TOKEN: optionalString,
     HUBSPOT_PARTNER_PIPELINE_ID: optionalString,
     HUBSPOT_USE_ASSOCIATION_LABELS: bool.default('false'),
+    // Not required in production: the portal polls and nothing subscribes to webhooks. The route answers 404 while this is unset.
     HUBSPOT_WEBHOOK_SECRET: optionalString,
     HUBSPOT_PORTAL_ID: optionalString,
     HUBSPOT_DEV_PORTAL_ID: optionalString,
@@ -88,7 +89,7 @@ const schema = z
     }
     const required = [
       'APP_URL', 'DATABASE_OWNER_URL', 'BREVO_API_KEY', 'BREVO_SENDER_EMAIL', 'R2_ENDPOINT', 'R2_BUCKET', 'R2_ACCESS_KEY_ID',
-      'R2_SECRET_ACCESS_KEY', 'HUBSPOT_PORTAL_TOKEN', 'HUBSPOT_PARTNER_PIPELINE_ID', 'HUBSPOT_WEBHOOK_SECRET',
+      'R2_SECRET_ACCESS_KEY', 'HUBSPOT_PORTAL_TOKEN', 'HUBSPOT_PARTNER_PIPELINE_ID',
       'TURNSTILE_SECRET_KEY', 'NEXT_PUBLIC_TURNSTILE_SITE_KEY', 'SENTRY_DSN',
     ] as const;
     for (const key of required) {

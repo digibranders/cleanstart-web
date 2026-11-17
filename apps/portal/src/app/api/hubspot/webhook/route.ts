@@ -11,7 +11,7 @@ const MAX_BODY_BYTES = 1_048_576;
 
 export async function POST(request: Request): Promise<NextResponse> {
   const secret = env.HUBSPOT_WEBHOOK_SECRET;
-  if (!secret) return NextResponse.json({ error: 'webhook not configured' }, { status: 503 });
+  if (!secret) return new NextResponse(null, { status: 404 });
   const declared = Number(request.headers.get('content-length'));
   if (Number.isFinite(declared) && declared > MAX_BODY_BYTES) return NextResponse.json({ error: 'payload too large' }, { status: 413 });
   const body = await request.text();
