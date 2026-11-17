@@ -63,8 +63,9 @@ const INDUSTRIES: readonly [Industry, Industry, Industry, Industry] = [
   },
   {
     label: 'Critical Infrastructure',
-    image: '/images/pqc/industry-infrastructure-v2.webp',
-    alt: '3D icon of an industrial plant with chimneys and a power pylon',
+    image: '/images/pqc/industry-infrastructure-v3.webp',
+    alt: '3D icon of a power grid with a pylon, a wind turbine and a substation',
+    scale: 1.25,
   },
 ];
 
