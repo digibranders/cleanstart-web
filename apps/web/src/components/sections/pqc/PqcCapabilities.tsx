@@ -22,7 +22,6 @@ const CARD_RADIUS = '24px';
 
 const CARD_BASE: React.CSSProperties = {
   borderRadius: CARD_RADIUS,
-  transition: 'transform 300ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 300ms ease',
 };
 
 function CardTitle({ children, color }: { children: React.ReactNode; color: string }): React.ReactElement {
@@ -60,7 +59,7 @@ export function PqcCapabilities(): React.ReactElement {
           {/* Post-Quantum Algorithms: the tall dark cell. */}
           <RevealItem className="lg:row-span-2">
             <article
-              className="group relative flex h-full min-h-[300px] flex-col justify-between overflow-hidden hover:-translate-y-1"
+              className="relative flex h-full min-h-[300px] flex-col justify-between overflow-hidden"
               style={{
                 ...CARD_BASE,
                 background: 'linear-gradient(180deg, #151021 0%, #131E8F 62.5%, #471EC0 100%)',
@@ -122,7 +121,7 @@ export function PqcCapabilities(): React.ReactElement {
           {/* Cryptographic Libraries: wide, white, hairline. */}
           <RevealItem className="lg:col-span-2">
             <article
-              className="group flex h-full items-center justify-between gap-6 hover:-translate-y-1"
+              className="flex h-full items-center justify-between gap-6"
               style={{
                 ...CARD_BASE,
                 background: '#FFFFFF',
@@ -137,7 +136,7 @@ export function PqcCapabilities(): React.ReactElement {
                   Validated open source libraries and versions
                 </p>
               </div>
-              <div className="relative h-[clamp(88px,8vw,116px)] w-[clamp(88px,8vw,116px)] shrink-0 transition-transform duration-300 group-hover:-translate-y-1">
+              <div className="relative h-[clamp(88px,8vw,116px)] w-[clamp(88px,8vw,116px)] shrink-0">
                 <Image
                   src="/images/telecom/icon-open-source.webp"
                   alt="3D icon of a code bracket on a platform"
@@ -153,7 +152,7 @@ export function PqcCapabilities(): React.ReactElement {
           {/* Runtime & Protocol Support: soft violet. */}
           <RevealItem>
             <article
-              className="group flex h-full flex-col hover:-translate-y-1"
+              className="flex h-full flex-col"
               style={{
                 ...CARD_BASE,
                 background: 'linear-gradient(135deg, #F3F0FF 0%, #EEF4FF 100%)',
@@ -162,7 +161,7 @@ export function PqcCapabilities(): React.ReactElement {
               }}
             >
               <div className="flex items-center gap-3">
-                <div className="relative h-[48px] w-[48px] shrink-0 transition-transform duration-300 group-hover:-translate-y-1">
+                <div className="relative h-[48px] w-[48px] shrink-0">
                   <Image
                     src="/images/telecom/icon-cloud-native.webp"
                     alt="3D icon of a cloud joined to a network"
@@ -183,7 +182,7 @@ export function PqcCapabilities(): React.ReactElement {
           {/* Technical Evidence: cyan ring. */}
           <RevealItem>
             <article
-              className="group flex h-full flex-col hover:-translate-y-1"
+              className="flex h-full flex-col"
               style={{
                 ...CARD_BASE,
                 background: '#FFFFFF',
@@ -193,7 +192,7 @@ export function PqcCapabilities(): React.ReactElement {
               }}
             >
               <div className="flex items-center gap-3">
-                <div className="relative h-[48px] w-[48px] shrink-0 transition-transform duration-300 group-hover:-translate-y-1">
+                <div className="relative h-[48px] w-[48px] shrink-0">
                   <Image
                     src="/images/compare/icon-sbom.webp"
                     alt="3D icon of a document with component cubes"
