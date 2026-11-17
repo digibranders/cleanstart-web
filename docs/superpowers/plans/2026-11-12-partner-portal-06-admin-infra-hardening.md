@@ -803,15 +803,10 @@ jobs:
           HUBSPOT_PORTAL_ID: ${{ vars.HUBSPOT_PORTAL_ID }}
           PORTAL_JOBS_ENABLED: ${{ vars.PORTAL_JOBS_ENABLED }}
           NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.PORTAL_TURNSTILE_SITE_KEY }}
-          MICROSOFT_TENANT_ID: ${{ vars.PORTAL_MICROSOFT_TENANT_ID }}
-          GOOGLE_CLIENT_ID: ${{ vars.PORTAL_GOOGLE_CLIENT_ID }}
-          MICROSOFT_CLIENT_ID: ${{ vars.PORTAL_MICROSOFT_CLIENT_ID }}
           # Secrets
           PORTAL_OWNER_DB_PASSWORD: ${{ secrets.PORTAL_OWNER_DB_PASSWORD }}
           PORTAL_APP_DB_PASSWORD: ${{ secrets.PORTAL_APP_DB_PASSWORD }}
           AUTH_SECRET: ${{ secrets.PORTAL_AUTH_SECRET }}
-          GOOGLE_CLIENT_SECRET: ${{ secrets.PORTAL_GOOGLE_CLIENT_SECRET }}
-          MICROSOFT_CLIENT_SECRET: ${{ secrets.PORTAL_MICROSOFT_CLIENT_SECRET }}
           BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
           R2_ACCESS_KEY_ID: ${{ secrets.PORTAL_R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.PORTAL_R2_SECRET_ACCESS_KEY }}
@@ -1054,9 +1049,8 @@ Repository variables (Settings, Secrets and variables, Variables):
 | `PARTNERS_NOTIFY_EMAIL` | fallback staff address |
 | `HUBSPOT_PARTNER_PIPELINE_ID`, `HUBSPOT_PORTAL_ID`, `HUBSPOT_USE_ASSOCIATION_LABELS` | from `docs/partner-portal/HUBSPOT-PROVISIONING.md` |
 | `PORTAL_JOBS_ENABLED` | leave unset (the workflow renders `true`) |
-| `PORTAL_GOOGLE_CLIENT_ID`, `PORTAL_MICROSOFT_CLIENT_ID`, `PORTAL_MICROSOFT_TENANT_ID` | optional, only when sign in with Google or Microsoft is enabled |
 
-Repository secrets: `PORTAL_OWNER_DB_PASSWORD`, `PORTAL_APP_DB_PASSWORD` (the two hex passwords from step 1.4), `PORTAL_AUTH_SECRET` (`openssl rand -base64 32`), `BREVO_API_KEY` (shared with the CMS: it is the same Brevo account), `PORTAL_R2_ACCESS_KEY_ID`, `PORTAL_R2_SECRET_ACCESS_KEY` (scoped to the private bucket only), `PORTAL_HUBSPOT_TOKEN`, `PORTAL_HUBSPOT_WEBHOOK_SECRET`, `PORTAL_CMS_INTAKE_API_KEY` (the CMS service user's API key), `PORTAL_TURNSTILE_SECRET_KEY`, `PORTAL_SENTRY_DSN`, and optionally `PORTAL_REVIEW_PASSWORD`, `PORTAL_GOOGLE_CLIENT_SECRET`, `PORTAL_MICROSOFT_CLIENT_SECRET`. `DROPLET_SSH_KEY`, `DROPLET_HOST` and `DROPLET_USER` already exist for the CMS deploy.
+Repository secrets: `PORTAL_OWNER_DB_PASSWORD`, `PORTAL_APP_DB_PASSWORD` (the two hex passwords from step 1.4), `PORTAL_AUTH_SECRET` (`openssl rand -base64 32`), `BREVO_API_KEY` (shared with the CMS: it is the same Brevo account), `PORTAL_R2_ACCESS_KEY_ID`, `PORTAL_R2_SECRET_ACCESS_KEY` (scoped to the private bucket only), `PORTAL_HUBSPOT_TOKEN`, `PORTAL_HUBSPOT_WEBHOOK_SECRET`, `PORTAL_CMS_INTAKE_API_KEY` (the CMS service user's API key), `PORTAL_TURNSTILE_SECRET_KEY`, `PORTAL_SENTRY_DSN`, and optionally `PORTAL_REVIEW_PASSWORD`. `DROPLET_SSH_KEY`, `DROPLET_HOST` and `DROPLET_USER` already exist for the CMS deploy.
 
 ## 3. Deploy and roll back
 

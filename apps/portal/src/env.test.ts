@@ -68,6 +68,18 @@ describe('loadEnv', () => {
     expect(loadEnv(production).NODE_ENV).toBe('production');
   });
 
+  it('does not require HUBSPOT_WEBHOOK_SECRET in production', () => {
+    const { HUBSPOT_WEBHOOK_SECRET: _omitted, ...rest } = production;
+    expect(loadEnv(rest).HUBSPOT_WEBHOOK_SECRET).toBeUndefined();
+  });
+
+  it('still names the other required variables when HUBSPOT_WEBHOOK_SECRET is unset', () => {
+    expect(() => loadEnv({ NODE_ENV: 'production' })).toThrow(
+      /DATABASE_URL is required[\s\S]*AUTH_SECRET is required[\s\S]*APP_URL is required in production[\s\S]*DATABASE_OWNER_URL is required in production/,
+    );
+    expect(() => loadEnv({ NODE_ENV: 'production' })).not.toThrow(/HUBSPOT_WEBHOOK_SECRET/);
+  });
+
   it('names the missing production variable', () => {
     const { HUBSPOT_PORTAL_TOKEN: _omitted, ...rest } = production;
     expect(() => loadEnv(rest)).toThrow(/HUBSPOT_PORTAL_TOKEN is required in production/);
