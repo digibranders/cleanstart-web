@@ -43,6 +43,13 @@
       "when": 1795100000000,
       "tag": "0005_application_fields",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1795200000000,
+      "tag": "0006_material_requests",
+      "breakpoints": true
     }
   ]
 }

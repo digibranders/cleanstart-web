@@ -7,6 +7,7 @@ import { listPublicDatasheets, type PublicDatasheetDto } from '@/server/files/pu
 import { log } from '@/server/log';
 import { withViewer } from '@/server/repo/context';
 import { listDocuments } from '@/server/repo/documents';
+import { listOwnMaterialRequests } from '@/server/repo/material-requests';
 
 export const metadata: Metadata = { title: 'Documents' };
 
@@ -26,7 +27,7 @@ export default async function Page({
 }): Promise<React.JSX.Element> {
   const view = parseDocumentsView(await searchParams);
   const viewer = await requireCan('document.read');
-  const [matches, publicDatasheets] = await Promise.all([
+  const [matches, publicDatasheets, requests] = await Promise.all([
     // The database does the search, type and product filters; the purpose tab and the sort are applied below.
     withViewer(viewer, (tx) =>
       listDocuments(tx, viewer, {
@@ -36,8 +37,9 @@ export default async function Page({
       }),
     ),
     loadDatasheets(),
+    viewer.kind === 'partner' ? withViewer(viewer, (tx) => listOwnMaterialRequests(tx, viewer)) : Promise.resolve([]),
   ]);
   const counts = Object.fromEntries(DOC_GROUPS.map((g) => [g, matches.filter((d) => groupOf(d.type) === g).length])) as Record<DocGroup, number>;
   const docs = sortDocuments(view.group ? matches.filter((d) => groupOf(d.type) === view.group) : matches, view.sort);
-  return <Documents docs={docs} counts={counts} view={view} publicDatasheets={publicDatasheets} today={systemClock.today()} />;
+  return <Documents docs={docs} counts={counts} view={view} publicDatasheets={publicDatasheets} requests={requests} today={systemClock.today()} />;
 }

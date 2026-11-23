@@ -32,9 +32,11 @@ import {
   DEAL_CURRENCIES,
   DEAL_REGIONS,
   DOC_PRODUCTS,
+  DOCUMENT_STATUSES,
   DOCUMENT_TYPES,
   EVENT_SOURCES,
   EXTENSION_STATUSES,
+  MATERIAL_REQUEST_STATUSES,
   MESSAGE_SIDES,
   NOTIFICATION_CATEGORIES,
   NOTIFICATION_KINDS,
@@ -491,6 +493,12 @@ export const documents = pgTable(
     originalName: text('original_name').notNull(),
     durationMinutes: integer('duration_minutes'),
     version: integer('version').notNull().default(1),
+    /** What changed in the current file, written on Replace file. Copied to the version row when the file is replaced. */
+    changeNote: text('change_note'),
+    /** Drafts are staff only and not announced. */
+    status: text('status', { enum: DOCUMENT_STATUSES }).notNull().default('published'),
+    /** From this moment partners no longer see the document; staff see it marked Expired. */
+    expiresAt: ts('expires_at'),
     uploadedBy: uuid('uploaded_by').references(() => users.id),
     deletedAt: ts('deleted_at'),
     createdAt: createdAt(),
@@ -506,6 +514,7 @@ export const documents = pgTable(
     check('documents_categories_chk', sql`${t.audienceCategories} <@ array[${sql.raw(PARTNER_CATEGORIES.map((c) => `'${c}'`).join(', '))}]::text[]`),
     check('documents_categories_required_chk', sql`${t.audienceKind} <> 'categories' or cardinality(${t.audienceCategories}) > 0`),
     check('documents_version_chk', sql`${t.version} >= 1`),
+    check('documents_status_chk', inList(t.status, DOCUMENT_STATUSES)),
   ],
 );
 
@@ -531,6 +540,7 @@ export const documentVersions = pgTable(
     fileSize: bigint('file_size', { mode: 'number' }).notNull(),
     mime: text('mime').notNull(),
     originalName: text('original_name').notNull(),
+    changeNote: text('change_note'),
     replacedAt: ts('replaced_at').notNull().defaultNow(),
     purgeAfter: ts('purge_after').notNull(),
     replacedBy: uuid('replaced_by').references(() => users.id),
@@ -549,6 +559,33 @@ export const documentOpens = pgTable(
     openedAt: ts('opened_at').notNull().defaultNow(),
   },
   (t) => [index('document_opens_doc_idx').on(t.documentId, t.partnerId), index('document_opens_partner_idx').on(t.partnerId, t.openedAt)],
+);
+
+/** A partner's request for sales material. Partners see their company's rows; staff work them from /admin/documents. */
+export const materialRequests = pgTable(
+  'material_requests',
+  {
+    id: id(),
+    partnerId: uuid('partner_id').notNull().references(() => partners.id),
+    requestedBy: uuid('requested_by').notNull().references(() => users.id),
+    subject: text('subject').notNull(),
+    details: text('details').notNull(),
+    product: text('product', { enum: DOC_PRODUCTS }).notNull(),
+    status: text('status', { enum: MATERIAL_REQUEST_STATUSES }).notNull().default('open'),
+    responseNote: text('response_note'),
+    /** The document that answers the request, set by staff. */
+    documentId: uuid('document_id').references(() => documents.id),
+    assignedTo: uuid('assigned_to').references(() => users.id),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+    closedAt: ts('closed_at'),
+  },
+  (t) => [
+    index('material_requests_partner_idx').on(t.partnerId, t.createdAt),
+    index('material_requests_status_idx').on(t.status, t.createdAt),
+    check('material_requests_status_chk', inList(t.status, MATERIAL_REQUEST_STATUSES)),
+    check('material_requests_product_chk', inList(t.product, DOC_PRODUCTS)),
+  ],
 );
 
 /* ---------------------------------------------------------------- notifications and audit */

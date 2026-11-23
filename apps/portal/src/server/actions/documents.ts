@@ -1,19 +1,26 @@
 'use server';
 
 import type { UploadTicketDto } from '@/lib/document-upload';
-import type { DocumentDto } from '@/lib/dto';
+import type { DocumentDto, MaterialRequestDto } from '@/lib/dto';
 import {
   createDocumentSchema,
+  type DocumentDetailDto,
   deleteDocumentSchema,
+  documentDetailSchema,
   handleCreateDocument,
   handleCreateUploadTicket,
   handleDeleteDocument,
+  handleGetDocumentDetail,
   handleReplaceDocumentFile,
   handleRequestMaterial,
+  handleRestoreDocumentVersion,
   handleUpdateDocument,
+  handleUpdateMaterialRequest,
   replaceDocumentSchema,
   requestMaterialSchema,
+  restoreDocumentVersionSchema,
   updateDocumentSchema,
+  updateMaterialRequestSchema,
   uploadTicketSchema,
 } from '@/server/files/document-service';
 import { getFileStorage } from '@/server/files/instance';
@@ -53,8 +60,27 @@ export async function deleteDocumentAction(raw: unknown): Promise<ActionResult<{
   );
 }
 
+export async function restoreDocumentVersionAction(raw: unknown): Promise<ActionResult<DocumentDto>> {
+  return runViewerAction({ name: 'document.restore_version', schema: restoreDocumentVersionSchema }, raw, (ctx, input) =>
+    handleRestoreDocumentVersion(ctx, input, { storage: getFileStorage() }),
+  );
+}
+
+/** Opened by, not opened yet and the file history, loaded when the edit drawer opens. */
+export async function getDocumentDetailAction(raw: unknown): Promise<ActionResult<DocumentDetailDto>> {
+  return runViewerAction({ name: 'document.detail', schema: documentDetailSchema }, raw, (ctx, input) =>
+    handleGetDocumentDetail(ctx, input),
+  );
+}
+
+export async function updateMaterialRequestAction(raw: unknown): Promise<ActionResult<MaterialRequestDto>> {
+  return runViewerAction({ name: 'document.update_request', schema: updateMaterialRequestSchema }, raw, (ctx, input) =>
+    handleUpdateMaterialRequest(ctx, input),
+  );
+}
+
 export async function requestMaterialAction(raw: unknown): Promise<ActionResult<{ sent: true }>> {
   return runViewerAction({ name: 'document.request_material', schema: requestMaterialSchema }, raw, (ctx, input) =>
-    handleRequestMaterial(ctx, input, {}),
+    handleRequestMaterial(ctx, input, {}).then(({ sent }) => ({ sent })),
   );
 }

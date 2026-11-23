@@ -19,6 +19,7 @@ const ICON: Record<NotificationKind, IconName> = {
   team_joined: 'team',
   team_removed: 'team',
   role_changed: 'team',
+  material_request_update: 'file',
 };
 
 export const notificationIcon = (kind: NotificationKind): IconName => ICON[kind];

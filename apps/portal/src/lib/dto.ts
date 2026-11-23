@@ -11,9 +11,11 @@ import type {
   DealCurrency,
   DealRegion,
   DocProduct,
+  DocumentStatus,
   DocumentType,
   EventSource,
   ExtensionStatus,
+  MaterialRequestStatus,
   MessageSide,
   NotificationCategory,
   NotificationKind,
@@ -581,6 +583,60 @@ export interface DocumentDto extends DocumentListItemDto {
   partnerCount: number | null;
   /** Partner only: opens by the viewer's own company. Null for staff. */
   ownOpens: number | null;
+  /** Staff only: the latest open by any partner. Null for partner viewers and for a document nobody opened. */
+  lastOpenedAt: IsoTimestamp | null;
+  status: DocumentStatus;
+  /** When partners stop seeing it. Null for no expiry. */
+  expiresAt: IsoTimestamp | null;
+  /** True once expiresAt has passed. Staff only; partners never receive an expired document. */
+  expired: boolean;
+}
+
+/** Staff, the edit drawer. One row per partner that opened the document. */
+export interface DocumentOpenerDto {
+  partnerId: string;
+  partnerName: string;
+  opens: number;
+  lastOpenedAt: IsoTimestamp;
+}
+
+export interface DocumentEngagementDto {
+  openedBy: DocumentOpenerDto[];
+  /** Partners the audience reaches that have not opened it. */
+  notOpened: Array<{ partnerId: string; partnerName: string }>;
+}
+
+/** The current file and every earlier file still kept, newest first. */
+export interface DocumentVersionDto {
+  version: number;
+  current: boolean;
+  originalName: string;
+  fileSize: number;
+  mime: string;
+  changeNote: string | null;
+  /** Current: when the document last changed. Kept: when it was replaced. */
+  at: IsoTimestamp;
+  /** Kept versions only: the last day the old file can still be restored. */
+  keptUntil: IsoTimestamp | null;
+}
+
+export interface MaterialRequestDto {
+  id: string;
+  partnerId: string;
+  partnerName: string;
+  requestedByName: string;
+  subject: string;
+  details: string;
+  product: DocProduct;
+  status: MaterialRequestStatus;
+  responseNote: string | null;
+  documentId: string | null;
+  documentTitle: string | null;
+  assignedToId: string | null;
+  assignedToName: string | null;
+  createdAt: IsoTimestamp;
+  updatedAt: IsoTimestamp;
+  closedAt: IsoTimestamp | null;
 }
 
 export interface DocumentOpenTarget {

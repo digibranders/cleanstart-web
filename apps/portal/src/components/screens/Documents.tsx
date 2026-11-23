@@ -3,6 +3,7 @@
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState, useTransition } from 'react';
 import { DocCard } from '@/components/documents/DocCard';
+import { MyRequests } from '@/components/documents/MyRequests';
 import { DocumentPreview } from '@/components/documents/DocumentPreview';
 import { RequestMaterialDialog } from '@/components/documents/RequestMaterialDialog';
 import { CHIP_PRODUCT, TYPE_ICON, TYPE_TONE } from '@/components/documents/doc-style';
@@ -27,7 +28,7 @@ import { ScrollRegion } from '@/components/ui/scroll-region';
 import { useToast } from '@/components/ui/toast';
 import { fmtLong } from '@/lib/dates';
 import { DOC_PRODUCT_LABEL, DOC_PRODUCTS, DOCUMENT_TYPE_LABEL, DOCUMENT_TYPES } from '@/lib/domain';
-import type { DocumentDto } from '@/lib/dto';
+import type { DocumentDto, MaterialRequestDto } from '@/lib/dto';
 import type { PublicDatasheetDto } from '@/server/files/public-resources';
 import { formatLabel } from '@/server/files/rules';
 
@@ -46,6 +47,7 @@ export function Documents({
   counts,
   view,
   publicDatasheets,
+  requests,
   today,
 }: {
   /** Already filtered, grouped and sorted by the server from the URL. */
@@ -54,6 +56,7 @@ export function Documents({
   counts: Record<DocGroup, number>;
   view: DocumentsView;
   publicDatasheets: readonly PublicDatasheetDto[];
+  requests: readonly MaterialRequestDto[];
   today: string;
 }): React.JSX.Element {
   const toast = useToast();
@@ -299,6 +302,8 @@ export function Documents({
           </ScrollRegion>
         )}
       </section>
+
+      <MyRequests requests={requests} />
 
       {publicDatasheets.length > 0 ? (
         <section aria-labelledby="pub" className="card clip">

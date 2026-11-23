@@ -1,11 +1,11 @@
 import { eq } from 'drizzle-orm';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { auditLog, documentVersions, documents, notificationPrefs, notifications } from '@/db/schema';
+import { auditLog, documentVersions, documents, materialRequests, notificationPrefs, notifications } from '@/db/schema';
 import { asStaff, makeDocument, makePartner, makeUser, resetDb, testDb, viewerFor } from '@/db/test-helpers';
 import { fixedClock } from '@/lib/clock';
 import { ROUTES } from '@/lib/routes';
 import { FakeEmailTransport } from '@/server/email/fake';
-import { ForbiddenError, IntegrationError, ValidationError } from '@/server/errors';
+import { ForbiddenError, ValidationError } from '@/server/errors';
 import {
   createDocumentSchema,
   handleCreateDocument,
@@ -153,7 +153,7 @@ describe('handleReplaceDocumentFile', () => {
     const ticket = await handleCreateUploadTicket(t.ctx, uploadTicketSchema.parse({ mode: 'replace', documentId: doc.id, originalName: 'new.pdf', size: 500 }), deps);
     storage.simulateUpload(ticket.key, 500, 'application/pdf', PDF_HEAD);
     const file = { key: ticket.key, size: 500, originalName: 'new.pdf' };
-    const replaced = await handleReplaceDocumentFile(t.ctx, { id: doc.id, file }, deps);
+    const replaced = await handleReplaceDocumentFile(t.ctx, { id: doc.id, file, changeNote: null }, deps);
     expect(replaced).toMatchObject({ id: doc.id, version: 2, originalName: 'new.pdf' });
     const [version] = await db.select().from(documentVersions).where(eq(documentVersions.documentId, doc.id));
     expect(version).toMatchObject({ version: 1, fileKey: doc.fileKey });
@@ -161,7 +161,7 @@ describe('handleReplaceDocumentFile', () => {
     const audit = await db.select().from(auditLog).where(eq(auditLog.event, 'document.replaced'));
     expect(audit).toHaveLength(1);
     expect(audit[0]?.note).toBe('Version 2 uploaded, link and open count kept');
-    await expect(handleReplaceDocumentFile(t.ctx, { id: doc.id, file }, deps)).rejects.toBeInstanceOf(ValidationError);
+    await expect(handleReplaceDocumentFile(t.ctx, { id: doc.id, file, changeNote: null }, deps)).rejects.toBeInstanceOf(ValidationError);
     expect(storage.deleted).toEqual([]);
   });
 });
@@ -213,7 +213,7 @@ describe('handleRequestMaterial', () => {
       requestMaterialSchema.parse({ request: 'A <b>Rust</b> one pager', product: 'images' }),
       { transport },
     );
-    expect(out).toEqual({ sent: true });
+    expect(out).toMatchObject({ sent: true });
     expect(transport.sent).toHaveLength(1);
     const message = transport.sent[0];
     expect(message?.to.map((a) => a.email).sort()).toEqual(['mk@cleanstart.test', 'pm@cleanstart.test']);
@@ -223,13 +223,23 @@ describe('handleRequestMaterial', () => {
     expect(message?.subject + (message?.htmlContent ?? '')).toContain('Kestrel Systems');
   });
 
-  it('tells the partner when the email could not be sent', async () => {
+  it('keeps the tracked request when the email could not be sent, so asking again is not needed', async () => {
     const viewer = await world();
     const { transport } = setup();
     transport.failNext = 'brevo down';
-    await expect(
-      handleRequestMaterial(makeActionCtx(viewer, clock).ctx, requestMaterialSchema.parse({ request: 'Anything', product: 'all' }), { transport }),
-    ).rejects.toBeInstanceOf(IntegrationError);
+    const out = await handleRequestMaterial(makeActionCtx(viewer, clock).ctx, requestMaterialSchema.parse({ request: 'Anything', product: 'all' }), { transport });
+    expect(out.request).toMatchObject({ subject: 'Anything', status: 'open', product: 'all' });
+    expect(await db.select().from(materialRequests)).toHaveLength(1);
+  });
+
+  it('stores the request with the given title, or the first line of the text', async () => {
+    const viewer = await world();
+    const { transport } = setup();
+    const ctx = makeActionCtx(viewer, clock).ctx;
+    const titled = await handleRequestMaterial(ctx, requestMaterialSchema.parse({ subject: 'Rust one pager', request: 'Details\nmore', product: 'images' }), { transport });
+    const derived = await handleRequestMaterial(ctx, requestMaterialSchema.parse({ request: 'First line here\nand a second', product: 'all' }), { transport });
+    expect([titled.request.subject, derived.request.subject]).toEqual(['Rust one pager', 'First line here']);
+    expect(transport.sent[0]?.htmlContent).toContain('Rust one pager');
   });
 
   it('is refused for staff and rejects an empty request at the schema', async () => {

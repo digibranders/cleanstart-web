@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react';
 import { AudiencePicker } from '@/components/documents/AudiencePicker';
+import { DocumentDetailSections } from '@/components/documents/DocumentDetailSections';
 import {
   adminUpdatedLabel,
   type AudienceDraft,
@@ -24,6 +25,7 @@ import {
   DOCUMENT_TYPE_LABEL,
   DOCUMENT_TYPES,
   type DocProduct,
+  type DocumentStatus,
   type DocumentType,
   isOneOf,
 } from '@/lib/domain';
@@ -37,6 +39,10 @@ import {
 import { audienceLabel, formatLabel, UPLOAD_ACCEPT } from '@/server/files/rules';
 
 const TYPE_OPTIONS = DOCUMENT_TYPES.map((t) => ({ value: t, label: DOCUMENT_TYPE_LABEL[t] }));
+const DOCUMENT_STATUS_OPTIONS: ReadonlyArray<{ value: DocumentStatus; label: string }> = [
+  { value: 'published', label: 'Published' },
+  { value: 'draft', label: 'Draft' },
+];
 const PRODUCT_OPTIONS = DOC_PRODUCTS.map((p) => ({ value: p, label: DOC_PRODUCT_LABEL[p] }));
 
 export function DocumentEditDrawer({
@@ -59,6 +65,10 @@ export function DocumentEditDrawer({
   const [docType, setDocType] = useState<DocumentType>(doc.type);
   const [product, setProduct] = useState<DocProduct>(doc.product);
   const [summary, setSummary] = useState(doc.summary ?? '');
+  const [status, setStatus] = useState<DocumentStatus>(doc.status);
+  const [expiresOn, setExpiresOn] = useState(doc.expiresAt ? doc.expiresAt.slice(0, 10) : '');
+  const [changeNote, setChangeNote] = useState('');
+  const [fileRefresh, setFileRefresh] = useState(0);
   const titleRef = useRef<HTMLInputElement>(null);
   const [draft, setDraft] = useState<AudienceDraft>(() => draftFromAudience(doc.audience));
 
@@ -70,6 +80,8 @@ export function DocumentEditDrawer({
     docType !== doc.type ||
     product !== doc.product ||
     summary.trim() !== (doc.summary ?? '') ||
+    status !== doc.status ||
+    expiresOn !== (doc.expiresAt ? doc.expiresAt.slice(0, 10) : '') ||
     !audience.ok ||
     !sameAudience(audience.audience, audienceInputOf(doc.audience));
 
@@ -88,13 +100,15 @@ export function DocumentEditDrawer({
       product,
       summary: summary.trim() === '' ? null : summary.trim(),
       audience: audience.audience,
+      status,
+      expiresOn: expiresOn === '' ? null : expiresOn,
     });
     setBusy(false);
     if (!result.ok) {
       setError(result.error.message);
       return;
     }
-    toast(`Saved ${result.data.title}`);
+    toast(status !== doc.status && status === 'published' ? `Published ${result.data.title}` : `Saved ${result.data.title}`);
     onClose();
   };
 
@@ -119,13 +133,15 @@ export function DocumentEditDrawer({
       setError(uploaded.error.message);
       return;
     }
-    const result = await replaceDocumentFileAction({ id: doc.id, file: uploaded.data });
+    const result = await replaceDocumentFileAction({ id: doc.id, file: uploaded.data, changeNote: changeNote.trim() === '' ? null : changeNote.trim() });
     setBusy(false);
     setProgress(null);
     if (!result.ok) {
       setError(result.error.message);
       return;
     }
+    setChangeNote('');
+    setFileRefresh((n) => n + 1);
     toast(`New version of ${doc.title} uploaded`);
   };
 
@@ -213,6 +229,11 @@ export function DocumentEditDrawer({
         <dd>
           <Badge tone={audienceTone(doc.audience.kind)}>{audienceLabel(doc.audience)}</Badge>
         </dd>
+        <dt>Status</dt>
+        <dd>
+          {doc.status === 'draft' ? <Badge tone="pending">Draft</Badge> : <Badge tone="accepted">Published</Badge>}{' '}
+          {doc.expired ? <Badge tone="expired">Expired</Badge> : null}
+        </dd>
         <dt>Updated</dt>
         <dd>{adminUpdatedLabel(doc.updatedAt, today)}</dd>
         <dt>Opens</dt>
@@ -279,6 +300,42 @@ export function DocumentEditDrawer({
           onChange={(e) => setSummary(e.target.value)}
         />
       </div>
+      <div className="grid2" style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+        <div className="fg">
+          <span id="ed-status" className="lbl">
+            Status
+          </span>
+          <div className="seg" role="group" aria-labelledby="ed-status" style={{ alignSelf: 'flex-start' }}>
+            {DOCUMENT_STATUS_OPTIONS.map((o) => (
+              <button
+                key={o.value}
+                type="button"
+                className={`seg-b${o.value === status ? ' seg-on' : ''}`}
+                aria-pressed={o.value === status}
+                disabled={busy}
+                onClick={() => setStatus(o.value)}
+              >
+                {o.label}
+              </button>
+            ))}
+          </div>
+          {status === 'draft' ? <span className="hint">Partners cannot see a draft. Publishing tells the partners it reaches.</span> : null}
+        </div>
+        <div className="fg">
+          <label htmlFor="ed-expires" className="lbl">
+            Hide from partners on
+          </label>
+          <input
+            id="ed-expires"
+            className="field"
+            type="date"
+            value={expiresOn}
+            disabled={busy}
+            onChange={(e) => setExpiresOn(e.target.value)}
+          />
+          <span className="hint">{expiresOn === '' ? 'Optional. Leave empty for no expiry.' : 'From that day partners no longer see it. You still do, marked Expired.'}</span>
+        </div>
+      </div>
       <AudiencePicker
         idPrefix="ed"
         draft={draft}
@@ -286,6 +343,22 @@ export function DocumentEditDrawer({
         error={audience.ok ? null : audience.error}
         disabled={busy}
       />
+      <div className="fg">
+        <label htmlFor="ed-note" className="lbl">
+          Change note for the next file you replace it with
+        </label>
+        <input
+          id="ed-note"
+          className="field"
+          type="text"
+          maxLength={300}
+          value={changeNote}
+          disabled={busy}
+          placeholder="What is different in the new file"
+          onChange={(e) => setChangeNote(e.target.value)}
+        />
+      </div>
+      <DocumentDetailSections documentId={doc.id} refreshKey={fileRefresh} canRestore={!busy} onChanged={() => setFileRefresh((n) => n + 1)} />
       <div className="note note-violet">
         <Icon name="lock" />
         <span>

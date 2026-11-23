@@ -17,12 +17,14 @@ export function RequestMaterialDialog({
   onClose: () => void;
 }): React.JSX.Element | null {
   const toast = useToast();
+  const [subject, setSubject] = useState('');
   const [text, setText] = useState('');
   const [product, setProduct] = useState<DocProduct>('all');
   const [tried, setTried] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const invalid = tried && text.trim() === '';
+  const subjectInvalid = tried && subject.trim() === '';
 
   const close = useCallback((): void => {
     setTried(false);
@@ -33,22 +35,23 @@ export function RequestMaterialDialog({
   const submit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     if (busy) return;
-    if (text.trim() === '') {
+    if (text.trim() === '' || subject.trim() === '') {
       setTried(true);
       return;
     }
     setBusy(true);
     setError(null);
-    const result = await requestMaterialAction({ request: text.trim(), product });
+    const result = await requestMaterialAction({ subject: subject.trim(), request: text.trim(), product });
     setBusy(false);
     if (!result.ok) {
       setError(result.error.message);
       return;
     }
+    setSubject('');
     setText('');
     setTried(false);
     onClose();
-    toast('Request sent to CleanStart');
+    toast('Request sent to CleanStart. You can follow it under Your requests.');
   };
 
   return (
@@ -69,6 +72,26 @@ export function RequestMaterialDialog({
         </>
       }
     >
+      <div className="fg">
+        <label htmlFor="req-subject" className="lbl">
+          Short title
+        </label>
+        <input
+          id="req-subject"
+          className={`field${subjectInvalid ? ' field-err' : ''}`}
+          type="text"
+          maxLength={120}
+          value={subject}
+          aria-invalid={subjectInvalid ? true : undefined}
+          aria-describedby={subjectInvalid ? 'req-subject-err' : undefined}
+          onChange={(e) => setSubject(e.target.value)}
+        />
+        {subjectInvalid ? (
+          <span className="err" id="req-subject-err">
+            Give the request a short title.
+          </span>
+        ) : null}
+      </div>
       <div className="fg">
         <label htmlFor="req-text" className="lbl">
           What do you need?

@@ -43,6 +43,11 @@ export const AUDIT_EVENTS = {
   'document.edited': { kind: 'documents', action: 'Edited a document' },
   'document.audience_changed': { kind: 'documents', action: 'Changed who can open it' },
   'document.deleted': { kind: 'documents', action: 'Deleted a document' },
+  'document.published': { kind: 'documents', action: 'Published a document' },
+  'document.unpublished': { kind: 'documents', action: 'Moved a document back to draft' },
+  'document.expiry_changed': { kind: 'documents', action: 'Changed when a document expires' },
+  'document.version_restored': { kind: 'documents', action: 'Restored an earlier file version' },
+  'document.request_updated': { kind: 'documents', action: 'Updated a material request' },
   // people_access
   'team.invited': { kind: 'people_access', action: 'Invited a user' },
   'team.invite_resent': { kind: 'people_access', action: 'Resent an invite' },

@@ -77,6 +77,7 @@ const MATRIX: Record<Action, string> = {
   'document.delete': '- - - Y - Y',
   'document.read_stats': '- - - Y - Y',
   'document.request_material': 'Y Y Y - - -',
+  'document.manage_requests': '- - - Y - Y',
   'audit.read': '- - - Y - -',
   'audit.export': '- - - Y - -',
   'search.use': 'Y Y Y Y Y Y',
