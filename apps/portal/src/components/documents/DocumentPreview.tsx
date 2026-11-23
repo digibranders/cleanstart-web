@@ -35,17 +35,20 @@ function VideoPlayer({ doc }: { doc: DocumentDto }): React.JSX.Element {
     );
   }
   return (
-    // biome-ignore lint/a11y/useMediaCaption: partner videos have no caption files yet
+    // biome-ignore lint/a11y/useMediaCaption: the captions track is added below when staff uploaded a file; many videos have none
     <video
       controls
       preload="metadata"
       playsInline
       aria-label={doc.title}
       src={`/api/files/${doc.id}/stream`}
+      poster={doc.hasPoster ? `/api/files/${doc.id}/poster` : undefined}
       style={{ ...frame, aspectRatio: '16 / 9' }}
       onPlay={count}
       onError={() => setFailed(true)}
-    />
+    >
+      {doc.hasCaptions ? <track kind="captions" src={`/api/files/${doc.id}/captions`} srcLang="en" label="Captions" /> : null}
+    </video>
   );
 }
 

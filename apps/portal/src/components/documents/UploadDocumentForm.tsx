@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { AudiencePicker } from '@/components/documents/AudiencePicker';
 import { type AudienceDraft, draftToInput, emptyAudienceDraft } from '@/components/documents/doc-view';
+import { attachMedia, mediaFileProblem } from '@/components/documents/media-client';
 import { uploadFile } from '@/components/documents/upload-client';
 import { defaultTypeFor, MAX_FILES_PER_BATCH, sortBatch, titleFromFileName } from '@/components/documents/upload-rows';
 import { Icon } from '@/components/icon';
@@ -20,6 +21,7 @@ import {
 } from '@/lib/domain';
 import { createDocumentAction, createUploadTicketAction } from '@/server/actions/documents';
 import { issuesToErrors } from '@/server/actions/result';
+import { MEDIA_ACCEPT, MEDIA_KINDS, MEDIA_LABEL, type MediaKind } from '@/server/files/media';
 import { UPLOAD_ACCEPT } from '@/server/files/rules';
 
 const TYPE_OPTIONS = DOCUMENT_TYPES.map((t) => ({ value: t, label: DOCUMENT_TYPE_LABEL[t] }));
@@ -34,6 +36,8 @@ interface UploadRow {
   summary: string;
   minutes: string;
   draft: AudienceDraft;
+  /** Videos only: the optional poster image and captions file, attached right after the document is created. */
+  media: Record<MediaKind, File | null>;
   state: 'idle' | 'uploading' | 'failed';
   progress: number;
   error: string | null;
@@ -53,6 +57,7 @@ const newRow = (file: File, previous: UploadRow | undefined): UploadRow => {
     summary: '',
     minutes: '',
     draft: previous ? { ...previous.draft, categories: [...previous.draft.categories] } : emptyAudienceDraft,
+    media: { poster: null, captions: null },
     state: 'idle',
     progress: 0,
     error: null,
@@ -100,6 +105,10 @@ export function UploadDocumentForm({
   const rowProblem = (row: UploadRow): string | null => {
     if (row.title.trim() === '') return 'Give the document a title.';
     if (minutesError(row)) return minutesError(row);
+    for (const kind of MEDIA_KINDS) {
+      const file = row.docType === 'video' ? row.media[kind] : null;
+      if (file && mediaFileProblem(kind, file)) return mediaFileProblem(kind, file);
+    }
     const audience = draftToInput(row.draft, partners);
     return audience.ok ? null : audience.error;
   };
@@ -145,6 +154,14 @@ export function UploadDocumentForm({
         continue;
       }
       done += 1;
+      const missed: string[] = [];
+      for (const kind of MEDIA_KINDS) {
+        const file = row.docType === 'video' ? row.media[kind] : null;
+        if (!file) continue;
+        const attached = await attachMedia({ documentId: created.data.id, kind, file });
+        if (!attached.ok) missed.push(`${MEDIA_LABEL[kind]} (${attached.error.message})`);
+      }
+      if (missed.length > 0) setNotes((current) => [...current, `${row.title.trim()} was uploaded, but the ${missed.join(' and the ')} could not be added. Add it from Edit.`]);
       setRows((current) => current.filter((r) => r.id !== row.id));
     }
     setBusy(false);
@@ -333,6 +350,29 @@ export function UploadDocumentForm({
                   {minutesErr ? <span className="err">{minutesErr}</span> : null}
                 </div>
               ) : null}
+              {row.docType === 'video'
+                ? MEDIA_KINDS.map((kind) => {
+                    const file = row.media[kind];
+                    const problem = file ? mediaFileProblem(kind, file) : null;
+                    return (
+                      <div className="fg" key={kind}>
+                        <label htmlFor={`${row.id}-${kind}`} className="lbl">
+                          {kind === 'poster' ? 'Poster image (optional)' : 'Captions file (optional)'}
+                        </label>
+                        <input
+                          id={`${row.id}-${kind}`}
+                          className={`field${problem ? ' field-err' : ''}`}
+                          type="file"
+                          accept={MEDIA_ACCEPT[kind]}
+                          disabled={locked}
+                          onChange={(e) => patch(row.id, { media: { ...row.media, [kind]: e.target.files?.[0] ?? null } })}
+                          aria-invalid={problem ? true : undefined}
+                        />
+                        {problem ? <span className="err">{problem}</span> : null}
+                      </div>
+                    );
+                  })
+                : null}
               <AudiencePicker
                 idPrefix={row.id}
                 draft={row.draft}

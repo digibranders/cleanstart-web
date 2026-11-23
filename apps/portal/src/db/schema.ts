@@ -528,6 +528,10 @@ export const documents = pgTable(
     fileSize: bigint('file_size', { mode: 'number' }).notNull(),
     mime: text('mime').notNull(),
     originalName: text('original_name').notNull(),
+    /** Video only: storage key of the poster image (png or jpg). Null for none. Never sent to the browser; the poster route reads it. */
+    posterKey: text('poster_key'),
+    /** Video only: storage key of the captions file (.vtt). Null for none. */
+    captionsKey: text('captions_key'),
     durationMinutes: integer('duration_minutes'),
     version: integer('version').notNull().default(1),
     /** What changed in the current file, written on Replace file. Copied to the version row when the file is replaced. */
