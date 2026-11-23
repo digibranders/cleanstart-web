@@ -1,12 +1,12 @@
 import { and, asc, eq } from 'drizzle-orm';
-import { applications, partners, registrations, staffScopes, users } from '@/db/schema';
+import { partners, registrations, staffScopes, users } from '@/db/schema';
 import { type Clock, systemClock } from '@/lib/clock';
 import { REVIEW_SLA_BUSINESS_DAYS, isOverSla, waitingBusinessDays } from '@/lib/deal-rules';
 import { type DealRegion, PARTNER_REGION_LABEL, PRODUCT_LABEL, type Product, type StaffRegion, type StaffRole } from '@/lib/domain';
 import { ROUTES } from '@/lib/routes';
 import { SYSTEM_ACTORS } from '@/server/auth/types';
 import { sendEmail } from '@/server/email/send';
-import { buildPendingDigest, type DigestApplicationRow, type DigestRegistrationRow } from '@/server/email/templates';
+import { buildPendingDigest, type DigestRegistrationRow } from '@/server/email/templates';
 import type { EmailTransport } from '@/server/email/transport';
 import { log } from '@/server/log';
 import { withSystem } from '@/server/repo/context';
@@ -30,17 +30,9 @@ export interface WaitingRegistration {
   since: string;
 }
 
-export interface WaitingApplication {
-  company: string;
-  applicantName: string;
-  /** The calendar day it arrived. */
-  since: string;
-}
-
 export interface ReviewerDigest {
   reviewer: DigestReviewer;
   registrations: DigestRegistrationRow[];
-  applications: DigestApplicationRow[];
 }
 
 /** Past this many business days a registration is overdue, not just late. */
@@ -59,12 +51,11 @@ const inScope = (reviewer: DigestReviewer, row: WaitingRegistration): boolean =>
 
 /**
  * Pure. One digest per reviewer who has something waiting; marketing and anyone who cannot read the queue get none.
- * Registrations: overdue first, then longest waiting first. Applications (partner managers only): longest waiting first.
+ * Registrations: overdue first, then longest waiting first.
  */
 export function buildDigests(
   reviewers: readonly DigestReviewer[],
   waitingRegistrations: readonly WaitingRegistration[],
-  waitingApplications: readonly WaitingApplication[],
   today: string,
 ): ReviewerDigest[] {
   const digests: ReviewerDigest[] = [];
@@ -85,31 +76,19 @@ export function buildDigests(
         };
       })
       .sort((a, b) => Number(b.overdue) - Number(a.overdue) || b.waitingBusinessDays - a.waitingBusinessDays);
-    const apps =
-      reviewer.role === 'partner_manager'
-        ? waitingApplications
-            .map((row): DigestApplicationRow => ({
-              company: row.company,
-              applicantName: row.applicantName,
-              waitingBusinessDays: waitingBusinessDays(row.since, today),
-              pastTarget: isOverSla(row.since, today),
-            }))
-            .sort((a, b) => b.waitingBusinessDays - a.waitingBusinessDays)
-        : [];
-    if (regs.length + apps.length > 0) digests.push({ reviewer, registrations: regs, applications: apps });
+    if (regs.length > 0) digests.push({ reviewer, registrations: regs });
   }
   return digests;
 }
 
 /**
- * Daily at 04:30 UTC, 10:00 IST. One email per active reviewer who has registrations or applications waiting, nothing
- * when nothing waits. Read only, so a second run on the same day simply sends the digest again; the job lock keeps runs
- * from overlapping. One failing email never stops the others.
+ * Daily at 04:30 UTC, 10:00 IST. One email per active reviewer who has registrations waiting, nothing when nothing waits. Read only, so a second run on the same day simply sends the digest again;
+ * the job lock keeps runs from overlapping. One failing email never stops the others.
  */
 export async function sendPendingDigests(deps: { clock: Clock; transport?: EmailTransport }): Promise<{ sent: number }> {
   const actor = SYSTEM_ACTORS.portal;
   const today = deps.clock.today();
-  const { reviewers, regs, apps } = await withSystem(actor, async (tx) => {
+  const { reviewers, regs } = await withSystem(actor, async (tx) => {
     const staff = await tx
       .select({ id: users.id, name: users.name, email: users.email, role: users.role, region: staffScopes.region })
       .from(users)
@@ -129,18 +108,13 @@ export async function sendPendingDigests(deps: { clock: Clock; transport?: Email
       .from(registrations)
       .innerJoin(partners, eq(partners.id, registrations.partnerId))
       .where(eq(registrations.status, 'pending'));
-    const open = await tx
-      .select({ company: applications.company, applicantName: applications.applicantName, createdAt: applications.createdAt })
-      .from(applications)
-      .where(eq(applications.status, 'new'));
     return {
       reviewers: staff.map((s): DigestReviewer => ({ id: s.id, name: s.name, email: s.email, role: s.role as StaffRole, region: s.region ?? 'all' })),
       regs: pending.map((r): WaitingRegistration => ({ ...r, since: r.resubmittedOn ?? r.registeredOn })),
-      apps: open.map((a): WaitingApplication => ({ company: a.company, applicantName: a.applicantName, since: a.createdAt.toISOString().slice(0, 10) })),
     };
   });
 
-  const digests = buildDigests(reviewers, regs, apps, today);
+  const digests = buildDigests(reviewers, regs, today);
   let sent = 0;
   for (const digest of digests) {
     try {
@@ -149,10 +123,8 @@ export async function sendPendingDigests(deps: { clock: Clock; transport?: Email
           to: { email: digest.reviewer.email, name: digest.reviewer.name },
           recipientName: digest.reviewer.name,
           registrations: digest.registrations,
-          applications: digest.applications,
           targetBusinessDays: REVIEW_SLA_BUSINESS_DAYS,
           approvalsUrl: absoluteUrl(ROUTES.admin.approvals),
-          partnersUrl: absoluteUrl(ROUTES.admin.partners),
         }),
         deps.transport,
       );

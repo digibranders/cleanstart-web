@@ -1,3 +1,4 @@
+import { runApplicationDigest } from './application-digest';
 import { runDocumentPurge } from './document-purge';
 import { runExpiry } from './expiry';
 import { runExpiryReminders } from './expiry-reminders';
@@ -18,6 +19,7 @@ export const JOBS: readonly JobSpec[] = [
   { name: 'expiry-reminders', schedule: '0 5 * * *', run: runExpiryReminders },
   { name: 'invite-reminders', schedule: '30 5 * * *', run: runInviteReminders },
   { name: 'pending-digest', schedule: '30 4 * * *', run: runPendingDigest },
+  { name: 'application-digest', schedule: '35 4 * * *', run: runApplicationDigest },
   { name: 'website-intake', schedule: '*/5 * * * *', run: runIntake },
   { name: 'document-purge', schedule: '20 3 * * *', run: runDocumentPurge },
   { name: 'retention', schedule: '40 3 * * *', run: runRetention },

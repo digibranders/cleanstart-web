@@ -3,7 +3,7 @@ export default function Loading(): React.JSX.Element {
     <div className="wrap" role="status" aria-label="Loading">
       <div className="head">
         <div className="skel" style={{ height: 22, width: 160 }} />
-        <div className="skel" style={{ height: 30, width: 320, borderRadius: 7 }} />
+        <div className="skel" style={{ height: 30, width: 520, borderRadius: 7 }} />
       </div>
       <div className="card clip">
         <div className="kpis dash-kpis">
@@ -16,7 +16,7 @@ export default function Loading(): React.JSX.Element {
         </div>
       </div>
       <div className="dash">
-        {[4, 4, 4, 8, 4].map((span, i) => (
+        {[4, 4, 4, 8, 4, 8, 8].map((span, i) => (
           <div key={i} className={`card dash-c${span}${span === 8 ? " dash-wide" : ""}`} style={{ display: "grid", gap: 10, alignContent: "start", padding: 12 }}>
             <div className="skel" style={{ height: 14, width: 140 }} />
             <div className="skel" style={{ height: 150 }} />

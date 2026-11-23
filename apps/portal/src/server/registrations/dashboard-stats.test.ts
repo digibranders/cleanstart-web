@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  activityHeat,
   approvalTimeBuckets,
   type DealFact,
   dealKpis,
@@ -251,5 +252,29 @@ describe('managerWorkload', () => {
       { managerId: null, waiting: 1, overdue: 0, decided: 0 },
       { managerId: 'm2', waiting: 0, overdue: 0, decided: 1 },
     ]);
+  });
+});
+
+describe('activityHeat', () => {
+  // Monday 2026-11-23 is the first day of the last of 12 weeks, so the first week starts 2026-09-07.
+  const today = '2026-11-25';
+  it('makes 12 Monday-start weeks of 7 days and leaves days after today empty', () => {
+    const heat = activityHeat([], today);
+    expect(heat).toHaveLength(12);
+    expect(heat[0]?.weekStart).toBe('2026-09-07');
+    expect(heat[11]?.weekStart).toBe('2026-11-23');
+    expect(heat[11]?.days).toEqual([0, 0, 0, null, null, null, null]);
+    expect(heat[0]?.days).toEqual([0, 0, 0, 0, 0, 0, 0]);
+  });
+
+  it('counts registrations on their weekday and ignores days outside the window', () => {
+    const heat = activityHeat(
+      [deal({ registeredOn: '2026-11-23' }), deal({ registeredOn: '2026-11-23' }), deal({ registeredOn: '2026-11-22' }), deal({ registeredOn: '2026-09-07' }), deal({ registeredOn: '2026-09-06' })],
+      today,
+    );
+    expect(heat[11]?.days[0]).toBe(2);
+    expect(heat[10]?.days[6]).toBe(1);
+    expect(heat[0]?.days[0]).toBe(1);
+    expect(heat.flatMap((w) => w.days).reduce<number>((n, d) => n + (d ?? 0), 0)).toBe(4);
   });
 });

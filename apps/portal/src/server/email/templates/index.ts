@@ -24,3 +24,4 @@ export * from './two-step-reset';
 export * from './email-change';
 export * from './password-reset';
 export * from './pending-digest';
+export * from './application-digest';
