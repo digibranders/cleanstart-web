@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Avatar } from "@/components/ui/badge";
+import { Drawer } from "@/components/ui/overlay";
 import { fmtShort, fmtLong } from "@/lib/dates";
 import { PARTNER_CATEGORY_LABEL, PARTNER_REGION_LABEL, PARTNER_ROLE_LABEL, PRODUCT_LABEL } from "@/lib/domain";
 import type { PartnerDetailDto } from "@/lib/dto";
@@ -20,6 +21,7 @@ interface PartnerDetailProps {
   onResendInvites: () => void;
   onSuspend: () => void;
   onRestore: () => void;
+  onClose: () => void;
 }
 
 const SMALL_BTN: React.CSSProperties = { height: 26, padding: "0 8px", fontSize: 12 };
@@ -33,38 +35,26 @@ export function PartnerDetail({
   onResendInvites,
   onSuspend,
   onRestore,
+  onClose,
 }: PartnerDetailProps): React.JSX.Element {
   const [confirming, setConfirming] = useState(false);
   const suspended = p.status === "suspended";
 
   return (
-    <aside
-      id="partner-detail"
-      aria-label="Selected partner"
-      style={{
-        // Picking a partner scrolls this under the 48 px top bar. It is the last block, so it needs about a screenful of
-        // height or the page runs out of scroll before the card reaches the top.
-        scrollMarginTop: 64,
-        minHeight: "calc(100dvh - 24px)",
-        flex: "1 1 100%",
-        minWidth: 0,
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-        gap: 12,
-        alignItems: "start",
-      }}
+    <Drawer
+      open
+      onClose={onClose}
+      title={p.name}
+      subtitle={p.domain}
+      lead={
+        <span className="av av-1" style={{ width: 36, height: 36, borderRadius: 9, fontSize: 13 }}>
+          {initialsOf(p.name)}
+        </span>
+      }
     >
+      <div style={{ display: "grid", gap: 12 }}>
       <section className="card clip">
-        <div style={{ display: "flex", alignItems: "center", gap: 10, padding: 12 }}>
-          <span className="av av-1" style={{ width: 36, height: 36, borderRadius: 9, fontSize: 13 }}>
-            {initialsOf(p.name)}
-          </span>
-          <div className="li-t">
-            <h2 id="partner-detail-h" tabIndex={-1} style={{ margin: 0, fontSize: 14, fontWeight: 700 }}>
-              {p.name}
-            </h2>
-            <span className="li-s">{p.domain}</span>
-          </div>
+        <div style={{ padding: 12 }}>
           <PartnerStatusBadge status={p.status} />
         </div>
         <hr className="hr" />
@@ -239,6 +229,7 @@ export function PartnerDetail({
           <p style={{ margin: 0, padding: 12, fontSize: 12.5, color: "#6B687D" }}>No deals registered yet.</p>
         ) : null}
       </section>
-    </aside>
+      </div>
+    </Drawer>
   );
 }

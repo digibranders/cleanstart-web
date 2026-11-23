@@ -73,7 +73,9 @@ export function AdminPartners({
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<PartnerSort>("name");
   const [dialog, setDialog] = useState<"add" | "category" | "manager" | null>(null);
-  const [focusId, setFocusId] = useState<string | null>(null);
+
+  const selectedParam = searchParams.get("selected");
+  const open = selectedParam !== null && detail?.id === selectedParam ? detail : null;
 
   const wantedCategory = CATEGORY_FOR_FILTER[category];
   const wantedRegion = region === "All regions" ? null : codeFromLabel(PARTNER_REGION_LABEL, region);
@@ -92,15 +94,6 @@ export function AdminPartners({
     if (sort === "won") return b.won - a.won || a.name.localeCompare(b.name);
     return a.name.localeCompare(b.name);
   });
-
-  // Picking a partner loads its detail below the list: bring it into view and hand it focus once it has rendered.
-  useEffect(() => {
-    if (!focusId || detail?.id !== focusId) return;
-    setFocusId(null);
-    const card = document.getElementById("partner-detail");
-    card?.scrollIntoView({ block: "start" });
-    document.getElementById("partner-detail-h")?.focus({ preventScroll: true });
-  }, [focusId, detail?.id]);
 
   const total = partners.length;
   const active = partners.filter((p) => p.status === "active").length;
@@ -129,10 +122,15 @@ export function AdminPartners({
   };
 
   const select = (id: string): void => {
-    setFocusId(id);
     const params = new URLSearchParams(searchParams.toString());
     params.set("selected", id);
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
+  const closeDetail = (): void => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("selected");
+    router.replace(params.size > 0 ? `${pathname}?${params.toString()}` : pathname, { scroll: false });
   };
 
   const report = async (pending: Promise<ActionResult<unknown>>, success: string): Promise<boolean> => {
@@ -259,7 +257,7 @@ export function AdminPartners({
             <PartnersTable
               partners={shown}
               total={total}
-              selectedId={detail?.id ?? ""}
+              selectedId={open?.id ?? ""}
               today={today}
               category={category}
               region={region}
@@ -298,17 +296,18 @@ export function AdminPartners({
           )}
         </section>
 
-        {tab === "Partners" && detail ? (
+        {tab === "Partners" && open ? (
           <PartnerDetail
-            key={detail.id}
-            partner={detail}
+            key={open.id}
+            partner={open}
+            onClose={closeDetail}
             today={today}
             canManage={canManage}
             onChangeManager={() => setDialog("manager")}
             onChangeCategory={() => setDialog("category")}
             onResendInvites={() => {
               void (async () => {
-                const result = await resendPartnerInvitesAction({ id: detail.id });
+                const result = await resendPartnerInvitesAction({ id: open.id });
                 if (!result.ok) {
                   toast(result.error.message);
                   return;
@@ -316,13 +315,13 @@ export function AdminPartners({
                 const count = result.data.count;
                 toast(
                   count > 0
-                    ? `Invites resent to ${count} ${count === 1 ? "person" : "people"} at ${detail.name}`
-                    : `Everyone at ${detail.name} has accepted their invite`,
+                    ? `Invites resent to ${count} ${count === 1 ? "person" : "people"} at ${open.name}`
+                    : `Everyone at ${open.name} has accepted their invite`,
                 );
               })();
             }}
-            onSuspend={() => void report(suspendPartnerAction({ id: detail.id }), `${detail.name} is suspended`)}
-            onRestore={() => void report(restorePartnerAction({ id: detail.id }), `Access restored for ${detail.name}`)}
+            onSuspend={() => void report(suspendPartnerAction({ id: open.id }), `${open.name} is suspended`)}
+            onRestore={() => void report(restorePartnerAction({ id: open.id }), `Access restored for ${open.name}`)}
           />
         ) : null}
       </div>
