@@ -69,7 +69,7 @@ const emailTaken = (): ConflictError => new ConflictError('email_taken', 'Someon
 /**
  * Same company only. Stores a hashed single use token (24 hours) for the new address and returns the clear token once; the
  * email itself changes only in confirmEmailChange. An earlier open request for the person is cancelled.
- * Throws ValidationError for a malformed or unchanged address and ConflictError('email_taken') when any login already has it.
+ * Throws ValidationError for a malformed or unchanged address, ConflictError('not_active') for a person who has not accepted their invite, and ConflictError('email_taken') when any login already has it.
  */
 export async function requestEmailChange(
   tx: Tx,
@@ -80,6 +80,8 @@ export async function requestEmailChange(
   const newEmail = input.email.trim().toLowerCase();
   if (!isValidEmail(newEmail)) throw new ValidationError([{ path: 'email', message: 'Enter a valid work email.' }]);
   const target = await loadCompanyUser(tx, viewer, input.userId, false);
+  // An invited person is found by the invite's address, so moving only the user row would orphan the invite.
+  if (target.status !== 'active') throw new ConflictError('not_active', 'They can change their email once they have accepted the invite.');
   if (newEmail === target.email) throw new ValidationError([{ path: 'email', message: 'That is already their address.' }]);
   const [taken] = await tx.select({ id: users.id }).from(users).where(eq(users.email, newEmail)).limit(1);
   if (taken) throw emailTaken();

@@ -200,7 +200,7 @@ export function Team({ team, today }: { team: TeamDto; today: string }): React.J
               <tbody>
                 {visible.map((m, i) => (
                   <tr key={m.id}>
-                    <td style={{ whiteSpace: "normal" }}>
+                    <td style={{ whiteSpace: "normal", minWidth: 190 }}>
                       <span style={{ display: "flex", alignItems: "center", gap: 10 }}>
                         <span className={`av av-r ${m.isYou ? "av-me" : (AVATARS[i % AVATARS.length] ?? "av-1")}`}>
                           {initialsOf(m.name)}

@@ -16,8 +16,6 @@ import { rateLimit } from '@/server/rate-limit';
 import { type Tx, withSystem, withViewer } from '@/server/repo/context';
 import {
   confirmEmailChange,
-  type EmailChangePreview,
-  previewEmailChange,
   reactivateMember,
   requestEmailChange,
   updateMemberDetails,
@@ -103,14 +101,6 @@ export async function requestMemberEmailChangeAction(raw: unknown): Promise<Acti
       );
     });
     return { userId: done.requested.userId, newEmail: done.requested.newEmail };
-  });
-}
-
-export async function previewEmailChangeAction(raw: unknown): Promise<ActionResult<EmailChangePreview>> {
-  return runPublicAction({ name: 'email_change.preview', schema: tokenSchema }, raw, async (ctx, input): Promise<EmailChangePreview> => {
-    rateLimit(`email-change:ip:${ctx.ip ?? UNKNOWN_IP_BUCKET}`, INVITE_IP_RULE);
-    const actor = emailChangeActor('Someone confirming an email');
-    return withSystem(actor, (tx) => previewEmailChange(tx, actor, input.token, ctx.clock));
   });
 }
 

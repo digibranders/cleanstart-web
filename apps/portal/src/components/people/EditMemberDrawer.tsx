@@ -126,6 +126,7 @@ export function EditMemberDrawer({ member, onClose }: { member: TeamMemberDto; o
           <span className="hint">Partner admins can invite and remove people and edit the company profile.</span>
         ) : null}
       </div>
+      {member.status === "active" ? (
       <div className="fg">
         <label htmlFor="em-email" className="lbl">
           Sign-in email
@@ -144,6 +145,9 @@ export function EditMemberDrawer({ member, onClose }: { member: TeamMemberDto; o
           <span className="hint">We send a link to the new address. The email changes only after they open it, and they are signed out everywhere.</span>
         ) : null}
       </div>
+      ) : (
+        <span className="hint">Their email can change once they have accepted the invite.</span>
+      )}
       {errors.form && !errors.name && !errors.email ? (
         <span className="err" role="alert">
           {errors.form}

@@ -107,6 +107,12 @@ describe('email change', () => {
     expect((await row(member.id))?.email).toBe('k2@kestrelsystems.in');
   });
 
+  it('waits until an invited person has accepted', async () => {
+    const { partner, admin } = await company();
+    const pending = await makeUser(db, { partnerId: partner.id, role: 'sales', status: 'invited' });
+    await expect(as(admin, (tx) => requestEmailChange(tx, admin, { userId: pending.id, email: 'p2@kestrelsystems.in' }, clock))).rejects.toMatchObject({ reason: 'not_active' });
+  });
+
   it('is limited to the admin of the same company', async () => {
     const { admin } = await company();
     const stranger = await makeUser(db, { partnerId: (await makePartner(db, {})).id, role: 'sales' });
