@@ -17,6 +17,7 @@ import { withdrawRegistrationAction } from "@/server/actions/withdraw";
 import { ContactDrawer, EditRegistrationDrawer, RemoveContactDialog } from "../deals/EditRegistrationDrawers";
 import { daysLeft, fmtLong, fmtShort, plural, PROTECTION_DAYS } from "../deals/dates";
 import { acceptedOn, firstWord, initialsOf, protectionLength, stageTrack, waitDays } from "../deals/derive";
+import { ConfirmationButton, OptionalFields } from "../deals/OptionalFields";
 import { ManagerMessageDrawer } from "../deals/ManagerMessageDrawer";
 import { ProductMark, StatusBadge } from "../deals/parts";
 import { RejectedDealDrawer } from "../deals/RejectedDealDrawer";
@@ -217,6 +218,7 @@ export function DealDetail({ deal, siblings, today, partnerManager, senderEmail 
           </span>
         </div>
         <div style={{ display: "flex", gap: 6 }}>
+          {deal.status === "accepted" ? <ConfirmationButton id={deal.id} /> : null}
           {deal.status === "accepted" && (deal.extensionStatus === "none" || deal.extensionStatus === "declined") ? (
             <button
               type="button"
@@ -365,6 +367,7 @@ export function DealDetail({ deal, siblings, today, partnerManager, senderEmail 
                     <dd>{/^\d{4}-\d{2}-\d{2}$/.test(deal.expectedClose) ? fmtLong(deal.expectedClose) : deal.expectedClose}</dd>
                   </>
                 ) : null}
+                <OptionalFields deal={deal} />
               </dl>
               <dl className="dl">
                 {primary ? (
