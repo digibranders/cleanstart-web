@@ -11,6 +11,7 @@ import { acceptRegistrationAction, rejectRegistrationAction } from "@/server/act
 import { issuesToErrors } from "@/server/actions/result";
 import { fmtLong } from "../deals/dates";
 import { defaultRejectReason, describeCheck, initialsOf, reviewSince } from "../deals/derive";
+import { ConfirmationButton, OptionalFields } from "../deals/OptionalFields";
 import { StatusBadge } from "../deals/parts";
 import { Icon } from "../icon";
 import { useToast } from "../ui/toast";
@@ -86,6 +87,7 @@ export function StaffDealDetail({ deal, check, today }: Props): React.JSX.Elemen
           <h1 className="h1">{deal.customer}</h1>
           <StatusBadge status={deal.status} />
         </div>
+        {deal.status === "accepted" ? <ConfirmationButton id={deal.id} /> : null}
         {waiting && reason === null ? (
           <div style={{ display: "flex", gap: 8 }}>
             <button type="button" className="btn btn-d" disabled={busy} onClick={() => setReason(defaultRejectReason(deal, checked))}>
@@ -159,6 +161,7 @@ export function StaffDealDetail({ deal, check, today }: Props): React.JSX.Elemen
           <dd>{fmtLong(reviewSince(deal))}</dd>
           <dt>Expected close</dt>
           <dd>{deal.expectedClose ? fmtLong(deal.expectedClose) : "Not recorded"}</dd>
+          <OptionalFields deal={deal} />
           <dt>Stage</dt>
           <dd>{deal.stage ?? "Not recorded"}</dd>
           <dt>Protection ends</dt>
