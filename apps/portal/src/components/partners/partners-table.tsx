@@ -137,7 +137,7 @@ export function PartnersTable({
                     aria-pressed={p.id === selectedId}
                     style={{ background: "none", border: 0, padding: 0, font: "inherit", cursor: "pointer" }}
                   >
-                    <Avatar initials={initialsOf(p.name)} />
+                    <Avatar initials={initialsOf(p.name)} logoUrl={p.logoUrl} />
                     <span className="li-t" style={{ textAlign: "left" }}>
                       <span className="li-n" style={{ fontSize: 13 }}>
                         {p.name}

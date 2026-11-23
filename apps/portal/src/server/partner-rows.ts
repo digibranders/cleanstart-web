@@ -1,4 +1,5 @@
 import { and, asc, eq, ilike, inArray, isNull, ne, or, sql, type SQL } from 'drizzle-orm';
+import { logoUrlOf } from '@/lib/company-profile';
 import { applications, invites, partners, registrations, users } from '@/db/schema';
 import type { PartnerCategory, PartnerRegion, PartnerStatus, StaffRegion } from '@/lib/domain';
 import type { PartnerListRow } from '@/lib/dto';
@@ -108,6 +109,7 @@ export async function partnerListRows(tx: Tx, filter: PartnerRowFilter): Promise
     const figures = countsBy.get(p.id);
     return {
       id: p.id,
+      logoUrl: logoUrlOf(p.id, p.logoKey),
       name: p.name,
       domain: p.domain,
       category: p.category,

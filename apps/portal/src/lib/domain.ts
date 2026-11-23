@@ -21,6 +21,17 @@ export const PARTNER_REGION_LABEL: Record<PartnerRegion, string> = {
 export const DEAL_REGIONS = ['india', 'middle_east'] as const;
 export type DealRegion = (typeof DEAL_REGIONS)[number];
 
+/** Company size bands on the partner profile. Stored as written; the CHECK constraint on partners.headcount_band lists the same values. */
+export const HEADCOUNT_BANDS = ['1-10', '11-50', '51-200', '201-1000', '1000+'] as const;
+export type HeadcountBand = (typeof HEADCOUNT_BANDS)[number];
+export const HEADCOUNT_BAND_LABEL: Record<HeadcountBand, string> = {
+  '1-10': '1 to 10 people',
+  '11-50': '11 to 50 people',
+  '51-200': '51 to 200 people',
+  '201-1000': '201 to 1,000 people',
+  '1000+': 'More than 1,000 people',
+};
+
 export const PARTNER_STATUSES = ['onboarding', 'active', 'inactive', 'suspended'] as const;
 export type PartnerStatus = (typeof PARTNER_STATUSES)[number];
 export const PARTNER_STATUS_LABEL: Record<PartnerStatus, string> = {

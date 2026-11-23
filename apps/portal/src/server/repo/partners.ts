@@ -1,8 +1,9 @@
 import { and, asc, desc, eq, isNull, ne, sql } from 'drizzle-orm';
 import { auditLog, invites, partnerChecklist, partners, registrations, staffScopes, users } from '@/db/schema';
 import { type Clock, systemClock } from '@/lib/clock';
+import { type CompanyDetailsInput, logoUrlOf } from '@/lib/company-profile';
 import { CHECKLIST_STEPS, type ChecklistStep, type PartnerCategory, type PartnerRegion, type PartnerStatus, type StaffRegion } from '@/lib/domain';
-import type { ChecklistDto, CompanyDto, CreatedInviteDto, IsoTimestamp, PartnerDetailDto, PartnerListRow } from '@/lib/dto';
+import type { ChecklistDto, CompanyDetailsDto, CompanyDto, CreatedInviteDto, IsoTimestamp, PartnerDetailDto, PartnerListRow } from '@/lib/dto';
 import { emailDomain, isPlausibleDomain, isValidEmail, nameFromEmail, normaliseDomain, staffTeamLabel } from '@/lib/people';
 import type { Viewer } from '@/server/auth/types';
 import { ConflictError, ForbiddenError, NotFoundError, ValidationError } from '@/server/errors';
@@ -16,6 +17,18 @@ import { assertStaff, type Tx } from './context';
 import { defineIsolation } from './isolation.registry';
 
 type PartnerRow = typeof partners.$inferSelect;
+
+const toDetails = (p: PartnerRow): CompanyDetailsDto => ({
+  legalName: p.legalName,
+  taxId: p.taxId,
+  hqCountry: p.hqCountry,
+  headcountBand: p.headcountBand,
+  billingContactName: p.billingContactName,
+  billingContactEmail: p.billingContactEmail,
+  supportContactName: p.supportContactName,
+  supportContactEmail: p.supportContactEmail,
+  logoUrl: logoUrlOf(p.id, p.logoKey),
+});
 
 const toCompany = async (tx: Tx, p: PartnerRow): Promise<CompanyDto> => {
   const [manager] = p.managerId
@@ -37,6 +50,7 @@ const toCompany = async (tx: Tx, p: PartnerRow): Promise<CompanyDto> => {
     phone: p.phone,
     address: p.address,
     about: p.about,
+    ...toDetails(p),
     tier: null,
     since: p.createdAt.toISOString().slice(0, 10),
     manager: manager ? { id: manager.id, name: manager.name, email: manager.email, team: staffTeamLabel(manager.region) } : null,
@@ -72,6 +86,56 @@ export async function updateCompanyProfile(
     .returning();
   if (!row) throw new NotFoundError('partner');
   return { company: await toCompany(tx, row), updatedAt: row.updatedAt.toISOString() };
+}
+
+const blankOrNull = (value: string): string | null => value.trim() || null;
+
+/** Partner admin on own company, partner manager on any. Returns the saved company and the fields that changed. */
+export async function updateCompanyDetails(
+  tx: Tx,
+  viewer: Viewer,
+  input: { partnerId?: string; details: CompanyDetailsInput },
+): Promise<{ company: CompanyDto; changed: Array<keyof CompanyDetailsInput> }> {
+  const partnerId = resolvePartnerScope(viewer, input.partnerId);
+  const [before] = await tx.select().from(partners).where(eq(partners.id, partnerId)).limit(1);
+  if (!before) throw new NotFoundError('partner');
+  const d = input.details;
+  const next = {
+    legalName: blankOrNull(d.legalName),
+    taxId: blankOrNull(d.taxId),
+    hqCountry: blankOrNull(d.hqCountry),
+    headcountBand: d.headcountBand === '' ? null : d.headcountBand,
+    billingContactName: blankOrNull(d.billingContactName),
+    billingContactEmail: blankOrNull(d.billingContactEmail)?.toLowerCase() ?? null,
+    supportContactName: blankOrNull(d.supportContactName),
+    supportContactEmail: blankOrNull(d.supportContactEmail)?.toLowerCase() ?? null,
+  };
+  const changed = (Object.keys(next) as Array<keyof typeof next>).filter((key) => next[key] !== before[key]);
+  if (changed.length === 0) return { company: await toCompany(tx, before), changed };
+  const [row] = await tx.update(partners).set({ ...next, updatedAt: new Date() }).where(eq(partners.id, partnerId)).returning();
+  if (!row) throw new NotFoundError('partner');
+  return { company: await toCompany(tx, row), changed };
+}
+
+/** Sets or clears the logo. Returns the key it replaced so the caller can delete that object after commit. Same permission as updateCompanyDetails. */
+export async function setPartnerLogo(
+  tx: Tx,
+  viewer: Viewer,
+  input: { partnerId?: string; key: string | null },
+): Promise<{ company: CompanyDto; previousKey: string | null }> {
+  const partnerId = resolvePartnerScope(viewer, input.partnerId);
+  const [before] = await tx.select({ logoKey: partners.logoKey }).from(partners).where(eq(partners.id, partnerId)).limit(1);
+  if (!before) throw new NotFoundError('partner');
+  const [row] = await tx.update(partners).set({ logoKey: input.key, updatedAt: new Date() }).where(eq(partners.id, partnerId)).returning();
+  if (!row) throw new NotFoundError('partner');
+  return { company: await toCompany(tx, row), previousKey: before.logoKey };
+}
+
+/** The stored logo key of a partner the viewer may see: a partner viewer's own, any for staff (sales staff only in their region). Null when there is no logo. */
+export async function getPartnerLogoKey(tx: Tx, viewer: Viewer, partnerId: string): Promise<string | null> {
+  const company = await getCompany(tx, viewer, { partnerId });
+  const [row] = await tx.select({ logoKey: partners.logoKey }).from(partners).where(eq(partners.id, company.partnerId)).limit(1);
+  return row?.logoKey ?? null;
 }
 
 /** The welcome checklist of the viewer's partner (M1.5). Partner viewers only. */
@@ -225,6 +289,7 @@ export async function getPartnerDetail(tx: Tx, viewer: Viewer, id: string): Prom
     phone: partner.phone,
     address: partner.address,
     about: partner.about,
+    ...toDetails(partner),
     people: people.map((p) => ({
       id: p.id,
       name: p.name,
@@ -365,11 +430,28 @@ export async function resendPartnerInvites(
 }
 
 export const isolation = defineIsolation<
-  | 'getCompany' | 'getChecklist' | 'tickChecklistStep' | 'listPartnerAdminRecipients' | 'updateCompanyProfile'
+  | 'getCompany' | 'updateCompanyDetails' | 'setPartnerLogo' | 'getPartnerLogoKey' | 'getChecklist' | 'tickChecklistStep' | 'listPartnerAdminRecipients' | 'updateCompanyProfile'
   | 'listPartners' | 'getPartnerDetail' | 'createPartner' | 'setPartnerManager' | 'setPartnerCategory'
   | 'suspendPartner' | 'restorePartner' | 'resendPartnerInvites'
 >({
   getCompany: { scope: 'tenant', probe: (tx, viewer, ctx) => getCompany(tx, viewer, { partnerId: ctx.b.partnerId }), expect: 'not_found' },
+  updateCompanyDetails: {
+    scope: 'tenant',
+    probe: (tx, viewer, ctx) =>
+      updateCompanyDetails(tx, viewer, {
+        partnerId: ctx.b.partnerId,
+        details: { legalName: 'Probe Ltd', taxId: '', hqCountry: '', headcountBand: '', billingContactName: '', billingContactEmail: '', supportContactName: '', supportContactEmail: '' },
+      }),
+    expect: 'not_found',
+    untouched: (ctx) => [{ table: 'partners', id: ctx.b.partnerId }],
+  },
+  setPartnerLogo: {
+    scope: 'tenant',
+    probe: (tx, viewer, ctx) => setPartnerLogo(tx, viewer, { partnerId: ctx.b.partnerId, key: null }),
+    expect: 'not_found',
+    untouched: (ctx) => [{ table: 'partners', id: ctx.b.partnerId }],
+  },
+  getPartnerLogoKey: { scope: 'tenant', probe: (tx, viewer, ctx) => getPartnerLogoKey(tx, viewer, ctx.b.partnerId), expect: 'not_found' },
   getChecklist: { scope: 'tenant', probe: (tx, viewer) => getChecklist(tx, viewer), expect: 'unchanged' },
   tickChecklistStep: { scope: 'tenant', probe: (tx, viewer) => tickChecklistStep(tx, viewer, { step: 'kickoff' }, systemClock), expect: 'unchanged' },
   listPartnerAdminRecipients: { scope: 'tenant', probe: (tx, _viewer, ctx) => listPartnerAdminRecipients(tx, { partnerId: ctx.b.partnerId }), expect: 'empty' },

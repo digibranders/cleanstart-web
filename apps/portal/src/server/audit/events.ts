@@ -37,6 +37,8 @@ export const AUDIT_EVENTS = {
   'partner.restored': { kind: 'partners', action: 'Restored partner access' },
   'partner.agreement_accepted': { kind: 'partners', action: 'Accepted the partner agreement' },
   'partner.profile_updated': { kind: 'partners', action: 'Updated company profile' },
+  'partner.details_updated': { kind: 'partners', action: 'Updated company details' },
+  'partner.logo_changed': { kind: 'partners', action: 'Changed company logo' },
   // documents
   'document.uploaded': { kind: 'documents', action: 'Uploaded a document' },
   'document.replaced': { kind: 'documents', action: 'Replaced document file' },

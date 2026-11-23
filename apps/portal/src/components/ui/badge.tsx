@@ -48,11 +48,21 @@ export function Avatar({
   initials,
   round,
   me,
+  logoUrl,
 }: {
   initials: string;
   round?: boolean;
   me?: boolean;
+  /** A company logo replaces the initials. The image has no alt text because the name is next to it. */
+  logoUrl?: string | null;
 }): React.JSX.Element {
+  if (logoUrl) {
+    return (
+      <span className={`av av-logo${round ? " av-r" : ""}`}>
+        <img src={logoUrl} alt="" decoding="async" />
+      </span>
+    );
+  }
   return <span className={`av av-1${round ? " av-r" : ""}${me ? " av-me" : ""}`}>{initials}</span>;
 }
 

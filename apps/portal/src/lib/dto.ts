@@ -15,6 +15,7 @@ import type {
   DocumentType,
   EventSource,
   ExtensionStatus,
+  HeadcountBand,
   MaterialRequestStatus,
   MessageSide,
   NotificationCategory,
@@ -52,6 +53,8 @@ export interface ShellDto {
   /** Company line in the sidebar. Partners: the partner. Staff: "CleanStart", sub "Partnerships". */
   orgName: string;
   orgSub: string;
+  /** Partner viewers: their company logo when one is set. */
+  orgLogoUrl?: string | null;
   /** The viewer's partner manager (partner viewers only). */
   manager: { id: string; name: string; email: string; team: string } | null;
   /** Partner viewers only: the partner's own region, the default on the deal form. */
@@ -230,6 +233,8 @@ export interface ApplicationNoteDto {
 
 export interface PartnerListRow {
   id: string;
+  /** Same-origin URL of the company logo, or null. */
+  logoUrl: string | null;
   name: string;
   domain: string;
   category: PartnerCategory;
@@ -276,7 +281,7 @@ export interface PartnerDealRow {
   status: RegistrationStatus;
 }
 
-export interface PartnerDetailDto extends PartnerListRow {
+export interface PartnerDetailDto extends PartnerListRow, CompanyDetailsDto {
   website: string | null;
   phone: string | null;
   address: string | null;
@@ -288,7 +293,21 @@ export interface PartnerDetailDto extends PartnerListRow {
   recentDeals: PartnerDealRow[];
 }
 
-export interface CompanyDto {
+/** The company details a partner admin or staff edit. Null means not set. hqCountry is an ISO 3166 code. */
+export interface CompanyDetailsDto {
+  legalName: string | null;
+  taxId: string | null;
+  hqCountry: string | null;
+  headcountBand: HeadcountBand | null;
+  billingContactName: string | null;
+  billingContactEmail: string | null;
+  supportContactName: string | null;
+  supportContactEmail: string | null;
+  /** Same-origin URL of the logo, or null (the screens then show initials). */
+  logoUrl: string | null;
+}
+
+export interface CompanyDto extends CompanyDetailsDto {
   partnerId: string;
   name: string;
   domain: string;

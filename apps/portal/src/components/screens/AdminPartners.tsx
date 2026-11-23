@@ -3,6 +3,7 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Icon } from "@/components/icon";
+import { DetailsDialog } from "@/components/partners/company-details";
 import { AddPartnerDrawer, type NewPartnerValues } from "@/components/partners/add-partner-drawer";
 import { ApplicationsTable } from "@/components/partners/applications-table";
 import { downloadCsv } from "@/components/partners/csv";
@@ -72,7 +73,7 @@ export function AdminPartners({
   const [status, setStatus] = useState("Any status");
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<PartnerSort>("name");
-  const [dialog, setDialog] = useState<"add" | "category" | "manager" | "identity" | "profile" | "suspend" | null>(null);
+  const [dialog, setDialog] = useState<"add" | "category" | "manager" | "identity" | "profile" | "details" | "suspend" | null>(null);
 
   const selectedParam = searchParams.get("selected");
   const open = selectedParam !== null && detail?.id === selectedParam ? detail : null;
@@ -307,6 +308,7 @@ export function AdminPartners({
             onChangeCategory={() => setDialog("category")}
             onEditIdentity={() => setDialog("identity")}
             onEditProfile={() => setDialog("profile")}
+            onEditDetails={() => setDialog("details")}
             onResendInvites={() => {
               void (async () => {
                 const result = await resendPartnerInvitesAction({ id: open.id });
@@ -344,6 +346,7 @@ export function AdminPartners({
         />
       ) : null}
       {dialog === "identity" && detail ? <IdentityDialog key={detail.id} partner={detail} onClose={() => setDialog(null)} /> : null}
+      {dialog === "details" && detail ? <DetailsDialog key={detail.id} partner={detail} onClose={() => setDialog(null)} /> : null}
       {dialog === "profile" && detail ? <ProfileDialog key={detail.id} partner={detail} onClose={() => setDialog(null)} /> : null}
       {dialog === "suspend" && detail ? (
         <SuspendDialog

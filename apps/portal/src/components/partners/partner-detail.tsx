@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { Drawer } from "@/components/ui/overlay";
 import { fmtShort, fmtLong } from "@/lib/dates";
-import { PARTNER_CATEGORY_LABEL, PARTNER_REGION_LABEL, PRODUCT_LABEL } from "@/lib/domain";
+import { countryName } from "@/lib/deal-format";
+import { HEADCOUNT_BAND_LABEL, PARTNER_CATEGORY_LABEL, PARTNER_REGION_LABEL, PRODUCT_LABEL } from "@/lib/domain";
 import type { PartnerDetailDto } from "@/lib/dto";
 import { formatAgreement, initialsOf } from "@/lib/people";
 import { ROUTES } from "@/lib/routes";
@@ -19,6 +20,7 @@ interface PartnerDetailProps {
   onChangeCategory: () => void;
   onEditIdentity: () => void;
   onEditProfile: () => void;
+  onEditDetails: () => void;
   onResendInvites: () => void;
   onSuspend: () => void;
   onRestore: () => void;
@@ -35,6 +37,7 @@ export function PartnerDetail({
   onChangeCategory,
   onEditIdentity,
   onEditProfile,
+  onEditDetails,
   onResendInvites,
   onSuspend,
   onRestore,
@@ -49,9 +52,15 @@ export function PartnerDetail({
       title={p.name}
       subtitle={p.domain}
       lead={
-        <span className="av av-1" style={{ width: 36, height: 36, borderRadius: 9, fontSize: 13 }}>
-          {initialsOf(p.name)}
-        </span>
+        p.logoUrl ? (
+          <span className="av av-logo" style={{ width: 36, height: 36, borderRadius: 9 }}>
+            <img src={p.logoUrl} alt="" decoding="async" />
+          </span>
+        ) : (
+          <span className="av av-1" style={{ width: 36, height: 36, borderRadius: 9, fontSize: 13 }}>
+            {initialsOf(p.name)}
+          </span>
+        )
       }
     >
       <div style={{ display: "grid", gap: 12 }}>
@@ -111,6 +120,23 @@ export function PartnerDetail({
               <dd>{p.about}</dd>
             </>
           ) : null}
+          {(
+            [
+              ["Legal name", p.legalName],
+              ["Tax ID", p.taxId],
+              ["HQ country", countryName(p.hqCountry)],
+              ["Company size", p.headcountBand ? HEADCOUNT_BAND_LABEL[p.headcountBand] : null],
+              ["Billing contact", [p.billingContactName, p.billingContactEmail].filter(Boolean).join(", ") || null],
+              ["Support contact", [p.supportContactName, p.supportContactEmail].filter(Boolean).join(", ") || null],
+            ] as const
+          ).map(([label, value]) =>
+            value ? (
+              <div key={label} style={{ display: "contents" }}>
+                <dt>{label}</dt>
+                <dd>{value}</dd>
+              </div>
+            ) : null,
+          )}
         </dl>
         <div className="kpis" style={{ borderTop: "1px solid #F0EFF4", gridTemplateColumns: "repeat(4, minmax(0, 1fr))" }}>
           {(
@@ -145,6 +171,9 @@ export function PartnerDetail({
             </button>
             <button type="button" className="btn btn-s" style={SMALL_BTN} onClick={onEditProfile}>
               Edit profile
+            </button>
+            <button type="button" className="btn btn-s" style={SMALL_BTN} onClick={onEditDetails}>
+              Edit details and logo
             </button>
             <button type="button" className="btn btn-s" style={SMALL_BTN} onClick={onChangeCategory}>
               Change category

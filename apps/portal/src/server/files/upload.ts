@@ -3,7 +3,7 @@ import type { UploadedFile } from '@/server/repo/documents';
 import { assertUploadAllowed, cleanOriginalName, documentKey, extensionOf, parseDocumentKey } from './rules';
 import type { FileStorage, PresignedPut } from './storage';
 
-const PEEK_BYTES = 16;
+export const PEEK_BYTES = 16;
 const TYPE_MESSAGE = 'Upload a PDF, PPTX, DOCX, XLSX, MP4 or ZIP file.';
 
 /** Step 1 of an upload: the action validates size and type, then returns a presigned PUT. The browser uploads directly to R2. */
@@ -52,7 +52,7 @@ async function readPrefix(response: Response, length: number): Promise<number[]>
 }
 
 /** The first bytes of the stored object through a presigned GET with a Range header. */
-async function rangeRead(storage: FileStorage, input: { key: string; originalName: string }, fetchImpl: typeof fetch): Promise<number[]> {
+export async function rangeRead(storage: FileStorage, input: { key: string; originalName: string }, fetchImpl: typeof fetch): Promise<number[]> {
   const { url } = await storage.presignGet({ key: input.key, filename: input.originalName });
   let response: Response;
   try {

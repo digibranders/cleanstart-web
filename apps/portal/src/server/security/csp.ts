@@ -27,7 +27,8 @@ export function buildCsp({ nonce, isDev, connectOrigins }: CspInput): string {
     // The development server injects inline <style> elements without a nonce (HMR), so development allows inline styles.
     'style-src': isDev ? ["'self'", "'unsafe-inline'"] : ["'self'", `'nonce-${nonce}'`],
     'style-src-attr': ["'unsafe-inline'"],
-    'img-src': ["'self'", 'data:', 'blob:'],
+    // The company logo route redirects to the document bucket, and a redirect target is checked against img-src.
+    'img-src': ["'self'", 'data:', 'blob:', ...connectOrigins],
     'font-src': ["'self'"],
     'connect-src': ["'self'", TURNSTILE, ...connectOrigins, ...(isDev ? ['ws://localhost:*'] : [])],
     // The video player and the PDF preview load our stream route, which redirects to the document bucket.
