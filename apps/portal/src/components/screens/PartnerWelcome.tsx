@@ -219,7 +219,7 @@ export function PartnerWelcome({ firstName, company, checklist, viewerEmail }: P
               <h2 id="myteam" className="card-t">
                 Your team
               </h2>
-              <span className="card-meta">1 person</span>
+              <span className="card-meta">Just you</span>
             </div>
             <div
               className="card-b"
