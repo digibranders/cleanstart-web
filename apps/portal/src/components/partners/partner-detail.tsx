@@ -1,15 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { Avatar } from "@/components/ui/badge";
 import { Drawer } from "@/components/ui/overlay";
 import { fmtShort, fmtLong } from "@/lib/dates";
-import { PARTNER_CATEGORY_LABEL, PARTNER_REGION_LABEL, PARTNER_ROLE_LABEL, PRODUCT_LABEL } from "@/lib/domain";
+import { PARTNER_CATEGORY_LABEL, PARTNER_REGION_LABEL, PRODUCT_LABEL } from "@/lib/domain";
 import type { PartnerDetailDto } from "@/lib/dto";
-import { formatAgreement, initialsOf, invitedLabel, lastSeenLabel } from "@/lib/people";
+import { formatAgreement, initialsOf } from "@/lib/people";
 import { ROUTES } from "@/lib/routes";
 import { DealStatusBadge, PartnerStatusBadge, ProductMark } from "./badges";
+import { PartnerPeople } from "./partner-people";
 
 interface PartnerDetailProps {
   partner: PartnerDetailDto;
@@ -18,6 +17,8 @@ interface PartnerDetailProps {
   canManage: boolean;
   onChangeManager: () => void;
   onChangeCategory: () => void;
+  onEditIdentity: () => void;
+  onEditProfile: () => void;
   onResendInvites: () => void;
   onSuspend: () => void;
   onRestore: () => void;
@@ -32,12 +33,13 @@ export function PartnerDetail({
   canManage,
   onChangeManager,
   onChangeCategory,
+  onEditIdentity,
+  onEditProfile,
   onResendInvites,
   onSuspend,
   onRestore,
   onClose,
 }: PartnerDetailProps): React.JSX.Element {
-  const [confirming, setConfirming] = useState(false);
   const suspended = p.status === "suspended";
 
   return (
@@ -56,6 +58,11 @@ export function PartnerDetail({
       <section className="card clip">
         <div style={{ padding: 12 }}>
           <PartnerStatusBadge status={p.status} />
+          {suspended && p.suspendReason ? (
+            <p style={{ margin: "8px 0 0", fontSize: 12.5, lineHeight: 1.45 }}>
+              <strong>Suspended:</strong> {p.suspendReason}
+            </p>
+          ) : null}
         </div>
         <hr className="hr" />
         <dl className="dl card-b" style={{ gridTemplateColumns: "110px minmax(0, 1fr)" }}>
@@ -133,43 +140,22 @@ export function PartnerDetail({
               background: "#FCFCFD",
             }}
           >
+            <button type="button" className="btn btn-s" style={SMALL_BTN} onClick={onEditIdentity}>
+              Edit name, domain, region
+            </button>
+            <button type="button" className="btn btn-s" style={SMALL_BTN} onClick={onEditProfile}>
+              Edit profile
+            </button>
             <button type="button" className="btn btn-s" style={SMALL_BTN} onClick={onChangeCategory}>
               Change category
             </button>
             <button type="button" className="btn btn-s" style={SMALL_BTN} onClick={onResendInvites}>
               Resend invites
             </button>
-            {!suspended && !confirming ? (
-              <button
-                type="button"
-                className="btn btn-d"
-                style={{ ...SMALL_BTN, marginLeft: "auto" }}
-                onClick={() => setConfirming(true)}
-              >
+            {!suspended ? (
+              <button type="button" className="btn btn-d" style={{ ...SMALL_BTN, marginLeft: "auto" }} onClick={onSuspend}>
                 Suspend
               </button>
-            ) : null}
-            {!suspended && confirming ? (
-              <div style={{ flexBasis: "100%", display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", paddingTop: 4 }}>
-                <span className="confirm" style={{ flex: "1 1 100%" }}>
-                  Suspend {p.name}? Its {p.users} {p.users === 1 ? "user loses" : "users lose"} access at once. Deals
-                  stay in HubSpot.
-                </span>
-                <button
-                  type="button"
-                  className="btn btn-dd"
-                  style={SMALL_BTN}
-                  onClick={() => {
-                    setConfirming(false);
-                    onSuspend();
-                  }}
-                >
-                  Suspend access
-                </button>
-                <button type="button" className="btn btn-g" style={{ ...SMALL_BTN, padding: "0 6px" }} onClick={() => setConfirming(false)}>
-                  Cancel
-                </button>
-              </div>
             ) : null}
             {suspended ? (
               <button type="button" className="btn btn-s" style={{ ...SMALL_BTN, marginLeft: "auto" }} onClick={onRestore}>
@@ -180,29 +166,7 @@ export function PartnerDetail({
         ) : null}
       </section>
 
-      <section aria-labelledby="sel-people" className="card clip">
-        <div className="card-h">
-          <h2 id="sel-people" className="card-t">
-            People
-          </h2>
-          <span className="card-meta tnum">{p.users}</span>
-        </div>
-        {p.people.map((u) => (
-          <div key={u.id} className="li">
-            <Avatar initials={initialsOf(u.name)} round />
-            <span className="li-t">
-              <span className="li-n">{u.name}</span>
-              <span className="li-s">{PARTNER_ROLE_LABEL[u.role]}</span>
-            </span>
-            <span className="li-s">
-              {u.status === "invited" ? invitedLabel(u.invitedAt) : lastSeenLabel(u.lastActiveAt, today)}
-            </span>
-          </div>
-        ))}
-        {p.people.length === 0 ? (
-          <p style={{ margin: 0, padding: 12, fontSize: 12.5, color: "#6B687D" }}>Nobody has been invited yet.</p>
-        ) : null}
-      </section>
+      <PartnerPeople partner={p} today={today} canManage={canManage} />
 
       <section aria-labelledby="sel-deals" className="card clip">
         <div className="card-h">

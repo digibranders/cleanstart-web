@@ -1,5 +1,5 @@
-import { and, asc, desc, eq, isNull, ne } from 'drizzle-orm';
-import { invites, partnerChecklist, partners, registrations, staffScopes, users } from '@/db/schema';
+import { and, asc, desc, eq, isNull, ne, sql } from 'drizzle-orm';
+import { auditLog, invites, partnerChecklist, partners, registrations, staffScopes, users } from '@/db/schema';
 import { type Clock, systemClock } from '@/lib/clock';
 import { CHECKLIST_STEPS, type ChecklistStep, type PartnerCategory, type PartnerRegion, type PartnerStatus, type StaffRegion } from '@/lib/domain';
 import type { ChecklistDto, CompanyDto, CreatedInviteDto, IsoTimestamp, PartnerDetailDto, PartnerListRow } from '@/lib/dto';
@@ -196,6 +196,23 @@ export async function getPartnerDetail(tx: Tx, viewer: Viewer, id: string): Prom
   const [partner] = await tx.select().from(partners).where(eq(partners.id, id)).limit(1);
   if (!row || !partner) throw new NotFoundError('partner');
   const people = await loadPartnerPeople(tx, partner.id);
+  const dealCounts = await tx
+    .select({ userId: registrations.registeredBy, n: sql<number>`count(*)::int` })
+    .from(registrations)
+    .where(eq(registrations.partnerId, partner.id))
+    .groupBy(registrations.registeredBy);
+  const twoStep = new Set(
+    (await tx.select({ id: users.id }).from(users).where(and(eq(users.partnerId, partner.id), eq(users.twoFactorEnabled, true)))).map((u) => u.id),
+  );
+  const [suspension] =
+    partner.status === 'suspended'
+      ? await tx
+          .select({ note: auditLog.note })
+          .from(auditLog)
+          .where(and(eq(auditLog.event, 'partner.suspended'), eq(auditLog.partnerId, partner.id)))
+          .orderBy(desc(auditLog.at))
+          .limit(1)
+      : [];
   const deals = await tx
     .select({ id: registrations.id, customer: registrations.customerName, product: registrations.product, registeredOn: registrations.registeredOn, status: registrations.status })
     .from(registrations)
@@ -216,7 +233,13 @@ export async function getPartnerDetail(tx: Tx, viewer: Viewer, id: string): Prom
       status: p.status,
       lastActiveAt: iso(p.lastLoginAt),
       invitedAt: iso(p.invitedAt),
+      title: p.title,
+      phone: p.phone,
+      deals: p.userId ? (dealCounts.find((d) => d.userId === p.userId)?.n ?? 0) : 0,
+      inviteId: p.inviteId,
+      twoFactorEnabled: p.userId !== null && twoStep.has(p.userId),
     })),
+    suspendReason: suspension?.note ?? null,
     openInvites: people.filter((p) => p.status === 'invited').length,
     recentDeals: deals.map((d) => ({ registrationId: d.id, customer: d.customer, product: d.product, registeredOn: d.registeredOn, status: d.status })),
   };

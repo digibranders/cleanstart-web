@@ -27,6 +27,8 @@ const MATRIX: Record<Action, string> = {
   'partner.update_profile': 'own - - Y - -',
   'partner.change_category': '- - - Y - -',
   'partner.change_manager': '- - - Y - -',
+  'partner.update_identity': '- - - Y - -',
+  'user.reset_two_step': '- - - Y - -',
   'partner.suspend': '- - - Y - -',
   'partner.restore': '- - - Y - -',
   'partner.resend_invites': '- - - Y - -',

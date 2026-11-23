@@ -53,6 +53,7 @@ const newPartnerSchema = z.object({
   sendInvite: z.boolean(),
 });
 const partnerIdSchema = z.object({ id: z.string().uuid() });
+const suspendSchema = z.object({ id: z.string().uuid(), reason: z.string().trim().min(1, 'Give a reason for the suspension.').max(500) });
 const managerSchema = z.object({ id: z.string().uuid(), managerId: z.string().uuid() });
 const categorySchema = z.object({ id: z.string().uuid(), category: z.enum(PARTNER_CATEGORIES) });
 
@@ -215,7 +216,7 @@ export async function setPartnerCategoryAction(raw: unknown): Promise<ActionResu
 }
 
 export async function suspendPartnerAction(raw: unknown): Promise<ActionResult<PartnerListRow>> {
-  return runViewerAction({ name: 'partner.suspend', schema: partnerIdSchema }, raw, async (ctx, input): Promise<PartnerListRow> => {
+  return runViewerAction({ name: 'partner.suspend', schema: suspendSchema }, raw, async (ctx, input): Promise<PartnerListRow> => {
     assertCan(ctx.viewer, 'partner.suspend');
     const done = await withViewer(ctx.viewer, async (tx) => {
       const before = await getPartnerDetail(tx, ctx.viewer, input.id);
@@ -224,6 +225,7 @@ export async function suspendPartnerAction(raw: unknown): Promise<ActionResult<P
         await recordAudit(tx, ctx.viewer, {
           event: 'partner.suspended',
           target: partner.name,
+          note: input.reason,
           partnerId: partner.id,
           subject: { type: 'partner', id: partner.id },
         });

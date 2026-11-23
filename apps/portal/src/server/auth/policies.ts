@@ -15,6 +15,7 @@ export const ACTIONS = [
   'partner.update_profile',
   'partner.change_category',
   'partner.change_manager',
+  'partner.update_identity',
   'partner.suspend',
   'partner.restore',
   'partner.resend_invites',
@@ -29,6 +30,7 @@ export const ACTIONS = [
   'team.edit_member',
   'team.reactivate',
   'access_request.decide',
+  'user.reset_two_step',
   // CleanStart staff (master 1.8)
   'staff.read',
   'staff.invite',
@@ -138,6 +140,7 @@ const RULES: Record<Action, Rule> = {
   'partner.update_profile': (v, s) => (isPartnerAdmin(v) && ownCompany(v, s)) || isPartnerManager(v),
   'partner.change_category': managerOnly,
   'partner.change_manager': managerOnly,
+  'partner.update_identity': managerOnly,
   'partner.suspend': managerOnly,
   'partner.restore': managerOnly,
   'partner.resend_invites': managerOnly,
@@ -152,6 +155,7 @@ const RULES: Record<Action, Rule> = {
   'team.edit_member': teamAdmin,
   'team.reactivate': teamAdmin,
   'access_request.decide': teamAdmin,
+  'user.reset_two_step': managerOnly,
 
   'staff.read': managerOnly,
   'staff.invite': managerOnly,
