@@ -55,14 +55,14 @@ const asciiOnly = (value: string): string =>
     .map((char) => ((char.codePointAt(0) ?? 0) > 0x7e ? '_' : char))
     .join('');
 
-/** Content-Disposition that forces a download: an ASCII fallback plus the RFC 5987 encoded name. */
-export function contentDisposition(filename: string): string {
+/** Content-Disposition that forces a download (or, with `inline`, lets the browser show the file): an ASCII fallback plus the RFC 5987 encoded name. */
+export function contentDisposition(filename: string, inline = false): string {
   const cleaned = printable(filename).trim() || 'download';
   const encoded = encodeURIComponent(cleaned).replace(
     /['()*]/g,
     (char) => `%${char.charCodeAt(0).toString(16).toUpperCase()}`,
   );
-  return `attachment; filename="${asciiOnly(cleaned)}"; filename*=UTF-8''${encoded}`;
+  return `${inline ? 'inline' : 'attachment'}; filename="${asciiOnly(cleaned)}"; filename*=UTF-8''${encoded}`;
 }
 
 const clampExpiry = (seconds: number): number => Math.min(Math.max(Math.floor(seconds), 1), MAX_EXPIRES_SECONDS);
@@ -92,7 +92,7 @@ export function createR2Storage(deps: R2StorageDeps): FileStorage {
       }
     },
 
-    async presignGet({ key, filename, expiresInSeconds = GET_EXPIRES_SECONDS }) {
+    async presignGet({ key, filename, inline = false, expiresInSeconds = GET_EXPIRES_SECONDS }) {
       const seconds = clampExpiry(expiresInSeconds);
       try {
         const url = await getSignedUrl(
@@ -100,7 +100,7 @@ export function createR2Storage(deps: R2StorageDeps): FileStorage {
           new GetObjectCommand({
             Bucket: deps.bucket,
             Key: key,
-            ResponseContentDisposition: contentDisposition(filename),
+            ResponseContentDisposition: contentDisposition(filename, inline),
           }),
           { expiresIn: seconds },
         );

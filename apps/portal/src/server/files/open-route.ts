@@ -53,3 +53,35 @@ export async function handleFileOpen(id: string, deps: FileOpenDeps): Promise<Re
     headers: { Location: url, 'Cache-Control': 'private, no-store', 'Referrer-Policy': 'no-referrer' },
   });
 }
+
+/** Only these are shown by the browser itself; every other type is still served as an attachment. */
+const isPlayableMime = (mime: string): boolean => mime === 'application/pdf' || mime.startsWith('video/');
+
+/**
+ * The inline sibling of handleFileOpen, for the video player and the PDF preview: same audience check, then a 302 to a
+ * 60 second presigned GET that the browser may range request (it asks this route again for each range). It records
+ * nothing: the player calls handleFilePlayed once per viewing, so seeking does not count as many opens.
+ */
+export async function handleFileStream(id: string, deps: FileOpenDeps): Promise<Response> {
+  try {
+    const target = await withViewer(deps.viewer, (tx) => getDocumentForOpen(tx, deps.viewer, id));
+    const storage = typeof deps.storage === 'function' ? deps.storage() : deps.storage;
+    const { url } = await storage.presignGet({ key: target.fileKey, filename: target.originalName, inline: isPlayableMime(target.mime) });
+    return new Response(null, {
+      status: 302,
+      headers: { Location: url, 'Cache-Control': 'private, no-store', 'Referrer-Policy': 'no-referrer' },
+    });
+  } catch (error) {
+    return fileErrorResponse(error);
+  }
+}
+
+/** One open for this viewer (staff are never counted), 404 for a document outside the audience or deleted. */
+export async function handleFilePlayed(id: string, deps: Pick<FileOpenDeps, 'viewer' | 'clock'>): Promise<Response> {
+  try {
+    await withViewer(deps.viewer, (tx) => recordDocumentOpen(tx, deps.viewer, { id }, deps.clock ?? systemClock));
+    return new Response(null, { status: 204, headers: { 'Cache-Control': 'no-store' } });
+  } catch (error) {
+    return fileErrorResponse(error);
+  }
+}
