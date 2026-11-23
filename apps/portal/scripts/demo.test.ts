@@ -1,7 +1,9 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import type { Pool } from 'pg';
 import { describe, expect, it } from 'vitest';
 import { DemoModeError } from '../src/server/demo';
-import { assertDemoDatabase, assertDemoScriptAllowed } from './demo';
+import { DEMO_LOGINS, DEMO_PASSWORD, assertDemoDatabase, assertDemoScriptAllowed } from './demo';
 
 const hosted = 'postgresql://portal_owner:pw@ep-demo-123.eu-central-1.aws.neon.tech/portal?sslmode=require';
 const allowed = {
@@ -62,5 +64,22 @@ describe('assertDemoDatabase', () => {
   it('lets setup run on an empty database, and on one it already set up', async () => {
     await expect(assertDemoDatabase('setup', ownerOf({ database: 'portal', tables: 0, sentinel: false }))).resolves.toBeUndefined();
     await expect(assertDemoDatabase('setup', ownerOf({ database: 'portal', tables: 22, sentinel: true }))).resolves.toBeUndefined();
+  });
+});
+
+describe('the generic demo logins', () => {
+  const seeded = ['mock-staff.json', 'mock-team.json'].map((name) => readFileSync(join(process.cwd(), 'src/db/mock-data', name), 'utf8')).join('\n');
+
+  it('rename accounts that exist in the mock data, to lower case addresses that do not', () => {
+    for (const { from, to } of DEMO_LOGINS) {
+      expect(seeded, from).toContain(from);
+      expect(seeded, to).not.toContain(to);
+      expect(to).toBe(to.toLowerCase());
+    }
+    expect(new Set(DEMO_LOGINS.map((login) => login.to)).size).toBe(DEMO_LOGINS.length);
+  });
+
+  it('share a password that is long enough for the portal password rule', () => {
+    expect(DEMO_PASSWORD.length).toBeGreaterThanOrEqual(12);
   });
 });

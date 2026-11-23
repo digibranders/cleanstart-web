@@ -8,6 +8,14 @@ import { DEMO_FILES_DDL } from '../src/server/files/demo-store';
 import { migrateDatabase } from './migrate';
 
 type Command = 'setup' | 'reset';
+
+/** The one shared demo password, public by design: the demo holds made-up data only. */
+export const DEMO_PASSWORD = 'Cleanstart@2026';
+/** The two generic logins, renamed from the seeded Kestrel and CleanStart accounts. Lower case: users_email_lower. */
+export const DEMO_LOGINS: ReadonlyArray<{ from: string; to: string }> = [
+  { from: 'gaurav.jadhav@cleanstart.com', to: 'admin@cleanstart.com' },
+  { from: 'aditi.rao@kestrelsystems.in', to: 'partner@cleanstart.com' },
+];
 type Source = Record<string, string | undefined>;
 
 /** Both commands refuse unless the switch is on and the target is not the real portal: reset truncates every table. */
@@ -51,7 +59,7 @@ async function setup(ownerUrl: string): Promise<void> {
     await owner.end();
   }
 
-  const [{ db, pool }, { DEV_SEED_PASSWORD, seedMockData }, { systemClock }, { hashPassword }, { sql }] = await Promise.all([
+  const [{ db, pool }, { seedMockData }, { systemClock }, { hashPassword }, { sql }] = await Promise.all([
     import('../src/db/client'),
     import('../src/db/fixtures'),
     import('../src/lib/clock'),
@@ -64,7 +72,11 @@ async function setup(ownerUrl: string): Promise<void> {
       console.info('demo data already present, nothing seeded');
       return;
     }
-    console.info('seeded the demo data', await seedMockData(db, { clock: systemClock, passwordHash: await hashPassword(DEV_SEED_PASSWORD) }));
+    console.info('seeded the demo data', await seedMockData(db, { clock: systemClock, passwordHash: await hashPassword(DEMO_PASSWORD) }));
+    for (const login of DEMO_LOGINS) {
+      const renamed = await db.execute(sql`update users set email = ${login.to} where email = ${login.from}`);
+      if (renamed.rowCount !== 1) throw new DemoModeError(`demo:setup could not rename the account ${login.from}: ${renamed.rowCount ?? 0} rows matched.`);
+    }
   } finally {
     await pool.end();
   }
