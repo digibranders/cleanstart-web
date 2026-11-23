@@ -12,7 +12,7 @@ import { ScrollRegion } from "@/components/ui/scroll-region";
 
 const PAGE_SIZE = 50;
 
-export const CATEGORY_FILTERS = ["All", "Distributors", "Channel", "SIs"] as const;
+export const CATEGORY_FILTERS = ["All", "Distributors", "Channel"] as const;
 export type CategoryFilter = (typeof CATEGORY_FILTERS)[number];
 export const REGION_FILTERS = ["All regions", "India", "Middle East"] as const;
 export const STATUS_FILTERS = ["Any status", "Active", "Onboarding", "Inactive", "Suspended"] as const;
@@ -29,7 +29,6 @@ export const CATEGORY_FOR_FILTER: Record<CategoryFilter, PartnerCategory | null>
   All: null,
   Distributors: "distributor",
   Channel: "channel",
-  SIs: "integrator",
 };
 
 interface PartnersTableProps {

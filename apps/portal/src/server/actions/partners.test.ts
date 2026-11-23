@@ -196,16 +196,24 @@ describe('partner management actions', () => {
     expect(await createPartnerAction(newPartner)).toMatchObject({ ok: false, error: { code: 'conflict', message: 'Another partner already uses this domain.' } });
   });
 
+  it('rejects the removed system integrator category', async () => {
+    harness.viewer = await manager();
+    const partner = await makePartner(db, { name: 'Arbor Cyber' });
+    for (const category of ['integrator', 'system_integrator']) {
+      expect(await setPartnerCategoryAction({ id: partner.id, category } as never)).toMatchObject({ ok: false, error: { code: 'validation' } });
+    }
+  });
+
   it('changes manager and category with audit notes and a fresh outbox key each time', async () => {
     harness.viewer = await manager();
     const gaurav = await makeUser(db, { kind: 'staff', role: 'partner_manager', region: 'india', name: 'Gaurav Jadhav' });
     const omar = await makeUser(db, { kind: 'staff', role: 'partner_manager', region: 'middle_east', name: 'Omar Nasser' });
-    const partner = await makePartner(db, { name: 'Arbor Cyber', managerId: gaurav.id, category: 'integrator' });
+    const partner = await makePartner(db, { name: 'Arbor Cyber', managerId: gaurav.id, category: 'channel' });
     expect(await setPartnerManagerAction({ id: partner.id, managerId: omar.id })).toMatchObject({ ok: true, data: { managerName: 'Omar Nasser' } });
     await new Promise((resolve) => setTimeout(resolve, 5));
     expect(await setPartnerCategoryAction({ id: partner.id, category: 'distributor' })).toMatchObject({ ok: true, data: { category: 'distributor' } });
     expect((await db.select().from(auditLog)).map((a) => [a.event, a.note]).sort()).toEqual([
-      ['partner.category_changed', 'System integrator to Distributor'],
+      ['partner.category_changed', 'Channel partner to Distributor'],
       ['partner.manager_changed', 'Gaurav Jadhav to Omar Nasser'],
     ]);
     const keys = (await db.select().from(hubspotOutbox)).map((o) => o.idempotencyKey);

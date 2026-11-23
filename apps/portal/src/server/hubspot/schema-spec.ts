@@ -28,7 +28,7 @@ export const COMPANY_PROPERTIES: PropertySpec[] = [
     label: 'Partner category',
     type: 'enumeration',
     fieldType: 'select',
-    options: opt('Distributor', 'Channel partner', 'System integrator'),
+    options: opt('Distributor', 'Channel partner'),
   },
   { name: 'partner_portal_id', label: 'Partner portal id', type: 'string', fieldType: 'text', hasUniqueValue: true },
   { name: 'partner_manager', label: 'Partner manager', type: 'string', fieldType: 'text' },

@@ -15,6 +15,13 @@
       "when": 1794700000000,
       "tag": "0001_registration_fields",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794800000000,
+      "tag": "0002_partner_categories",
+      "breakpoints": true
     }
   ]
 }

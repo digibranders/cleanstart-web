@@ -162,7 +162,7 @@ describe('listPartners', () => {
   it('lists every partner for a partner manager with the real counts and filters', async () => {
     const manager = await asStaff(db, 'partner_manager', 'india');
     const a = await makePartner(db, { name: 'Kestrel Systems', domain: 'kestrelsystems.in', region: 'india', category: 'channel', status: 'active' });
-    const b = await makePartner(db, { name: 'Arbor Cyber', domain: 'arborcyber.ae', region: 'middle_east', category: 'integrator', status: 'onboarding' });
+    const b = await makePartner(db, { name: 'Arbor Cyber', domain: 'arborcyber.ae', region: 'middle_east', category: 'channel', status: 'onboarding' });
     await makeUser(db, { partnerId: a.id, role: 'partner_admin' });
     await makeRegistration(db, { partnerId: a.id, status: 'pending' });
     await makeRegistration(db, { partnerId: a.id, status: 'accepted' });

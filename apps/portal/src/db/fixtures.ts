@@ -154,8 +154,8 @@ const emailFor = (name: string, domain: string): string => {
 };
 const sha256Hex = (value: string): string => createHash('sha256').update(value).digest('hex');
 
-const PARTNER_CATEGORY: Record<string, PartnerCategory> = { Distributor: 'distributor', 'Channel partner': 'channel', 'System integrator': 'integrator' };
-const AUDIENCE_CATEGORY: Record<string, PartnerCategory> = { Distributors: 'distributor', 'Channel partners': 'channel', 'System integrators': 'integrator' };
+const PARTNER_CATEGORY: Record<string, PartnerCategory> = { Distributor: 'distributor', 'Channel partner': 'channel' };
+const AUDIENCE_CATEGORY: Record<string, PartnerCategory> = { Distributors: 'distributor', 'Channel partners': 'channel' };
 const REGION: Record<string, PartnerRegion> = { India: 'india', 'Middle East': 'middle_east', Elsewhere: 'elsewhere' };
 const STAFF_REGION: Record<string, StaffRegion> = { India: 'india', 'Middle East': 'middle_east', 'All regions': 'all' };
 const PARTNER_ROLE: Record<string, PartnerRole> = { 'Partner admin': 'partner_admin', Sales: 'sales', Technical: 'technical' };

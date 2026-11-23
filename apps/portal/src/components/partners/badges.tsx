@@ -14,7 +14,6 @@ import {
 const CATEGORY_TONE: Record<PartnerCategory, BadgeTone> = {
   distributor: "violet",
   channel: "blue",
-  integrator: "cyan",
 };
 
 const STATUS_TONE: Record<PartnerStatus, BadgeTone> = {
