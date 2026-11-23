@@ -113,6 +113,8 @@ const toListItem = (row: DocumentRow): DocumentListItemDto => ({
   originalName: row.originalName,
   version: row.version,
   updatedAt: row.updatedAt.toISOString(),
+  hasPoster: row.posterKey !== null,
+  hasCaptions: row.captionsKey !== null,
 });
 
 /**
@@ -188,7 +190,7 @@ async function hydrateOne(tx: Tx, viewer: Viewer, row: DocumentRow): Promise<Doc
 async function findVisible(tx: Tx, viewer: Viewer, id: string): Promise<DocumentOpenTarget | null> {
   if (!UUID_RE.test(id)) return null;
   const [row] = await tx
-    .select({ fileKey: documents.fileKey, originalName: documents.originalName, mime: documents.mime })
+    .select({ fileKey: documents.fileKey, originalName: documents.originalName, mime: documents.mime, posterKey: documents.posterKey, captionsKey: documents.captionsKey })
     .from(documents)
     .where(and(eq(documents.id, id), visibleTo(viewer)))
     .limit(1);
@@ -512,7 +514,7 @@ export async function purgeExpiredFiles(tx: Tx, _actor: SystemActor, clock: Cloc
   keys.push(...expired.map((row) => row.fileKey));
 
   const stale = await tx
-    .select({ id: documents.id, fileKey: documents.fileKey })
+    .select({ id: documents.id, fileKey: documents.fileKey, posterKey: documents.posterKey, captionsKey: documents.captionsKey })
     .from(documents)
     .where(
       and(
@@ -526,11 +528,11 @@ export async function purgeExpiredFiles(tx: Tx, _actor: SystemActor, clock: Cloc
       .delete(documentVersions)
       .where(eq(documentVersions.documentId, doc.id))
       .returning({ fileKey: documentVersions.fileKey });
-    keys.push(doc.fileKey, ...versions.map((row) => row.fileKey));
+    keys.push(doc.fileKey, ...versions.map((row) => row.fileKey), ...[doc.posterKey, doc.captionsKey].filter((k): k is string => k !== null));
     await tx.delete(documentAudience).where(eq(documentAudience.documentId, doc.id));
     await tx
       .update(documents)
-      .set({ fileKey: `${PURGED_KEY_PREFIX}${doc.id}`, fileSize: 0 })
+      .set({ fileKey: `${PURGED_KEY_PREFIX}${doc.id}`, fileSize: 0, posterKey: null, captionsKey: null })
       .where(eq(documents.id, doc.id));
   }
   return { keys };

@@ -5,7 +5,7 @@ import { docIcon, docMeta } from './overview';
 describe('new document rows', () => {
   const doc = (over: Partial<DocumentListItemDto>): DocumentListItemDto => ({
     id: 'd', title: 'T', type: 'datasheet', product: 'all', summary: null, durationMinutes: null, fileSize: 1, mime: 'application/pdf',
-    originalName: 't.pdf', version: 1, updatedAt: '2026-10-30T09:00:00.000Z', ...over,
+    originalName: 't.pdf', version: 1, updatedAt: '2026-10-30T09:00:00.000Z', hasPoster: false, hasCaptions: false, ...over,
   });
   it('writes the type, the length of a video and the date', () => {
     expect(docMeta(doc({ type: 'video', durationMinutes: 14, updatedAt: '2026-11-04T09:00:00.000Z' }))).toBe('Video, 14 min, 4 Nov');

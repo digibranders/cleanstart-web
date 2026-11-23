@@ -594,6 +594,9 @@ export interface DocumentListItemDto {
   originalName: string;
   version: number;
   updatedAt: IsoTimestamp;
+  /** A video can have a poster image and a captions file. The files are served by /api/files/<id>/poster and /captions. */
+  hasPoster: boolean;
+  hasCaptions: boolean;
 }
 
 export interface DocumentDto extends DocumentListItemDto {
@@ -665,6 +668,8 @@ export interface DocumentOpenTarget {
   fileKey: string;
   originalName: string;
   mime: string;
+  posterKey: string | null;
+  captionsKey: string | null;
 }
 
 /* ---------------------------------------------------------------- audit, search, notifications, health */

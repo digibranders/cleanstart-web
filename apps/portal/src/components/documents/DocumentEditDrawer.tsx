@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react';
 import { AudiencePicker } from '@/components/documents/AudiencePicker';
 import { DocumentDetailSections } from '@/components/documents/DocumentDetailSections';
+import { DocumentMediaSection } from '@/components/documents/DocumentMediaSection';
 import {
   adminUpdatedLabel,
   type AudienceDraft,
@@ -358,6 +359,7 @@ export function DocumentEditDrawer({
           onChange={(e) => setChangeNote(e.target.value)}
         />
       </div>
+      {doc.type === 'video' ? <DocumentMediaSection doc={doc} onChanged={() => setFileRefresh((n) => n + 1)} /> : null}
       <DocumentDetailSections documentId={doc.id} refreshKey={fileRefresh} canRestore={!busy} onChanged={() => setFileRefresh((n) => n + 1)} />
       <div className="note note-violet">
         <Icon name="lock" />

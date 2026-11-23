@@ -9,7 +9,7 @@ import { plural } from '@/lib/dates';
 import type { ReportInsightsDto, RollupRow } from '@/lib/report-insights';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-const monthLabel = (ym: string): string => `${MONTHS[Number(ym.slice(5, 7)) - 1] ?? ym} ${ym.slice(2, 4)}`;
+const monthLabel = (ym: string): string => `${MONTHS[Number(ym.slice(5, 7)) - 1] ?? ym} ${ym.slice(0, 4)}`;
 const pct = (fraction: number | null): string => (fraction === null ? 'None yet' : `${Math.round(fraction * 100)}%`);
 const days = (n: number | null): string => (n === null ? 'None yet' : `${n} ${n === 1 ? 'day' : 'days'}`);
 

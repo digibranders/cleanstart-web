@@ -55,6 +55,8 @@ export const AUDIT_EVENTS = {
   'document.published': { kind: 'documents', action: 'Published a document' },
   'document.unpublished': { kind: 'documents', action: 'Moved a document back to draft' },
   'document.expiry_changed': { kind: 'documents', action: 'Changed when a document expires' },
+  'document.poster_changed': { kind: 'documents', action: 'Changed a video poster image' },
+  'document.captions_changed': { kind: 'documents', action: 'Changed a video captions file' },
   'document.version_restored': { kind: 'documents', action: 'Restored an earlier file version' },
   'document.request_updated': { kind: 'documents', action: 'Updated a material request' },
   // people_access

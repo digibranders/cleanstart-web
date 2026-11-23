@@ -24,6 +24,14 @@ import {
   uploadTicketSchema,
 } from '@/server/files/document-service';
 import { getFileStorage } from '@/server/files/instance';
+import {
+  handleCreateMediaTicket,
+  handleRemoveMedia,
+  handleSetMedia,
+  mediaTicketSchema,
+  removeMediaSchema,
+  setMediaSchema,
+} from '@/server/files/media-service';
 import type { ActionResult } from './result';
 import { runViewerAction } from './run';
 
@@ -82,5 +90,25 @@ export async function updateMaterialRequestAction(raw: unknown): Promise<ActionR
 export async function requestMaterialAction(raw: unknown): Promise<ActionResult<{ sent: true }>> {
   return runViewerAction({ name: 'document.request_material', schema: requestMaterialSchema }, raw, (ctx, input) =>
     handleRequestMaterial(ctx, input, {}).then(({ sent }) => ({ sent })),
+  );
+}
+
+/** Step 1 for a video's poster image or captions file. */
+export async function createDocumentMediaTicketAction(raw: unknown): Promise<ActionResult<UploadTicketDto>> {
+  return runViewerAction({ name: 'document.media_ticket', schema: mediaTicketSchema }, raw, (ctx, input) =>
+    handleCreateMediaTicket(ctx, input, { storage: getFileStorage() }),
+  );
+}
+
+/** Step 2: attach the uploaded poster or captions file to the video. */
+export async function setDocumentMediaAction(raw: unknown): Promise<ActionResult<DocumentDto>> {
+  return runViewerAction({ name: 'document.media_set', schema: setMediaSchema }, raw, (ctx, input) =>
+    handleSetMedia(ctx, input, { storage: getFileStorage() }),
+  );
+}
+
+export async function removeDocumentMediaAction(raw: unknown): Promise<ActionResult<DocumentDto>> {
+  return runViewerAction({ name: 'document.media_remove', schema: removeMediaSchema }, raw, (ctx, input) =>
+    handleRemoveMedia(ctx, input, { storage: getFileStorage() }),
   );
 }

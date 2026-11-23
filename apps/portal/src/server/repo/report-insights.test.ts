@@ -41,7 +41,7 @@ describe('getReportInsights', () => {
     await makeRegistration(db, { partnerId: me.id, registeredOn: '2026-10-05', status: 'won', dealValue: 900, customerName: 'z' });
     const all = await asStaff(db, 'partner_manager', 'all');
     const full = await withViewer(all, (tx) => getReportInsights(tx, all, range));
-    const withDeals = (rows: { deals: number }[]) => rows.filter((x) => x.deals > 0);
+    const withDeals = <T extends { deals: number }>(rows: T[]): T[] => rows.filter((x) => x.deals > 0);
     expect(withDeals(full.regions).map((x) => [x.key, x.deals, x.wonValue])).toEqual([['middle_east', 1, 900], ['india', 2, 100]]);
     expect(withDeals(full.managers).map((x) => [x.label, x.deals, x.winRate])).toEqual([['No manager', 1, 1], ['Omar Nasser', 2, 0.5]]);
     // Every active region shows, with zeros when nothing was registered there.
