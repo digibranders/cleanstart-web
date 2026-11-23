@@ -18,7 +18,6 @@ import { PartnerCategoryBadge } from "./badges";
 import { Seg } from "./seg";
 import { ScrollRegion } from "@/components/ui/scroll-region";
 
-const DEFAULT_REASON = "We already have a partner covering this region and segment.";
 const CATEGORY_OPTIONS: readonly string[] = PARTNER_CATEGORIES.map((c) => PARTNER_CATEGORY_LABEL[c]);
 const REGION_OPTIONS: readonly string[] = PARTNER_REGIONS.map((r) => PARTNER_REGION_LABEL[r]);
 
@@ -56,7 +55,7 @@ export function ApplicationsTable({
 }: ApplicationsTableProps): React.JSX.Element {
   const [rejectingId, setRejectingId] = useState<string | null>(null);
   const [approvingId, setApprovingId] = useState<string | null>(null);
-  const [reason, setReason] = useState(DEFAULT_REASON);
+  const [reason, setReason] = useState("");
   const [reasonTried, setReasonTried] = useState(false);
   const [categoryLabel, setCategoryLabel] = useState<string>(PARTNER_CATEGORY_LABEL.channel);
   const [regionLabel, setRegionLabel] = useState<string>(PARTNER_REGION_LABEL.india);
@@ -72,7 +71,7 @@ export function ApplicationsTable({
   const startReject = (id: string): void => {
     setApprovingId(null);
     setRejectingId(id);
-    setReason(DEFAULT_REASON);
+    setReason("");
     setReasonTried(false);
   };
 
@@ -162,6 +161,7 @@ export function ApplicationsTable({
                       <span className="li-t">
                         <span style={{ fontWeight: 600 }}>{a.company}</span>
                         <span className="li-s">{a.domain}</span>
+                        <span className="li-s tnum">{a.reference}</span>
                         <span style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 2 }}>
                           <Badge tone="neutral">{a.source === "website" ? "Website form" : "Portal form"}</Badge>
                           {a.personalEmail ? <Badge tone="pending">Personal email</Badge> : null}
@@ -172,7 +172,9 @@ export function ApplicationsTable({
                     <td className="hide-sm">
                       <span className="li-t">
                         <span>{a.applicantName}</span>
-                        <span className="li-s">{a.role ?? a.email}</span>
+                        {a.role ? <span className="li-s">{a.role}</span> : null}
+                        <span className="li-s">{a.email}</span>
+                        {a.phone ? <span className="li-s tnum">{a.phone}</span> : null}
                       </span>
                     </td>
                     <td className="hide-sm">
