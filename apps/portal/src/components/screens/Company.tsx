@@ -1,7 +1,9 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Icon } from "@/components/icon";
+import { DetailsFields, detailsOf, LogoEditor, sameDetails, saveDetails } from "@/components/partners/company-details";
 import { MessageDrawer } from "@/components/partners/message-drawer";
 import { PartnerCategoryBadge, PartnerStatusBadge } from "@/components/partners/badges";
 import { Avatar, Badge } from "@/components/ui/badge";
@@ -9,6 +11,7 @@ import { useToast } from "@/components/ui/toast";
 import { fmtLong } from "@/lib/dates";
 import { PARTNER_REGION_LABEL } from "@/lib/domain";
 import type { CompanyDto } from "@/lib/dto";
+import type { CompanyDetailsInput } from "@/lib/company-profile";
 import { initialsOf } from "@/lib/people";
 import { updateCompanyProfileAction } from "@/server/actions/partners";
 
@@ -38,6 +41,7 @@ interface CompanyProps {
 
 export function Company({ company, canEdit, viewerEmail }: CompanyProps): React.JSX.Element {
   const toast = useToast();
+  const router = useRouter();
   const saved = fieldsOf(company);
   // null until the admin types: the form then shows the saved profile without copying it into state.
   const [draft, setDraft] = useState<ProfileFields | null>(null);
@@ -68,6 +72,32 @@ export function Company({ company, canEdit, viewerEmail }: CompanyProps): React.
     toast("Company profile saved");
   };
 
+  // Held locally after a save so the card does not flash the old values while the refreshed page is on its way.
+  const [savedDetails, setSavedDetails] = useState(() => detailsOf(company));
+  const [detailsDraft, setDetailsDraft] = useState<CompanyDetailsInput | null>(null);
+  const [detailsSaving, setDetailsSaving] = useState(false);
+  const [detailsErrors, setDetailsErrors] = useState<Partial<Record<keyof CompanyDetailsInput | "form", string>>>({});
+  const [logoUrl, setLogoUrl] = useState(company.logoUrl);
+  const detailsForm = detailsDraft ?? savedDetails;
+  const detailsDirty = detailsDraft !== null && !sameDetails(detailsDraft, savedDetails);
+
+  const saveCompanyDetails = async (event: React.FormEvent): Promise<void> => {
+    event.preventDefault();
+    if (!detailsDirty) return;
+    setDetailsSaving(true);
+    setDetailsErrors({});
+    const result = await saveDetails(undefined, detailsForm);
+    setDetailsSaving(false);
+    if (!result.ok) {
+      setDetailsErrors(result.errors);
+      return;
+    }
+    setSavedDetails(detailsForm);
+    setDetailsDraft(null);
+    toast("Company details saved");
+    router.refresh();
+  };
+
   const manager = company.manager;
   const teamName = manager ? manager.team.replace(/^CleanStart\s*/, "") : "";
   const signed = company.agreementAcceptedAt !== null;
@@ -82,12 +112,12 @@ export function Company({ company, canEdit, viewerEmail }: CompanyProps): React.
       </div>
 
       <div className="row">
+        <div style={{ flex: "1 1 620px", minWidth: 0, display: "flex", flexDirection: "column", gap: 12 }}>
         <form
           onSubmit={save}
           noValidate
           aria-labelledby="prof"
           className="card clip"
-          style={{ flex: "1 1 620px", minWidth: 0 }}
         >
           <div className="card-h">
             <h2 id="prof" className="card-t">
@@ -242,6 +272,63 @@ export function Company({ company, canEdit, viewerEmail }: CompanyProps): React.
             </div>
           ) : null}
         </form>
+
+        <form onSubmit={saveCompanyDetails} noValidate aria-labelledby="det" className="card clip">
+          <div className="card-h">
+            <h2 id="det" className="card-t">
+              Company details
+            </h2>
+            {detailsSaving ? (
+              <span className="card-meta" role="status">Saving</span>
+            ) : detailsDirty ? (
+              <span className="card-meta t-amber">Unsaved changes</span>
+            ) : (
+              <span className="card-meta">{canEdit ? "All changes saved" : "Read only"}</span>
+            )}
+          </div>
+          <div className="card-b" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            <LogoEditor name={company.name} logoUrl={logoUrl} canEdit={canEdit} onChanged={(next) => { setLogoUrl(next); router.refresh(); }} />
+            <DetailsFields values={detailsForm} onChange={(next) => {
+                setDetailsDraft(next);
+                setDetailsErrors({});
+              }} readOnly={!canEdit} errors={detailsErrors} idPrefix="co" />
+            {detailsErrors.form && Object.keys(detailsErrors).length === 1 ? (
+              <span className="err" role="alert">
+                {detailsErrors.form}
+              </span>
+            ) : null}
+          </div>
+          {canEdit ? (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "flex-end",
+                gap: 6,
+                padding: "10px 12px",
+                borderTop: "1px solid #F0EFF4",
+                background: "#FCFCFD",
+              }}
+            >
+              {detailsDirty ? (
+                <button
+                  type="button"
+                  className="btn btn-g"
+                  onClick={() => {
+                    setDetailsDraft(null);
+                    setDetailsErrors({});
+                  }}
+                >
+                  Discard
+                </button>
+              ) : null}
+              <button type="submit" className="btn btn-p" disabled={!detailsDirty || detailsSaving}>
+                Save details
+              </button>
+            </div>
+          ) : null}
+        </form>
+        </div>
 
         <aside
           aria-label="Agreement and contacts"

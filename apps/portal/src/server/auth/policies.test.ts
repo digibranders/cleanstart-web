@@ -25,6 +25,7 @@ const MATRIX: Record<Action, string> = {
   'partner.read': 'own own own Y region -',
   'partner.create': '- - - Y - -',
   'partner.update_profile': 'own - - Y - -',
+  'partner.update_details': 'own - - Y - -',
   'partner.change_category': '- - - Y - -',
   'partner.change_manager': '- - - Y - -',
   'partner.update_identity': '- - - Y - -',

@@ -91,6 +91,7 @@ export function Shell({
     org: shell.orgName,
     orgSub: shell.orgSub,
     orgInitials: initialsOf(shell.orgName),
+    orgLogoUrl: shell.orgLogoUrl ?? null,
     user: shell.viewerName,
     userInitials: initialsOf(shell.viewerName),
     role: shell.roleLabel,
@@ -255,7 +256,7 @@ export function Shell({
           <div className="side-foot">
             {kind === "partner" ? (
               <div className="who">
-                <Avatar initials={me.orgInitials} />
+                <Avatar initials={me.orgInitials} logoUrl={me.orgLogoUrl} />
                 <span className="who-t">
                   <span className="who-n">{me.org}</span>
                   <span className="who-s">{me.orgSub}</span>

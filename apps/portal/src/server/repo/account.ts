@@ -1,3 +1,4 @@
+import { logoUrlOf } from '@/lib/company-profile';
 import { and, count, eq, isNull, sql } from 'drizzle-orm';
 import { notificationPrefs, notifications, partners, registrations, staffScopes, users } from '@/db/schema';
 import { type Clock, systemClock } from '@/lib/clock';
@@ -62,7 +63,7 @@ export async function getShell(tx: Tx, viewer: Viewer): Promise<ShellDto> {
   }
 
   const [partner] = await tx
-    .select({ category: partners.category, region: partners.region, managerId: partners.managerId })
+    .select({ id: partners.id, category: partners.category, region: partners.region, managerId: partners.managerId, logoKey: partners.logoKey })
     .from(partners)
     .where(eq(partners.id, viewer.partnerId))
     .limit(1);
@@ -81,6 +82,7 @@ export async function getShell(tx: Tx, viewer: Viewer): Promise<ShellDto> {
     ...base,
     roleLabel: PARTNER_ROLE_LABEL[viewer.role],
     orgName: viewer.partnerName,
+    orgLogoUrl: logoUrlOf(partner.id, partner.logoKey),
     orgSub: `${PARTNER_CATEGORY_LABEL[partner.category]}, ${PARTNER_REGION_LABEL[partner.region]}`,
     partnerRegion: partner.region,
     manager: manager ? { id: manager.id, name: manager.name, email: manager.email, team: teamLabel(manager.region ?? 'all') } : null,

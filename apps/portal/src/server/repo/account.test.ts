@@ -31,6 +31,7 @@ describe('getShell, partner viewer', () => {
       viewerEmail: admin.email,
       kind: 'partner',
       roleLabel: 'Partner admin',
+      orgLogoUrl: null,
       orgName: 'Qamar Solutions',
       orgSub: 'Channel partner, Middle East',
       partnerRegion: 'middle_east',

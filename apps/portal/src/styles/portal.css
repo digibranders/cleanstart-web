@@ -97,6 +97,8 @@ a:hover{text-decoration:underline}
 .prod{display:inline-flex;align-items:center;gap:6px;color:#2A2838;white-space:nowrap}
 .av{width:24px;height:24px;border-radius:6px;display:grid;place-items:center;font-size:10.5px;font-weight:700;flex:none}
 .av-r{border-radius:99px}
+.av-xl .av{width:56px;height:56px;border-radius:12px;font-size:18px}
+.av-logo{background:#FFFFFF;border:1px solid #E7E5EE;overflow:hidden;padding:2px}.av-logo img{width:100%;height:100%;object-fit:contain;display:block}
 .av-1{background:#F1EEFB;color:#4B23C8}.av-2{background:#EAF1FE;color:#1F5BD6}.av-3{background:#E6F6FA;color:#0B7894}.av-4{background:#ECEFFE;color:#2B3CA8}.av-me{background:#151021;color:#FFFFFF}
 
 .tbl{width:100%;border-collapse:collapse;font-size:13px}
