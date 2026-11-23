@@ -17,6 +17,7 @@ export const AUDIT_EVENTS = {
   'registration.stage_changed': { kind: 'deal_decisions', action: 'Stage changed' },
   'registration.protection_end_changed': { kind: 'deal_decisions', action: 'Protection end changed' },
   'registration.expired': { kind: 'deal_decisions', action: 'Registration expired' },
+  'integration.sync_requeued': { kind: 'deal_decisions', action: 'Retried a failed HubSpot sync' },
   'integration.outbox_retried': { kind: 'deal_decisions', action: 'Retried failed HubSpot syncs' },
   // partners
   'application.submitted': { kind: 'partners', action: 'Submitted partner application' },

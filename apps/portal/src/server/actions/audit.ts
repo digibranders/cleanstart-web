@@ -8,12 +8,16 @@ import { recordAudit } from '@/server/audit/record';
 import { assertCan } from '@/server/auth/policies';
 import { exportAudit } from '@/server/repo/audit';
 import { withViewer } from '@/server/repo/context';
+import { requeueFailedSync } from '@/server/repo/failed-syncs';
 import { retryFailedOutbox } from '@/server/repo/integration-health';
 import type { ActionResult } from './result';
 import { runViewerAction } from './run';
 
 const exportSchema = z.object({
-  period: z.enum(['7d', '30d', '90d']),
+  period: z.enum(['24h', '7d', '30d', '90d', 'custom']),
+  from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  event: z.string().max(60).optional(),
   kind: z.enum(AUDIT_KINDS).optional(),
   who: z.enum(AUDIT_WHO).optional(),
   q: z.string().trim().max(100).optional(),
@@ -26,6 +30,9 @@ export async function exportAuditAction(raw: unknown): Promise<ActionResult<Audi
     assertCan(ctx.viewer, 'audit.export');
     const filter = {
       period: input.period,
+      ...(input.from ? { from: input.from } : {}),
+      ...(input.to ? { to: input.to } : {}),
+      ...(input.event ? { event: input.event } : {}),
       ...(input.kind ? { kind: input.kind } : {}),
       ...(input.who ? { who: input.who } : {}),
       ...(input.q ? { q: input.q } : {}),
@@ -53,5 +60,20 @@ export async function retryFailedOutboxAction(raw: unknown): Promise<ActionResul
     });
     ctx.revalidate(ROUTES.admin.audit);
     return { retried };
+  });
+}
+
+const requeueSchema = z.object({ id: z.string().uuid() });
+
+/** Sets one failed HubSpot sync job back to pending (Failed syncs list on the Audit log screen). */
+export async function requeueFailedSyncAction(raw: unknown): Promise<ActionResult<{ requeued: true }>> {
+  return runViewerAction({ name: 'integration.requeue_sync', schema: requeueSchema }, raw, async (ctx, input) => {
+    assertCan(ctx.viewer, 'integration.retry_failed');
+    await withViewer(ctx.viewer, async (tx) => {
+      const op = await requeueFailedSync(tx, ctx.viewer, input.id);
+      await recordAudit(tx, ctx.viewer, { event: 'integration.sync_requeued', target: op });
+    });
+    ctx.revalidate(ROUTES.admin.audit);
+    return { requeued: true as const };
   });
 }

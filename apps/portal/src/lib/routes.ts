@@ -23,6 +23,7 @@ export const ROUTES = {
     company: "/partner/company",
     account: "/partner/account",
     notifications: "/partner/notifications",
+    help: "/partner/help",
   },
   admin: {
     overview: "/admin/overview",
@@ -35,6 +36,7 @@ export const ROUTES = {
     audit: "/admin/audit",
     account: "/admin/account",
     notifications: "/admin/notifications",
+    help: "/admin/help",
   },
 } as const;
 
@@ -58,6 +60,7 @@ export const PARTNER_NAV: readonly NavItem[] = [
   { label: "Program", href: ROUTES.partner.program, icon: "info", action: "partner.read" },
   { label: "Team", href: ROUTES.partner.team, icon: "team", action: "team.read" },
   { label: "Company", href: ROUTES.partner.company, icon: "bld", action: "partner.read" },
+  { label: "Help", href: ROUTES.partner.help, icon: "lib", action: "help.read" },
 ];
 
 export const ADMIN_NAV: readonly NavItem[] = [
@@ -68,6 +71,7 @@ export const ADMIN_NAV: readonly NavItem[] = [
   { label: "Reports", href: ROUTES.admin.reports, icon: "chart", action: "report.read" },
   { label: "Team", href: ROUTES.admin.team, icon: "team", action: "staff.read" },
   { label: "Audit log", href: ROUTES.admin.audit, icon: "clk", action: "audit.read" },
+  { label: "Help", href: ROUTES.admin.help, icon: "lib", action: "help.read" },
 ];
 
 /** The sidebar items this viewer may open, in order. */

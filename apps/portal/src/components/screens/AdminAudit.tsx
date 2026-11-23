@@ -14,6 +14,8 @@ import {
   type AuditView,
   auditViewToExportFilter,
   auditViewToQuery,
+  EVENT_CHOICES,
+  isRealDay,
   KIND_CHOICES,
   PERIOD_CHOICES,
   WHO_CHOICES,
@@ -63,6 +65,10 @@ export function AdminAudit({ page, view, partners, today, healthSlot }: AdminAud
   const [q, setQ] = useState(view.q);
   const [viewing, setViewing] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
+  const [customOpen, setCustomOpen] = useState(view.period === 'custom');
+  const [from, setFrom] = useState(view.from ?? '');
+  const [to, setTo] = useState(view.to ?? '');
+  const rangeValid = isRealDay(from) && isRealDay(to) && from <= to;
   const closeView = useCallback((): void => setViewing(null), []);
 
   const go = useCallback(
@@ -72,6 +78,11 @@ export function AdminAudit({ page, view, partners, today, healthSlot }: AdminAud
 
   // After a navigation (Clear filters, browser back) show the URL's search text.
   useEffect(() => setQ(view.q), [view.q]);
+  useEffect(() => {
+    setCustomOpen(view.period === 'custom');
+    setFrom(view.from ?? '');
+    setTo(view.to ?? '');
+  }, [view.period, view.from, view.to]);
 
   // The URL, and so the server query, follows the box 300 ms after the last keystroke.
   useEffect(() => {
@@ -93,7 +104,7 @@ export function AdminAudit({ page, view, partners, today, healthSlot }: AdminAud
   };
 
   const selected = page.rows.find((e) => e.id === viewing) ?? null;
-  const filtered = view.kind !== null || view.who !== null || view.partnerId !== null || view.q !== '';
+  const filtered = view.kind !== null || view.event !== null || view.who !== null || view.partnerId !== null || view.q !== '';
 
   return (
     <div className="wrap">
@@ -131,6 +142,12 @@ export function AdminAudit({ page, view, partners, today, healthSlot }: AdminAud
               onChange={(v) => go({ ...view, kind: isOneOf(AUDIT_KINDS, v) ? v : null, cursor: null })}
             />
             <Dropdown
+              ariaLabel="Event type"
+              value={view.event ?? ''}
+              options={EVENT_CHOICES}
+              onChange={(v) => go({ ...view, event: v || null, cursor: null })}
+            />
+            <Dropdown
               ariaLabel="Who"
               value={view.who ?? ''}
               options={WHO_CHOICES}
@@ -144,10 +161,53 @@ export function AdminAudit({ page, view, partners, today, healthSlot }: AdminAud
             />
             <Dropdown
               ariaLabel="Period"
-              value={view.period}
+              value={customOpen ? 'custom' : view.period}
               options={PERIOD_CHOICES}
-              onChange={(v) => go({ ...view, period: isOneOf(AUDIT_PERIODS, v) ? v : view.period, cursor: null })}
+              onChange={(v) => {
+                if (!isOneOf(AUDIT_PERIODS, v)) return;
+                if (v === 'custom') {
+                  setCustomOpen(true);
+                  return;
+                }
+                setCustomOpen(false);
+                go({ ...view, period: v, from: null, to: null, cursor: null });
+              }}
             />
+            {customOpen ? (
+              <>
+                <label className="sr" htmlFor="afrom">
+                  From
+                </label>
+                <input
+                  id="afrom"
+                  className="finput"
+                  type="date"
+                  value={from}
+                  max={to || today}
+                  onChange={(e) => setFrom(e.target.value)}
+                />
+                <label className="sr" htmlFor="ato">
+                  To
+                </label>
+                <input
+                  id="ato"
+                  className="finput"
+                  type="date"
+                  value={to}
+                  min={from}
+                  max={today}
+                  onChange={(e) => setTo(e.target.value)}
+                />
+                <button
+                  type="button"
+                  className="btn btn-s"
+                  disabled={!rangeValid}
+                  onClick={() => go({ ...view, period: 'custom', from, to, cursor: null })}
+                >
+                  Apply
+                </button>
+              </>
+            ) : null}
           </div>
           <span className="card-meta tnum">{plural(page.total, 'event')}</span>
         </div>
@@ -206,7 +266,7 @@ export function AdminAudit({ page, view, partners, today, healthSlot }: AdminAud
                 <button
                   type="button"
                   className="btn btn-g"
-                  onClick={() => go({ period: '90d', kind: null, who: null, partnerId: null, q: '', cursor: null })}
+                  onClick={() => go({ period: '90d', from: null, to: null, kind: null, event: null, who: null, partnerId: null, q: '', cursor: null })}
                   style={{ height: 24, padding: '0 6px', fontSize: 12 }}
                 >
                   Clear filters

@@ -83,6 +83,7 @@ const MATRIX: Record<Action, string> = {
   'audit.export': '- - - Y - -',
   'search.use': 'Y Y Y Y Y Y',
   'notification.read': 'Y Y Y Y Y Y',
+  'help.read': 'Y Y Y Y Y Y',
   'integration.read_health': '- - - Y - -',
   'integration.retry_failed': '- - - Y - -',
 };
@@ -202,6 +203,7 @@ describe('allowedActions', () => {
       'document.request_material',
       'search.use',
       'notification.read',
+      'help.read',
     ]);
   });
 });

@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { auditLog, hubspotOutbox } from '@/db/schema';
 import { asPartner, asStaff, resetDb, testDb } from '@/db/test-helpers';
 import { requireActionViewer } from '@/server/auth/viewer';
-import { exportAuditAction, retryFailedOutboxAction } from './audit';
+import { exportAuditAction, requeueFailedSyncAction, retryFailedOutboxAction } from './audit';
 
 vi.mock('@/server/auth/viewer', () => ({ requireActionViewer: vi.fn() }));
 vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }));
@@ -67,5 +67,41 @@ describe('retryFailedOutboxAction', () => {
   it('is forbidden for everyone but a partner manager', async () => {
     signedInAs(await asStaff(db, 'marketing'));
     expect(await retryFailedOutboxAction({})).toMatchObject({ ok: false, error: { code: 'forbidden' } });
+  });
+});
+
+describe('requeueFailedSyncAction', () => {
+  it('requeues one failed job, leaves the others, and writes one audit entry', async () => {
+    const staff = await asStaff(db, 'partner_manager');
+    signedInAs(staff);
+    const [a, b] = await db
+      .insert(hubspotOutbox)
+      .values([
+        { op: 'registration.create', subjectId: 'a', idempotencyKey: 'a', status: 'failed', attempts: 5, lastError: 'boom' },
+        { op: 'partner.upsert', subjectId: 'b', idempotencyKey: 'b', status: 'failed', attempts: 5, lastError: 'boom' },
+      ])
+      .returning();
+    expect(await requeueFailedSyncAction({ id: a?.id })).toEqual({ ok: true, data: { requeued: true } });
+    const rows = await db.select().from(hubspotOutbox);
+    expect(rows.find((r) => r.id === a?.id)).toMatchObject({ status: 'pending', attempts: 0, lastError: null });
+    expect(rows.find((r) => r.id === b?.id)).toMatchObject({ status: 'failed', attempts: 5 });
+    const audit = await db.select().from(auditLog);
+    expect(audit).toHaveLength(1);
+    expect(audit[0]).toMatchObject({ event: 'integration.sync_requeued', target: 'registration.create', actorId: staff.id });
+  });
+
+  it('answers not found for a job that is no longer failed, and writes nothing', async () => {
+    signedInAs(await asStaff(db, 'partner_manager'));
+    const [row] = await db.insert(hubspotOutbox).values({ op: 'partner.upsert', subjectId: 'a', idempotencyKey: 'a', status: 'done' }).returning();
+    expect(await requeueFailedSyncAction({ id: row?.id })).toMatchObject({ ok: false, error: { code: 'not_found' } });
+    expect(await db.select().from(auditLog)).toHaveLength(0);
+  });
+
+  it('is forbidden for staff sales and partner users', async () => {
+    const id = '0b6f7c1e-2f4a-4c7e-9a55-1d3c8e2f9a10';
+    signedInAs(await asStaff(db, 'sales', 'india'));
+    expect(await requeueFailedSyncAction({ id })).toMatchObject({ ok: false, error: { code: 'forbidden' } });
+    signedInAs(await asPartner(db));
+    expect(await requeueFailedSyncAction({ id })).toMatchObject({ ok: false, error: { code: 'forbidden' } });
   });
 });
