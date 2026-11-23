@@ -32,6 +32,9 @@ const AVATARS = ["av-1", "av-2", "av-3", "av-4"] as const;
 
 const PERMISSIONS: ReadonlyArray<readonly [string, boolean, boolean, boolean]> = [
   ["Register and track deals", true, true, false],
+  ["See the Overview", true, true, false],
+  ["Message CleanStart about a deal", true, true, false],
+  ["Request a deal extension", true, true, false],
   ["Open documents", true, true, true],
   ["Invite or remove people", true, false, false],
   ["Edit company profile", true, false, false],

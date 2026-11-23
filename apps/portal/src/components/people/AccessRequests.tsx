@@ -26,14 +26,19 @@ export function AccessRequests({
   const [picked, setPicked] = useState<Record<string, AccessRequestRole>>({});
   if (requests.length === 0) return null;
 
+  // The request and decision awaiting the admin's second click.
+  const [confirming, setConfirming] = useState<{ id: string; decision: "approve" | "decline" } | null>(null);
+
   const roleOf = (rq: AccessRequestDto): AccessRequestRole => picked[rq.id] ?? rq.role;
 
   const approve = async (rq: AccessRequestDto): Promise<void> => {
+    setConfirming(null);
     const result = await decideAccessRequestAction({ id: rq.id, decision: "approve", role: roleOf(rq) });
     toast(result.ok ? `${rq.name} can now set a password and sign in` : result.error.message);
   };
 
   const decline = async (rq: AccessRequestDto): Promise<void> => {
+    setConfirming(null);
     const result = await decideAccessRequestAction({ id: rq.id, decision: "decline" });
     toast(result.ok ? `Request declined. ${rq.name} gets an email.` : result.error.message);
   };
@@ -82,27 +87,48 @@ export function AccessRequests({
               ariaLabel={`Role for ${rq.name}`}
               compact
             />
-            <span style={{ display: "flex", gap: 8 }}>
-              <button
-                type="button"
-                className="btn btn-s"
-                style={BUTTON_STYLE}
-                aria-label={`Decline, ${rq.name}`}
-                onClick={() => void decline(rq)}
-              >
-                Decline
-              </button>
-              <button
-                type="button"
-                className="btn btn-p"
-                style={BUTTON_STYLE}
-                aria-label={`Approve as ${PARTNER_ROLE_LABEL[roleOf(rq)]}, ${rq.name}`}
-                title="Sends a login link"
-                onClick={() => void approve(rq)}
-              >
-                Approve as {PARTNER_ROLE_LABEL[roleOf(rq)]}
-              </button>
-            </span>
+            {confirming?.id === rq.id ? (
+              <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span className="li-s" role="alert" style={{ whiteSpace: "normal" }}>
+                  {confirming.decision === "approve"
+                    ? `Approve ${rq.name} as ${PARTNER_ROLE_LABEL[roleOf(rq)]}? They get a login link.`
+                    : `Decline ${rq.name}? They get an email.`}
+                </span>
+                <button type="button" className="btn btn-s" style={BUTTON_STYLE} onClick={() => setConfirming(null)}>
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-p"
+                  style={BUTTON_STYLE}
+                  onClick={() => void (confirming.decision === "approve" ? approve(rq) : decline(rq))}
+                >
+                  {confirming.decision === "approve" ? "Confirm approve" : "Confirm decline"}
+                </button>
+              </span>
+            ) : (
+              <span style={{ display: "flex", gap: 8 }}>
+                <button
+                  type="button"
+                  className="btn btn-s"
+                  style={BUTTON_STYLE}
+                  aria-label={`Decline, ${rq.name}`}
+                  onClick={() => setConfirming({ id: rq.id, decision: "decline" })}
+                >
+                  Decline
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-p"
+                  style={BUTTON_STYLE}
+                  aria-label={`Approve as ${PARTNER_ROLE_LABEL[roleOf(rq)]}, ${rq.name}`}
+                  title="Sends a login link"
+                  onClick={() => setConfirming({ id: rq.id, decision: "approve" })}
+                >
+                  Approve as {PARTNER_ROLE_LABEL[roleOf(rq)]}
+                </button>
+              </span>
+            )}
           </span>
         </div>
       ))}
