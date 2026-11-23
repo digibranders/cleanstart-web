@@ -21,6 +21,7 @@ export function InviteCard({
   partnerDomain: string;
 }): React.JSX.Element {
   const toast = useToast();
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<PartnerRole>("sales");
   const [tried, setTried] = useState(false);
@@ -41,12 +42,13 @@ export function InviteCard({
       return;
     }
     setBusy(true);
-    const result = await inviteMemberAction({ email: address, role });
+    const result = await inviteMemberAction({ email: address, role, ...(name.trim() ? { name: name.trim() } : {}) });
     setBusy(false);
     if (!result.ok) {
       setServerError(issuesToErrors(result.error).email ?? result.error.message);
       return;
     }
+    setName("");
     setEmail("");
     setTried(false);
     toast(`Invite sent to ${address}`);
@@ -60,6 +62,20 @@ export function InviteCard({
         </h2>
       </div>
       <div className="card-b" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        <div className="fg">
+          <label htmlFor="in" className="lbl">
+            Full name (optional)
+          </label>
+          <input
+            id="in"
+            className="field"
+            type="text"
+            autoComplete="off"
+            maxLength={120}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </div>
         <div className="fg">
           <label htmlFor="ie" className="lbl">
             Work email

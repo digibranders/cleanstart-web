@@ -29,6 +29,13 @@
       "when": 1794900000000,
       "tag": "0003_notification_role_changed",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1795000000000,
+      "tag": "0004_email_change",
+      "breakpoints": true
     }
   ]
 }

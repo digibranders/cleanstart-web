@@ -123,7 +123,7 @@ export function Account({ profile, sessions, today }: AccountProps): React.JSX.E
                 >
                   {profile.email}
                 </span>
-                <span className="hint">Your sign-in. Your partner manager can change it.</span>
+                <span className="hint">Your sign-in. Ask your partner admin to change it.</span>
               </div>
               <div className="fg">
                 <label htmlFor="at" className="lbl">

@@ -1,8 +1,8 @@
-import { and, asc, eq, isNull, ne, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, isNull, ne, sql } from 'drizzle-orm';
 import { accessRequests, invites, partners, registrations, users } from '@/db/schema';
 import { type Clock, systemClock } from '@/lib/clock';
 import { ACCESS_REQUEST_ROLES, type AccessRequestRole, type PartnerRole } from '@/lib/domain';
-import type { AccessRequestDto, CreatedInviteDto, TeamDto, TeamMemberDto } from '@/lib/dto';
+import type { AccessRequestDto, CreatedInviteDto, RemovedMemberDto, TeamDto, TeamMemberDto } from '@/lib/dto';
 import { emailDomain } from '@/lib/people';
 import type { SystemActor, Viewer } from '@/server/auth/types';
 import { ConflictError, NotFoundError, ValidationError } from '@/server/errors';
@@ -45,6 +45,12 @@ export async function getTeam(tx: Tx, viewer: Viewer, input: { partnerId?: strin
     .where(and(eq(accessRequests.partnerId, partner.id), eq(accessRequests.status, 'open')))
     .orderBy(asc(accessRequests.createdAt));
 
+  const removed = await tx
+    .select()
+    .from(users)
+    .where(and(eq(users.partnerId, partner.id), eq(users.kind, 'partner'), eq(users.status, 'disabled')))
+    .orderBy(desc(users.removedAt));
+
   return {
     partnerId: partner.id,
     partnerName: partner.name,
@@ -59,10 +65,22 @@ export async function getTeam(tx: Tx, viewer: Viewer, input: { partnerId?: strin
         invitedAt: iso(p.invitedAt),
         deals: p.userId ? (deals.get(p.userId) ?? 0) : 0,
         isYou: p.userId !== null && p.userId === viewer.id,
+        title: p.title,
+        phone: p.phone,
         inviteId: p.inviteId,
       }),
     ),
     requests: requests.map(toRequestDto),
+    removed: removed.map(
+      (u): RemovedMemberDto => ({
+        id: u.id,
+        name: u.name,
+        email: u.email,
+        role: u.role as PartnerRole,
+        removedAt: iso(u.removedAt),
+        deals: deals.get(u.id) ?? 0,
+      }),
+    ),
   };
 }
 

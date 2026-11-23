@@ -91,8 +91,20 @@ export interface TeamMemberDto {
   /** Registrations this person registered. */
   deals: number;
   isYou: boolean;
+  title: string | null;
+  phone: string | null;
   /** The open invite for an invited member, for resend and withdraw. */
   inviteId: string | null;
+}
+
+/** Someone removed from the company: kept so their deals still show a name, and so an admin can reactivate them. */
+export interface RemovedMemberDto {
+  id: string;
+  name: string;
+  email: string;
+  role: PartnerRole;
+  removedAt: IsoTimestamp | null;
+  deals: number;
 }
 
 export interface AccessRequestDto {
@@ -110,6 +122,8 @@ export interface TeamDto {
   partnerName: string;
   members: TeamMemberDto[];
   requests: AccessRequestDto[];
+  /** People removed from the company, newest removal first. They can be reactivated. */
+  removed: RemovedMemberDto[];
 }
 
 export interface StaffMemberDto {

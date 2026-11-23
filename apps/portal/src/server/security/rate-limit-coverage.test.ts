@@ -51,7 +51,7 @@ describe('public server actions are rate limited', () => {
 
   it('finds the public actions the contracts name', () => {
     expect(actions.map((a) => a.name).sort()).toEqual(
-      ['acceptInviteAction', 'previewInviteAction', 'requestAccessAction', 'submitApplicationAction'].sort(),
+      ['acceptInviteAction', 'confirmEmailChangeAction', 'previewInviteAction', 'requestAccessAction', 'submitApplicationAction'].sort(),
     );
   });
 

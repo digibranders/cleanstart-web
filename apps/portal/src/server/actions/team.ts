@@ -17,16 +17,17 @@ import { type NewNotification, notifyUsers, resolveEmailRecipients } from '@/ser
 import { type Tx, withViewer } from '@/server/repo/context';
 import { changeInviteRole, createInvite, resendInvite, revokeInvite } from '@/server/repo/invites';
 import { getCompany, listPartnerAdminRecipients } from '@/server/repo/partners';
+import { moveDeals } from '@/server/repo/member-edit';
 import { changeMemberRole, decideAccessRequest, getTeam, removeMember } from '@/server/repo/team';
 import { inviteUrl } from '@/server/urls';
 import type { ActionResult } from './result';
 import { runViewerAction } from './run';
 
 const partnerId = z.string().uuid().optional();
-const inviteSchema = z.object({ email: z.string().trim().max(254), role: z.enum(PARTNER_ROLES), partnerId });
+const inviteSchema = z.object({ email: z.string().trim().max(254), name: z.string().trim().max(120).optional(), role: z.enum(PARTNER_ROLES), partnerId });
 const inviteIdSchema = z.object({ inviteId: z.string().uuid(), partnerId });
 const roleSchema = z.object({ userId: z.string().uuid(), role: z.enum(PARTNER_ROLES), partnerId });
-const removeSchema = z.object({ userId: z.string().uuid(), partnerId });
+const removeSchema = z.object({ userId: z.string().uuid(), partnerId, moveDealsTo: z.string().uuid().optional() });
 const decideSchema = z.discriminatedUnion('decision', [
   z.object({ id: z.string().uuid(), partnerId, decision: z.literal('approve'), role: z.enum(ACCESS_REQUEST_ROLES) }),
   z.object({ id: z.string().uuid(), partnerId, decision: z.literal('decline') }),
@@ -62,10 +63,10 @@ export async function inviteMemberAction(raw: unknown): Promise<ActionResult<Inv
     assertCan(ctx.viewer, 'team.invite', { partnerId: target });
     const done = await withViewer(ctx.viewer, async (tx) => {
       const company = await getCompany(tx, ctx.viewer, { partnerId: target });
-      const created = await createInvite(tx, ctx.viewer, { kind: 'partner', partnerId: target, email: input.email, role: input.role }, ctx.clock);
+      const created = await createInvite(tx, ctx.viewer, { kind: 'partner', partnerId: target, email: input.email, role: input.role, name: input.name ?? null }, ctx.clock);
       await recordAudit(tx, ctx.viewer, {
         event: 'team.invited',
-        target: `${nameFromEmail(created.invite.email)}, ${lower(input.role)}, at ${company.name}`,
+        target: `${input.name || nameFromEmail(created.invite.email)}, ${lower(input.role)}, at ${company.name}`,
         partnerId: target,
         subject: { type: 'invite', id: created.invite.id },
       });
@@ -73,7 +74,7 @@ export async function inviteMemberAction(raw: unknown): Promise<ActionResult<Inv
     });
     ctx.revalidate(ROUTES.partner.team);
     ctx.afterCommit(async () => {
-      await sendEmail(inviteMail({ invite: done.created.invite, token: done.created.token, inviteeName: null, inviterName: ctx.viewer.name, companyName: done.companyName }));
+      await sendEmail(inviteMail({ invite: done.created.invite, token: done.created.token, inviteeName: input.name || null, inviterName: ctx.viewer.name, companyName: done.companyName }));
     });
     return done.created.invite;
   });
@@ -177,6 +178,10 @@ export async function removeMemberAction(raw: unknown): Promise<ActionResult<{ u
       const member = team.members.find((m) => m.id === input.userId && m.inviteId !== m.id);
       if (!member) throw new NotFoundError('user');
       assertCan(ctx.viewer, 'team.remove', { partnerId: team.partnerId });
+      // Checked before anything changes, so a bad pick leaves the person in place.
+      if (input.moveDealsTo && !team.members.some((m) => m.id === input.moveDealsTo && m.status === 'active' && m.role !== 'technical' && m.inviteId !== m.id)) {
+        throw new ValidationError([{ path: 'moveDealsTo', message: 'Pick a remaining sales or admin person.' }]);
+      }
       const removed = await removeMember(tx, ctx.viewer, { userId: member.id }, ctx.clock);
       await recordAudit(tx, ctx.viewer, {
         event: 'team.removed',
@@ -184,6 +189,16 @@ export async function removeMemberAction(raw: unknown): Promise<ActionResult<{ u
         partnerId: team.partnerId,
         subject: { type: 'user', id: removed.userId },
       });
+      if (input.moveDealsTo && member.deals > 0) {
+        const moved = await moveDeals(tx, ctx.viewer, { fromUserId: removed.userId, toUserId: input.moveDealsTo });
+        await recordAudit(tx, ctx.viewer, {
+          event: 'team.deals_moved',
+          target: `${moved.from.name} to ${moved.to.name}, at ${team.partnerName}`,
+          note: `${moved.moved} ${moved.moved === 1 ? 'deal' : 'deals'} now belong to ${moved.to.name}. Their status is unchanged.`,
+          partnerId: team.partnerId,
+          subject: { type: 'user', id: removed.userId },
+        });
+      }
       const admins = await listPartnerAdminRecipients(tx, { partnerId: team.partnerId });
       const items: NewNotification[] = admins
         .filter((admin) => admin.userId !== removed.userId && admin.userId !== ctx.viewer.id)

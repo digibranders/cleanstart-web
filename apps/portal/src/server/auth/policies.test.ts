@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { StaffRegion } from '@/lib/domain';
 import { ForbiddenError } from '@/server/errors';
-import { ACTIONS, type Action, allowedActions, assertCan, can } from './policies';
+import { ACTIONS, type Action, allowedActions, assertCan, can, partnerPermissionTable } from './policies';
 import { type PartnerViewer, type RoleKey, roleKey, type StaffViewer, type Viewer } from './types';
 
 /** Column order of the table in the contracts, section D.3. */
@@ -37,6 +37,8 @@ const MATRIX: Record<Action, string> = {
   'team.revoke_invite': 'own - - Y - -',
   'team.change_role': 'own - - Y - -',
   'team.remove': 'own - - Y - -',
+  'team.edit_member': 'own - - Y - -',
+  'team.reactivate': 'own - - Y - -',
   'access_request.decide': 'own - - Y - -',
   'staff.read': '- - - Y - -',
   'staff.invite': '- - - Y - -',
@@ -197,6 +199,24 @@ describe('allowedActions', () => {
       'search.use',
       'notification.read',
     ]);
+  });
+});
+
+describe('partnerPermissionTable', () => {
+  it('matches what the policies allow for each partner role', () => {
+    const table = partnerPermissionTable();
+    expect(table.map((row) => [row.label, row.roles.partner_admin, row.roles.sales, row.roles.technical])).toEqual([
+      ['Register and track deals', true, true, false],
+      ['See the Overview', true, true, false],
+      ['Message CleanStart about a deal', true, true, false],
+      ['Request a deal extension', true, true, false],
+      ['Open documents', true, true, true],
+      ['Invite or remove people', true, false, false],
+      ['Edit company profile', true, false, false],
+    ]);
+    const technical = viewerOf('partner.technical');
+    expect(can(technical, 'registration.create')).toBe(false);
+    expect(can(technical, 'document.open')).toBe(true);
   });
 });
 

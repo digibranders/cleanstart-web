@@ -65,7 +65,7 @@ BEGIN
   FOREACH t IN ARRAY ARRAY[
     'partners', 'users', 'staff_scopes', 'partner_checklist', 'applications', 'invites', 'access_requests',
     'registrations', 'registration_contacts', 'registration_messages', 'registration_events', 'registration_reminders',
-    'documents', 'document_audience', 'document_versions', 'document_opens',
+    'documents', 'document_audience', 'document_versions', 'document_opens', 'email_change_requests',
     'notifications', 'notification_prefs', 'audit_log', 'hubspot_outbox', 'hubspot_sync_state',
     'auth_session', 'auth_account', 'auth_verification', 'auth_two_factor'
   ] LOOP
@@ -81,7 +81,7 @@ DECLARE t text;
 BEGIN
   FOREACH t IN ARRAY ARRAY[
     'registrations', 'registration_contacts', 'registration_messages', 'registration_events',
-    'document_opens', 'access_requests', 'partner_checklist'
+    'document_opens', 'access_requests', 'partner_checklist', 'email_change_requests'
   ] LOOP
     EXECUTE format('DROP POLICY IF EXISTS %I ON %I', t || '_select', t);
     EXECUTE format('DROP POLICY IF EXISTS %I ON %I', t || '_insert', t);
