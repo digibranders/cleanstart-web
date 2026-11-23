@@ -168,6 +168,29 @@ export const Jobs: CollectionConfig = {
       defaultValue: false,
     },
     {
+      name: 'abstract',
+      type: 'textarea',
+      admin: {
+        description:
+          'Short summary shown on listing cards and drives the SEO description fallback. Keep under 160 characters.',
+        condition: (_data, sibling) => sibling?.source === 'cms',
+      },
+    },
+    mediaUploadField({
+      name: 'descriptionPdf',
+      folderHint: 'web/job',
+      accept: ['application/pdf'],
+      description: 'Optional JD PDF (routed to web/job/).',
+      condition: (_data, sibling) => (sibling as { source?: string } | undefined)?.source === 'cms',
+    }),
+    {
+      name: 'body',
+      type: 'richText',
+      admin: {
+        condition: (_data, sibling) => sibling?.source === 'cms',
+      },
+    },
+    {
       type: 'group',
       name: 'salaryRange',
       label: 'Salary range (optional)',
@@ -202,29 +225,6 @@ export const Jobs: CollectionConfig = {
         },
       ],
     },
-    {
-      name: 'abstract',
-      type: 'textarea',
-      admin: {
-        description:
-          'Short summary shown on listing cards and drives the SEO description fallback. Keep under 160 characters.',
-        condition: (_data, sibling) => sibling?.source === 'cms',
-      },
-    },
-    {
-      name: 'body',
-      type: 'richText',
-      admin: {
-        condition: (_data, sibling) => sibling?.source === 'cms',
-      },
-    },
-    mediaUploadField({
-      name: 'descriptionPdf',
-      folderHint: 'web/job',
-      accept: ['application/pdf'],
-      description: 'Optional JD PDF (routed to web/job/).',
-      condition: (_data, sibling) => (sibling as { source?: string } | undefined)?.source === 'cms',
-    }),
     {
       name: 'applyUrl',
       type: 'text',
