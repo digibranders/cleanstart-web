@@ -38,27 +38,20 @@ Not simulated: the database (real Postgres, real row level security, real sign i
 
 ## Accounts
 
-One shared demo password for every account: `Portal-dev-2026!` (the dev seed password, `DEV_SEED_PASSWORD` in `src/db/fixtures.ts`). It is demo only and public (it is in this repository); the review password in front of the site is the real gate. Role (screen set) in brackets.
-
-Staff (CleanStart):
+One shared demo password for every account: `Cleanstart@2026` (`DEMO_PASSWORD` in `apps/portal/scripts/demo.ts`). It is demo only and public (it is in this repository). Two generic logins are the ones to hand out:
 
 | Account | Role |
 | --- | --- |
-| gaurav.jadhav@cleanstart.com | Partner manager, India |
-| omar.nasser@cleanstart.com | Partner manager, Middle East |
-| rahul.menon@cleanstart.com | Sales, India |
-| sara.almansoori@cleanstart.com | Sales, Middle East |
-| ishita.bose@cleanstart.com | Marketing, all regions |
+| admin@cleanstart.com | CleanStart staff, partner manager for India (the seeded Gaurav Jadhav) |
+| partner@cleanstart.com | Partner admin at Kestrel Systems, the partner the mock is written around (the seeded Aditi Rao) |
 
-Partner users at Kestrel Systems (the partner the mock is written around):
+`demo:setup` renames those two seeded accounts after seeding, so they exist after every `demo:reset` too. The other seeded people keep their own addresses and the same password:
 
-| Account | Role |
-| --- | --- |
-| aditi.rao@kestrelsystems.in | Partner admin |
-| karan.malhotra@kestrelsystems.in | Sales |
-| sneha.iyer@kestrelsystems.in | Technical |
+Staff (CleanStart): omar.nasser@cleanstart.com (partner manager, Middle East), rahul.menon@cleanstart.com (sales, India), sara.almansoori@cleanstart.com (sales, Middle East), ishita.bose@cleanstart.com (marketing, all regions).
 
-Other partner admins: layla.haddad@arborcyber.ae (Arbor Cyber), rahul.bhatia@saffronsecure.com (Saffron Secure), faisal.rahman@dunesnetworks.ae (Dunes Networks), ishaan.verma@vyomdigital.in (Vyom Digital), and `admin@seed-partner-01.example.com` to `admin@seed-partner-11.example.com` for the filler partners. Invited people (for example vikram.sethi@kestrelsystems.in, kunal.shah@cleanstart.com) have no login yet.
+Kestrel Systems: karan.malhotra@kestrelsystems.in (sales), sneha.iyer@kestrelsystems.in (technical).
+
+Other partner admins: layla.haddad@arborcyber.ae (Arbor Cyber), rahul.bhatia@saffronsecure.com (Saffron Secure), faisal.rahman@dunesnetworks.ae (Dunes Networks), ishaan.verma@vyomdigital.in (Vyom Digital), and `admin@seed-partner-01.example.com` to `admin@seed-partner-11.example.com` for the filler partners.
 
 Sign in is limited to 10 attempts a minute for the whole site (one shared bucket on Vercel unless `PORTAL_TRUSTED_PROXY_HOPS=1` is set, see below), so a group of reviewers signing in together can see "too many attempts" for a minute.
 
