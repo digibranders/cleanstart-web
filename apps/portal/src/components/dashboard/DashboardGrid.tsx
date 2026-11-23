@@ -13,7 +13,7 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable } from "@dnd-kit/sortable";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   type DashboardCardDef,
   type DashboardId,
@@ -26,6 +26,7 @@ import {
   toSaved,
 } from "@/lib/dashboard-layout";
 import { saveDashboardLayoutAction } from "@/server/actions/dashboard-layout";
+import { useCustomize } from "./CustomizeContext";
 import { Icon } from "../icon";
 import { Drawer } from "../ui/overlay";
 import { useToast } from "../ui/toast";
@@ -33,8 +34,6 @@ import { useToast } from "../ui/toast";
 // Phosphor icons, 256 viewbox.
 const GRIP =
   "M108,60A16,16,0,1,1,92,44,16,16,0,0,1,108,60Zm56,16a16,16,0,1,0-16-16A16,16,0,0,0,164,76ZM92,112a16,16,0,1,0,16,16A16,16,0,0,0,92,112Zm72,0a16,16,0,1,0,16,16A16,16,0,0,0,164,112ZM92,180a16,16,0,1,0,16,16A16,16,0,0,0,92,180Zm72,0a16,16,0,1,0,16,16A16,16,0,0,0,164,180Z";
-const SLIDERS =
-  "M40,88H73a32,32,0,0,0,62,0h81a8,8,0,0,0,0-16H135a32,32,0,0,0-62,0H40a8,8,0,0,0,0,16Zm64-24A16,16,0,1,1,88,80,16,16,0,0,1,104,64ZM216,168H199a32,32,0,0,0-62,0H40a8,8,0,0,0,0,16h97a32,32,0,0,0,62,0h17a8,8,0,0,0,0-16Zm-48,24a16,16,0,1,1,16-16A16,16,0,0,1,168,192Z";
 const PLUS = "M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z";
 const RESET =
   "M224,128a96,96,0,0,1-94.71,96H128A95.38,95.38,0,0,1,62.1,197.8a8,8,0,0,1,11-11.63A80,80,0,1,0,71.43,71.39a3.07,3.07,0,0,1-.26.25L44.59,96H72a8,8,0,0,1,0,16H24a8,8,0,0,1-8-8V56a8,8,0,0,1,16,0V85.8L60.25,60A96,96,0,0,1,224,128Z";
@@ -72,6 +71,7 @@ function Tile({
   return (
     <div
       ref={setNodeRef}
+      data-id={entry.id}
       className={`dc${editing ? " dc-editing" : ""}${isDragging ? " dc-drag" : ""}${isOver ? " dc-over" : ""}`}
       style={{ ["--span" as string]: span }}
     >
@@ -112,15 +112,43 @@ export function DashboardGrid({ dashboard, cards, saved }: { dashboard: Dashboar
   const defOf = useMemo(() => new Map(cards.map((c) => [c.def.id, c.def])), [cards]);
 
   const [entries, setEntries] = useState<LayoutEntry[]>(() => reconcileLayout(defs, saved));
-  const [editing, setEditing] = useState(false);
+  const { editing, setEditing } = useCustomize();
   const [adding, setAdding] = useState(false);
   const [dragging, setDragging] = useState<string | null>(null);
   const [overId, setOverId] = useState<string | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const grid = useRef<HTMLDivElement>(null);
+  const boxes = useRef(new Map<string, { x: number; y: number; w: number }>());
   const latest = useRef(entries);
   latest.current = entries;
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }), useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }));
+
+  // Cards glide to their new place when the layout changes, and a card that is added eases in. Offsets are relative to the page, so scrolling never counts as movement.
+  useLayoutEffect(() => {
+    const host = grid.current;
+    if (!host) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const next = new Map<string, { x: number; y: number; w: number }>();
+    const ease = "cubic-bezier(0.2, 0.8, 0.2, 1)";
+    for (const el of host.querySelectorAll<HTMLElement>(":scope > .dc")) {
+      const id = el.dataset.id;
+      if (!id) continue;
+      const box = { x: el.offsetLeft, y: el.offsetTop, w: el.offsetWidth };
+      next.set(id, box);
+      if (reduced) continue;
+      const before = boxes.current.get(id);
+      if (before) {
+        const dx = before.x - box.x;
+        const dy = before.y - box.y;
+        if (Math.abs(dx) > 1 || Math.abs(dy) > 1) el.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: "none" }], { duration: 320, easing: ease });
+        else if (Math.abs(before.w - box.w) > 1) el.animate([{ opacity: 0.55 }, { opacity: 1 }], { duration: 260, easing: ease });
+      } else if (boxes.current.size > 0) {
+        el.animate([{ opacity: 0, transform: "scale(0.97)" }, { opacity: 1, transform: "none" }], { duration: 300, easing: ease });
+      }
+    }
+    boxes.current = next;
+  });
 
   const flush = (): void => {
     clearTimeout(timer.current);
@@ -178,35 +206,28 @@ export function DashboardGrid({ dashboard, cards, saved }: { dashboard: Dashboar
 
   return (
     <>
-      <div className="dc-tools">
-        {editing ? (
-          <>
-            <span className="dc-hint">Drag a card by its handle to move it. Pick a width, or hide what you do not need. Changes save as you go.</span>
-            <div className="dc-actions">
-              <button type="button" className="btn btn-s" onClick={() => setAdding(true)} disabled={hidden.length === 0}>
-                <Icon d={PLUS} />
-                Add cards{hidden.length ? ` (${hidden.length})` : ""}
-              </button>
-              <button type="button" className="btn btn-s" onClick={reset}>
-                <Icon d={RESET} />
-                Reset
-              </button>
-              <button type="button" className="btn btn-p" onClick={done}>
-                Done
-              </button>
-            </div>
-          </>
-        ) : (
-          <button type="button" className="btn btn-s dc-open" onClick={() => setEditing(true)}>
-            <Icon d={SLIDERS} />
-            Customize
-          </button>
-        )}
-      </div>
+      {editing ? (
+        <div className="dc-tools">
+          <span className="dc-hint">Drag a card by its handle to move it. Pick a width, or hide what you do not need. Changes save as you go.</span>
+          <div className="dc-actions">
+            <button type="button" className="btn btn-s" onClick={() => setAdding(true)} disabled={hidden.length === 0}>
+              <Icon d={PLUS} />
+              Add cards{hidden.length ? ` (${hidden.length})` : ""}
+            </button>
+            <button type="button" className="btn btn-s" onClick={reset}>
+              <Icon d={RESET} />
+              Reset
+            </button>
+            <button type="button" className="btn btn-p" onClick={done}>
+              Done
+            </button>
+          </div>
+        </div>
+      ) : null}
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={onDragStart} onDragOver={onDragOver} onDragEnd={onDragEnd} onDragCancel={cancelDrag}>
         <SortableContext items={visible.map((e) => e.id)} strategy={() => null}>
-          <div className="dgrid">
+          <div className="dgrid" ref={grid}>
             {visible.map((e, i) => {
               const d = defOf.get(e.id) as DashboardCardDef;
               return (

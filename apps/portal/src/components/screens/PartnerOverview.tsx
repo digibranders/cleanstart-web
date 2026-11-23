@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BarList, Columns, Donut, Funnel, Heatmap, PRODUCT_COLOR, STATUS_COLOR, StatTile, Timeline } from "@/components/charts";
+import { CustomizeButton, CustomizeProvider } from "@/components/dashboard/CustomizeContext";
 import { type DashboardCard, DashboardGrid } from "@/components/dashboard/DashboardGrid";
 import type { SavedLayout } from "@/lib/dashboard-layout";
 import { ExportKpisButton } from "@/components/dashboard/ExportKpisButton";
@@ -180,6 +181,7 @@ function Header({ filters, today, asOf, deals, exportKpis }: { filters: Dashboar
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
           <OverviewFilters period={filters.period} from={filters.from} to={filters.to} product={filters.product} />
           {exportKpis}
+          <CustomizeButton />
           <Link href={ROUTES.partner.newDeal} className="btn btn-p">
             <Icon d={PLUS_PATH} />
             Register deal
@@ -429,6 +431,7 @@ export function PartnerOverview({ data, today, asOf }: PartnerOverviewProps): Re
   ];
 
   return (
+    <CustomizeProvider>
     <div className="wrap">
       <Header
         filters={d.filters}
@@ -465,5 +468,6 @@ export function PartnerOverview({ data, today, asOf }: PartnerOverviewProps): Re
 
       <DashboardGrid dashboard="partner-overview" cards={cards} saved={data.layout} />
     </div>
+    </CustomizeProvider>
   );
 }

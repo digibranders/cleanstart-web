@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BarList, CATEGORICAL, Columns, Donut, Funnel, Heatmap, Line, PRODUCT_COLOR, STATUS_COLOR, StatTile } from "@/components/charts";
+import { CustomizeButton, CustomizeProvider } from "@/components/dashboard/CustomizeContext";
 import { type DashboardCard, DashboardGrid } from "@/components/dashboard/DashboardGrid";
 import { ExportKpisButton } from "@/components/dashboard/ExportKpisButton";
 import { OverviewFilters } from "@/components/dashboard/OverviewFilters";
@@ -419,6 +420,7 @@ export function StaffOverview({ data, today, asOf, scope, regions }: StaffOvervi
   ];
 
   return (
+    <CustomizeProvider>
     <div className="wrap">
       <Header
         today={today}
@@ -438,6 +440,7 @@ export function StaffOverview({ data, today, asOf, scope, regions }: StaffOvervi
               partners={data.partners}
             />
             <ExportKpisButton filename={kpiFilename(d.range)} header={TILES_CSV_HEADER} rows={kpiCsvRows(f, d.range, tiles, new Map(data.partners.map((p) => [p.id, p.name])), regionLabel)} />
+            <CustomizeButton />
           </div>
         }
       />
@@ -467,5 +470,6 @@ export function StaffOverview({ data, today, asOf, scope, regions }: StaffOvervi
 
       <DashboardGrid dashboard="staff-overview" cards={cards} saved={data.layout} />
     </div>
+    </CustomizeProvider>
   );
 }

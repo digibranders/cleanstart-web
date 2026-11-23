@@ -23,12 +23,12 @@ function tipHtml(tip: Tip): string {
   const rows = tip.rows
     .map(
       (r) =>
-        `<div style="display:flex;align-items:center;justify-content:space-between;gap:18px;margin-top:4px"><span style="display:inline-flex;align-items:center;gap:7px;color:${INK.secondary}">${
+        `<div style="display:flex;align-items:center;justify-content:space-between;gap:18px;margin-top:4px"><span style="display:inline-flex;align-items:center;gap:7px;color:#4A4858;font-weight:500">${
           r.color ? `<i style="display:inline-block;width:8px;height:8px;border-radius:99px;background:${esc(r.color)}"></i>` : ""
-        }${esc(r.label)}</span><b style="font-variant-numeric:tabular-nums;color:${INK.primary}">${esc(r.value)}</b></div>`,
+        }${esc(r.label)}</span><b style="font-variant-numeric:tabular-nums;font-weight:700;color:${INK.primary}">${esc(r.value)}</b></div>`,
     )
     .join("");
-  return `<div style="min-width:132px"><div style="font-size:11.5px;font-weight:600;color:${INK.muted}">${esc(tip.title)}</div>${rows}</div>`;
+  return `<div style="min-width:132px"><div style="font-size:12px;font-weight:600;color:#5E5B6E;margin-bottom:2px">${esc(tip.title)}</div>${rows}</div>`;
 }
 
 /** One tooltip for every chart. A point with its own `tip` wins; otherwise each series in the hover becomes a row from the point's `f` text. */
@@ -50,10 +50,10 @@ const TOOLTIP_STYLE = {
   borderColor: "#EAECF0",
   borderWidth: 1,
   padding: [12, 14],
-  textStyle: { color: INK.primary, fontSize: 12.5, fontFamily: "inherit" },
-  extraCssText: "border-radius:10px;box-shadow:0 8px 24px rgba(20,20,30,.06);",
+  textStyle: { color: INK.primary, fontSize: 13, fontFamily: "inherit" },
+  extraCssText: "border-radius:10px;box-shadow:0 8px 24px rgba(20,20,30,.08);-webkit-font-smoothing:antialiased;",
   confine: true,
-  transitionDuration: 0.1,
+  transitionDuration: 0,
 } as const;
 
 type Api = { value: (dim: number) => number; coord: (v: number[]) => number[]; size: (v: number[]) => number[]; style: () => Record<string, unknown> };
@@ -103,7 +103,12 @@ function prepare(core: Awaited<ReturnType<typeof loadEcharts>>, option: EChartsC
   next.animationDurationUpdate = 200;
   next.animationEasing = "cubicOut";
   next.aria = { enabled: true };
-  next.tooltip = { ...TOOLTIP_STYLE, ...((next.tooltip as Mutable | undefined) ?? {}), formatter: formatTip };
+  next.tooltip = {
+    ...TOOLTIP_STYLE,
+    ...((next.tooltip as Mutable | undefined) ?? {}),
+    formatter: formatTip,
+    position: (point: number[]): number[] => [Math.round(point[0] ?? 0) + 12, Math.round(point[1] ?? 0) + 12],
+  };
   if (valueAxis) {
     const axis = next[`${valueAxis}Axis`] as Mutable | undefined;
     if (axis) axis.axisLabel = { ...((axis.axisLabel as Mutable | undefined) ?? {}), formatter: (v: number) => formatCompact(v) };
