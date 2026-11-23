@@ -34,6 +34,8 @@ interface DealsProps {
   today: string;
   /** Partner sales see only the deals they registered. */
   ownDealsOnly: boolean;
+  /** Status tab to open on, from the ?status= query. Unknown values fall back to All. */
+  initialStatus?: string | undefined;
 }
 
 const closeText = (deal: RegistrationListItem): string =>
@@ -59,11 +61,11 @@ function SortHead({ label, field, sort, onSort, className }: SortHeadProps): Rea
   );
 }
 
-export function Deals({ deals, today, ownDealsOnly }: DealsProps): React.JSX.Element {
+export function Deals({ deals, today, ownDealsOnly, initialStatus }: DealsProps): React.JSX.Element {
   const toast = useToast();
   const managerOptions = [ANY_MANAGER, ...new Set(deals.flatMap((d) => (d.managerName ? [d.managerName] : [])))];
 
-  const [tab, setTab] = useState<Tab>("All");
+  const [tab, setTab] = useState<Tab>(TABS.find((t) => t.toLowerCase() === initialStatus?.toLowerCase()) ?? "All");
   const [q, setQ] = useState("");
   const [product, setProduct] = useState(ALL_PRODUCTS);
   const [region, setRegion] = useState(ALL_REGIONS);
