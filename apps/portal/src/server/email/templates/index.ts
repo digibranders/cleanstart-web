@@ -8,6 +8,7 @@ export * from './access-request-declined';
 export * from './deal-accepted';
 export * from './deal-rejected';
 export * from './deal-submitted-staff-alert';
+export * from './registration-received';
 export * from './deal-message';
 export * from './deal-stage-changed';
 export * from './extension-requested';
