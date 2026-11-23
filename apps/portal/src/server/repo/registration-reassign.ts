@@ -1,7 +1,7 @@
 import { and, eq } from 'drizzle-orm';
 import { registrationEvents, registrations } from '@/db/schema';
 import { type Clock, fixedClock } from '@/lib/clock';
-import { type DealRegion, PARTNER_REGION_LABEL } from '@/lib/domain';
+import type { DealRegion } from '@/lib/domain';
 import type { RegistrationDetailDto } from '@/lib/dto';
 import type { Viewer } from '@/server/auth/types';
 import { ConflictError, ValidationError } from '@/server/errors';
@@ -9,6 +9,8 @@ import { assertStaff, type Tx } from './context';
 import { defineIsolation } from './isolation.registry';
 import { getRegistration, lockRegistration } from './registrations';
 import { listManagerOptions } from './staff';
+import { regionName } from '@/lib/regions';
+import { assertRegionAssignable } from './regions';
 
 export interface RoutingSnapshot {
   managerId: string | null;
@@ -32,7 +34,7 @@ const snapshot = (reg: Pick<RegistrationDetailDto, 'managerId' | 'managerName' |
 
 /** "Gaurav Jadhav, India": how the audit entry and the history line read one side of the change. */
 export const routingLabel = (routing: RoutingSnapshot): string =>
-  `${routing.managerName ?? 'No manager'}, ${PARTNER_REGION_LABEL[routing.region]}`;
+  `${routing.managerName ?? 'No manager'}, ${regionName(routing.region)}`;
 
 /**
  * Staff. Changes the partner manager and the region of a pending registration. The manager must be one of
@@ -53,6 +55,7 @@ export async function reassignRegistration(
   const manager = (await listManagerOptions(tx, viewer)).find((m) => m.id === input.managerId);
   if (!manager) throw new ValidationError([{ path: 'managerId', message: 'Pick one of the listed partner managers.' }]);
 
+  await assertRegionAssignable(tx, input.region, current.region);
   const before = snapshot(current);
   const after: RoutingSnapshot = { managerId: manager.id, managerName: manager.name, region: input.region };
   if (before.managerId === after.managerId && before.region === after.region) {

@@ -2,11 +2,12 @@ import { and, eq } from 'drizzle-orm';
 import type { Db } from '@/db/client';
 import { partners, registrationContacts, registrations, users } from '@/db/schema';
 import { type Clock, systemClock } from '@/lib/clock';
-import { PARTNER_REGION_LABEL, PRODUCT_LABEL } from '@/lib/domain';
+import { PRODUCT_LABEL } from '@/lib/domain';
 import { log } from '@/server/log';
 import { dealProperties } from './mappers';
 import type { Handlers } from './outbox';
 import { DependencyPending, type HubspotApi } from './types';
+import { regionName } from '@/lib/regions';
 
 const CATEGORY_VALUE = { distributor: 'distributor', channel: 'channel_partner' } as const;
 
@@ -74,7 +75,7 @@ export const buildHandlers = (db: Db, hs: HubspotApi, pipelineId: string, clock:
                 id: reg.id,
                 customerName: reg.customerName,
                 product: PRODUCT_LABEL[reg.product],
-                region: PARTNER_REGION_LABEL[reg.region],
+                region: regionName(reg.region),
                 protectionEnd: reg.protectionEnd,
                 reference: reg.reference,
                 dealValue: reg.dealValue,

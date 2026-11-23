@@ -22,6 +22,7 @@ import { fmtLong, fmtShort, plural } from "@/lib/dates";
 import { PRODUCT_LABEL } from "@/lib/domain";
 import { ROUTES } from "@/lib/routes";
 import { CHIP_PRODUCT } from "../deals/derive";
+import { type RegionDto, regionName } from "@/lib/regions";
 import { CustomerMark } from "../deals/parts";
 import { ProductChip } from "../ui/badge";
 import { CardHead, Cell, ChartEmpty, Empty, STATUS_NAME, STATUS_ORDER } from "./PartnerOverview";
@@ -44,6 +45,8 @@ interface StaffOverviewProps {
   asOf: string;
   /** One line saying which part of the business this person sees. */
   scope: string;
+  /** The regions table, for chart and export labels (this screen renders on the server, so it cannot read the context). */
+  regions?: readonly RegionDto[];
 }
 
 
@@ -86,7 +89,8 @@ function topPartners(d: StaffDashboardDto): PartnerPerformanceRow[] {
   return [...byId.values()].sort((a, b) => b.pipelineValue - a.pipelineValue || b.wonValue - a.wonValue || a.name.localeCompare(b.name));
 }
 
-export function StaffOverview({ data, today, asOf, scope }: StaffOverviewProps): React.JSX.Element {
+export function StaffOverview({ data, today, asOf, scope, regions }: StaffOverviewProps): React.JSX.Element {
+  const regionLabel = (key: string): string => regionName(key, regions);
   if (data.kind === "documents") {
     return (
       <div className="wrap">
@@ -119,7 +123,7 @@ export function StaffOverview({ data, today, asOf, scope }: StaffOverviewProps):
   const { series, kpis } = d;
   const statusSlices = STATUS_ORDER.map((s) => ({ key: s, label: STATUS_NAME[s], value: kpis.statusCounts[s], color: STATUS_COLOR[s] }));
   const noDeals = Object.values(kpis.statusCounts).every((n) => n === 0);
-  const regionRows = regionBars(series.byRegion);
+  const regionRows = regionBars(series.byRegion, regionLabel);
   const productRows = productBars(series.byProduct);
   const productSlices = productRows.map((p) => ({ key: p.key, label: p.label, value: p.value, ...(p.color ? { color: p.color } : {}) }));
   const reasons = reasonBars(series.rejectionReasons);
@@ -159,7 +163,7 @@ export function StaffOverview({ data, today, asOf, scope }: StaffOverviewProps):
               regionSwitch={data.regionSwitch}
               partners={data.partners}
             />
-            <ExportKpisButton filename={kpiFilename(d.range)} header={TILES_CSV_HEADER} rows={kpiCsvRows(f, d.range, tiles, new Map(data.partners.map((p) => [p.id, p.name])))} />
+            <ExportKpisButton filename={kpiFilename(d.range)} header={TILES_CSV_HEADER} rows={kpiCsvRows(f, d.range, tiles, new Map(data.partners.map((p) => [p.id, p.name])), regionLabel)} />
           </div>
         }
       />

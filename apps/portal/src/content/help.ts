@@ -235,10 +235,10 @@ export const HELP_ARTICLES: readonly HelpArticle[] = [
     body: [
       { type: 'steps', items: [
         'Open Team and choose Invite teammate.',
-        'Pick a role: Partner manager, Sales or Marketing. Sales also has a region.',
+        'Pick a role: Partner manager, Sales or Marketing. Sales also has a region, or all regions.',
         'To end someone\'s access, choose Remove access from the Actions menu.',
       ] },
-      { type: 'p', text: 'Partner accounts never reach this admin portal. What each role can do is in the table on the Team page.' },
+      { type: 'p', text: 'Partner accounts never reach this admin portal. What each role can do is in the table on the Team page. Partner managers add, rename, reorder and turn off regions on the Regions page. A region that is turned off stays on the partners and deals that already have it.' },
     ],
   },
   {

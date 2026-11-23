@@ -39,7 +39,7 @@ describe("navFor", () => {
   });
 
   it("gives a partner manager every admin item", () => {
-    expect(labels(staff("partner_manager"))).toEqual(["Overview", "Deals", "Partners", "Documents", "Reports", "Team", "Audit log", "Help"]);
+    expect(labels(staff("partner_manager"))).toEqual(["Overview", "Deals", "Partners", "Documents", "Reports", "Team", "Regions", "Audit log", "Help"]);
   });
 
   it("gives staff sales approvals, partners and reports", () => {

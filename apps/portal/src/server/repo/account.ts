@@ -2,18 +2,7 @@ import { logoUrlOf } from '@/lib/company-profile';
 import { and, count, eq, isNull, sql } from 'drizzle-orm';
 import { notificationPrefs, notifications, partners, registrations, staffScopes, users } from '@/db/schema';
 import { type Clock, systemClock } from '@/lib/clock';
-import {
-  NOTIFICATION_CATEGORIES,
-  type NotificationCategory,
-  PARTNER_CATEGORY_LABEL,
-  PARTNER_REGION_LABEL,
-  PARTNER_ROLE_LABEL,
-  type PartnerRole,
-  STAFF_REGION_LABEL,
-  STAFF_ROLE_LABEL,
-  type StaffRegion,
-  type StaffRole,
-} from '@/lib/domain';
+import { NOTIFICATION_CATEGORIES, type NotificationCategory, PARTNER_CATEGORY_LABEL, PARTNER_ROLE_LABEL, type PartnerRole, STAFF_ROLE_LABEL, type StaffRegion, type StaffRole } from '@/lib/domain';
 import type { ProfileDto, ShellDto } from '@/lib/dto';
 import type { Viewer } from '@/server/auth/types';
 import { NotFoundError, ValidationError } from '@/server/errors';
@@ -21,9 +10,10 @@ import { NOTIFICATION_PREF_DEFAULTS } from '@/server/notify';
 import { iso } from '@/server/people';
 import type { Tx } from './context';
 import { defineIsolation } from './isolation.registry';
+import { regionName } from '@/lib/regions';
 
 /** "CleanStart India", "CleanStart Middle East", or plain "CleanStart" for a manager who covers every region. */
-const teamLabel = (region: StaffRegion): string => (region === 'all' ? 'CleanStart' : `CleanStart ${STAFF_REGION_LABEL[region]}`);
+const teamLabel = (region: StaffRegion): string => (region === 'all' ? 'CleanStart' : `CleanStart ${regionName(region)}`);
 
 async function unreadCount(tx: Tx, userId: string): Promise<number> {
   const [row] = await tx
@@ -50,7 +40,7 @@ export async function getShell(tx: Tx, viewer: Viewer): Promise<ShellDto> {
   const unreadNotifications = await unreadCount(tx, viewer.id);
 
   if (viewer.kind === 'staff') {
-    const region = viewer.region === 'all' ? '' : `, ${STAFF_REGION_LABEL[viewer.region]}`;
+    const region = viewer.region === 'all' ? '' : `, ${regionName(viewer.region)}`;
     return {
       ...base,
       roleLabel: `${STAFF_ROLE_LABEL[viewer.role]}${region}`,
@@ -83,7 +73,7 @@ export async function getShell(tx: Tx, viewer: Viewer): Promise<ShellDto> {
     roleLabel: PARTNER_ROLE_LABEL[viewer.role],
     orgName: viewer.partnerName,
     orgLogoUrl: logoUrlOf(partner.id, partner.logoKey),
-    orgSub: `${PARTNER_CATEGORY_LABEL[partner.category]}, ${PARTNER_REGION_LABEL[partner.region]}`,
+    orgSub: `${PARTNER_CATEGORY_LABEL[partner.category]}, ${regionName(partner.region)}`,
     partnerRegion: partner.region,
     manager: manager ? { id: manager.id, name: manager.name, email: manager.email, team: teamLabel(manager.region ?? 'all') } : null,
     waitingApprovals: 0,

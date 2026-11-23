@@ -11,6 +11,7 @@ import { issueInvite, rotateInviteToken, toInviteDto } from '@/server/invite-cor
 import { listManagerRecipients } from './applications';
 import { assertStaff, type Tx } from './context';
 import { defineIsolation } from './isolation.registry';
+import { assertStaffScopeAssignable } from './regions';
 
 export interface AcceptInviteInput {
   token: string;
@@ -195,6 +196,7 @@ export async function createInvite(tx: Tx, viewer: Viewer, input: NewInviteInput
   if (!isValidEmail(input.email)) throw new ValidationError([{ path: 'email', message: 'Enter a valid work email.' }]);
   if (input.kind === 'staff') {
     assertStaff(viewer);
+    await assertStaffScopeAssignable(tx, input.region);
     return issueInvite(tx, { kind: 'staff', partnerId: null, email: input.email, role: input.role, staffRegion: input.region, invitedBy: viewer.id }, clock);
   }
   if (viewer.kind === 'partner' && input.partnerId !== viewer.partnerId) throw new NotFoundError('partner');

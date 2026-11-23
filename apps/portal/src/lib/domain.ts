@@ -9,17 +9,12 @@ export const PARTNER_CATEGORY_PLURAL: Record<PartnerCategory, string> = {
   channel: 'Channel partners',
 };
 
-export const PARTNER_REGIONS = ['india', 'middle_east', 'elsewhere'] as const;
-export type PartnerRegion = (typeof PARTNER_REGIONS)[number];
-export const PARTNER_REGION_LABEL: Record<PartnerRegion, string> = {
-  india: 'India',
-  middle_east: 'Middle East',
-  elsewhere: 'Elsewhere',
-};
-
-/** Regions a deal can be registered in. A partner in 'elsewhere' still registers in one of these two. */
-export const DEAL_REGIONS = ['india', 'middle_east'] as const;
-export type DealRegion = (typeof DEAL_REGIONS)[number];
+/**
+ * A region key: a slug from the `regions` table (staff add more on /admin/settings/regions), so plain strings.
+ * Names, validation and slugging live in lib/regions.ts.
+ */
+export type PartnerRegion = string;
+export type DealRegion = string;
 
 /** Company size bands on the partner profile. Stored as written; the CHECK constraint on partners.headcount_band lists the same values. */
 export const HEADCOUNT_BANDS = ['1-10', '11-50', '51-200', '201-1000', '1000+'] as const;
@@ -62,13 +57,9 @@ export const STAFF_ROLE_LABEL: Record<StaffRole, string> = {
   marketing: 'Marketing',
 };
 
-export const STAFF_REGIONS = ['india', 'middle_east', 'all'] as const;
-export type StaffRegion = (typeof STAFF_REGIONS)[number];
-export const STAFF_REGION_LABEL: Record<StaffRegion, string> = {
-  india: 'India',
-  middle_east: 'Middle East',
-  all: 'All regions',
-};
+/** A staff scope: a region key, or ALL_REGIONS for the person who covers every region. */
+export type StaffRegion = string;
+export const ALL_REGIONS = 'all';
 
 /** Currencies a deal value can be entered in. USD is the default. */
 export const DEAL_CURRENCIES = ['USD', 'EUR', 'GBP', 'INR', 'AED', 'SAR'] as const;

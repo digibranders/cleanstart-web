@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { fmtTimestamp } from "@/lib/dates";
-import { EVENT_SOURCE_LABEL, PARTNER_CATEGORY_LABEL, PARTNER_REGION_LABEL, PRODUCT_LABEL } from "@/lib/domain";
+import { EVENT_SOURCE_LABEL, PARTNER_CATEGORY_LABEL, PRODUCT_LABEL } from "@/lib/domain";
 import type { ManagerOptionDto, RegistrationCheckDto, RegistrationDetailDto } from "@/lib/dto";
 import { ROUTES } from "@/lib/routes";
 import { acceptRegistrationAction, rejectRegistrationAction } from "@/server/actions/decisions";
@@ -16,6 +16,7 @@ import { ReassignControl } from "../deals/ReassignControl";
 import { StatusBadge } from "../deals/parts";
 import { Icon } from "../icon";
 import { useToast } from "../ui/toast";
+import { RegionName } from "@/components/regions-context";
 
 interface Props {
   deal: RegistrationDetailDto | null;
@@ -144,7 +145,7 @@ export function StaffDealDetail({ deal, check, today, canReassign, managers }: P
           <dt>Product</dt>
           <dd>{PRODUCT_LABEL[deal.product]}</dd>
           <dt>Region</dt>
-          <dd>{PARTNER_REGION_LABEL[deal.region]}</dd>
+          <dd><RegionName k={deal.region} /></dd>
           <dt>Partner</dt>
           <dd>
             {deal.partnerName}, {PARTNER_CATEGORY_LABEL[deal.partnerCategory]}

@@ -1,4 +1,4 @@
-import { type DealRegion, PARTNER_ROLES, type PartnerRegion, type PartnerRole } from '@/lib/domain';
+import { ALL_REGIONS, type DealRegion, PARTNER_ROLES, type PartnerRegion, type PartnerRole } from '@/lib/domain';
 import { ForbiddenError } from '@/server/errors';
 import type { Viewer } from './types';
 import { roleKey } from './types';
@@ -39,6 +39,8 @@ export const ACTIONS = [
   'staff.change_role',
   'staff.change_region',
   'staff.remove',
+  // Sales regions (M3)
+  'region.manage',
   // The signed-in person's own account (master 1.7). Always self only.
   'account.update_profile',
   'account.change_password',
@@ -110,7 +112,7 @@ const mine = (v: Viewer, s: PolicySubject | undefined): boolean =>
   v.kind === 'partner' && (s?.ownerUserId === undefined || s.ownerUserId === v.id);
 
 const inScope = (v: Viewer, s: PolicySubject | undefined): boolean =>
-  v.kind === 'staff' && (s?.region === undefined || v.region === 'all' || s.region === v.region);
+  v.kind === 'staff' && (s?.region === undefined || v.region === ALL_REGIONS || s.region === v.region);
 
 const self = (v: Viewer, s: PolicySubject | undefined): boolean =>
   s?.targetUserId === undefined || s.targetUserId === v.id;
@@ -167,6 +169,8 @@ const RULES: Record<Action, Rule> = {
   'staff.change_role': managerOnly,
   'staff.change_region': managerOnly,
   'staff.remove': managerOnly,
+
+  'region.manage': managerOnly,
 
   'account.update_profile': self,
   'account.change_password': self,

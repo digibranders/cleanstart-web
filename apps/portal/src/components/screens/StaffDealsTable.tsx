@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ScrollRegion } from "@/components/ui/scroll-region";
 import { fmtLong } from "@/lib/dates";
-import { DEAL_REGIONS, PARTNER_REGION_LABEL, PRODUCT_LABEL, PRODUCTS } from "@/lib/domain";
+import { PRODUCT_LABEL, PRODUCTS } from "@/lib/domain";
+import { RegionName, useRegions } from "@/components/regions-context";
 import type { ManagerOptionDto } from "@/lib/dto";
 import { ROUTES } from "@/lib/routes";
 import {
@@ -107,6 +108,7 @@ interface TableProps {
 
 export function StaffDealsTable({ facet, deals, filters, partners, managers }: TableProps): React.JSX.Element {
   const router = useRouter();
+  const { offer } = useRegions();
   const [q, setQ] = useState(filters.q ?? "");
   const go = (change: Partial<StaffDealFilters>): void =>
     router.push(staffDealsUrl(facet, { ...filters, page: 1, ...change }));
@@ -156,8 +158,8 @@ export function StaffDealsTable({ facet, deals, filters, partners, managers }: T
             id="sdg"
             ariaLabel="Region"
             value={filters.region ?? ANY}
-            options={[{ value: ANY, label: "All regions" }, ...DEAL_REGIONS.map((r) => ({ value: r, label: PARTNER_REGION_LABEL[r] }))]}
-            onChange={(v) => open({ region: v === ANY ? undefined : (v as (typeof DEAL_REGIONS)[number]) })}
+            options={[{ value: ANY, label: "All regions" }, ...offer(filters.region).map((r) => ({ value: r.key, label: r.name }))]}
+            onChange={(v) => open({ region: v === ANY ? undefined : (v) })}
           />
           <div className="seg" role="group" aria-label="Flags">
             <button type="button" className={`seg-b${filters.overdue ? " seg-on" : ""}`} aria-pressed={filters.overdue} onClick={() => open({ overdue: !filters.overdue })} style={{ height: 24, padding: "0 10px" }}>
@@ -196,7 +198,7 @@ export function StaffDealsTable({ facet, deals, filters, partners, managers }: T
                 </td>
                 <td className="hide-sm">{d.partnerName}</td>
                 <td className="t-sec hide-sm">{PRODUCT_LABEL[d.product]}</td>
-                <td className="t-sec hide-sm">{PARTNER_REGION_LABEL[d.region]}</td>
+                <td className="t-sec hide-sm"><RegionName k={d.region} /></td>
                 <td className="t-sec hide-sm">{d.managerName ?? "Not assigned"}</td>
                 <td>
                   <StatusBadge status={d.status} />

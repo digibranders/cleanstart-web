@@ -63,7 +63,7 @@ DO $$
 DECLARE t text;
 BEGIN
   FOREACH t IN ARRAY ARRAY[
-    'partners', 'users', 'staff_scopes', 'partner_checklist', 'applications', 'application_notes', 'application_tokens', 'invites', 'access_requests',
+    'regions', 'partners', 'users', 'staff_scopes', 'partner_checklist', 'applications', 'application_notes', 'application_tokens', 'invites', 'access_requests',
     'registrations', 'registration_contacts', 'registration_messages', 'registration_events', 'registration_reminders',
     'documents', 'document_audience', 'document_versions', 'document_opens', 'material_requests', 'email_change_requests',
     'notifications', 'notification_prefs', 'audit_log', 'hubspot_outbox', 'hubspot_sync_state',
@@ -214,6 +214,15 @@ CREATE POLICY staff_scopes_select ON staff_scopes FOR SELECT USING (
   OR user_id IN (SELECT u.id FROM users u WHERE u.kind = 'staff' AND u.role = 'partner_manager' AND u.status = 'active')
 );
 CREATE POLICY staff_scopes_write ON staff_scopes FOR ALL USING (app_is_staff()) WITH CHECK (app_is_staff());
+
+-- ---------------------------------------------------------------- regions
+-- Any signed in user (and the system, which serves the public apply form) reads the list; only staff change it.
+DROP POLICY IF EXISTS regions_select ON regions;
+DROP POLICY IF EXISTS regions_insert ON regions;
+DROP POLICY IF EXISTS regions_update ON regions;
+CREATE POLICY regions_select ON regions FOR SELECT USING (app_kind() IN ('staff', 'partner', 'system'));
+CREATE POLICY regions_insert ON regions FOR INSERT WITH CHECK (app_is_staff());
+CREATE POLICY regions_update ON regions FOR UPDATE USING (app_is_staff()) WITH CHECK (app_is_staff());
 
 -- ---------------------------------------------------------------- audit_log and hubspot_outbox
 DROP POLICY IF EXISTS audit_log_insert ON audit_log;

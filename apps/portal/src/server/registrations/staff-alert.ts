@@ -1,5 +1,5 @@
 import { env } from '@/env';
-import { type DealRegion, PARTNER_REGION_LABEL, PRODUCT_LABEL, type Product } from '@/lib/domain';
+import { type DealRegion, PRODUCT_LABEL, type Product } from '@/lib/domain';
 import { ROUTES } from '@/lib/routes';
 import { sendEmail } from '@/server/email/send';
 import { buildDealSubmittedStaffAlert } from '@/server/email/templates';
@@ -7,6 +7,7 @@ import type { EmailAddress } from '@/server/email/transport';
 import { log } from '@/server/log';
 import { type NewNotification, resolveEmailRecipients } from '@/server/notify';
 import { absoluteUrl } from '@/server/urls';
+import { regionName } from '@/lib/regions';
 
 /** The deal manager's address from their notification, or PARTNERS_NOTIFY_EMAIL when the deal has no manager. May be empty. */
 export async function staffRecipients(items: readonly NewNotification[]): Promise<EmailAddress[]> {
@@ -40,7 +41,7 @@ export async function sendSubmissionAlert(alert: SubmissionAlert): Promise<void>
       partnerName: alert.partnerName,
       customer: alert.customer,
       productLabel: alert.products.map((p) => PRODUCT_LABEL[p]).join(', '),
-      regionLabel: PARTNER_REGION_LABEL[alert.region],
+      regionLabel: regionName(alert.region),
       registeredByName: alert.registeredByName,
       resubmitted: alert.resubmitted,
       approvalsUrl: absoluteUrl(ROUTES.admin.approvals),

@@ -1,17 +1,14 @@
-import {
-  PARTNER_CATEGORIES,
-  PARTNER_CATEGORY_LABEL,
-  PARTNER_REGION_LABEL,
-  PARTNER_REGIONS,
-} from './domain';
+import { PARTNER_CATEGORIES, PARTNER_CATEGORY_LABEL } from './domain';
 import type { PartnerReportRow } from './dto';
+import { type RegionDto, regionName } from './regions';
 
 export const SORTS = ['Most registered', 'Most won', 'Highest accept rate', 'Name'] as const;
 export type ReportSort = (typeof SORTS)[number];
 
-export const REGION_OPTIONS = [
+/** The region filter: every region in the list (inactive ones too, their partners still exist). */
+export const regionOptions = (regions: readonly RegionDto[]): { value: string; label: string }[] => [
   { value: 'all', label: 'All regions' },
-  ...PARTNER_REGIONS.map((r) => ({ value: r, label: PARTNER_REGION_LABEL[r] })),
+  ...regions.map((r) => ({ value: r.key, label: r.name })),
 ];
 export const CATEGORY_OPTIONS = [
   { value: 'all', label: 'All partner categories' },
@@ -56,13 +53,13 @@ const csvCell = (value: string | number): string => {
   return /[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
 };
 
-export function partnersToCsv(rows: readonly PartnerReportView[]): string {
+export function partnersToCsv(rows: readonly PartnerReportView[], regions?: readonly RegionDto[]): string {
   const header = ['Partner', 'Category', 'Region', 'Registered', 'Accepted', 'Accept rate', 'Won', 'Protected now'];
   const lines = rows.map((p) =>
     [
       p.name,
       PARTNER_CATEGORY_LABEL[p.category],
-      PARTNER_REGION_LABEL[p.region],
+      regionName(p.region, regions),
       p.registered,
       p.accepted,
       p.rate === null ? 'None yet' : `${p.rate}%`,

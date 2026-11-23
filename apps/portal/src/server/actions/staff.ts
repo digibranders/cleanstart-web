@@ -1,7 +1,7 @@
 'use server';
 
 import { z } from 'zod';
-import { STAFF_REGION_LABEL, STAFF_REGIONS, STAFF_ROLE_LABEL, STAFF_ROLES } from '@/lib/domain';
+import { STAFF_ROLE_LABEL, STAFF_ROLES } from '@/lib/domain';
 import type { InviteDto, StaffMemberDto } from '@/lib/dto';
 import { ROUTES } from '@/lib/routes';
 import { recordAudit } from '@/server/audit/record';
@@ -17,16 +17,17 @@ import { changeStaffRegion, changeStaffRole, listStaff, removeStaff } from '@/se
 import { inviteUrl } from '@/server/urls';
 import type { ActionResult } from './result';
 import { runViewerAction } from './run';
+import { regionName, staffScopeSchema } from '@/lib/regions';
 
 const inviteSchema = z.object({
   name: z.string().trim().min(1, 'Enter their name.').max(120),
   email: z.string().trim().max(254),
   role: z.enum(STAFF_ROLES),
-  region: z.enum(STAFF_REGIONS),
+  region: staffScopeSchema,
 });
 const inviteIdSchema = z.object({ inviteId: z.string().uuid() });
 const roleSchema = z.object({ userId: z.string().uuid(), role: z.enum(STAFF_ROLES) });
-const regionSchema = z.object({ userId: z.string().uuid(), region: z.enum(STAFF_REGIONS) });
+const regionSchema = z.object({ userId: z.string().uuid(), region: staffScopeSchema });
 const removeSchema = z.object({ id: z.string().uuid() });
 
 const staffMail = (args: { invite: InviteDto; token: string; inviteeName: string; inviterName: string }) =>
@@ -48,7 +49,7 @@ export async function inviteStaffAction(raw: unknown): Promise<ActionResult<Invi
       const result = await createInvite(tx, ctx.viewer, { kind: 'staff', email: input.email, role: input.role, region: input.region }, ctx.clock);
       await recordAudit(tx, ctx.viewer, {
         event: 'staff.invited',
-        target: `${input.name}, ${STAFF_ROLE_LABEL[input.role].toLowerCase()}, ${STAFF_REGION_LABEL[input.region]}`,
+        target: `${input.name}, ${STAFF_ROLE_LABEL[input.role].toLowerCase()}, ${regionName(input.region)}`,
         subject: { type: 'invite', id: result.invite.id },
       });
       return result;
@@ -70,7 +71,7 @@ export async function resendStaffInviteAction(raw: unknown): Promise<ActionResul
       const resent = await resendInvite(tx, ctx.viewer, { inviteId: input.inviteId }, ctx.clock);
       await recordAudit(tx, ctx.viewer, {
         event: 'staff.invite_resent',
-        target: `${member.name}, ${STAFF_ROLE_LABEL[member.role].toLowerCase()}, ${STAFF_REGION_LABEL[member.region]}`,
+        target: `${member.name}, ${STAFF_ROLE_LABEL[member.role].toLowerCase()}, ${regionName(member.region)}`,
         subject: { type: 'invite', id: resent.invite.id },
       });
       return { resent, member };
@@ -127,7 +128,7 @@ export async function changeStaffRegionAction(raw: unknown): Promise<ActionResul
         await recordAudit(tx, ctx.viewer, {
           event: 'staff.region_changed',
           target: `${after.name}, CleanStart team`,
-          note: `${STAFF_REGION_LABEL[before.region]} to ${STAFF_REGION_LABEL[after.region]}.`,
+          note: `${regionName(before.region)} to ${regionName(after.region)}.`,
           subject: { type: 'user', id: after.id },
         });
       }
@@ -147,7 +148,7 @@ export async function removeStaffAction(raw: unknown): Promise<ActionResult<{ id
       const removed = await removeStaff(tx, ctx.viewer, { userId: input.id }, ctx.clock);
       await recordAudit(tx, ctx.viewer, {
         event: 'staff.removed',
-        target: `${removed.name}, ${STAFF_ROLE_LABEL[member.role].toLowerCase()}, ${STAFF_REGION_LABEL[member.region]}`,
+        target: `${removed.name}, ${STAFF_ROLE_LABEL[member.role].toLowerCase()}, ${regionName(member.region)}`,
         subject: { type: 'user', id: removed.userId },
       });
       return { removed, hadLogin: member.inviteId !== member.id };

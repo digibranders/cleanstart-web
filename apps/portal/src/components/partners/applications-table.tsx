@@ -7,8 +7,6 @@ import { fmtLong } from "@/lib/dates";
 import {
   PARTNER_CATEGORIES,
   PARTNER_CATEGORY_LABEL,
-  PARTNER_REGION_LABEL,
-  PARTNER_REGIONS,
   type PartnerCategory,
   type PartnerRegion,
 } from "@/lib/domain";
@@ -17,10 +15,10 @@ import { codeFromLabel } from "@/lib/people";
 import { ApplicationDrawer } from "./application-drawer";
 import { PartnerCategoryBadge } from "./badges";
 import { Seg } from "./seg";
+import { useRegions } from "@/components/regions-context";
 import { ScrollRegion } from "@/components/ui/scroll-region";
 
 const CATEGORY_OPTIONS: readonly string[] = PARTNER_CATEGORIES.map((c) => PARTNER_CATEGORY_LABEL[c]);
-const REGION_OPTIONS: readonly string[] = PARTNER_REGIONS.map((r) => PARTNER_REGION_LABEL[r]);
 
 const STATUS_OPTIONS = [
   { value: "all", label: "Any status" },
@@ -55,13 +53,15 @@ export function ApplicationsTable({
   onDecline,
   onUndo,
 }: ApplicationsTableProps): React.JSX.Element {
+  const { offer, name: regionName } = useRegions();
+  const regionList = offer();
   const [detailId, setDetailId] = useState<string | null>(null);
   const [rejectingId, setRejectingId] = useState<string | null>(null);
   const [approvingId, setApprovingId] = useState<string | null>(null);
   const [reason, setReason] = useState("");
   const [reasonTried, setReasonTried] = useState(false);
   const [categoryLabel, setCategoryLabel] = useState<string>(PARTNER_CATEGORY_LABEL.channel);
-  const [regionLabel, setRegionLabel] = useState<string>(PARTNER_REGION_LABEL.india);
+  const [regionLabel, setRegionLabel] = useState<string>(regionList[0]?.name ?? "");
 
   const [text, setText] = useState(query);
   // Wait for a pause in typing before asking the server to filter.
@@ -87,12 +87,12 @@ export function ApplicationsTable({
     setRejectingId(null);
     setApprovingId(application.id);
     setCategoryLabel(application.category ? PARTNER_CATEGORY_LABEL[application.category] : PARTNER_CATEGORY_LABEL.channel);
-    setRegionLabel(application.region ? PARTNER_REGION_LABEL[application.region] : PARTNER_REGION_LABEL.india);
+    setRegionLabel(application.region ? regionName(application.region) : (regionList[0]?.name ?? ""));
   };
 
   const confirmApprove = (application: ApplicationDto): void => {
     const category = codeFromLabel(PARTNER_CATEGORY_LABEL, categoryLabel);
-    const region = codeFromLabel(PARTNER_REGION_LABEL, regionLabel);
+    const region = regionList.find((r) => r.name === regionLabel)?.key;
     if (!category || !region) return;
     setApprovingId(null);
     onApprove(application, { category, region });
@@ -188,7 +188,7 @@ export function ApplicationsTable({
                       {a.category ? <PartnerCategoryBadge category={a.category} /> : <span className="t-muted">Not set</span>}
                     </td>
                     <td className="t-sec hide-sm">
-                      {a.region ? PARTNER_REGION_LABEL[a.region] : <span className="t-muted">Not set</span>}
+                      {a.region ? regionName(a.region) : <span className="t-muted">Not set</span>}
                     </td>
                     <td className="tnum t-sec hide-sm">{fmtLong(a.submittedAt)}</td>
                     <td className="r" style={{ whiteSpace: "normal" }}>
@@ -277,7 +277,7 @@ export function ApplicationsTable({
                             <span id={`aa-reg-${a.id}`} className="lbl">
                               Region
                             </span>
-                            <Seg options={REGION_OPTIONS} value={regionLabel} onChange={setRegionLabel} labelledBy={`aa-reg-${a.id}`} />
+                            <Seg options={regionList.map((r) => r.name)} value={regionLabel} onChange={setRegionLabel} labelledBy={`aa-reg-${a.id}`} />
                           </div>
                           <button type="button" className="btn btn-s" onClick={() => setApprovingId(null)}>
                             Cancel

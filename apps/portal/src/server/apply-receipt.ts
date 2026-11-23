@@ -1,7 +1,8 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { z } from 'zod';
 import { env } from '@/env';
-import { PARTNER_CATEGORIES, PARTNER_REGIONS } from '@/lib/domain';
+import { PARTNER_CATEGORIES } from '@/lib/domain';
+import { regionKeySchema } from '@/lib/regions';
 
 /** Cookie set by submitApplicationAction and read by /apply/done (decision 16: not the query string, not the database). */
 export const APPLY_RECEIPT_COOKIE = 'portal_apply_receipt';
@@ -13,7 +14,7 @@ const receiptSchema = z.object({
   firstName: z.string(),
   email: z.string(),
   category: z.enum(PARTNER_CATEGORIES),
-  region: z.enum(PARTNER_REGIONS),
+  region: regionKeySchema,
   submittedOn: z.string().length(10),
   /** The private status link token, so the receipt page can offer the link. Never logged. */
   statusToken: z.string().min(1).max(200).optional(),

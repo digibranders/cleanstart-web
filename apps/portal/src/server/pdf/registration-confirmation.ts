@@ -2,8 +2,9 @@ import { PDFDocument, type PDFFont, type PDFPage, rgb, StandardFonts } from 'pdf
 import { fmtLong } from '@/lib/dates';
 import { countryName, formatDealValue } from '@/lib/deal-format';
 import { EXTENSION_DAYS, PROTECTION_DAYS, REVIEW_SLA_BUSINESS_DAYS } from '@/lib/deal-rules';
-import { PARTNER_REGION_LABEL, PRODUCT_LABEL } from '@/lib/domain';
+import { PRODUCT_LABEL } from '@/lib/domain';
 import type { RegistrationDetailDto } from '@/lib/dto';
+import { regionName } from '@/lib/regions';
 
 /** Everything the page prints, already resolved: dates are ISO, labels are display text. */
 export interface RegistrationConfirmationDto {
@@ -34,7 +35,7 @@ export function toConfirmationDto(deal: RegistrationDetailDto, today: string): R
     website: deal.website,
     country: countryName(deal.customerCountry),
     product: PRODUCT_LABEL[deal.product],
-    region: PARTNER_REGION_LABEL[deal.region],
+    region: regionName(deal.region),
     partnerName: deal.partnerName,
     registeredOn: deal.registeredOn,
     acceptedOn: deal.decidedOn,

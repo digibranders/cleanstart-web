@@ -49,6 +49,7 @@ const MATRIX: Record<Action, string> = {
   'staff.change_role': '- - - Y - -',
   'staff.change_region': '- - - Y - -',
   'staff.remove': '- - - Y - -',
+  'region.manage': '- - - Y - -',
   'account.update_profile': 'self self self self self self',
   'account.change_password': 'self self self self self self',
   'account.manage_two_factor': 'self self self self self self',

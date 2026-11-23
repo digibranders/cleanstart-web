@@ -56,6 +56,11 @@ export async function resetDb(_db?: Db): Promise<void> {
     );
     const names = rows.map((row) => `"${row.tablename}"`).join(', ');
     await client.query(`truncate ${names} restart identity cascade`);
+    // regions is reference data, so a reset puts the migration's rows back (row level security is forced for the owner too).
+    await client.query("select set_config('app.kind', 'system', false)");
+    await client.query(
+      "insert into regions (key, name, sort_order, active) values ('india', 'India', 10, true), ('middle_east', 'Middle East', 20, true), ('eu', 'EU', 30, true), ('us', 'US', 40, true), ('elsewhere', 'Elsewhere', 900, false)",
+    );
     await client.query('alter sequence application_reference_seq restart with 1');
     await client.query('alter sequence registration_reference_seq restart with 1');
   } finally {
@@ -76,7 +81,7 @@ const PRODUCT_BY_LABEL: Record<string, Product> = {
   'Clean Libraries': 'libraries',
   CleanSight: 'cleansight',
 };
-const REGION_BY_LABEL: Record<string, DealRegion> = { India: 'india', 'Middle East': 'middle_east' };
+const REGION_BY_LABEL: Record<string, DealRegion> = { India: 'india', 'Middle East': 'middle_east', EU: 'eu', US: 'us' };
 const STAFF_ONLY_ROLES: ReadonlySet<string> = new Set(['partner_manager', 'marketing']);
 
 type PartnerRow = typeof partners.$inferSelect;

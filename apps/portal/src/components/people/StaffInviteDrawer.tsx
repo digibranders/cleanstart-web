@@ -4,8 +4,7 @@ import { useState } from "react";
 import { Drawer } from "@/components/ui/overlay";
 import { useToast } from "@/components/ui/toast";
 import {
-  STAFF_REGION_LABEL,
-  STAFF_REGIONS,
+  ALL_REGIONS,
   STAFF_ROLE_LABEL,
   STAFF_ROLES,
   type StaffRegion,
@@ -15,9 +14,9 @@ import { codeFromLabel, isValidEmail } from "@/lib/people";
 import { inviteStaffAction } from "@/server/actions/staff";
 import { issuesToErrors } from "@/server/actions/result";
 import { Seg } from "./Seg";
+import { useRegions } from "@/components/regions-context";
 
 const ROLES: readonly string[] = STAFF_ROLES.map((r) => STAFF_ROLE_LABEL[r]);
-const REGIONS: readonly string[] = STAFF_REGIONS.map((r) => STAFF_REGION_LABEL[r]);
 const ROLE_HINT: Record<StaffRole, string> = {
   partner_manager: "Approves deals and applications, and manages partners.",
   sales: "Sees and approves deals in their own region.",
@@ -34,10 +33,13 @@ export function StaffInviteDrawer({
   existingEmails: readonly string[];
 }): React.JSX.Element | null {
   const toast = useToast();
+  const { offer } = useRegions();
+  const scopes = [{ key: ALL_REGIONS, name: "All regions" }, ...offer()];
+  const defaultScope = scopes[1]?.name ?? scopes[0]?.name ?? "";
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [roleLabel, setRoleLabel] = useState<string>(STAFF_ROLE_LABEL.sales);
-  const [regionLabel, setRegionLabel] = useState<string>(STAFF_REGION_LABEL.india);
+  const [regionLabel, setRegionLabel] = useState<string>(defaultScope);
   const [tried, setTried] = useState(false);
   const [busy, setBusy] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
@@ -48,7 +50,7 @@ export function StaffInviteDrawer({
   const nameErr = tried && name.trim() === "";
   const emailErr = (tried && (!emailOk || duplicate)) || serverError !== null;
   const role: StaffRole = codeFromLabel(STAFF_ROLE_LABEL, roleLabel) ?? "sales";
-  const region: StaffRegion = codeFromLabel(STAFF_REGION_LABEL, regionLabel) ?? "india";
+  const region: StaffRegion = scopes.find((s) => s.name === regionLabel)?.key ?? ALL_REGIONS;
 
   const submit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
@@ -67,7 +69,7 @@ export function StaffInviteDrawer({
     setName("");
     setEmail("");
     setRoleLabel(STAFF_ROLE_LABEL.sales);
-    setRegionLabel(STAFF_REGION_LABEL.india);
+    setRegionLabel(defaultScope);
     setTried(false);
     onClose();
     toast(`Invite sent to ${address}`);
@@ -143,7 +145,7 @@ export function StaffInviteDrawer({
           Region
         </span>
         <div style={{ alignSelf: "flex-start" }}>
-          <Seg options={REGIONS} value={regionLabel} onChange={setRegionLabel} labelledBy="inv-reg" />
+          <Seg options={scopes.map((s) => s.name)} value={regionLabel} onChange={setRegionLabel} labelledBy="inv-reg" />
         </div>
       </div>
     </Drawer>

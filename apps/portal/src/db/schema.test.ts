@@ -21,7 +21,7 @@ const EXPECTED_TABLES = [
   'access_requests', 'application_notes', 'application_tokens', 'applications', 'audit_log', 'auth_account', 'auth_session', 'auth_two_factor',
   'auth_verification', 'document_audience', 'document_opens', 'document_versions', 'documents', 'email_change_requests', 'hubspot_outbox',
   'hubspot_sync_state', 'invites', 'material_requests', 'notification_prefs', 'notifications', 'partner_checklist', 'partners',
-  'registration_contacts', 'registration_events', 'registration_messages', 'registration_reminders', 'registrations',
+  'regions', 'registration_contacts', 'registration_events', 'registration_messages', 'registration_reminders', 'registrations',
   'staff_scopes', 'users',
 ];
 

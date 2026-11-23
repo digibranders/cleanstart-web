@@ -2,7 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { DEAL_REGIONS, type DealRegion, PARTNER_REGION_LABEL } from "@/lib/domain";
+import { useRegions } from "@/components/regions-context";
+import type { DealRegion } from "@/lib/domain";
 import type { ManagerOptionDto } from "@/lib/dto";
 import { issuesToErrors } from "@/server/actions/result";
 import { reassignRegistrationAction } from "@/server/actions/registration-reassign";
@@ -17,6 +18,7 @@ interface Props {
 /** Change the manager and region of a waiting registration. The caller shows it to partner managers on pending deals only. */
 export function ReassignControl({ deal, managers }: Props): React.JSX.Element {
   const router = useRouter();
+  const { offer } = useRegions();
   const toast = useToast();
   const [open, setOpen] = useState(false);
   const [managerId, setManagerId] = useState(deal.managerId ?? managers[0]?.id ?? "");
@@ -73,7 +75,7 @@ export function ReassignControl({ deal, managers }: Props): React.JSX.Element {
           variant="field"
           ariaLabel="Region"
           value={region}
-          options={DEAL_REGIONS.map((r) => ({ value: r, label: PARTNER_REGION_LABEL[r] }))}
+          options={offer(deal.region).map((r) => ({ value: r.key, label: r.name }))}
           onChange={(value) => setRegion(value as DealRegion)}
         />
       </div>

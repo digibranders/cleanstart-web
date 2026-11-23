@@ -30,7 +30,6 @@ import {
   AUDIT_WHO,
   CHECKLIST_STEPS,
   DEAL_CURRENCIES,
-  DEAL_REGIONS,
   DOC_PRODUCTS,
   DOCUMENT_STATUSES,
   DOCUMENT_TYPES,
@@ -44,12 +43,10 @@ import {
   OUTBOX_OPS,
   OUTBOX_STATUSES,
   PARTNER_CATEGORIES,
-  PARTNER_REGIONS,
   PARTNER_ROLES,
   PARTNER_STATUSES,
   PRODUCTS,
   REGISTRATION_STATUSES,
-  STAFF_REGIONS,
   STAFF_ROLES,
   STAGE_AWAITING_REVIEW,
   USER_KINDS,
@@ -69,6 +66,20 @@ const NIL_UUID = sql`'00000000-0000-0000-0000-000000000000'`;
 
 /* ---------------------------------------------------------------- partners and people */
 
+/** Sales regions. Keys are immutable slugs; staff add, rename, reorder and deactivate rows on /admin/settings/regions. Never deleted. */
+export const regions = pgTable(
+  'regions',
+  {
+    id: id(),
+    key: text('key').notNull(),
+    name: text('name').notNull(),
+    sortOrder: integer('sort_order').notNull().default(0),
+    active: boolean('active').notNull().default(true),
+    createdAt: createdAt(),
+  },
+  (t) => [unique('regions_key_key').on(t.key), check('regions_key_chk', sql`${t.key} ~ '^[a-z][a-z0-9_]{1,31}$' and ${t.key} <> 'all'`)],
+);
+
 export const partners = pgTable(
   'partners',
   {
@@ -76,7 +87,7 @@ export const partners = pgTable(
     name: text('name').notNull(),
     domain: text('domain').notNull(),
     category: text('category', { enum: PARTNER_CATEGORIES }).notNull(),
-    region: text('region', { enum: PARTNER_REGIONS }).notNull(),
+    region: text('region').notNull().references(() => regions.key),
     status: text('status', { enum: PARTNER_STATUSES }).notNull().default('onboarding'),
     statusBeforeSuspend: text('status_before_suspend', { enum: PARTNER_STATUSES }),
     managerId: uuid('manager_id').references((): AnyPgColumn => users.id),
@@ -106,7 +117,6 @@ export const partners = pgTable(
     index('partners_name_trgm').using('gin', t.name.op('gin_trgm_ops')),
     check('partners_domain_lower', sql`${t.domain} = lower(${t.domain})`),
     check('partners_category_chk', inList(t.category, PARTNER_CATEGORIES)),
-    check('partners_region_chk', inList(t.region, PARTNER_REGIONS)),
     check('partners_status_chk', inList(t.status, PARTNER_STATUSES)),
     check('partners_headcount_chk', sql`${t.headcountBand} is null or ${inList(t.headcountBand, HEADCOUNT_BANDS)}`),
     check('partners_prior_status_chk', sql`${t.statusBeforeSuspend} is null or ${inList(t.statusBeforeSuspend, PARTNER_STATUSES)}`),
@@ -159,11 +169,12 @@ export const staffScopes = pgTable(
   {
     id: id(),
     userId: uuid('user_id').notNull().references(() => users.id),
-    region: text('region', { enum: STAFF_REGIONS }).notNull(),
+    /** 'all' or a regions.key. Validated by the staff actions, not a foreign key, because 'all' is not a region. */
+    region: text('region').notNull(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
-  (t) => [unique('staff_scopes_user_key').on(t.userId), check('staff_scopes_region_chk', inList(t.region, STAFF_REGIONS))],
+  (t) => [unique('staff_scopes_user_key').on(t.userId)],
 );
 
 /** Ticks the welcome checklist keeps. Derived steps are never stored (DERIVED_CHECKLIST_STEPS). */
@@ -195,7 +206,7 @@ export const applications = pgTable(
     role: text('role'),
     phone: text('phone'),
     category: text('category', { enum: PARTNER_CATEGORIES }),
-    region: text('region', { enum: PARTNER_REGIONS }),
+    region: text('region').references(() => regions.key),
     reason: text('reason'),
     source: text('source', { enum: APPLICATION_SOURCES }).notNull(),
     sourceRef: text('source_ref'),
@@ -280,7 +291,7 @@ export const invites = pgTable(
     kind: text('kind', { enum: USER_KINDS }).notNull(),
     partnerId: uuid('partner_id').references(() => partners.id),
     role: text('role').notNull(),
-    staffRegion: text('staff_region', { enum: STAFF_REGIONS }),
+    staffRegion: text('staff_region'),
     tokenHash: text('token_hash').notNull(),
     expiresAt: ts('expires_at').notNull(),
     acceptedAt: ts('accepted_at'),
@@ -368,7 +379,7 @@ export const registrations = pgTable(
     customerName: text('customer_name').notNull(),
     customerDomain: text('customer_domain'),
     product: text('product', { enum: PRODUCTS }).notNull(),
-    region: text('region', { enum: DEAL_REGIONS }).notNull(),
+    region: text('region').notNull().references(() => regions.key),
     managerId: uuid('manager_id').references(() => users.id),
     expectedClose: text('expected_close'),
     notes: text('notes'),
@@ -414,7 +425,6 @@ export const registrations = pgTable(
     index('registrations_protection_end_idx').on(t.protectionEnd).where(sql`${t.status} = 'accepted'`),
     index('registrations_customer_trgm').using('gin', t.customerName.op('gin_trgm_ops')),
     check('registrations_status_chk', inList(t.status, REGISTRATION_STATUSES)),
-    check('registrations_region_chk', inList(t.region, DEAL_REGIONS)),
     check('registrations_product_chk', inList(t.product, PRODUCTS)),
     check('registrations_extension_chk', inList(t.extensionStatus, EXTENSION_STATUSES)),
     check('registrations_currency_chk', inList(t.currency, DEAL_CURRENCIES)),

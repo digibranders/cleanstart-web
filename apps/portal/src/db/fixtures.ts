@@ -156,8 +156,8 @@ const sha256Hex = (value: string): string => createHash('sha256').update(value).
 
 const PARTNER_CATEGORY: Record<string, PartnerCategory> = { Distributor: 'distributor', 'Channel partner': 'channel' };
 const AUDIENCE_CATEGORY: Record<string, PartnerCategory> = { Distributors: 'distributor', 'Channel partners': 'channel' };
-const REGION: Record<string, PartnerRegion> = { India: 'india', 'Middle East': 'middle_east', Elsewhere: 'elsewhere' };
-const STAFF_REGION: Record<string, StaffRegion> = { India: 'india', 'Middle East': 'middle_east', 'All regions': 'all' };
+const REGION: Record<string, PartnerRegion> = { India: 'india', 'Middle East': 'middle_east', EU: 'eu', US: 'us', Elsewhere: 'elsewhere' };
+const STAFF_REGION: Record<string, StaffRegion> = { India: 'india', 'Middle East': 'middle_east', EU: 'eu', US: 'us', 'All regions': 'all' };
 const PARTNER_ROLE: Record<string, PartnerRole> = { 'Partner admin': 'partner_admin', Sales: 'sales', Technical: 'technical' };
 const STAFF_ROLE: Record<string, StaffRole> = { 'Partner manager': 'partner_manager', Sales: 'sales', Marketing: 'marketing' };
 const PRODUCT = { 'CleanStart Images': 'images', 'Clean Libraries': 'libraries', CleanSight: 'cleansight' } as const;
@@ -281,7 +281,7 @@ export async function seedMockData(db: Db, opts: SeedOptions): Promise<SeedSumma
     const category: PartnerCategory = i % 2 === 1 ? 'distributor' : 'channel';
     const row = first(
       await db.insert(partners).values({
-        name: `Seed partner ${label}`, domain: `seed-partner-${label}.example.com`, category, region: (['india', 'middle_east', 'elsewhere'] as const)[i % 3] ?? 'india',
+        name: `Seed partner ${label}`, domain: `seed-partner-${label}.example.com`, category, region: (['india', 'middle_east', 'eu', 'us'] as const)[i % 4] ?? 'india',
         status: 'active', managerId: staffIdByName.get(i % 2 === 1 ? 'Gaurav Jadhav' : 'Omar Nasser') ?? null,
         agreementVersion: 'v1.2', agreementAcceptedAt: at('2026-06-01'), createdAt: at('2026-06-01'),
       }).returning({ id: partners.id }),
@@ -332,7 +332,7 @@ export async function seedMockData(db: Db, opts: SeedOptions): Promise<SeedSumma
         customerName: deal.customer,
         customerDomain: deal.website ?? null,
         product: lookup(PRODUCT, deal.product, 'product'),
-        region: lookup({ India: 'india', 'Middle East': 'middle_east' } as const, deal.region, 'deal region'),
+        region: lookup(REGION, deal.region, 'deal region'),
         managerId: staffIdByName.get(deal.manager) ?? null,
         notes: deal.notes ?? null,
         dealValue: deal.dealValue ?? null,

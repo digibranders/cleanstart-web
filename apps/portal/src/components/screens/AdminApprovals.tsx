@@ -3,7 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { fmtTimestamp } from "@/lib/dates";
-import { PARTNER_CATEGORY_LABEL, PARTNER_REGION_LABEL, PRODUCT_LABEL, type StaffRegion } from "@/lib/domain";
+import { PARTNER_CATEGORY_LABEL, PRODUCT_LABEL, type StaffRegion } from "@/lib/domain";
 import type { ApprovalQueueDto, ManagerOptionDto, RegistrationDetailDto } from "@/lib/dto";
 import { BULK_DECIDE_MAX } from "@/lib/deal-rules";
 import { type BulkItemResult, bulkDecideAction } from "@/server/actions/bulk-decide";
@@ -41,11 +41,11 @@ import { Dropdown } from "../ui/dropdown";
 import { Drawer } from "../ui/overlay";
 import { useToast } from "../ui/toast";
 import { ScrollRegion } from "@/components/ui/scroll-region";
+import { useRegions } from "@/components/regions-context";
 
 const ALL_PRODUCTS = "All products";
 const ALL_REGIONS = "All regions";
 const PRODUCT_OPTIONS = [ALL_PRODUCTS, "CleanStart Images", "Clean Libraries", "CleanSight"];
-const REGION_OPTIONS = [ALL_REGIONS, "India", "Middle East"];
 const SMALL_BTN = { height: 24, padding: "0 6px", fontSize: 12 } as const;
 const HINT_LIMIT = 50;
 
@@ -109,11 +109,13 @@ export function AdminApprovals({
   canReassign,
 }: AdminApprovalsProps): React.JSX.Element {
   const toast = useToast();
+  const { regions, offer, name: regionName } = useRegions();
 
   const [view, setView] = useState<"mine" | "all">("all");
   const [q, setQ] = useState("");
   const [product, setProduct] = useState(ALL_PRODUCTS);
   const [region, setRegion] = useState(ALL_REGIONS);
+  const regionOptions = [ALL_REGIONS, ...offer(regions.find((r) => r.name === region)?.key).map((r) => r.name)];
   // The Audit log links here with ?deal=<id> to open that registration.
   const [viewingId, setViewingId] = useState<string | null>(useSearchParams().get("deal"));
   const [declining, setDeclining] = useState<{ id: string; note: string; tried: boolean } | null>(null);
@@ -169,7 +171,7 @@ export function AdminApprovals({
       (view === "all" || inMyQueue(deal)) &&
       (!needle || `${deal.partnerName} ${deal.customer}`.toLowerCase().includes(needle)) &&
       (product === ALL_PRODUCTS || PRODUCT_LABEL[deal.product] === product) &&
-      (region === ALL_REGIONS || PARTNER_REGION_LABEL[deal.region] === region),
+      (region === ALL_REGIONS || regionName(deal.region) === region),
   );
 
   const waiting = rows.filter((r) => r.state === "open" || r.state === "rejecting");
@@ -267,7 +269,7 @@ export function AdminApprovals({
         r.deal.partnerName,
         r.deal.customer,
         PRODUCT_LABEL[r.deal.product],
-        PARTNER_REGION_LABEL[r.deal.region],
+        regionName(r.deal.region),
         fmtLong(reviewSince(r.deal)),
         ageLabel(r.age),
         r.check.label,
@@ -412,10 +414,10 @@ export function AdminApprovals({
               onChange={(e) => setQ(e.target.value)}
             />
             <Dropdown id="ap" ariaLabel="Product" value={product} options={PRODUCT_OPTIONS} onChange={setProduct} />
-            <Dropdown id="ar" ariaLabel="Region" value={region} options={REGION_OPTIONS} onChange={setRegion} />
+            <Dropdown id="ar" ariaLabel="Region" value={region} options={regionOptions} onChange={setRegion} />
           </div>
           <span className="card-meta tnum">
-            {visible.length} shown, oldest first. {routingText(managers)}
+            {visible.length} shown, oldest first. {routingText(managers, regions)}
           </span>
         </div>
         <ScrollRegion label="Approval queue">
@@ -483,7 +485,7 @@ export function AdminApprovals({
                     <td className="hide-sm">
                       <ProductChip product={CHIP_PRODUCT[deal.product]} />
                     </td>
-                    <td className="t-sec hide-sm">{PARTNER_REGION_LABEL[deal.region]}</td>
+                    <td className="t-sec hide-sm">{regionName(deal.region)}</td>
                     <td className={`tnum hide-sm ${row.over ? "t-amber" : "t-sec"}`} title={`Submitted ${fmtLong(reviewSince(deal))}`}>
                       {ageLabel(row.age)}
                       {row.over ? <span className="why why-amber">Over 2-day target</span> : null}
@@ -879,7 +881,7 @@ export function AdminApprovals({
             <dt>Product</dt>
             <dd>{PRODUCT_LABEL[viewing.deal.product]}</dd>
             <dt>Region</dt>
-            <dd>{PARTNER_REGION_LABEL[viewing.deal.region]}</dd>
+            <dd>{regionName(viewing.deal.region)}</dd>
             <dt>Partner manager</dt>
             <dd>{viewing.deal.managerName ?? "Not assigned"}</dd>
             <dt>Partner</dt>

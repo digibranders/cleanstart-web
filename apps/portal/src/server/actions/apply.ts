@@ -7,18 +7,7 @@ import { z } from 'zod';
 import { env } from '@/env';
 import { type ApplyOutcome, APPLY_EMAIL_RULE, APPLY_IP_RULE, APPLY_REPLY_IP_RULE, APPLY_REPLY_TOKEN_RULE } from '@/lib/apply';
 import { findCountry } from '@/lib/deal-form';
-import {
-  APPLICATION_COMPANY_SIZES,
-  APPLICATION_REFERRALS,
-  APPLICATION_VENDORS,
-  APPLICATION_VERTICALS,
-  APPLICATION_YEARS,
-  PARTNER_CATEGORIES,
-  PARTNER_CATEGORY_LABEL,
-  PARTNER_REGION_LABEL,
-  PARTNER_REGIONS,
-  PRODUCTS,
-} from '@/lib/domain';
+import { APPLICATION_COMPANY_SIZES, APPLICATION_REFERRALS, APPLICATION_VENDORS, APPLICATION_VERTICALS, APPLICATION_YEARS, PARTNER_CATEGORIES, PARTNER_CATEGORY_LABEL, PRODUCTS } from '@/lib/domain';
 import { emailDomain, isPlausibleDomain, normaliseDomain } from '@/lib/people';
 import { ROUTES } from '@/lib/routes';
 import { APPLY_RECEIPT_COOKIE, APPLY_RECEIPT_TTL_SECONDS, signApplyReceipt } from '@/server/apply-receipt';
@@ -39,6 +28,7 @@ import { verifyTurnstile } from '@/server/turnstile';
 import { absoluteUrl, applicationStatusUrl } from '@/server/urls';
 import type { ActionResult } from './result';
 import { runPublicAction } from './run';
+import { regionName, regionKeySchema } from '@/lib/regions';
 
 const text = (max: number) => z.string().trim().max(max);
 
@@ -50,7 +40,7 @@ const applySchema = z.object({
   email: z.string().trim().max(254),
   phone: text(40),
   category: z.enum(PARTNER_CATEGORIES),
-  region: z.enum(PARTNER_REGIONS),
+  region: regionKeySchema,
   reason: text(2000).min(1, 'Tell us why you want to partner with CleanStart.'),
   vendors: z.array(z.enum(APPLICATION_VENDORS)).max(APPLICATION_VENDORS.length),
   vendorsOther: text(100),
@@ -123,7 +113,7 @@ export async function submitApplicationAction(raw: unknown): Promise<ActionResul
       await recordAudit(tx, actor, {
         event: 'application.submitted',
         target: application.company,
-        note: `${PARTNER_CATEGORY_LABEL[input.category]}, ${PARTNER_REGION_LABEL[input.region]}${merged ? '. Updated an open application.' : ''}`,
+        note: `${PARTNER_CATEGORY_LABEL[input.category]}, ${regionName(input.region)}${merged ? '. Updated an open application.' : ''}`,
         subject: { type: 'application', id: application.id },
       });
       const managers = await listManagerRecipients(tx, actor);
@@ -131,7 +121,7 @@ export async function submitApplicationAction(raw: unknown): Promise<ActionResul
         userId: manager.userId,
         kind: 'application_new',
         title: `New application from ${application.company}`,
-        body: `${application.applicantName}, ${PARTNER_CATEGORY_LABEL[input.category]}, ${PARTNER_REGION_LABEL[input.region]}`,
+        body: `${application.applicantName}, ${PARTNER_CATEGORY_LABEL[input.category]}, ${regionName(input.region)}`,
         link: `${ROUTES.admin.partners}?tab=applications`,
       }));
       await notifyUsers(tx, items);
@@ -165,7 +155,7 @@ export async function submitApplicationAction(raw: unknown): Promise<ActionResul
           applicantName: application.applicantName,
           applicantEmail: application.email,
           categoryLabel: PARTNER_CATEGORY_LABEL[input.category],
-          regionLabel: PARTNER_REGION_LABEL[input.region],
+          regionLabel: regionName(input.region),
           source: 'portal',
           personalEmail: false,
           existingDomain: false,

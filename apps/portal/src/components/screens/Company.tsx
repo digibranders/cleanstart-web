@@ -9,7 +9,7 @@ import { PartnerCategoryBadge, PartnerStatusBadge } from "@/components/partners/
 import { Avatar, Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/toast";
 import { fmtLong } from "@/lib/dates";
-import { PARTNER_REGION_LABEL } from "@/lib/domain";
+import { RegionName } from "@/components/regions-context";
 import type { CompanyDto } from "@/lib/dto";
 import type { CompanyDetailsInput } from "@/lib/company-profile";
 import { initialsOf } from "@/lib/people";
@@ -233,7 +233,7 @@ export function Company({ company, canEdit, viewerEmail }: CompanyProps): React.
                 <PartnerCategoryBadge category={company.category} />
               </dd>
               <dt>Region</dt>
-              <dd>{PARTNER_REGION_LABEL[company.region]}</dd>
+              <dd><RegionName k={company.region} /></dd>
               <dt>Partner since</dt>
               <dd>{fmtLong(company.since)}</dd>
               <dt>Status</dt>

@@ -1,5 +1,6 @@
 import { addDays } from './dates';
-import { DEAL_REGIONS, type DealRegion, isOneOf, PARTNER_CATEGORIES, type PartnerCategory, PRODUCTS, type Product, type RegistrationStatus } from './domain';
+import { type DealRegion, isOneOf, PARTNER_CATEGORIES, type PartnerCategory, PRODUCTS, type Product, type RegistrationStatus } from './domain';
+import { REGION_KEY_PATTERN } from './regions';
 import type { AttentionItemDto, DocumentListItemDto, IntegrationHealthDto, IsoTimestamp } from './dto';
 
 /* ---------------------------------------------------------------- filters (URL state) */
@@ -59,7 +60,7 @@ export function parseDashboardFilters(params: Params, opts: { staff: boolean }):
   return {
     period: custom ? 'custom' : isOneOf(DASHBOARD_PERIODS, period) ? period : DEFAULT_DASHBOARD_PERIOD,
     ...(custom ? { from, to } : {}),
-    ...(isOneOf(DEAL_REGIONS, region) ? { region } : {}),
+    ...(region !== undefined && REGION_KEY_PATTERN.test(region) ? { region } : {}),
     ...(isOneOf(PRODUCTS, product) ? { product } : {}),
     ...(opts.staff && isOneOf(PARTNER_CATEGORIES, category) ? { category } : {}),
     ...(opts.staff && partnerId !== undefined && UUID.test(partnerId) ? { partnerId } : {}),

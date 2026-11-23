@@ -3,7 +3,8 @@ import { PRODUCT_COLOR } from "@/components/charts";
 import { type BreakdownRow, type DashboardFilters, type DealKpis, type ExpiringRow, type HeatWeekPoint, type ManagerWorkloadRow, type PartnerDashboardDto, type ReasonRow, type StaffDashboardDto, DASHBOARD_PERIOD_LABEL } from "@/lib/dashboard-dto";
 import { plural } from "@/lib/dates";
 import { PROTECTION_DAYS } from "@/lib/deal-rules";
-import { PARTNER_CATEGORY_LABEL, PARTNER_REGION_LABEL, PRODUCT_LABEL, type Product } from "@/lib/domain";
+import { PARTNER_CATEGORY_LABEL, PRODUCT_LABEL, type Product } from "@/lib/domain";
+import { regionName } from "@/lib/regions";
 import { ROUTES } from "@/lib/routes";
 import { STAGE_LABELS } from "@/server/hubspot/types";
 
@@ -210,8 +211,7 @@ export function buildStaffTiles(d: StaffDashboardDto, canApplications: boolean):
 }
 
 /** Pipeline value per deal region, largest first. */
-export const regionBars = (rows: readonly BreakdownRow[]): Bar[] =>
-  toBars(rows, (key) => PARTNER_REGION_LABEL[key as keyof typeof PARTNER_REGION_LABEL] ?? key);
+export const regionBars = (rows: readonly BreakdownRow[], label: (key: string) => string = regionName): Bar[] => toBars(rows, label);
 
 /** Rejection reasons as a ranked list. */
 export const reasonBars = (rows: readonly ReasonRow[]): Bar[] => rows.map((r) => ({ key: r.reason, label: r.reason, value: r.count }));
@@ -244,9 +244,9 @@ export const kpiFilename = (range: { from: string; to: string }): string => `ove
  * The KPI download: the filters that produced the figures first, so a saved file says what it covers, then one row per tile.
  * `names` turns a partner id into a name (staff only).
  */
-export function kpiCsvRows(filters: DashboardFilters, range: { from: string; to: string }, tiles: readonly { label: string; value: string; foot: string }[], names: ReadonlyMap<string, string> = new Map()): string[][] {
+export function kpiCsvRows(filters: DashboardFilters, range: { from: string; to: string }, tiles: readonly { label: string; value: string; foot: string }[], names: ReadonlyMap<string, string> = new Map(), regionLabel: (key: string) => string = regionName): string[][] {
   const applied: string[][] = [["Period", filters.period === "custom" ? "Custom dates" : DASHBOARD_PERIOD_LABEL[filters.period], `${range.from} to ${range.to}`]];
-  if (filters.region) applied.push(["Region", PARTNER_REGION_LABEL[filters.region], ""]);
+  if (filters.region) applied.push(["Region", regionLabel(filters.region), ""]);
   if (filters.product) applied.push(["Product", PRODUCT_LABEL[filters.product], ""]);
   if (filters.category) applied.push(["Partner category", PARTNER_CATEGORY_LABEL[filters.category], ""]);
   if (filters.partnerId) applied.push(["Partner", names.get(filters.partnerId) ?? filters.partnerId, ""]);

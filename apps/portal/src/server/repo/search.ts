@@ -1,18 +1,7 @@
 import { and, asc, desc, eq, isNull, ne, or, type SQL, sql } from 'drizzle-orm';
 import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 import { documents, partners, registrations, users } from '@/db/schema';
-import {
-  DOCUMENT_TYPE_LABEL,
-  isOneOf,
-  PARTNER_CATEGORY_LABEL,
-  PARTNER_REGION_LABEL,
-  PARTNER_ROLE_LABEL,
-  PARTNER_ROLES,
-  PRODUCT_LABEL,
-  REGISTRATION_STATUS_LABEL,
-  STAFF_ROLE_LABEL,
-  STAFF_ROLES,
-} from '@/lib/domain';
+import { DOCUMENT_TYPE_LABEL, isOneOf, PARTNER_CATEGORY_LABEL, PARTNER_ROLE_LABEL, PARTNER_ROLES, PRODUCT_LABEL, REGISTRATION_STATUS_LABEL, STAFF_ROLE_LABEL, STAFF_ROLES } from '@/lib/domain';
 import type { SearchHitDto } from '@/lib/dto';
 import { ROUTES } from '@/lib/routes';
 import { staffDealHref } from '@/lib/staff-deals-dto';
@@ -20,6 +9,7 @@ import { SEARCH_MIN_CHARS } from '@/lib/search-pages';
 import type { Viewer } from '@/server/auth/types';
 import type { Tx } from './context';
 import { defineIsolation } from './isolation.registry';
+import { regionName } from '@/lib/regions';
 
 const MAX_PER_GROUP = 10;
 
@@ -107,7 +97,7 @@ async function searchPartners(tx: Tx, viewer: Viewer, q: string, pattern: string
   return rows.map((p) => ({
     group: 'partners',
     label: p.name,
-    hint: `${PARTNER_CATEGORY_LABEL[p.category]}, ${PARTNER_REGION_LABEL[p.region]}`,
+    hint: `${PARTNER_CATEGORY_LABEL[p.category]}, ${regionName(p.region)}`,
     href: `${ROUTES.admin.partners}?selected=${p.id}`,
     icon: 'bld',
   }));

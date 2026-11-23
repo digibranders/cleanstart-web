@@ -15,6 +15,7 @@ import { iso } from '@/server/people';
 import { resolvePartnerScope } from '@/server/partner-scope';
 import { assertStaff, type Tx } from './context';
 import { defineIsolation } from './isolation.registry';
+import { assertRegionAssignable, listRegions } from './regions';
 
 type PartnerRow = typeof partners.$inferSelect;
 
@@ -53,7 +54,7 @@ const toCompany = async (tx: Tx, p: PartnerRow): Promise<CompanyDto> => {
     ...toDetails(p),
     tier: null,
     since: p.createdAt.toISOString().slice(0, 10),
-    manager: manager ? { id: manager.id, name: manager.name, email: manager.email, team: staffTeamLabel(manager.region) } : null,
+    manager: manager ? { id: manager.id, name: manager.name, email: manager.email, team: staffTeamLabel(manager.region, await listRegions(tx)) } : null,
     agreementVersion: p.agreementVersion,
     agreementAcceptedAt: iso(p.agreementAcceptedAt),
   };
@@ -332,6 +333,7 @@ export async function createPartner(
   if (!isPlausibleDomain(domain)) issues.push({ path: 'website', message: 'Enter the company website.' });
   if (issues.length > 0) throw new ValidationError(issues);
 
+  await assertRegionAssignable(tx, input.region);
   const managerId = await pickManagerId(tx, input.region);
   const partner = await insertOnboardingPartner(tx, {
     name: input.name.trim(),

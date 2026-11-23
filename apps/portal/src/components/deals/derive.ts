@@ -1,8 +1,9 @@
 import type { Product as ChipProduct, BadgeTone } from "../ui/badge";
 import { sameCustomer } from "@/lib/customer";
 import { acceptedOnFor, EXPIRING_SOON_DAYS, isOverSla, PROTECTION_DAYS, REVIEW_SLA_BUSINESS_DAYS, waitingBusinessDays } from "@/lib/deal-rules";
-import { DEAL_REGIONS, type DealRegion, PARTNER_REGION_LABEL, PRODUCT_LABEL, type Product, type RegistrationStatus } from "@/lib/domain";
+import { type DealRegion, PRODUCT_LABEL, type Product, type RegistrationStatus } from "@/lib/domain";
 import type { ManagerOptionDto, RegistrationCheckDto, RegistrationDetailDto, RegistrationListItem } from "@/lib/dto";
+import { type RegionDto, regionName } from "@/lib/regions";
 import { addDays, daysBetween, daysLeft, daysLeftLabel, fmtLong, fmtShort, plural } from "./dates";
 import type { HubspotHintDto } from "./types";
 
@@ -200,10 +201,11 @@ export function defaultRejectReason(deal: CheckedDeal, check: Check): string {
 }
 
 /** "India goes to Gaurav, Middle East to Omar." from the managers partners can pick. */
-export function routingText(managers: readonly ManagerOptionDto[]): string {
-  const parts = DEAL_REGIONS.flatMap((region) => {
+export function routingText(managers: readonly ManagerOptionDto[], regions?: readonly RegionDto[]): string {
+  const keys = regions ? regions.filter((r) => r.active).map((r) => r.key) : [...new Set(managers.map((m) => m.region))].filter((k) => k !== "all");
+  const parts = keys.flatMap((region) => {
     const manager = managers.find((m) => m.region === region);
     return manager ? [{ region, first: firstWord(manager.name) }] : [];
-  }).map((p, index) => `${PARTNER_REGION_LABEL[p.region]} ${index === 0 ? "goes to" : "to"} ${p.first}`);
+  }).map((p, index) => `${regionName(p.region, regions)} ${index === 0 ? "goes to" : "to"} ${p.first}`);
   return parts.length ? `${parts.join(", ")}.` : "";
 }

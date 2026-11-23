@@ -13,7 +13,8 @@ import { type PartnerTab as Tab, partnerTabs } from "@/components/partners/partn
 import { CATEGORY_FOR_FILTER, type CategoryFilter, type PartnerSort, PartnersTable } from "@/components/partners/partners-table";
 import { useToast } from "@/components/ui/toast";
 import { daysBetween, plural } from "@/lib/dates";
-import { PARTNER_CATEGORY_LABEL, PARTNER_REGION_LABEL, PARTNER_STATUS_LABEL } from "@/lib/domain";
+import { PARTNER_CATEGORY_LABEL, PARTNER_STATUS_LABEL } from "@/lib/domain";
+import { useRegions } from "@/components/regions-context";
 import type { ApplicationDto, ManagerOptionDto, PartnerDetailDto, PartnerListRow } from "@/lib/dto";
 import { codeFromLabel, lastSeenLabel } from "@/lib/people";
 import {
@@ -63,13 +64,14 @@ export function AdminPartners({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { name: regionName } = useRegions();
   const [tab, setTab] = useState<Tab>("Partners");
   const requestedTab = searchParams.get("tab");
   useEffect(() => {
     if (requestedTab === "applications" && canReadApplications) setTab("Applications");
   }, [requestedTab, canReadApplications]);
   const [category, setCategory] = useState<CategoryFilter>("All");
-  const [region, setRegion] = useState("All regions");
+  const [region, setRegion] = useState("all");
   const [status, setStatus] = useState("Any status");
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<PartnerSort>("name");
@@ -79,7 +81,7 @@ export function AdminPartners({
   const open = selectedParam !== null && detail?.id === selectedParam ? detail : null;
 
   const wantedCategory = CATEGORY_FOR_FILTER[category];
-  const wantedRegion = region === "All regions" ? null : codeFromLabel(PARTNER_REGION_LABEL, region);
+  const wantedRegion = region === "all" ? null : region;
   const wantedStatus = status === "Any status" ? null : codeFromLabel(PARTNER_STATUS_LABEL, status);
   const needle = query.trim().toLowerCase();
   const matching = partners.filter(
@@ -159,7 +161,7 @@ export function AdminPartners({
         p.name,
         p.domain,
         PARTNER_CATEGORY_LABEL[p.category],
-        PARTNER_REGION_LABEL[p.region],
+        regionName(p.region),
         PARTNER_STATUS_LABEL[p.status],
         p.pending,
         p.protectedCount,
@@ -177,7 +179,7 @@ export function AdminPartners({
     setDialog(null);
     setTab("Partners");
     setCategory("All");
-    setRegion("All regions");
+    setRegion("all");
     setStatus("Any status");
     setQuery("");
     select(result.data.id);

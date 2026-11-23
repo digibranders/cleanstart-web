@@ -40,6 +40,12 @@ export const AUDIT_EVENTS = {
   'partner.profile_updated': { kind: 'partners', action: 'Updated company profile' },
   'partner.details_updated': { kind: 'partners', action: 'Updated company details' },
   'partner.logo_changed': { kind: 'partners', action: 'Changed company logo' },
+  // regions
+  'region.added': { kind: 'partners', action: 'Added a region' },
+  'region.renamed': { kind: 'partners', action: 'Renamed a region' },
+  'region.reordered': { kind: 'partners', action: 'Reordered the regions' },
+  'region.deactivated': { kind: 'partners', action: 'Deactivated a region' },
+  'region.reactivated': { kind: 'partners', action: 'Reactivated a region' },
   // documents
   'document.uploaded': { kind: 'documents', action: 'Uploaded a document' },
   'document.replaced': { kind: 'documents', action: 'Replaced document file' },

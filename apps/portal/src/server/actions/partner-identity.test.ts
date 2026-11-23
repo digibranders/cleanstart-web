@@ -47,7 +47,7 @@ describe('updatePartnerIdentityAction', () => {
     const deal = await makeRegistration(db, { partnerId: partner.id });
     const before = (await db.select().from(registrations).where(eq(registrations.id, deal.id)))[0];
     harness.viewer = await asStaff(db, 'partner_manager', 'all');
-    expect(await updatePartnerIdentityAction({ id: partner.id, region: 'elsewhere' })).toMatchObject({ ok: true });
+    expect(await updatePartnerIdentityAction({ id: partner.id, region: 'us' })).toMatchObject({ ok: true });
     expect((await db.select().from(registrations).where(eq(registrations.id, deal.id)))[0]).toEqual(before);
   });
 

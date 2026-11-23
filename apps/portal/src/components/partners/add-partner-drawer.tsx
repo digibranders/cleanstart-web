@@ -5,16 +5,15 @@ import { Drawer } from "@/components/ui/overlay";
 import {
   PARTNER_CATEGORIES,
   PARTNER_CATEGORY_LABEL,
-  PARTNER_REGION_LABEL,
   type PartnerCategory,
   type PartnerRegion,
 } from "@/lib/domain";
 import type { PartnerListRow } from "@/lib/dto";
 import { codeFromLabel, emailDomain, isValidEmail, normaliseDomain } from "@/lib/people";
 import { Seg } from "./seg";
+import { useRegions } from "@/components/regions-context";
 
 const CATEGORY_OPTIONS: readonly string[] = PARTNER_CATEGORIES.map((c) => PARTNER_CATEGORY_LABEL[c]);
-const REGIONS: readonly string[] = [PARTNER_REGION_LABEL.india, PARTNER_REGION_LABEL.middle_east];
 
 export interface NewPartnerValues {
   name: string;
@@ -35,10 +34,12 @@ interface AddPartnerDrawerProps {
 
 /** Mounted only while open, so every opening starts from a blank form. */
 export function AddPartnerDrawer({ partners, onClose, onAdd }: AddPartnerDrawerProps): React.JSX.Element {
+  const { offer } = useRegions();
+  const regionList = offer();
   const [name, setName] = useState("");
   const [website, setWebsite] = useState("");
   const [categoryLabel, setCategoryLabel] = useState<string>(PARTNER_CATEGORY_LABEL.channel);
-  const [regionLabel, setRegionLabel] = useState<string>(PARTNER_REGION_LABEL.india);
+  const [regionLabel, setRegionLabel] = useState<string>(regionList[0]?.name ?? "");
   const [admin, setAdmin] = useState("");
   const [email, setEmail] = useState("");
   const [sendInvite, setSendInvite] = useState(true);
@@ -62,7 +63,7 @@ export function AddPartnerDrawer({ partners, onClose, onAdd }: AddPartnerDrawerP
     setTried(true);
     setServerError(null);
     const category = codeFromLabel(PARTNER_CATEGORY_LABEL, categoryLabel);
-    const region = codeFromLabel(PARTNER_REGION_LABEL, regionLabel);
+    const region = regionList.find((r) => r.name === regionLabel)?.key;
     if (!name.trim() || !isValidEmail(email) || taken || !category || !region) return;
     setBusy(true);
     const error = await onAdd({ name, website, category, region, adminName: admin, adminEmail: email, sendInvite });
@@ -132,7 +133,7 @@ export function AddPartnerDrawer({ partners, onClose, onAdd }: AddPartnerDrawerP
         <span id="np-reg" className="lbl">
           Region
         </span>
-        <Seg options={REGIONS} value={regionLabel} onChange={setRegionLabel} labelledBy="np-reg" />
+        <Seg options={regionList.map((r) => r.name)} value={regionLabel} onChange={setRegionLabel} labelledBy="np-reg" />
       </div>
       <hr className="hr" />
       <div className="fg">

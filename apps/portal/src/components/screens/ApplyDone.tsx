@@ -5,7 +5,8 @@ import { Icon } from "@/components/icon";
 import { BulletList, CHECK_D, PublicHeading, PublicSplit, StatusIcon } from "@/components/partners/public-frame";
 import { fmtLong } from "@/lib/dates";
 import { ROUTES } from "@/lib/routes";
-import { PARTNER_CATEGORY_LABEL, PARTNER_REGION_LABEL } from "@/lib/domain";
+import { PARTNER_CATEGORY_LABEL } from "@/lib/domain";
+import { regionName } from "@/lib/regions";
 import type { ApplyReceipt } from "@/server/apply-receipt";
 
 const DOT_D =
@@ -112,7 +113,7 @@ export function ApplyDone({ receipt }: { receipt: ApplyReceipt }): React.JSX.Ele
           <dt>Category</dt>
           <dd>{PARTNER_CATEGORY_LABEL[receipt.category]}</dd>
           <dt>Region</dt>
-          <dd>{PARTNER_REGION_LABEL[receipt.region]}</dd>
+          <dd>{regionName(receipt.region)}</dd>
         </dl>
         {receipt.statusToken ? (
           <Link

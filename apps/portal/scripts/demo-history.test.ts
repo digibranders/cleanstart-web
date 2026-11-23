@@ -8,6 +8,8 @@ const partners = [
   { id: 'p1', region: 'india' as const, managerId: 'm1', people: [{ id: 'u1', name: 'Asha' }, { id: 'u2', name: 'Ben' }] },
   { id: 'p2', region: 'middle_east' as const, managerId: null, people: [{ id: 'u3', name: 'Cara' }] },
   { id: 'p3', region: 'elsewhere' as const, managerId: 'm2', people: [{ id: 'u4', name: 'Dev' }] },
+  { id: 'p4', region: 'eu' as const, managerId: 'm1', people: [{ id: 'u5', name: 'Elke' }] },
+  { id: 'p5', region: 'us' as const, managerId: 'm2', people: [{ id: 'u6', name: 'Fay' }] },
 ];
 const deciders = [{ id: 'm1', name: 'Mira' }, { id: 'm2', name: 'Omar' }];
 const make = (extra: { count?: number; seed?: number } = {}) => generateDemoHistory({ today, partners, deciders, ...extra });
@@ -49,7 +51,7 @@ describe('generateDemoHistory', () => {
       expect(REGISTRATION_STATUSES).toContain(d.status);
       expect(d.currency).toBe('USD');
       expect(d.dealValue).toBeGreaterThan(0);
-      expect(d.region === 'india' || d.region === 'middle_east').toBe(true);
+      expect(['india', 'middle_east', 'eu', 'us']).toContain(d.region);
       if (d.status === 'pending') {
         expect([d.decidedOn, d.decidedBy, d.protectionEnd, d.closedOn, d.rejectionReason]).toEqual([null, null, null, null, null]);
       } else {
@@ -68,7 +70,7 @@ describe('generateDemoHistory', () => {
     const deals = make();
     expect(new Set(deals.map((d) => d.status)).size).toBeGreaterThanOrEqual(5);
     expect(new Set(deals.map((d) => d.product)).size).toBe(3);
-    expect(new Set(deals.map((d) => d.region)).size).toBe(2);
+    expect(new Set(deals.map((d) => d.region)).size).toBe(4);
     expect(new Set(deals.map((d) => d.customerCountry)).size).toBeGreaterThanOrEqual(3);
     expect(new Set(deals.map((d) => d.customerIndustry)).size).toBeGreaterThanOrEqual(5);
     expect(new Set(deals.flatMap((d) => (d.rejectionReason ? [d.rejectionReason] : []))).size).toBeGreaterThanOrEqual(2);
