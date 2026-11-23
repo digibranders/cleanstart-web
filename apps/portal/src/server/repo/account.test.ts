@@ -33,6 +33,7 @@ describe('getShell, partner viewer', () => {
       roleLabel: 'Partner admin',
       orgName: 'Qamar Solutions',
       orgSub: 'Channel partner, Middle East',
+      partnerRegion: 'middle_east',
       manager: { id: manager.id, name: 'Omar Nasser', email: manager.email, team: 'CleanStart Middle East' },
       waitingApprovals: 0,
       unreadNotifications: 0,
