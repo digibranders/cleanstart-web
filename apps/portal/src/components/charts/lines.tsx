@@ -1,8 +1,10 @@
-import { area, line } from "d3-shape";
+import { line } from "d3-shape";
 import { scaleLinear } from "d3-scale";
-import { ChartFrame, Svg } from "./frame";
-import { evenIndices, formatCompact, maxOf, niceMax, niceTicks } from "./geometry";
-import { ACCENT, categorical, GRID, INK, MUTED_MARK, SURFACE } from "./palette";
+import { AXIS_LABEL, type Datum, NO_LINE, gradient, rgba, SPLIT_LINE } from "./chart-style";
+import { EChart } from "./echart";
+import { ChartFrame } from "./frame";
+import { formatCompact, maxOf, niceMax } from "./geometry";
+import { ACCENT, categorical, GRID, INK, SURFACE } from "./palette";
 
 export interface LineSeries {
   key: string;
@@ -13,8 +15,8 @@ export interface LineSeries {
 }
 
 /**
- * Trend over time: 2px lines, optional 10% area wash, end dot with the latest value, and a crosshair column per x.
- * The crosshair and tooltip are pure CSS and focus: every x is a focusable column that lists every series.
+ * Trend over time: smooth glowing lines, a soft gradient wash under a single series (or under every series with `withArea`), a
+ * dot and label on the latest value, and a dashed crosshair with a tooltip listing every series.
  */
 export function Line({
   title,
@@ -31,17 +33,52 @@ export function Line({
   withArea?: boolean;
   format?: (n: number) => string;
 }): React.JSX.Element {
-  const W = 480;
-  const H = 220;
-  const M = { top: 14, right: 44, bottom: 26, left: 40 };
   const n = labels.length;
   const colors = series.map((s, i) => s.color ?? categorical(i));
   const top = niceMax(maxOf(series.flatMap((s) => [...s.values])));
-  const x = scaleLinear().domain([0, Math.max(1, n - 1)]).range([M.left, W - M.right]);
-  const y = scaleLinear().domain([0, top]).range([H - M.bottom, M.top]);
-  const path = line<number>().x((_, i) => x(i)).y((v) => y(v));
-  const wash = area<number>().x((_, i) => x(i)).y0(y(0)).y1((v) => y(v));
-  const step = n > 1 ? (W - M.left - M.right) / (n - 1) : W - M.left - M.right;
+  const washed = withArea;
+
+  const option = {
+    grid: { left: 4, right: 58, top: 18, bottom: 4, containLabel: true },
+    tooltip: { trigger: "axis", axisPointer: { type: "line", lineStyle: { color: "#D0D5DD", type: "solid", width: 1 } } },
+    xAxis: {
+      type: "category",
+      boundaryGap: false,
+      data: [...labels],
+      axisLine: { lineStyle: { color: GRID } },
+      axisTick: NO_LINE,
+      axisLabel: { ...AXIS_LABEL, hideOverlap: true },
+    },
+    yAxis: { type: "value", max: top, splitNumber: 4, axisLine: NO_LINE, axisTick: NO_LINE, splitLine: SPLIT_LINE, axisLabel: AXIS_LABEL },
+    series: series.map((s, k) => {
+      const color = colors[k] ?? categorical(k);
+      const last = s.values[n - 1];
+      return {
+        name: s.label,
+        type: "line",
+        smooth: false,
+        showSymbol: false,
+        symbol: "circle",
+        symbolSize: 7,
+        lineStyle: { width: 2.5, color, cap: "round", join: "round" },
+        itemStyle: { color, borderColor: SURFACE, borderWidth: 2 },
+        ...(washed ? { areaStyle: { color: gradient(rgba(color, 0.14), rgba(color, 0)) } } : {}),
+        emphasis: { focus: "none" },
+        data: s.values.map((v): Datum => ({ value: v, f: format(v), c: color })),
+        ...(last === undefined
+          ? {}
+          : {
+              markPoint: {
+                silent: true,
+                symbol: "circle",
+                label: { show: false },
+                data: [{ coord: [n - 1, last], symbolSize: 9, itemStyle: { color, borderColor: SURFACE, borderWidth: 2 } }],
+              },
+              endLabel: { show: true, formatter: format(last), color: INK.secondary, fontWeight: 700, fontSize: 11.5, distance: 10 },
+            }),
+      };
+    }),
+  };
 
   return (
     <ChartFrame
@@ -53,53 +90,7 @@ export function Line({
         rows: labels.map((l, i) => [l, ...series.map((s) => format(s.values[i] ?? 0))]),
       }}
     >
-      <Svg width={W} height={H} label={title}>
-        {niceTicks(top).map((t) => (
-          <g key={t}>
-            <line x1={M.left} x2={W - M.right} y1={y(t)} y2={y(t)} stroke={GRID} strokeWidth={1} />
-            <text x={M.left - 6} y={y(t) + 4} textAnchor="end" fontSize={11} fill={INK.muted} className="tnum">
-              {formatCompact(t)}
-            </text>
-          </g>
-        ))}
-        {series.map((s, k) => (
-          <g key={s.key}>
-            {withArea ? <path d={wash([...s.values]) ?? ""} fill={colors[k]} fillOpacity={0.1} /> : null}
-            <path d={path([...s.values]) ?? ""} fill="none" stroke={colors[k]} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
-          </g>
-        ))}
-        {series.map((s, k) => {
-          const last = s.values[n - 1];
-          return last === undefined ? null : (
-            <g key={s.key}>
-              <circle cx={x(n - 1)} cy={y(last)} r={4} fill={colors[k]} stroke={SURFACE} strokeWidth={2} />
-              <text x={x(n - 1) + 8} y={y(last) + 4} fontSize={11} fontWeight={600} fill={INK.secondary} className="tnum">
-                {format(last)}
-              </text>
-            </g>
-          );
-        })}
-        {labels.map((l, i) => (
-          <g
-            key={l}
-            className="ch-col"
-            tabIndex={0}
-            aria-label={`${l}: ${series.map((s) => `${s.label} ${format(s.values[i] ?? 0)}`).join(", ")}`}
-            data-tip={`${l}\n${series.map((s) => `${s.label}: ${format(s.values[i] ?? 0)}`).join("\n")}`}
-          >
-            <rect x={x(i) - step / 2} y={M.top} width={step} height={H - M.bottom - M.top} fill="transparent" />
-            <line className="ch-xh" x1={x(i)} x2={x(i)} y1={M.top} y2={H - M.bottom} stroke={MUTED_MARK} strokeWidth={1} />
-            {series.map((s, k) => (
-              <circle key={s.key} className="ch-xh" cx={x(i)} cy={y(s.values[i] ?? 0)} r={4} fill={colors[k]} stroke={SURFACE} strokeWidth={2} />
-            ))}
-          </g>
-        ))}
-        {evenIndices(n, 6).map((i) => (
-          <text key={i} x={x(i)} y={H - 8} textAnchor="middle" fontSize={11} fill={INK.muted}>
-            {labels[i]}
-          </text>
-        ))}
-      </Svg>
+      <EChart option={option} height={240} label={title} valueAxis="y" />
     </ChartFrame>
   );
 }
@@ -123,7 +114,7 @@ export function Sparkline({
   const last = values[values.length - 1] ?? 0;
   return (
     <svg className="ch-spark" viewBox={`0 0 ${width} ${height}`} width={width} height={height} aria-hidden="true" focusable="false">
-      <path d={d} fill="none" stroke={MUTED_MARK} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
+      <path d={d} fill="none" stroke={ACCENT} strokeOpacity={0.5} strokeWidth={1.5} strokeLinejoin="round" strokeLinecap="round" />
       <circle cx={x(values.length - 1)} cy={y(last)} r={3} fill={ACCENT} stroke={SURFACE} strokeWidth={2} />
     </svg>
   );

@@ -1,6 +1,5 @@
 import { useId } from "react";
 import { TableToggle } from "./table-toggle";
-import { TipHost } from "./tooltip";
 
 export interface LegendItem {
   label: string;
@@ -53,7 +52,7 @@ export function ChartFrame({
         </ul>
       ) : null}
       {scaleKey}
-      <TipHost>{children}</TipHost>
+      {children}
       <TableToggle>
         <table>
           <caption className="sr">{title}</caption>
@@ -86,24 +85,6 @@ export function ChartFrame({
         </table>
       </TableToggle>
     </figure>
-  );
-}
-
-export function Svg({
-  width,
-  height,
-  label,
-  children,
-}: {
-  width: number;
-  height: number;
-  label: string;
-  children: React.ReactNode;
-}): React.JSX.Element {
-  return (
-    <svg className="ch-svg" viewBox={`0 0 ${width} ${height}`} role="group" aria-label={label} preserveAspectRatio="xMidYMid meet">
-      {children}
-    </svg>
   );
 }
 

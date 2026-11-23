@@ -399,17 +399,7 @@ button.search{background:transparent}
 .ch-sw{display:inline-block;width:10px;height:10px;border-radius:3px;flex:none}
 .ch-scale{display:flex;align-items:center;gap:3px;font-size:11.5px;color:#6B687D}
 .ch-scale .ch-sw{margin:0 1px}
-.ch-host{position:relative;min-width:0}
-.ch-svg{display:block;width:100%;height:auto;max-height:340px;overflow:visible}
 .ch-spark{display:block;flex:none}
-.ch-mark:hover{opacity:.85}
-.ch-mark:focus-visible,.ch-col:focus-visible{outline:2px solid #4B23C8;outline-offset:1px}
-.ch-xh{opacity:0}
-.ch-col:hover .ch-xh,.ch-col:focus .ch-xh{opacity:1}
-.ch-col{outline:none}
-.ch-tip{position:absolute;z-index:5;transform:translate(-50%,calc(-100% - 8px));pointer-events:none;min-width:96px;max-width:240px;padding:6px 9px;border-radius:7px;background:#151021;color:#FFFFFF;font-size:12px;line-height:1.35;box-shadow:0 2px 8px rgba(23,12,70,.18)}
-.ch-tip-t{color:#B3AECB;font-size:11.5px}
-.ch-tip-v{font-weight:700;font-variant-numeric:tabular-nums}
 .ch-table table{width:100%;margin-top:8px;border-collapse:collapse;font-size:12px}
 .ch-table th,.ch-table td{padding:5px 8px;border-bottom:1px solid #F0EFF4;text-align:left}
 .ch-table td{text-align:right}
@@ -570,3 +560,9 @@ textarea{scrollbar-gutter:stable}
 .ch-toggle .ic{width:11px;height:11px;transition:transform .15s}
 .ch-toggle[aria-expanded="true"] .ic{transform:rotate(180deg)}
 @media (prefers-reduced-motion:reduce){.hint-tip{animation:none}.ch-toggle .ic,.dd-menu{transition:none}}
+
+/* chart canvas: the skeleton holds the space until ECharts has loaded */
+.ch-canvas{position:relative;width:100%}
+.ch-skel{position:absolute;inset:0;border-radius:10px;background:linear-gradient(100deg,#F4F3F8 30%,#FAF9FD 50%,#F4F3F8 70%);background-size:200% 100%;animation:ch-shimmer 1.4s linear infinite}
+@keyframes ch-shimmer{from{background-position:100% 0}to{background-position:-100% 0}}
+@media (prefers-reduced-motion:reduce){.ch-skel{animation:none}}

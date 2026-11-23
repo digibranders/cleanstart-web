@@ -1,7 +1,9 @@
-import { scaleQuantize, scaleTime } from "d3-scale";
-import { ChartFrame, Svg, truncate } from "./frame";
-import { evenIndices, formatCompact, maxOf, roundedBarPath } from "./geometry";
-import { ACCENT, INK, MUTED_MARK, STATUS_COLOR, TRACK, VIOLET_RAMP } from "./palette";
+import { scaleQuantize } from "d3-scale";
+import { AXIS_LABEL, type Datum, lifted, NO_LINE, SPLIT_LINE } from "./chart-style";
+import { EChart } from "./echart";
+import { ChartFrame, truncate } from "./frame";
+import { formatCompact, maxOf } from "./geometry";
+import { ACCENT, GRID, INK, MUTED_MARK, STATUS_COLOR, VIOLET_RAMP } from "./palette";
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
 const HEAT_STEPS = [VIOLET_RAMP[1], VIOLET_RAMP[2], VIOLET_RAMP[3], VIOLET_RAMP[4], VIOLET_RAMP[6]] as const;
@@ -26,14 +28,45 @@ export function Heatmap({
   weeks: readonly HeatWeek[];
   unit?: string;
 }): React.JSX.Element {
-  const CELL = 16;
-  const GAP = 2;
-  const LEFT = 32;
-  const TOP = 16;
   const top = maxOf(weeks.flatMap((w) => w.days.map((d) => d ?? 0))) || 1;
   const color = scaleQuantize<string>().domain([1, top]).range([...HEAT_STEPS]);
-  const W = LEFT + weeks.length * (CELL + GAP);
-  const H = TOP + 7 * (CELL + GAP);
+  const cells: Datum[] = weeks.flatMap((w, wi) =>
+    DAYS.flatMap((day, d): Datum[] => {
+      const v = w.days[d];
+      if (v == null) return [];
+      const fill = v > 0 ? color(v) : EMPTY;
+      return [
+        {
+          value: [wi, d, v],
+          f: `${formatCompact(v)} ${unit}`,
+          c: fill,
+          tip: { title: `${w.label}, ${day}`, rows: [{ label: unit.charAt(0).toUpperCase() + unit.slice(1), value: formatCompact(v), color: fill }] },
+          itemStyle: { color: fill },
+        },
+      ];
+    }),
+  );
+  const option = {
+    grid: { left: 34, right: 4, top: 4, bottom: 22 },
+    tooltip: { trigger: "item" },
+    xAxis: {
+      type: "category",
+      data: weeks.map((w) => w.label),
+      axisLine: NO_LINE,
+      axisTick: NO_LINE,
+      axisLabel: { ...AXIS_LABEL, hideOverlap: true },
+    },
+    yAxis: { type: "category", inverse: true, data: [...DAYS], axisLine: NO_LINE, axisTick: NO_LINE, axisLabel: { ...AXIS_LABEL, interval: 1 } },
+    series: [
+      {
+        type: "custom",
+        renderer: "cell",
+        encode: { x: 0, y: 1 },
+        data: cells,
+        emphasis: { focus: "none", itemStyle: { opacity: 0.82 } },
+      },
+    ],
+  };
   return (
     <ChartFrame
       title={title}
@@ -52,40 +85,7 @@ export function Heatmap({
         rows: weeks.map((w) => [w.label, ...DAYS.map((_, d) => (w.days[d] == null ? "" : formatCompact(w.days[d] ?? 0)))]),
       }}
     >
-      <Svg width={W} height={H} label={title}>
-        {[0, 2, 4].map((d) => (
-          <text key={d} x={0} y={TOP + d * (CELL + GAP) + 12} fontSize={11} fill={INK.muted}>
-            {DAYS[d]}
-          </text>
-        ))}
-        {evenIndices(weeks.length, Math.max(2, Math.floor(weeks.length / 4))).map((i) => (
-          <text key={i} x={LEFT + i * (CELL + GAP)} y={10} fontSize={11} fill={INK.muted}>
-            {weeks[i]?.label}
-          </text>
-        ))}
-        {weeks.map((w, wi) =>
-          DAYS.map((day, d) => {
-            const v = w.days[d];
-            if (v == null) return null;
-            const text = `${w.label}, ${day}: ${formatCompact(v)} ${unit}`;
-            return (
-              <rect
-                key={`${w.label}-${day}`}
-                className="ch-mark"
-                x={LEFT + wi * (CELL + GAP)}
-                y={TOP + d * (CELL + GAP)}
-                width={CELL}
-                height={CELL}
-                rx={3}
-                fill={v > 0 ? color(v) : EMPTY}
-                tabIndex={0}
-                aria-label={text}
-                data-tip={`${w.label}, ${day}\n${formatCompact(v)} ${unit}`}
-              />
-            );
-          }),
-        )}
-      </Svg>
+      <EChart option={option} height={7 * 24 + 36} label={title} />
     </ChartFrame>
   );
 }
@@ -123,14 +123,62 @@ export function Timeline({
   bars: readonly ProtectionBar[];
   today: number;
 }): React.JSX.Element {
-  const W = 560;
-  const LABEL = 150;
-  const ROW = 28;
-  const AXIS = 22;
   const lo = Math.min(today, ...bars.map((b) => b.start));
   const hi = Math.max(today, ...bars.map((b) => b.end));
-  const x = scaleTime().domain([lo, hi]).range([LABEL, W - 8]);
-  const H = bars.length * ROW + AXIS;
+  const pad = Math.max(1, (hi - lo) * 0.03);
+  const option = {
+    grid: { left: 4, right: 20, top: 26, bottom: 4, containLabel: true },
+    tooltip: { trigger: "item" },
+    xAxis: {
+      type: "time",
+      min: lo - pad,
+      max: hi + pad,
+      axisLine: { lineStyle: { color: GRID } },
+      axisTick: NO_LINE,
+      splitLine: SPLIT_LINE,
+      axisLabel: { ...AXIS_LABEL, hideOverlap: true },
+    },
+    yAxis: {
+      type: "category",
+      inverse: true,
+      data: bars.map((b) => truncate(b.label, 26)),
+      axisLine: NO_LINE,
+      axisTick: NO_LINE,
+      axisLabel: { color: INK.primary, fontSize: 12.5, width: 150, overflow: "truncate" },
+    },
+    series: [
+      {
+        type: "custom",
+        renderer: "gantt",
+        encode: { x: [1, 2], y: 0 },
+        z: 2,
+        data: bars.map((b, i): Datum => ({
+          value: [i, b.start, b.end],
+          tip: {
+            title: b.label,
+            rows: [
+              { label: "Status", value: STATE_LABEL[b.state], color: STATE_COLOR[b.state] },
+              { label: "From", value: dateText(b.start) },
+              { label: "Until", value: dateText(b.end) },
+            ],
+          },
+          itemStyle: lifted(STATE_COLOR[b.state], "right"),
+        })),
+      },
+      {
+        type: "line",
+        silent: true,
+        data: [],
+        markLine: {
+          silent: true,
+          symbol: "none",
+          lineStyle: { color: INK.primary, width: 1.5, type: "solid" },
+          label: { formatter: "Today", position: "start", distance: 6, color: INK.primary, fontWeight: 600, fontSize: 11.5 },
+          data: [{ xAxis: today }],
+        },
+      },
+    ],
+  };
   return (
     <ChartFrame
       title={title}
@@ -141,32 +189,8 @@ export function Timeline({
         rows: bars.map((b) => [b.label, STATE_LABEL[b.state], dateText(b.start), dateText(b.end)]),
       }}
     >
-      <Svg width={W} height={H} label={title}>
-        {bars.map((b, i) => {
-          const text = `${b.label}: ${STATE_LABEL[b.state]}, ${dateText(b.start)} to ${dateText(b.end)}`;
-          return (
-            <g
-              key={b.key}
-              className="ch-mark"
-              tabIndex={0}
-              aria-label={text}
-              data-tip={`${b.label}\n${STATE_LABEL[b.state]}\n${dateText(b.start)} to ${dateText(b.end)}`}
-              transform={`translate(0 ${i * ROW})`}
-            >
-              <rect width={W} height={ROW} fill="transparent" />
-              <text x={0} y={ROW / 2 + 4} fontSize={12.5} fill={INK.primary}>
-                {truncate(b.label, 24)}
-              </text>
-              <rect x={LABEL} y={(ROW - 12) / 2} width={W - 8 - LABEL} height={12} rx={4} fill={TRACK} />
-              <path d={roundedBarPath(x(b.start), (ROW - 12) / 2, Math.max(2, x(b.end) - x(b.start)), 12, "right")} fill={STATE_COLOR[b.state]} />
-            </g>
-          );
-        })}
-        <line x1={x(today)} x2={x(today)} y1={0} y2={bars.length * ROW} stroke={INK.primary} strokeWidth={1} />
-        <text x={x(today)} y={bars.length * ROW + 14} textAnchor="middle" fontSize={11} fontWeight={600} fill={INK.primary}>
-          Today
-        </text>
-      </Svg>
+      <EChart option={option} height={bars.length * 30 + 52} label={title} />
     </ChartFrame>
   );
 }
+
