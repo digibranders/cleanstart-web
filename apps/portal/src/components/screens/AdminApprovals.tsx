@@ -1,5 +1,6 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { fmtTimestamp } from "@/lib/dates";
 import { PARTNER_CATEGORY_LABEL, PARTNER_REGION_LABEL, PRODUCT_LABEL, type StaffRegion } from "@/lib/domain";
@@ -76,7 +77,9 @@ export function AdminApprovals({ queue, extensions, viewerId, viewerRegion, mana
   const [q, setQ] = useState("");
   const [product, setProduct] = useState(ALL_PRODUCTS);
   const [region, setRegion] = useState(ALL_REGIONS);
-  const [viewingId, setViewingId] = useState<string | null>(null);
+  // The Audit log links here with ?deal=<id> to open that registration.
+  const [viewingId, setViewingId] = useState<string | null>(useSearchParams().get("deal"));
+  const [declining, setDeclining] = useState<{ id: string; note: string; tried: boolean } | null>(null);
   const [rejecting, setRejecting] = useState<Record<string, Rejecting>>({});
   const [busyId, setBusyId] = useState<string | null>(null);
   const [hints, setHints] = useState<Record<string, HubspotHintDto>>({});
@@ -136,10 +139,11 @@ export function AdminApprovals({ queue, extensions, viewerId, viewerRegion, mana
   const recentDecisions = queue.recentDecisions;
   const visibleExtensions = extensions.filter((d) => view === "all" || inMyQueue(d));
 
-  const decideExt = async (deal: RegistrationDetailDto, decision: "grant" | "decline"): Promise<void> => {
+  const decideExt = async (deal: RegistrationDetailDto, decision: "grant" | "decline", note: string | null): Promise<void> => {
     setBusyId(deal.id);
     try {
-      const result = await decideExtensionAction({ id: deal.id, decision, note: null });
+      const result = await decideExtensionAction({ id: deal.id, decision, note });
+      if (result.ok) setDeclining(null);
       toast(
         result.ok
           ? decision === "grant"
@@ -501,16 +505,50 @@ export function AdminApprovals({ queue, extensions, viewerId, viewerRegion, mana
                     <td className="tnum t-sec hide-sm">{d.protectionEnd ? fmtLong(d.protectionEnd) : ""}</td>
                     <td className="t-sec" style={{ whiteSpace: "normal", maxWidth: 360 }}>
                       {d.extensionReason}
+                      {declining?.id === d.id ? (
+                        <span className="fg" style={{ marginTop: 8 }}>
+                          <label htmlFor={`ext-why-${d.id}`} className="lbl">
+                            Reason for declining, sent to {d.partnerName}
+                          </label>
+                          <textarea
+                            id={`ext-why-${d.id}`}
+                            className={`field${declining.tried && !declining.note.trim() ? " field-err" : ""}`}
+                            rows={2}
+                            maxLength={500}
+                            value={declining.note}
+                            onChange={(e) => setDeclining({ ...declining, note: e.target.value })}
+                            aria-invalid={declining.tried && !declining.note.trim() ? true : undefined}
+                          />
+                          {declining.tried && !declining.note.trim() ? <span className="err">Say why, so the partner knows.</span> : null}
+                        </span>
+                      ) : null}
                     </td>
                     <td className="r">
-                      <span style={{ display: "inline-flex", gap: 6 }}>
-                        <button type="button" className="btn btn-s" onClick={() => decideExt(d, "decline")} disabled={busyId === d.id} style={SMALL_BTN}>
-                          Decline
-                        </button>
-                        <button type="button" className="btn btn-p" onClick={() => decideExt(d, "grant")} disabled={busyId === d.id} style={SMALL_BTN}>
-                          Grant {EXTENSION_DAYS} days
-                        </button>
-                      </span>
+                      {declining?.id === d.id ? (
+                        <span style={{ display: "inline-flex", gap: 6 }}>
+                          <button type="button" className="btn btn-s" onClick={() => setDeclining(null)} disabled={busyId === d.id} style={SMALL_BTN}>
+                            Cancel
+                          </button>
+                          <button
+                            type="button"
+                            className="btn btn-dd"
+                            onClick={() => (declining.note.trim() ? decideExt(d, "decline", declining.note.trim()) : setDeclining({ ...declining, tried: true }))}
+                            disabled={busyId === d.id}
+                            style={SMALL_BTN}
+                          >
+                            Send decline
+                          </button>
+                        </span>
+                      ) : (
+                        <span style={{ display: "inline-flex", gap: 6 }}>
+                          <button type="button" className="btn btn-s" onClick={() => setDeclining({ id: d.id, note: "", tried: false })} disabled={busyId === d.id} style={SMALL_BTN}>
+                            Decline
+                          </button>
+                          <button type="button" className="btn btn-p" onClick={() => decideExt(d, "grant", null)} disabled={busyId === d.id} style={SMALL_BTN}>
+                            Grant {EXTENSION_DAYS} days
+                          </button>
+                        </span>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -613,8 +651,30 @@ export function AdminApprovals({ queue, extensions, viewerId, viewerRegion, mana
           <dl className="dl">
             <dt>Customer</dt>
             <dd>{viewing.deal.customer}</dd>
-            <dt>Contact</dt>
-            <dd>{viewing.deal.contacts[0]?.name ?? "Not recorded"}</dd>
+            <dt>{viewing.deal.contacts.length > 1 ? "Contacts" : "Contact"}</dt>
+            <dd>
+              {viewing.deal.contacts.length === 0
+                ? "Not recorded"
+                : viewing.deal.contacts.map((c) => (
+                    <span key={c.id} style={{ display: "block" }}>
+                      {c.name}
+                      {c.role ? `, ${c.role}` : ""}
+                      {c.email ? (
+                        <>
+                          {", "}
+                          <a href={`mailto:${c.email}`} className="linkbtn">
+                            {c.email}
+                          </a>
+                        </>
+                      ) : null}
+                      {c.phone ? `, ${c.phone}` : ""}
+                    </span>
+                  ))}
+            </dd>
+            <dt>Website</dt>
+            <dd>{viewing.deal.website ?? "Not recorded"}</dd>
+            <dt>Expected close</dt>
+            <dd>{viewing.deal.expectedClose ? fmtLong(viewing.deal.expectedClose) : "Not recorded"}</dd>
             <dt>Product</dt>
             <dd>{PRODUCT_LABEL[viewing.deal.product]}</dd>
             <dt>Region</dt>
@@ -626,6 +686,12 @@ export function AdminApprovals({ queue, extensions, viewerId, viewerRegion, mana
             <dt>Submitted</dt>
             <dd>{fmtLong(reviewSince(viewing.deal))}</dd>
           </dl>
+          {viewing.deal.notes ? (
+            <div className="fg">
+              <span className="lbl">Partner notes</span>
+              <span style={{ fontSize: 13, lineHeight: 1.55, whiteSpace: "pre-wrap" }}>{viewing.deal.notes}</span>
+            </div>
+          ) : null}
           <div className="fg">
             <span className="lbl">Checks</span>
             <span>

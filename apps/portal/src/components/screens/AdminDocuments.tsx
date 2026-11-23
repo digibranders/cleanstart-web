@@ -1,6 +1,7 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useCallback, useMemo, useState } from 'react';
 import { Icon } from '@/components/icon';
 import { DocumentEditDrawer } from '@/components/documents/DocumentEditDrawer';
 import { DocumentPreview } from '@/components/documents/DocumentPreview';
@@ -9,13 +10,24 @@ import { CHIP_PRODUCT, TYPE_ICON, TYPE_TONE } from '@/components/documents/doc-s
 import { adminUpdatedLabel, audienceTone } from '@/components/documents/doc-view';
 import { ActionMenu } from '@/components/ui/action-menu';
 import { Badge, ProductChip } from '@/components/ui/badge';
+import { Dropdown } from '@/components/ui/dropdown';
 import { useToast } from '@/components/ui/toast';
 import type { AudiencePartnerDto } from '@/lib/document-upload';
 import { plural } from '@/lib/dates';
-import { DOCUMENT_TYPE_LABEL } from '@/lib/domain';
+import { DOC_PRODUCT_LABEL, DOC_PRODUCTS, DOCUMENT_TYPE_LABEL, DOCUMENT_TYPES } from '@/lib/domain';
 import type { DocumentDto } from '@/lib/dto';
 import { audienceLabel, formatLabel } from '@/server/files/rules';
 import { ScrollRegion } from "@/components/ui/scroll-region";
+
+const ANY = 'any';
+const TYPE_FILTER = [
+  { value: ANY, label: 'All types' },
+  ...DOCUMENT_TYPES.map((t) => ({ value: t, label: DOCUMENT_TYPE_LABEL[t] })),
+];
+const PRODUCT_FILTER = [
+  { value: ANY, label: 'All products' },
+  ...DOC_PRODUCTS.map((p) => ({ value: p, label: DOC_PRODUCT_LABEL[p] })),
+];
 
 export function AdminDocuments({
   docs,
@@ -27,12 +39,33 @@ export function AdminDocuments({
   today: string;
 }): React.JSX.Element {
   const [uploadOpen, setUploadOpen] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
+  // The Audit log links here with ?doc=<id> to open that document's edit drawer.
+  const [editingId, setEditingId] = useState<string | null>(useSearchParams().get('doc'));
+  const [q, setQ] = useState('');
+  const [typeFilter, setTypeFilter] = useState(ANY);
+  const [productFilter, setProductFilter] = useState(ANY);
   const [viewingId, setViewingId] = useState<string | null>(null);
   const toast = useToast();
   const closeUpload = useCallback((): void => setUploadOpen(false), []);
   const closeEdit = useCallback((): void => setEditingId(null), []);
   const closeView = useCallback((): void => setViewingId(null), []);
+
+  const needle = q.trim().toLowerCase();
+  const rows = useMemo(
+    () =>
+      docs.filter(
+        (d) =>
+          (typeFilter === ANY || d.type === typeFilter) &&
+          (productFilter === ANY || d.product === productFilter) &&
+          (needle === '' || `${d.title} ${d.summary ?? ''}`.toLowerCase().includes(needle)),
+      ),
+    [docs, typeFilter, productFilter, needle],
+  );
+  const clear = (): void => {
+    setQ('');
+    setTypeFilter(ANY);
+    setProductFilter(ANY);
+  };
 
   const opensTotal = docs.reduce((n, d) => n + (d.opens ?? 0), 0);
   const editing = editingId ? (docs.find((d) => d.id === editingId) ?? null) : null;
@@ -87,7 +120,26 @@ export function AdminDocuments({
             <h2 id="lib" className="card-t">
               Library
             </h2>
-            <span className="card-meta">Newest first</span>
+            <span className="card-meta tnum">
+              {rows.length === docs.length ? plural(docs.length, 'document') : `${rows.length} of ${docs.length}`}, newest first
+            </span>
+          </div>
+          <div className="toolbar">
+            <div className="filters">
+              <label className="sr" htmlFor="adq">
+                Search documents
+              </label>
+              <input
+                id="adq"
+                className="finput"
+                type="search"
+                placeholder="Search title or summary"
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+              />
+              <Dropdown ariaLabel="Type" value={typeFilter} options={TYPE_FILTER} onChange={setTypeFilter} />
+              <Dropdown ariaLabel="Product" value={productFilter} options={PRODUCT_FILTER} onChange={setProductFilter} />
+            </div>
           </div>
           <ScrollRegion label="Document library">
             <table className="tbl">
@@ -113,7 +165,7 @@ export function AdminDocuments({
                 </tr>
               </thead>
               <tbody>
-                {docs.map((d) => (
+                {rows.map((d) => (
                   <tr key={d.id}>
                     <td style={{ whiteSpace: 'normal', minWidth: 150 }}>
                       <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -132,6 +184,7 @@ export function AdminDocuments({
                           <span className="li-s">
                             {DOCUMENT_TYPE_LABEL[d.type]}, {formatLabel(d)}
                           </span>
+                          {d.summary ? <span className="li-s">{d.summary}</span> : null}
                         </span>
                       </span>
                     </td>
@@ -161,6 +214,18 @@ export function AdminDocuments({
             </table>
             {docs.length === 0 ? (
               <div className="empty">No documents yet. Upload the first one.</div>
+            ) : rows.length === 0 ? (
+              <div className="empty">
+                No documents match these filters.{' '}
+                <button
+                  type="button"
+                  className="btn btn-g"
+                  onClick={clear}
+                  style={{ height: 24, padding: '0 6px', fontSize: 12 }}
+                >
+                  Clear filters
+                </button>
+              </div>
             ) : null}
           </ScrollRegion>
         </section>

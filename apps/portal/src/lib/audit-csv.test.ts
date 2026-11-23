@@ -18,6 +18,8 @@ const entry = (over: Partial<AuditEntryDto> = {}): AuditEntryDto => ({
   after: null,
   note: 'Protected until 3 Feb 2027.',
   partnerId: null,
+  subjectType: null,
+  subjectId: null,
   ...over,
 });
 

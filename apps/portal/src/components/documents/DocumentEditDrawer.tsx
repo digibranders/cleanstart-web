@@ -14,10 +14,19 @@ import {
 import { uploadFile } from '@/components/documents/upload-client';
 import { Icon } from '@/components/icon';
 import { Badge } from '@/components/ui/badge';
+import { Dropdown } from '@/components/ui/dropdown';
 import { Drawer } from '@/components/ui/overlay';
 import { useToast } from '@/components/ui/toast';
 import type { AudiencePartnerDto } from '@/lib/document-upload';
-import { DOC_PRODUCT_LABEL, DOCUMENT_TYPE_LABEL } from '@/lib/domain';
+import {
+  DOC_PRODUCT_LABEL,
+  DOC_PRODUCTS,
+  DOCUMENT_TYPE_LABEL,
+  DOCUMENT_TYPES,
+  type DocProduct,
+  type DocumentType,
+  isOneOf,
+} from '@/lib/domain';
 import type { DocumentDto } from '@/lib/dto';
 import {
   createUploadTicketAction,
@@ -26,6 +35,9 @@ import {
   updateDocumentAction,
 } from '@/server/actions/documents';
 import { audienceLabel, formatLabel, UPLOAD_ACCEPT } from '@/server/files/rules';
+
+const TYPE_OPTIONS = DOCUMENT_TYPES.map((t) => ({ value: t, label: DOCUMENT_TYPE_LABEL[t] }));
+const PRODUCT_OPTIONS = DOC_PRODUCTS.map((p) => ({ value: p, label: DOC_PRODUCT_LABEL[p] }));
 
 export function DocumentEditDrawer({
   doc,
@@ -44,6 +56,9 @@ export function DocumentEditDrawer({
   const [progress, setProgress] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [title, setTitle] = useState(doc.title);
+  const [docType, setDocType] = useState<DocumentType>(doc.type);
+  const [product, setProduct] = useState<DocProduct>(doc.product);
+  const [summary, setSummary] = useState(doc.summary ?? '');
   const titleRef = useRef<HTMLInputElement>(null);
   const [draft, setDraft] = useState<AudienceDraft>(() => draftFromAudience(doc.audience));
 
@@ -52,6 +67,9 @@ export function DocumentEditDrawer({
     title.trim() === '' ? 'Give the document a title.' : audience.ok ? null : audience.error;
   const changed =
     title.trim() !== doc.title ||
+    docType !== doc.type ||
+    product !== doc.product ||
+    summary.trim() !== (doc.summary ?? '') ||
     !audience.ok ||
     !sameAudience(audience.audience, audienceInputOf(doc.audience));
 
@@ -66,6 +84,9 @@ export function DocumentEditDrawer({
     const result = await updateDocumentAction({
       id: doc.id,
       title: title.trim(),
+      type: docType,
+      product,
+      summary: summary.trim() === '' ? null : summary.trim(),
       audience: audience.audience,
     });
     setBusy(false);
@@ -188,8 +209,6 @@ export function DocumentEditDrawer({
       }
     >
       <dl className="dl">
-        <dt>Product</dt>
-        <dd>{DOC_PRODUCT_LABEL[doc.product]}</dd>
         <dt>Who can open it</dt>
         <dd>
           <Badge tone={audienceTone(doc.audience.kind)}>{audienceLabel(doc.audience)}</Badge>
@@ -214,6 +233,50 @@ export function DocumentEditDrawer({
           disabled={busy}
           onChange={(e) => setTitle(e.target.value)}
           aria-invalid={title.trim() === '' ? true : undefined}
+        />
+      </div>
+      <div className="grid2" style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+        <div className="fg">
+          <label htmlFor="ed-type" className="lbl">
+            Type
+          </label>
+          <Dropdown
+            id="ed-type"
+            variant="field"
+            value={docType}
+            options={TYPE_OPTIONS}
+            onChange={(v) => {
+              if (isOneOf(DOCUMENT_TYPES, v)) setDocType(v);
+            }}
+          />
+        </div>
+        <div className="fg">
+          <label htmlFor="ed-product" className="lbl">
+            Product
+          </label>
+          <Dropdown
+            id="ed-product"
+            variant="field"
+            value={product}
+            options={PRODUCT_OPTIONS}
+            onChange={(v) => {
+              if (isOneOf(DOC_PRODUCTS, v)) setProduct(v);
+            }}
+          />
+        </div>
+      </div>
+      <div className="fg">
+        <label htmlFor="ed-summary" className="lbl">
+          Summary
+        </label>
+        <textarea
+          id="ed-summary"
+          className="field"
+          rows={2}
+          maxLength={300}
+          value={summary}
+          disabled={busy}
+          onChange={(e) => setSummary(e.target.value)}
         />
       </div>
       <AudiencePicker

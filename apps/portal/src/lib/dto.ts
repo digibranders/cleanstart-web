@@ -540,6 +540,8 @@ export interface AuditEntryDto {
   after: string | null;
   note: string | null;
   partnerId: string | null;
+  subjectType: string | null;
+  subjectId: string | null;
 }
 
 export type AuditPeriod = '7d' | '30d' | '90d';

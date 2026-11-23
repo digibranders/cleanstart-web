@@ -79,6 +79,8 @@ const toDto = (row: AuditRow): AuditEntryDto => ({
   after: row.after,
   note: row.note,
   partnerId: row.partnerId,
+  subjectType: row.subjectType,
+  subjectId: row.subjectId,
 });
 
 /** Partner manager only. Newest first. `q` matches actor, action and target. */

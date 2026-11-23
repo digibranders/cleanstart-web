@@ -3,7 +3,7 @@ import { auditViewToExportFilter, auditViewToQuery, parseAuditView } from './aud
 
 describe('parseAuditView', () => {
   it('defaults to the last 30 days with no other filter', () => {
-    expect(parseAuditView({})).toEqual({ period: '30d', kind: null, who: null, q: '', cursor: null });
+    expect(parseAuditView({})).toEqual({ period: '30d', kind: null, who: null, partnerId: null, q: '', cursor: null });
   });
 
   it('reads known values and ignores unknown ones', () => {
@@ -11,6 +11,7 @@ describe('parseAuditView', () => {
       period: '7d',
       kind: 'partners',
       who: 'sync',
+      partnerId: null,
       q: 'pearl',
       cursor: null,
     });
@@ -31,13 +32,13 @@ describe('parseAuditView', () => {
 describe('auditViewToQuery', () => {
   it('writes nothing for the default view and only the changed filters otherwise', () => {
     expect(auditViewToQuery(parseAuditView({}))).toBe('');
-    expect(auditViewToQuery({ period: '7d', kind: 'documents', who: null, q: 'a b', cursor: 'abc' })).toBe(
+    expect(auditViewToQuery({ period: '7d', kind: 'documents', who: null, partnerId: null, q: 'a b', cursor: 'abc' })).toBe(
       '?period=7d&kind=documents&q=a+b&cursor=abc',
     );
   });
 
   it('round trips through parseAuditView', () => {
-    const view = { period: '90d', kind: 'people_access', who: 'staff', q: 'Omar', cursor: null } as const;
+    const view = { period: '90d', kind: 'people_access', who: 'staff', partnerId: '0b6f7c1e-2f4a-4c7e-9a55-1d3c8e2f9a10', q: 'Omar', cursor: null } as const;
     const params = Object.fromEntries(new URLSearchParams(auditViewToQuery(view)));
     expect(parseAuditView(params)).toEqual(view);
   });
@@ -45,9 +46,12 @@ describe('auditViewToQuery', () => {
 
 describe('auditViewToExportFilter', () => {
   it('leaves out the cursor and the unset filters', () => {
-    expect(auditViewToExportFilter({ period: '7d', kind: null, who: 'sync', q: '', cursor: 'abc' })).toEqual({
+    expect(auditViewToExportFilter({ period: '7d', kind: null, who: 'sync', partnerId: null, q: '', cursor: 'abc' })).toEqual({
       period: '7d',
       who: 'sync',
     });
+    expect(
+      auditViewToExportFilter({ period: '7d', kind: null, who: null, partnerId: 'p1', q: '', cursor: null }),
+    ).toEqual({ period: '7d', partnerId: 'p1' });
   });
 });
