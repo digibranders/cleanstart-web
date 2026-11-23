@@ -2,10 +2,10 @@ import Link from "next/link";
 import type { Job } from "@/lib/jobs";
 import {
   applyHref,
-  DEPARTMENT_LABEL,
   EMPLOYMENT_TYPE_LABEL,
   experienceDisplay,
   JOB_STATUS_LABEL,
+  jobDepartment,
   jobStatusBadge,
   locationDisplay,
   type JobStatusBadge,
@@ -19,9 +19,7 @@ export function JobCard({ job }: JobCardProps): React.ReactElement {
   const employmentLabel = job.employmentType
     ? EMPLOYMENT_TYPE_LABEL[job.employmentType]
     : null;
-  const departmentLabel = job.department
-    ? DEPARTMENT_LABEL[job.department]
-    : null;
+  const departmentLabel = jobDepartment(job)?.name ?? null;
   const location = locationDisplay(job);
   const experience = experienceDisplay(job);
   const href = applyHref(job);

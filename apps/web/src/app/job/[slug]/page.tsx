@@ -8,8 +8,8 @@ import { JobApplyForm } from "@/components/sections/careers/JobApplyForm";
 import type { LexicalRoot } from "@/lib/blog";
 import { mediaUrl } from "@/lib/blog";
 import {
-  DEPARTMENT_LABEL,
   experienceDisplay,
+  jobDepartment,
   getJobBySlug,
   getJobBySlugDraft,
   getJobSlugs,
@@ -61,9 +61,7 @@ export async function generateMetadata({
       noindex: true,
     });
   }
-  const departmentLabel = job.department
-    ? DEPARTMENT_LABEL[job.department]
-    : null;
+  const departmentLabel = jobDepartment(job)?.name ?? null;
   const descriptionParts = [
     `Apply for the ${job.title} role at CleanStart`,
     departmentLabel ? `in ${departmentLabel}` : null,
@@ -106,9 +104,7 @@ export async function renderJobDetail({
     job.body ?? null,
   );
 
-  const departmentLabel = job.department
-    ? DEPARTMENT_LABEL[job.department]
-    : (departmentFromBody ?? null);
+  const departmentLabel = jobDepartment(job)?.name ?? departmentFromBody ?? null;
   const experienceLabel = experienceDisplay(job);
 
   const meta = [

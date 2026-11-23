@@ -68,6 +68,7 @@ import * as migration_20261028_120000_advisories_cover_title from './20261028_12
 import * as migration_20261026_120000_add_missing_job_log_task_slugs from './20261026_120000_add_missing_job_log_task_slugs';
 import * as migration_20261031_100000_add_videos from './20261031_100000_add_videos';
 import * as migration_20261102_120000_advisories_cta_picks from './20261102_120000_advisories_cta_picks';
+import * as migration_20261123_100000_departments_editable from './20261123_100000_departments_editable';
 
 export const migrations = [
   {
@@ -394,5 +395,10 @@ export const migrations = [
     up: migration_20261102_120000_advisories_cta_picks.up,
     down: migration_20261102_120000_advisories_cta_picks.down,
     name: '20261102_120000_advisories_cta_picks',
+  },
+  {
+    up: migration_20261123_100000_departments_editable.up,
+    down: migration_20261123_100000_departments_editable.down,
+    name: '20261123_100000_departments_editable',
   },
 ];

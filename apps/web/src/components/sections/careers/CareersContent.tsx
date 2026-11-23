@@ -5,8 +5,9 @@ import { FadeUp } from "@/components/ui/FadeUp";
 import type { Job } from "@/lib/jobs";
 import {
   DEPARTMENT_LABEL,
+  jobDepartment,
   resolvedLocations,
-  type JobDepartment,
+  type JobDepartmentOption,
   type JobLocation,
   type JobStatusFilter,
 } from "@/lib/jobs-utils";
@@ -15,7 +16,7 @@ export interface CareersContentProps {
   /** The current page of jobs after filter + pagination. */
   jobs: Job[];
   /** Department slugs that have at least one matching role (sidebar options). */
-  availableDepartments: JobDepartment[];
+  availableDepartments: JobDepartmentOption[];
   /** Location records that have at least one matching role attached. */
   availableLocations: JobLocation[];
   hasActiveFilter: boolean;
@@ -156,7 +157,7 @@ export function CareersContent({
 /** Page size for the listing grid (matches the prior server-side pagination). */
 export const JOBS_PAGE_SIZE = 50;
 
-const DEPARTMENT_ORDER = Object.keys(DEPARTMENT_LABEL) as JobDepartment[];
+const DEPARTMENT_ORDER = Object.keys(DEPARTMENT_LABEL);
 
 interface SelectJobsArgs {
   department: string;
@@ -171,7 +172,7 @@ export interface SelectJobsResult {
   totalPages: number;
   currentPage: number;
   hasActiveFilter: boolean;
-  availableDepartments: JobDepartment[];
+  availableDepartments: JobDepartmentOption[];
   availableLocations: JobLocation[];
 }
 
@@ -205,7 +206,7 @@ export function selectJobs(
 
   const q = search.trim().toLowerCase();
   const filtered = statusFiltered.filter((job) => {
-    const departmentOk = !department || job.department === department;
+    const departmentOk = !department || jobDepartment(job)?.slug === department;
     const locationOk =
       !location || resolvedLocations(job).some((l) => l.slug === location);
     const searchOk = !q || job.title.toLowerCase().includes(q);
@@ -233,12 +234,20 @@ function matchesStatus(job: Job, status: JobStatusFilter): boolean {
   return job.hiringStatus === "open" || job.hiringStatus === "closed";
 }
 
-function collectAvailableDepartments(jobs: Job[]): JobDepartment[] {
-  const seen = new Set<JobDepartment>();
+function collectAvailableDepartments(jobs: Job[]): JobDepartmentOption[] {
+  const seen = new Map<string, JobDepartmentOption>();
   for (const job of jobs) {
-    if (job.department) seen.add(job.department);
+    const dept = jobDepartment(job);
+    if (dept) seen.set(dept.slug, dept);
   }
-  return DEPARTMENT_ORDER.filter((d) => seen.has(d));
+  // The original eight keep their order; departments added later follow A to Z.
+  const rank = (slug: string): number => {
+    const i = DEPARTMENT_ORDER.indexOf(slug);
+    return i < 0 ? DEPARTMENT_ORDER.length : i;
+  };
+  return [...seen.values()].sort(
+    (a, b) => rank(a.slug) - rank(b.slug) || a.name.localeCompare(b.name),
+  );
 }
 
 function collectAvailableLocations(

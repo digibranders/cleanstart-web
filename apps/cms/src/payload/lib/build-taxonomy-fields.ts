@@ -12,7 +12,6 @@ const PATH_PREFIX_BY_SLUG: Record<string, string> = {
   knowledgeCategories: '/knowledge-hub',
   industries: '/case-studies/industry',
   resourceTypes: '/resources/type',
-  departments: '/careers/department',
   regions: '/region',
   pressTypes: '/news/type',
   webinarTypes: '/webinar/type',
@@ -34,7 +33,6 @@ export const buildTaxonomyFields = (
     | 'knowledgeCategories'
     | 'industries'
     | 'resourceTypes'
-    | 'departments'
     | 'regions'
     | 'pressTypes'
     | 'webinarTypes',

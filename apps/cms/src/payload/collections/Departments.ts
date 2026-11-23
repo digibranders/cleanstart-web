@@ -1,25 +1,21 @@
 import type { CollectionConfig } from 'payload';
 
 import { isAdminEditorOrHr } from '../access';
-import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
-import { taxonomyParentCycleGuardHook } from '../hooks/taxonomy-parent-cycle-guard';
-import { buildTaxonomyFields } from '../lib/build-taxonomy-fields';
+import { slugField } from '../fields/slug';
 
 /**
- * Department taxonomy for the Jobs collection. Promoted from the hardcoded
- * `jobs.department` select enum so editors can manage the list and each
- * department can carry metadata (description, icon, SEO) for a landing page.
- * Seeded from the original enum options; `slug` equals the old enum value so
- * existing `?department=<value>` URLs keep working. (The webflow-import
- * `normalizeDepartment` map remains the import-time normaliser for incoming
- * free-text department strings during the transition.)
+ * Department list for the Jobs collection. Editors add entries from the Job
+ * editor's Department field (+ New) or here. Name and slug only: nothing on
+ * the public site renders a department page, so there is no SEO, parent or
+ * icon to maintain. Seed slugs equal the old `jobs.department` enum values so
+ * `?department=<slug>` careers URLs keep working.
  */
 export const Departments: CollectionConfig = {
   slug: 'departments',
   labels: { singular: 'Department', plural: 'Departments' },
   admin: {
     useAsTitle: 'name',
-    defaultColumns: ['name', 'parent', 'updatedAt'],
+    defaultColumns: ['name', 'slug', 'updatedAt'],
     group: 'Taxonomies',
   },
   access: {
@@ -28,11 +24,6 @@ export const Departments: CollectionConfig = {
     update: isAdminEditorOrHr,
     delete: isAdminEditorOrHr,
   },
-  fields: buildTaxonomyFields('departments'),
-  hooks: {
-    beforeChange: [taxonomyParentCycleGuardHook('departments')],
-    afterChange: [slugChangeRedirectHook('departments')],
-  },
-  versions: { drafts: true },
+  fields: [{ name: 'name', type: 'text', required: true }, slugField({ source: 'name' })],
   timestamps: true,
 };

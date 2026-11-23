@@ -47,7 +47,7 @@ export const Jobs: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: [
       'title',
-      'department',
+      'departmentRef',
       'employmentType',
       'hiringStatus',
       '_status',
@@ -97,12 +97,20 @@ export const Jobs: CollectionConfig = {
       },
     },
     {
+      name: 'departmentRef',
+      label: 'Department',
+      type: 'relationship',
+      relationTo: 'departments',
+      admin: {
+        description: 'Pick a department, or use + New to add one.',
+      },
+    },
+    {
+      // Frozen fallback for jobs saved before departments became editable;
+      // apps/web reads it only while `departmentRef` is empty.
       name: 'department',
       type: 'select',
-      admin: {
-        description:
-          'Legacy enum — superseded by the Department relationship below. Kept during the taxonomy transition; removed once apps/web reads the relationship.',
-      },
+      admin: { hidden: true },
       options: [
         { label: 'Engineering', value: 'engineering' },
         { label: 'Sales', value: 'sales' },
@@ -113,15 +121,6 @@ export const Jobs: CollectionConfig = {
         { label: 'Legal', value: 'legal' },
         { label: 'People', value: 'people' },
       ],
-    },
-    {
-      name: 'departmentRef',
-      type: 'relationship',
-      relationTo: 'departments',
-      admin: {
-        description:
-          'Department taxonomy reference. Seeded/backfilled from the legacy `department` enum; editors manage the list under Taxonomies → Departments.',
-      },
     },
     {
       name: 'employmentType',

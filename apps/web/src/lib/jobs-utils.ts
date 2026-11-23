@@ -17,6 +17,12 @@ export type JobDepartment =
   | "legal"
   | "people";
 
+/** A department as shown on the site; `slug` is also the `?department=` value. */
+export interface JobDepartmentOption {
+  slug: string;
+  name: string;
+}
+
 export type JobEmploymentType =
   | "full-time"
   | "part-time"
@@ -49,6 +55,7 @@ export interface JobDisplayFields {
   atsUrl?: string | null;
   applyUrl?: string | null;
   department?: JobDepartment | null;
+  departmentRef?: { slug?: string | null; name?: string | null } | number | null;
   employmentType?: JobEmploymentType | null;
   experienceLevel?: JobExperienceLevel | null;
   experienceRange?: string | null;
@@ -70,6 +77,22 @@ export const DEPARTMENT_LABEL: Record<JobDepartment, string> = {
   legal: "Legal",
   people: "People",
 };
+
+/**
+ * The job's department. Editors pick `departmentRef` (an editable list); the
+ * frozen `department` enum is the fallback for jobs saved before that list
+ * existed. Both share slugs, so `?department=` URLs match either source.
+ */
+export function jobDepartment(job: JobDisplayFields): JobDepartmentOption | null {
+  const ref = job.departmentRef;
+  if (typeof ref === "object" && ref !== null && ref.slug && ref.name) {
+    return { slug: ref.slug, name: ref.name };
+  }
+  if (job.department) {
+    return { slug: job.department, name: DEPARTMENT_LABEL[job.department] };
+  }
+  return null;
+}
 
 export const EMPLOYMENT_TYPE_LABEL: Record<JobEmploymentType, string> = {
   "full-time": "Full-Time",

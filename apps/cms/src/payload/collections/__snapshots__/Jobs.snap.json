@@ -34,6 +34,11 @@
       "name": "atsUrl"
     },
     {
+      "type": "relationship",
+      "name": "departmentRef",
+      "relationTo": "departments"
+    },
+    {
       "type": "select",
       "name": "department",
       "options": [
@@ -62,11 +67,6 @@
           "value": "people"
         }
       ]
-    },
-    {
-      "type": "relationship",
-      "name": "departmentRef",
-      "relationTo": "departments"
     },
     {
       "type": "select",
