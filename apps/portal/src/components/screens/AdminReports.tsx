@@ -65,7 +65,7 @@ export function AdminReports({ report, today }: AdminReportsProps): React.JSX.El
         </div>
       </div>
 
-      <section aria-label="Quarter summary" className="card kpis">
+      <section aria-label="All time summary" className="card kpis">
         <div className="kpi">
           <span className="kpi-l">Registered</span>
           <span className="kpi-v">{report.totalRegistered}</span>
@@ -150,7 +150,7 @@ export function AdminReports({ report, today }: AdminReportsProps): React.JSX.El
               {rows.map((p, i) => (
                 <tr key={p.partnerId}>
                   <td>
-                    <Link href={ROUTES.admin.partners} className="cust">
+                    <Link href={`${ROUTES.admin.partners}?selected=${p.partnerId}`} className="cust">
                       <span className={`av ${avatarClass(i)}`}>{initialsOf(p.name)}</span>
                       {p.name}
                     </Link>
