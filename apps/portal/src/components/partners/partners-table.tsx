@@ -17,6 +17,14 @@ export type CategoryFilter = (typeof CATEGORY_FILTERS)[number];
 export const REGION_FILTERS = ["All regions", "India", "Middle East"] as const;
 export const STATUS_FILTERS = ["Any status", "Active", "Onboarding", "Inactive", "Suspended"] as const;
 
+export const SORT_OPTIONS = [
+  { value: "name", label: "Sort: Name" },
+  { value: "active", label: "Sort: Last active" },
+  { value: "pending", label: "Sort: Pending" },
+  { value: "won", label: "Sort: Won YTD" },
+] as const;
+export type PartnerSort = (typeof SORT_OPTIONS)[number]["value"];
+
 export const CATEGORY_FOR_FILTER: Record<CategoryFilter, PartnerCategory | null> = {
   All: null,
   Distributors: "distributor",
@@ -32,6 +40,10 @@ interface PartnersTableProps {
   category: CategoryFilter;
   region: string;
   status: string;
+  query: string;
+  sort: PartnerSort;
+  onQuery: (value: string) => void;
+  onSort: (value: PartnerSort) => void;
   onCategory: (value: CategoryFilter) => void;
   onRegion: (value: string) => void;
   onStatus: (value: string) => void;
@@ -46,6 +58,10 @@ export function PartnersTable({
   category,
   region,
   status,
+  query,
+  sort,
+  onQuery,
+  onSort,
   onCategory,
   onRegion,
   onStatus,
@@ -57,9 +73,29 @@ export function PartnersTable({
     <>
       <div className="toolbar">
         <div className="filters">
+          <label className="sr" htmlFor="partner-q">
+            Search partners
+          </label>
+          <input
+            id="partner-q"
+            className="finput"
+            type="search"
+            placeholder="Search name or domain"
+            value={query}
+            onChange={(e) => onQuery(e.target.value)}
+          />
           <Seg options={CATEGORY_FILTERS} value={category} onChange={onCategory} ariaLabel="Category" compact />
           <Dropdown value={region} options={REGION_FILTERS} onChange={onRegion} ariaLabel="Region" />
           <Dropdown value={status} options={STATUS_FILTERS} onChange={onStatus} ariaLabel="Status" />
+          <Dropdown
+            value={sort}
+            options={SORT_OPTIONS}
+            onChange={(v) => {
+              const next = SORT_OPTIONS.find((o) => o.value === v);
+              if (next) onSort(next.value);
+            }}
+            ariaLabel="Sort"
+          />
         </div>
         <span className="card-meta tnum">
           Showing {visible.length} of {total}
