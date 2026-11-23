@@ -31,7 +31,14 @@ vi.mock('@/server/email/send', async () => {
   return { sendEmail: (message: EmailMessage) => fake.send(message), fake };
 });
 
-import { approveApplicationAction, declineApplicationAction, reopenApplicationAction } from './applications';
+import {
+  addApplicationNoteAction,
+  approveApplicationAction,
+  declineApplicationAction,
+  listApplicationNotesAction,
+  reopenApplicationAction,
+  requestApplicationInfoAction,
+} from './applications';
 
 const db = testDb();
 let fake: FakeEmailTransport;
@@ -133,5 +140,34 @@ describe('reopenApplicationAction', () => {
     const app = await open({ status: 'approved', partnerId: partner.id, domain: 'live.example' });
     const result = await reopenApplicationAction({ id: app.id });
     expect(result).toMatchObject({ ok: false, error: { code: 'conflict' } });
+  });
+});
+
+describe('notes and requests for information', () => {
+  it('adds and lists an internal note and audits it', async () => {
+    const app = await open();
+    expect(await addApplicationNoteAction({ id: app.id, note: 'Called them.' })).toMatchObject({ ok: true, data: { kind: 'internal', note: 'Called them.' } });
+    const listed = await listApplicationNotesAction({ id: app.id });
+    expect(listed).toMatchObject({ ok: true });
+    expect(listed.ok && listed.data).toHaveLength(1);
+    expect((await db.select().from(auditLog)).map((a) => a.event)).toEqual(['application.note_added']);
+  });
+
+  it('emails the applicant a reply link, sets the status and audits it', async () => {
+    const app = await open();
+    const result = await requestApplicationInfoAction({ id: app.id, message: 'Which regions do you cover?' });
+    expect(result).toMatchObject({ ok: true, data: { status: 'info_requested' } });
+    const html = fake.only('neha.joshi@tidewaterinfosec.in').htmlContent;
+    expect(html).toContain('Which regions do you cover?');
+    expect(html).toMatch(/\/apply\/reply\?token=[\w-]{43}/u);
+    expect((await db.select().from(auditLog)).map((a) => a.event)).toEqual(['application.info_requested']);
+  });
+
+  it('needs a typed message and is for partner managers only', async () => {
+    const app = await open();
+    expect(await requestApplicationInfoAction({ id: app.id, message: '   ' })).toMatchObject({ ok: false, error: { code: 'validation' } });
+    harness.viewer = await asStaff(db, 'sales', 'india');
+    expect(await requestApplicationInfoAction({ id: app.id, message: 'Hello?' })).toMatchObject({ ok: false, error: { code: 'forbidden' } });
+    expect(fake.sent).toHaveLength(0);
   });
 });

@@ -14,6 +14,14 @@ export function confirmEmailUrl(token: string): string {
   return absoluteUrl(`${ROUTES.confirmEmail}?token=${encodeURIComponent(token)}`);
 }
 
+export function applicationStatusUrl(token: string): string {
+  return absoluteUrl(`${ROUTES.applyStatus}?token=${encodeURIComponent(token)}`);
+}
+
+export function applicationReplyUrl(token: string): string {
+  return absoluteUrl(`${ROUTES.applyReply}?token=${encodeURIComponent(token)}`);
+}
+
 export function resetPasswordUrl(token: string): string {
   return absoluteUrl(`${ROUTES.resetPassword}?token=${encodeURIComponent(token)}`);
 }

@@ -43,7 +43,7 @@ vi.mock('@/server/auth/auth', () => ({
 }));
 
 import { auth } from '@/server/auth/auth';
-import { acceptInviteAction, previewInviteAction, requestAccessAction } from './invites';
+import { acceptInviteAction, previewInviteAction, requestAccessAction, requestNewInviteAction } from './invites';
 
 const db = testDb();
 let fake: FakeEmailTransport;
@@ -220,13 +220,26 @@ describe('requestAccessAction', () => {
     expect(fake.to('aditi.rao@kestrelsystems.in')[0]?.htmlContent).toContain('Rohit Desai');
   });
 
-  it('for any other domain: nothing is stored and nobody is emailed', async () => {
+  it('for any other domain: nothing is stored and only the requester gets the copy', async () => {
     await kestrel();
     await ask({ email: 'someone@not-a-partner.example' });
     expect(await db.select().from(accessRequests)).toHaveLength(0);
     expect(await db.select().from(notifications)).toHaveLength(0);
+    await vi.waitFor(() => expect(fake.sent).toHaveLength(1));
     await new Promise((resolve) => setTimeout(resolve, 50));
-    expect(fake.sent).toHaveLength(0);
+    expect(fake.sent).toHaveLength(1);
+    expect(fake.to('someone@not-a-partner.example')).toHaveLength(1);
+  });
+
+  it('emails the requester a copy whether or not the domain is a partner, saying the same thing', async () => {
+    await kestrel();
+    await ask();
+    await ask({ email: 'someone@not-a-partner.example' });
+    await vi.waitFor(() => expect(fake.to('someone@not-a-partner.example')).toHaveLength(1));
+    await vi.waitFor(() => expect(fake.to('rohit.desai@kestrelsystems.in')).toHaveLength(1));
+    const copy = fake.to('rohit.desai@kestrelsystems.in')[0];
+    expect(copy?.subject).toBe(fake.to('someone@not-a-partner.example')[0]?.subject);
+    expect(copy?.htmlContent).toContain('If your company is a CleanStart partner');
   });
 
   it('caps requests per partner domain whatever the IP or the local part, so a known domain cannot be flooded', async () => {
@@ -264,5 +277,40 @@ describe('requestAccessAction', () => {
     harness.ip = `203.0.113.${ipCounter}`;
     for (let i = 0; i < 5; i += 1) await ask({ email: `p${i}@kestrelsystems.in` });
     expect(await ask({ email: 'p9@kestrelsystems.in' })).toMatchObject({ ok: false, error: { code: 'rate_limited' } });
+  });
+});
+
+describe('requestNewInviteAction', () => {
+  const deadInvite = async () => {
+    const partner = await makePartner(db, { name: 'Kestrel Systems' });
+    const admin = await makeUser(db, { partnerId: partner.id, role: 'partner_admin', email: 'aditi.rao@kestrelsystems.in', name: 'Aditi Rao' });
+    const { token } = await makeInvite(db, { partnerId: partner.id, invitedBy: admin.id, email: 'late@kestrelsystems.in', expiresAt: new Date('2020-01-01T00:00:00Z') });
+    return { admin, token };
+  };
+
+  it('tells the inviter in the app and by email, and answers the same for a known and an unknown token', async () => {
+    const { admin, token } = await deadInvite();
+    const known = await requestNewInviteAction({ token });
+    const unknown = await requestNewInviteAction({ token: 'not-a-token' });
+    expect(known).toEqual({ ok: true, data: { confirmation: 'sent' } });
+    expect(unknown).toEqual(known);
+    expect((await db.select().from(notifications)).map((n) => [n.userId, n.kind])).toEqual([[admin.id, 'access_requested']]);
+    await vi.waitFor(() => expect(fake.to('aditi.rao@kestrelsystems.in')).toHaveLength(1));
+    expect(fake.to('aditi.rao@kestrelsystems.in')[0]?.htmlContent).toContain('late@kestrelsystems.in');
+  });
+
+  it('tells the inviter once however often the page is pressed, and never for a live invite', async () => {
+    const { token } = await deadInvite();
+    await requestNewInviteAction({ token });
+    expect(await requestNewInviteAction({ token })).toEqual({ ok: true, data: { confirmation: 'sent' } });
+    expect(await db.select().from(notifications)).toHaveLength(1);
+    const live = await makeInvite(db, { email: 'live@example.com' });
+    await requestNewInviteAction({ token: live.token });
+    expect(await db.select().from(notifications)).toHaveLength(1);
+  });
+
+  it('rate limits by address', async () => {
+    for (let i = 0; i < 5; i += 1) await requestNewInviteAction({ token: `t${i}` });
+    expect(await requestNewInviteAction({ token: 'another' })).toMatchObject({ ok: false, error: { code: 'rate_limited' } });
   });
 });

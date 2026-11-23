@@ -1,6 +1,9 @@
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { applications, auditLog, notifications } from '@/db/schema';
-import { makePartner, makeUser, resetDb, testDb } from '@/db/test-helpers';
+import { asStaff, makePartner, makeUser, resetDb, testDb } from '@/db/test-helpers';
+import { systemClock } from '@/lib/clock';
+import { withViewer } from '@/server/repo/context';
+import { requestApplicationInfo } from '@/server/repo/applications';
 import type { Viewer } from '@/server/auth/types';
 import type { FakeEmailTransport } from '@/server/email/fake';
 import type { EmailMessage } from '@/server/email/transport';
@@ -35,7 +38,7 @@ vi.mock('@/server/email/send', async () => {
 });
 vi.mock('@/server/turnstile', () => ({ verifyTurnstile: vi.fn(async () => undefined) }));
 
-import { submitApplicationAction } from './apply';
+import { replyToApplicationAction, submitApplicationAction } from './apply';
 
 const db = testDb();
 let fake: FakeEmailTransport;
@@ -51,6 +54,15 @@ const form = (overrides: Record<string, unknown> = {}): Record<string, unknown> 
   category: 'channel',
   region: 'india',
   reason: 'We resell security tooling to mid-size banks.',
+  vendors: ['CrowdStrike'],
+  vendorsOther: 'Acme EDR',
+  products: ['images', 'cleansight'],
+  companySize: '11 to 50',
+  yearsInBusiness: '4 to 10 years',
+  verticals: ['Telecom'],
+  country: 'India',
+  referralSource: 'Search engine',
+  consent: true,
   turnstileToken: 'token',
   ...overrides,
 });
@@ -83,6 +95,36 @@ describe('submitApplicationAction', () => {
     expect(fake.to('gaurav@cleanstart.com')).toHaveLength(1);
     const receipt = verifyApplyReceipt(harness.cookieJar.get(APPLY_RECEIPT_COOKIE) ?? '', new Date());
     expect(receipt).toMatchObject({ company: 'Tidewater Infosec', firstName: 'Neha', category: 'channel', region: 'india' });
+  });
+
+  it('stores the new answers and the consent time, and sends the private status link', async () => {
+    await submitApplicationAction(form());
+    const [row] = await db.select().from(applications);
+    expect(row).toMatchObject({
+      vendors: ['CrowdStrike', 'Other: Acme EDR'],
+      products: ['images', 'cleansight'],
+      companySize: '11 to 50',
+      yearsInBusiness: '4 to 10 years',
+      verticals: ['Telecom'],
+      country: 'IN',
+      referralSource: 'Search engine',
+    });
+    expect(row?.consentAt).toBeInstanceOf(Date);
+    const html = fake.to('neha.joshi@tidewaterinfosec.in')[0]?.htmlContent ?? '';
+    expect(html).toMatch(/\/apply\/status\?token=[\w-]{43}/u);
+    const receipt = verifyApplyReceipt(harness.cookieJar.get(APPLY_RECEIPT_COOKIE) ?? '', new Date());
+    expect(html).toContain(receipt?.statusToken ?? 'missing');
+  });
+
+  it.each([
+    ['consent missing', { consent: false }, 'consent'],
+    ['no product', { products: [] }, 'products'],
+    ['unknown country', { country: 'Atlantis' }, 'country'],
+    ['unknown size', { companySize: 'Huge' }, 'companySize'],
+  ])('refuses %s and creates nothing', async (_name, override, path) => {
+    const result = await submitApplicationAction(form(override));
+    expect(result).toMatchObject({ ok: false, error: { code: 'validation', issues: [{ path }] } });
+    expect(await db.select().from(applications)).toHaveLength(0);
   });
 
   it('rejects a free-mail address on the email field and creates nothing', async () => {
@@ -145,5 +187,38 @@ describe('submitApplicationAction', () => {
     expect(result).toMatchObject({ ok: false, error: { code: 'validation' } });
     const paths = result.ok ? [] : (result.error.issues ?? []).map((i) => i.path);
     expect(paths).toEqual(expect.arrayContaining(['company', 'name', 'reason']));
+  });
+});
+
+describe('replyToApplicationAction', () => {
+  const setup = async () => {
+    const manager = await makeUser(db, { kind: 'staff', role: 'partner_manager', region: 'india', email: 'gaurav@cleanstart.com' });
+    await submitApplicationAction(form());
+    const [application] = await db.select().from(applications);
+    const staff = await asStaff(db, 'partner_manager', 'india');
+    const asked = await withViewer(staff, (tx) => requestApplicationInfo(tx, staff, { id: application?.id ?? '', message: 'Which regions?' }, systemClock));
+    return { manager, application, token: asked.replyToken };
+  };
+
+  it('stores the answer, audits it and notifies the managers', async () => {
+    const { manager, token } = await setup();
+    expect(await replyToApplicationAction({ token, message: 'India and the Gulf.' })).toMatchObject({ ok: true });
+    const [row] = await db.select().from(applications);
+    expect(row?.status).toBe('new');
+    const answered = (await db.select().from(notifications)).filter((n) => n.title.includes('answered'));
+    expect(answered.map((n) => n.userId)).toContain(manager.id);
+    expect(answered.every((n) => n.kind === 'application_new')).toBe(true);
+    expect((await db.select().from(auditLog)).map((a) => a.event)).toContain('application.info_received');
+  });
+
+  it('answers a bad link and a used link the same way and rate limits by address', async () => {
+    const { token } = await setup();
+    await replyToApplicationAction({ token, message: 'First.' });
+    const used = await replyToApplicationAction({ token, message: 'Again.' });
+    const wrong = await replyToApplicationAction({ token: 'nope', message: 'x' });
+    expect(used).toMatchObject({ ok: false, error: { message: expect.stringContaining('no longer valid') } });
+    expect(wrong).toEqual(used);
+    for (let i = 0; i < 6; i += 1) await replyToApplicationAction({ token: `t${i}`, message: 'x' });
+    expect(await replyToApplicationAction({ token: 'zzz', message: 'x' })).toMatchObject({ ok: false, error: { code: 'rate_limited' } });
   });
 });

@@ -14,6 +14,7 @@ import {
 } from "@/lib/domain";
 import type { ApplicationDto } from "@/lib/dto";
 import { codeFromLabel } from "@/lib/people";
+import { ApplicationDrawer } from "./application-drawer";
 import { PartnerCategoryBadge } from "./badges";
 import { Seg } from "./seg";
 import { ScrollRegion } from "@/components/ui/scroll-region";
@@ -24,6 +25,7 @@ const REGION_OPTIONS: readonly string[] = PARTNER_REGIONS.map((r) => PARTNER_REG
 const STATUS_OPTIONS = [
   { value: "all", label: "Any status" },
   { value: "new", label: "Waiting" },
+  { value: "info_requested", label: "Info requested" },
   { value: "approved", label: "Approved" },
   { value: "declined", label: "Rejected" },
 ];
@@ -53,6 +55,7 @@ export function ApplicationsTable({
   onDecline,
   onUndo,
 }: ApplicationsTableProps): React.JSX.Element {
+  const [detailId, setDetailId] = useState<string | null>(null);
   const [rejectingId, setRejectingId] = useState<string | null>(null);
   const [approvingId, setApprovingId] = useState<string | null>(null);
   const [reason, setReason] = useState("");
@@ -152,20 +155,24 @@ export function ApplicationsTable({
           </thead>
           <tbody>
             {applications.map((a) => {
-              const rejecting = rejectingId === a.id && a.status === "new";
-              const approving = approvingId === a.id && a.status === "new";
+              const isOpen = a.status === "new" || a.status === "info_requested";
+              const rejecting = rejectingId === a.id && isOpen;
+              const approving = approvingId === a.id && isOpen;
               return (
                 <Fragment key={a.id}>
                   <tr>
                     <td>
                       <span className="li-t">
-                        <span style={{ fontWeight: 600 }}>{a.company}</span>
+                        <button type="button" className="linkbtn" style={{ fontWeight: 600, textAlign: "left", padding: 0 }} onClick={() => setDetailId(a.id)} aria-label={`Open the application from ${a.company}`}>
+                          {a.company}
+                        </button>
                         <span className="li-s">{a.domain}</span>
                         <span className="li-s tnum">{a.reference}</span>
                         <span style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 2 }}>
                           <Badge tone="neutral">{a.source === "website" ? "Website form" : "Portal form"}</Badge>
                           {a.personalEmail ? <Badge tone="pending">Personal email</Badge> : null}
                           {a.existingDomain ? <Badge tone="violet">Domain already a partner</Badge> : null}
+                          {a.status === "info_requested" ? <Badge tone="pending">Info requested</Badge> : null}
                         </span>
                       </span>
                     </td>
@@ -185,7 +192,7 @@ export function ApplicationsTable({
                     </td>
                     <td className="tnum t-sec hide-sm">{fmtLong(a.submittedAt)}</td>
                     <td className="r" style={{ whiteSpace: "normal" }}>
-                      {a.status === "new" && !rejecting && !approving && canDecide ? (
+                      {isOpen && !rejecting && !approving && canDecide ? (
                         <span className="acts" style={{ gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}>
                           <button
                             type="button"
@@ -207,9 +214,9 @@ export function ApplicationsTable({
                           </button>
                         </span>
                       ) : null}
-                      {a.status === "new" && rejecting ? <Badge tone="neutral">Add a reason below</Badge> : null}
-                      {a.status === "new" && approving ? <Badge tone="neutral">Choose below</Badge> : null}
-                      {a.status !== "new" ? (
+                      {isOpen && rejecting ? <Badge tone="neutral">Add a reason below</Badge> : null}
+                      {isOpen && approving ? <Badge tone="neutral">Choose below</Badge> : null}
+                      {!isOpen ? (
                         <span style={{ display: "inline-flex", gap: 6, alignItems: "center" }}>
                           {a.status === "approved" ? (
                             <Badge tone="accepted">Approved, invite sent</Badge>
@@ -334,6 +341,7 @@ export function ApplicationsTable({
         </table>
         {applications.length === 0 ? <div className="empty">{status || query ? "No applications match these filters." : "No applications yet."}</div> : null}
       </ScrollRegion>
+      <ApplicationDrawer application={applications.find((x) => x.id === detailId) ?? null} onClose={() => setDetailId(null)} canDecide={canDecide} />
       <div style={{ padding: "10px 12px", borderTop: "1px solid #F0EFF4" }}>
         <span className="hint">
           Approving creates the partner company, makes the applicant its partner admin, and emails them an invite to

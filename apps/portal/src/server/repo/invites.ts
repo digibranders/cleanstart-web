@@ -8,6 +8,7 @@ import type { SystemActor, Viewer } from '@/server/auth/types';
 import { hashToken, inviteState } from '@/server/auth/tokens';
 import { ConflictError, NotFoundError, ValidationError } from '@/server/errors';
 import { issueInvite, rotateInviteToken, toInviteDto } from '@/server/invite-core';
+import { listManagerRecipients } from './applications';
 import { assertStaff, type Tx } from './context';
 import { defineIsolation } from './isolation.registry';
 
@@ -264,11 +265,55 @@ export async function listOpenInvites(
   return rows.map((row) => toInviteDto(row, clock.now()));
 }
 
+export interface InviteAgainRequest {
+  inviteEmail: string;
+  kind: UserKind;
+  role: PartnerRole | StaffRole;
+  partnerId: string | null;
+  partnerName: string | null;
+  /** Who is asked: the person who invited, else the partner's admins, else the partner managers. */
+  recipients: Array<{ userId: string; email: string; name: string }>;
+}
+
+/**
+ * Public. The invitee on a dead invite page (expired, used or revoked) asks for a new one. Returns who to tell, or null
+ * for an unknown token or a live invite, and the action answers the same either way. Writes nothing.
+ */
+export async function findInviteAgainRecipients(tx: Tx, actor: SystemActor, token: string, clock: Clock): Promise<InviteAgainRequest | null> {
+  if (token.length === 0 || token.length > MAX_TOKEN_LENGTH) return null;
+  const [invite] = await tx.select().from(invites).where(eq(invites.tokenHash, hashToken(token))).limit(1);
+  if (!invite || inviteState(invite, clock.now()) === 'ok') return null;
+  const [partner] = invite.partnerId ? await tx.select({ name: partners.name }).from(partners).where(eq(partners.id, invite.partnerId)).limit(1) : [];
+
+  let recipients = invite.invitedBy
+    ? await tx
+        .select({ userId: users.id, email: users.email, name: users.name })
+        .from(users)
+        .where(and(eq(users.id, invite.invitedBy), eq(users.status, 'active')))
+    : [];
+  if (recipients.length === 0 && invite.partnerId) {
+    recipients = await tx
+      .select({ userId: users.id, email: users.email, name: users.name })
+      .from(users)
+      .where(and(eq(users.partnerId, invite.partnerId), eq(users.role, 'partner_admin'), eq(users.status, 'active')));
+  }
+  if (recipients.length === 0) recipients = await listManagerRecipients(tx, actor);
+  return {
+    inviteEmail: invite.email,
+    kind: invite.kind,
+    role: invite.role as PartnerRole | StaffRole,
+    partnerId: invite.partnerId,
+    partnerName: partner?.name ?? null,
+    recipients,
+  };
+}
+
 export const isolation = defineIsolation<
-  'previewInvite' | 'acceptInvite' | 'createInvite' | 'resendInvite' | 'revokeInvite' | 'changeInviteRole' | 'listOpenInvites'
+  'previewInvite' | 'acceptInvite' | 'findInviteAgainRecipients' | 'createInvite' | 'resendInvite' | 'revokeInvite' | 'changeInviteRole' | 'listOpenInvites'
 >({
   previewInvite: { scope: 'public', reason: 'Public invite page. Takes a SystemActor; covered by invites.test.ts.' },
   acceptInvite: { scope: 'public', reason: 'Public invite flow. Takes a SystemActor; covered by invites.test.ts and actions/invites.test.ts.' },
+  findInviteAgainRecipients: { scope: 'public', reason: 'Public "send me a new invite" flow. Takes a SystemActor, writes nothing; covered by invites.test.ts.' },
   createInvite: {
     scope: 'tenant',
     probe: (tx, viewer, ctx) => createInvite(tx, viewer, { kind: 'partner', partnerId: ctx.b.partnerId, email: 'probe@example.com', role: 'sales' }, systemClock),

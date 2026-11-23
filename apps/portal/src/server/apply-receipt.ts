@@ -15,6 +15,8 @@ const receiptSchema = z.object({
   category: z.enum(PARTNER_CATEGORIES),
   region: z.enum(PARTNER_REGIONS),
   submittedOn: z.string().length(10),
+  /** The private status link token, so the receipt page can offer the link. Never logged. */
+  statusToken: z.string().min(1).max(200).optional(),
 });
 export type ApplyReceipt = z.infer<typeof receiptSchema>;
 

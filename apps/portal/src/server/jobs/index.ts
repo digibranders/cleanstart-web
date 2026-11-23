@@ -4,6 +4,7 @@ import { runExpiryReminders } from './expiry-reminders';
 import { runHubspotOutbox } from './hubspot-outbox';
 import { runHubspotPoll } from './hubspot-poll';
 import { runIntake } from './intake';
+import { runInviteReminders } from './invite-reminders';
 import { runPendingDigest } from './pending-digest';
 import { runReconcile } from './reconcile';
 import { runRetention } from './retention';
@@ -15,6 +16,7 @@ export const JOBS: readonly JobSpec[] = [
   { name: 'hubspot-reconcile', schedule: '30 2 * * *', run: runReconcile },
   { name: 'expiry', schedule: '10 0 * * *', run: runExpiry },
   { name: 'expiry-reminders', schedule: '0 5 * * *', run: runExpiryReminders },
+  { name: 'invite-reminders', schedule: '30 5 * * *', run: runInviteReminders },
   { name: 'pending-digest', schedule: '30 4 * * *', run: runPendingDigest },
   { name: 'website-intake', schedule: '*/5 * * * *', run: runIntake },
   { name: 'document-purge', schedule: '20 3 * * *', run: runDocumentPurge },

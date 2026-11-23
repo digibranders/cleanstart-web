@@ -2,6 +2,7 @@ import type {
   AccessRequestRole,
   AccessRequestStatus,
   ApplicationSource,
+  ApplicationNoteKind,
   ApplicationStatus,
   AudienceKind,
   AuditKind,
@@ -205,6 +206,24 @@ export interface ApplicationDto {
   declineReason: string | null;
   decidedAt: IsoTimestamp | null;
   partnerId: string | null;
+  vendors: string[];
+  products: string[];
+  companySize: string | null;
+  yearsInBusiness: string | null;
+  verticals: string[];
+  /** ISO 3166-1 alpha-2 code. */
+  country: string | null;
+  referralSource: string | null;
+  consentAt: IsoTimestamp | null;
+}
+
+export interface ApplicationNoteDto {
+  id: string;
+  kind: ApplicationNoteKind;
+  note: string;
+  /** Null for the applicant's own reply. */
+  authorName: string | null;
+  createdAt: IsoTimestamp;
 }
 
 export interface PartnerListRow {

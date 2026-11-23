@@ -105,8 +105,55 @@ export const EVENT_SOURCE_LABEL: Record<EventSource, string> = { portal: 'Portal
 export const MESSAGE_SIDES = ['partner', 'staff'] as const;
 export type MessageSide = (typeof MESSAGE_SIDES)[number];
 
-export const APPLICATION_STATUSES = ['new', 'approved', 'declined'] as const;
+export const APPLICATION_STATUSES = ['new', 'info_requested', 'approved', 'declined'] as const;
 export type ApplicationStatus = (typeof APPLICATION_STATUSES)[number];
+/** Statuses a reviewer can still decide. info_requested waits on the applicant but stays decidable. */
+export const OPEN_APPLICATION_STATUSES = ['new', 'info_requested'] as const satisfies readonly ApplicationStatus[];
+export const isOpenApplication = (status: ApplicationStatus): boolean => status === 'new' || status === 'info_requested';
+
+export const APPLICATION_NOTE_KINDS = ['internal', 'info_request', 'applicant_reply'] as const;
+export type ApplicationNoteKind = (typeof APPLICATION_NOTE_KINDS)[number];
+export const APPLICATION_TOKEN_KINDS = ['status', 'reply'] as const;
+export type ApplicationTokenKind = (typeof APPLICATION_TOKEN_KINDS)[number];
+
+/** Answer lists on the apply form. The stored value is the text shown, so a reviewer reads the same words. */
+export const APPLICATION_VENDORS = [
+  'Palo Alto Networks',
+  'CrowdStrike',
+  'Fortinet',
+  'Check Point',
+  'Microsoft Security',
+  'Cisco',
+  'Zscaler',
+  'Wiz',
+  'Snyk',
+  'Sysdig',
+  'Aqua Security',
+  'Docker',
+  'Red Hat',
+] as const;
+export const APPLICATION_COMPANY_SIZES = ['1 to 10', '11 to 50', '51 to 200', '201 to 1,000', 'More than 1,000'] as const;
+export const APPLICATION_YEARS = ['Less than 1 year', '1 to 3 years', '4 to 10 years', 'More than 10 years'] as const;
+export const APPLICATION_VERTICALS = [
+  'Banking and financial services',
+  'Government and public sector',
+  'Healthcare and life sciences',
+  'Telecom',
+  'Manufacturing and industrial',
+  'Technology and software',
+  'Retail and e-commerce',
+  'Energy and utilities',
+  'Education',
+] as const;
+export const APPLICATION_REFERRALS = [
+  'Search engine',
+  'CleanStart website',
+  'A CleanStart partner manager',
+  'A partner or customer',
+  'Event or webinar',
+  'LinkedIn or social media',
+  'Other',
+] as const;
 export const APPLICATION_SOURCES = ['portal', 'website'] as const;
 export type ApplicationSource = (typeof APPLICATION_SOURCES)[number];
 

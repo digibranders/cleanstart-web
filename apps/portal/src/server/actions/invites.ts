@@ -15,7 +15,8 @@ import { auth } from '@/server/auth/auth';
 import { assertPasswordOk, hashPassword } from '@/server/auth/passwords';
 import { type SystemActor, publicActor } from '@/server/auth/types';
 import { sendEmail } from '@/server/email/send';
-import { buildAccessRequest, buildTeamChangeNotice } from '@/server/email/templates';
+import { buildAccessRequest, buildAccessRequestCopy, buildInviteAgainRequest, buildTeamChangeNotice } from '@/server/email/templates';
+import { hashToken } from '@/server/auth/tokens';
 import { ValidationError } from '@/server/errors';
 import { enqueue } from '@/server/hubspot/outbox';
 import { loadInvitePreview } from '@/server/invite-preview';
@@ -24,7 +25,7 @@ import { type NewNotification, notifyUsers, resolveEmailRecipients } from '@/ser
 import { rateLimit } from '@/server/rate-limit';
 import { UNKNOWN_IP_BUCKET } from '@/server/security/client-ip';
 import { withSystem } from '@/server/repo/context';
-import { acceptInvite } from '@/server/repo/invites';
+import { acceptInvite, findInviteAgainRecipients } from '@/server/repo/invites';
 import { listPartnerAdminRecipients } from '@/server/repo/partners';
 import { createAccessRequest } from '@/server/repo/team';
 import { absoluteUrl } from '@/server/urls';
@@ -194,6 +195,11 @@ export async function requestAccessAction(raw: unknown): Promise<ActionResult<{ 
       return { result, items };
     });
 
+    ctx.afterCommit(async () => {
+      void sendEmail(buildAccessRequestCopy({ to: { email: checked.email, name: input.name }, requesterName: input.name, note: input.note ?? null })).catch((error: unknown) => {
+        log.warn({ err: error }, 'access request copy failed');
+      });
+    });
     if (found.items.length > 0) {
       ctx.afterCommit(async () => {
         void (async () => {
@@ -210,6 +216,62 @@ export async function requestAccessAction(raw: unknown): Promise<ActionResult<{ 
             }),
           );
         })();
+      });
+    }
+    return { confirmation: 'sent' };
+  });
+}
+
+const newInviteSchema = z.object({ token: z.string().min(1).max(200) });
+const NEW_INVITE_IP_RULE = { limit: 5, windowSeconds: 3600 } as const;
+/** One request per dead link per day: the inviter is told once, however often the page is pressed. */
+const NEW_INVITE_TOKEN_RULE = { limit: 1, windowSeconds: 86_400 } as const;
+
+/**
+ * "Send me a new invite" on an expired, used or withdrawn invite page. The answer is the same for a known token, an
+ * unknown one and a live one, and the inviter is told without being awaited, so nothing reveals which tokens exist.
+ */
+export async function requestNewInviteAction(raw: unknown): Promise<ActionResult<{ confirmation: 'sent' }>> {
+  return runPublicAction({ name: 'invite.request_new', schema: newInviteSchema }, raw, async (ctx, input): Promise<{ confirmation: 'sent' }> => {
+    rateLimit(`invite-again:ip:${ctx.ip ?? UNKNOWN_IP_BUCKET}`, NEW_INVITE_IP_RULE);
+    const actor = publicActor('Invitee');
+    const tokenKey = `invite-again:token:${hashToken(input.token)}`;
+    try {
+      rateLimit(tokenKey, NEW_INVITE_TOKEN_RULE);
+    } catch {
+      // A repeat press for the same link is answered like the first and tells nobody again.
+      return { confirmation: 'sent' };
+    }
+    const found = await withSystem(actor, async (tx) => {
+      const request = await findInviteAgainRecipients(tx, actor, input.token, ctx.clock);
+      if (!request) return null;
+      const roleLabel = request.kind === 'staff' ? STAFF_ROLE_LABEL[request.role as keyof typeof STAFF_ROLE_LABEL] : PARTNER_ROLE_LABEL[request.role as keyof typeof PARTNER_ROLE_LABEL];
+      const link = request.kind === 'staff' ? ROUTES.admin.team : ROUTES.partner.team;
+      const items: NewNotification[] = request.recipients.map((recipient) => ({
+        userId: recipient.userId,
+        kind: 'access_requested' as const,
+        title: `${request.inviteEmail} asked for a new invite`,
+        body: roleLabel,
+        link,
+      }));
+      await notifyUsers(tx, items);
+      return { request, roleLabel, link, items };
+    });
+    if (found && found.items.length > 0) {
+      ctx.afterCommit(async () => {
+        void (async () => {
+          const to = (await resolveEmailRecipients(found.items)).map((r) => ({ email: r.email, name: r.name }));
+          if (to.length === 0) return;
+          await sendEmail(
+            buildInviteAgainRequest({
+              to,
+              inviteeEmail: found.request.inviteEmail,
+              roleLabel: found.roleLabel,
+              companyName: found.request.partnerName,
+              reviewUrl: absoluteUrl(found.link),
+            }),
+          );
+        })().catch((error: unknown) => log.warn({ err: error }, 'new invite request email failed'));
       });
     }
     return { confirmation: 'sent' };
