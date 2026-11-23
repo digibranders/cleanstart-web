@@ -165,7 +165,7 @@ export function PartnerWelcome({ firstName, company, checklist, viewerEmail }: P
                   {step.action}
                 </Link>
               ) : null}
-              {!isDone && step.target === "message" ? (
+              {!isDone && step.target === "message" && company.manager ? (
                 <button
                   type="button"
                   className="btn btn-s"

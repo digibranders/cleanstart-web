@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { PartnerViewer, StaffViewer } from "@/server/auth/types";
-import { activeNavHref, joinWords, navFor, PARTNER_NAV, searchNouns } from "./routes";
+import { ADMIN_NAV, activeNavHref, joinWords, navFor, PARTNER_NAV, ROUTES, searchNouns } from "./routes";
 
 const partner = (role: PartnerViewer["role"]): PartnerViewer => ({
   id: "u1",
@@ -68,6 +68,14 @@ describe("activeNavHref", () => {
   it("lights Overview on the welcome page and nothing on the account page", () => {
     expect(activeNavHref(PARTNER_NAV, "/partner/welcome")).toBe("/partner/overview");
     expect(activeNavHref(PARTNER_NAV, "/partner/account")).toBeNull();
+  });
+});
+
+describe("staff account route", () => {
+  it("lives under /admin and is reached from the profile menu, not the sidebar", () => {
+    expect(ROUTES.admin.account).toBe("/admin/account");
+    expect(ADMIN_NAV.some((item) => item.href === ROUTES.admin.account)).toBe(false);
+    expect(activeNavHref(ADMIN_NAV, ROUTES.admin.account)).toBeNull();
   });
 });
 
