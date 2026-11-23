@@ -192,7 +192,7 @@ export function AdminTeam({ people, today }: { people: StaffMemberDto[]; today: 
                       />
                     )}
                   </td>
-                  <td className="t-sec hide-sm" title={p.partners.join(", ")}>
+                  <td className="t-sec hide-sm" data-hint={p.partners.join(", ")}>
                     {p.partners.length ? `${p.partners.length} partners` : "None"}
                   </td>
                   <td className="t-sec hide-sm">{lastActive(p)}</td>

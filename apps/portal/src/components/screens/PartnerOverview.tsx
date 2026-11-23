@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { BarList, Columns, Donut, Funnel, Heatmap, PRODUCT_COLOR, STATUS_COLOR, StatTile, Timeline } from "@/components/charts";
+import { type DashboardCard, DashboardGrid } from "@/components/dashboard/DashboardGrid";
+import type { SavedLayout } from "@/lib/dashboard-layout";
 import { ExportKpisButton } from "@/components/dashboard/ExportKpisButton";
 import { OverviewFilters } from "@/components/dashboard/OverviewFilters";
 import {
@@ -31,7 +33,7 @@ import { ProductChip } from "../ui/badge";
 
 /** Partner admin and sales get the deal dashboard; technical has no deals, so they get documents. */
 export type PartnerOverviewData =
-  | { kind: "deals"; dashboard: PartnerDashboardDto }
+  | { kind: "deals"; dashboard: PartnerDashboardDto; layout: SavedLayout | null }
   | { kind: "documents"; filters: DashboardFilters; newDocuments: DocumentListItemDto[]; mostOpened: DocumentUseRow[] };
 
 interface PartnerOverviewProps {
@@ -112,38 +114,54 @@ export function CardHead({ id, title, meta, href, hrefLabel }: { id: string; tit
   );
 }
 
+function NewDocumentsCard({ documents }: { documents: DocumentListItemDto[] }): React.JSX.Element {
+  return (
+    <section className="card clip" aria-label="New documents">
+      <CardHead id="newdocs" title="New documents" href={ROUTES.partner.documents} hrefLabel="All" />
+      {documents.length === 0 ? <Empty>No new documents in the last 30 days.</Empty> : null}
+      {documents.map((f) => (
+        <Link href={ROUTES.partner.documents} className="li" key={f.id}>
+          <span className="li-ic">
+            <Icon name={docIcon(f)} />
+          </span>
+          <span className="li-t">
+            <span className="li-n">{f.title}</span>
+            <span className="li-s">{docMeta(f)}</span>
+          </span>
+        </Link>
+      ))}
+    </section>
+  );
+}
+
+function MostOpenedCard({ documents }: { documents: DocumentUseRow[] }): React.JSX.Element {
+  return (
+    <section className="card clip" aria-label="Most opened documents">
+      <CardHead id="opened" title="Most opened documents" href={ROUTES.partner.documents} hrefLabel="All" />
+      {documents.length === 0 ? <Empty>No documents opened yet. Open one from the Documents page.</Empty> : null}
+      {documents.map((d) => (
+        <Link href={ROUTES.partner.documents} className="li" key={d.id}>
+          <span className="li-ic">
+            <Icon name="file" />
+          </span>
+          <span className="li-t">
+            <span className="li-n">{d.title}</span>
+            <span className="li-s">{plural(d.opens, "open")}</span>
+          </span>
+        </Link>
+      ))}
+    </section>
+  );
+}
+
 function DocumentLists({ newDocuments, mostOpened }: { newDocuments: DocumentListItemDto[]; mostOpened: DocumentUseRow[] }): React.JSX.Element {
   return (
     <>
-      <Cell span={4} label="New documents" className="card clip">
-        <CardHead id="newdocs" title="New documents" href={ROUTES.partner.documents} hrefLabel="All" />
-        {newDocuments.length === 0 ? <Empty>No new documents in the last 30 days.</Empty> : null}
-        {newDocuments.map((f) => (
-          <Link href={ROUTES.partner.documents} className="li" key={f.id}>
-            <span className="li-ic">
-              <Icon name={docIcon(f)} />
-            </span>
-            <span className="li-t">
-              <span className="li-n">{f.title}</span>
-              <span className="li-s">{docMeta(f)}</span>
-            </span>
-          </Link>
-        ))}
+      <Cell span={4} label="New documents" className="">
+        <NewDocumentsCard documents={newDocuments} />
       </Cell>
-      <Cell span={4} label="Most opened documents" className="card clip">
-        <CardHead id="opened" title="Most opened documents" href={ROUTES.partner.documents} hrefLabel="All" />
-        {mostOpened.length === 0 ? <Empty>No documents opened yet. Open one from the Documents page.</Empty> : null}
-        {mostOpened.map((d) => (
-          <Link href={ROUTES.partner.documents} className="li" key={d.id}>
-            <span className="li-ic">
-              <Icon name="file" />
-            </span>
-            <span className="li-t">
-              <span className="li-n">{d.title}</span>
-              <span className="li-s">{plural(d.opens, "open")}</span>
-            </span>
-          </Link>
-        ))}
+      <Cell span={4} label="Most opened documents" className="">
+        <MostOpenedCard documents={mostOpened} />
       </Cell>
     </>
   );
@@ -202,6 +220,214 @@ export function PartnerOverview({ data, today, asOf }: PartnerOverviewProps): Re
   const shownIds = new Set([...d.expiring14.map((e) => e.id), ...series.topDeals.map((t) => t.id)]);
   const attention = d.attention.filter((a) => !((a.kind === "expiring" || a.kind === "late") && shownIds.has(a.key.slice(a.key.indexOf("-") + 1))));
 
+  const cards: DashboardCard[] = [
+    {
+      def: { id: "status", title: "Deals by status", description: "Registered deals in the period, split by status.", span: 4, min: 4, max: 8 },
+      node: (
+<>
+      {statusSlices.some((s) => s.value > 0) ? (
+        <Donut title="Deals by status" description="Registered deals in the period by status." totalLabel="deals" data={statusSlices} />
+      ) : (
+        <ChartEmpty title="Deals by status" action={{ href: ROUTES.partner.newDeal, label: "Register a deal" }}>No deals registered in this period. Choose a longer period or register a deal.</ChartEmpty>
+      )}
+</>
+      ),
+    },
+    {
+      def: { id: "product", title: "Pipeline value by product", description: "Open pipeline in USD for each product.", span: 4, min: 4, max: 12 },
+      node: (
+<>
+      {productRows.length > 0 ? (
+        <BarList title="Pipeline value by product" description="Open deals (pending and accepted), USD." data={productRows} format={formatUsd} />
+      ) : (
+        <ChartEmpty title="Pipeline value by product" action={{ href: ROUTES.partner.newDeal, label: "Register a deal" }}>No open pipeline value for this period. Add a deal value when you register a deal.</ChartEmpty>
+      )}
+</>
+      ),
+    },
+    {
+      def: { id: "stage", title: "Pipeline by sales stage", description: "Open deals that reached each stage.", span: 4, min: 4, max: 12 },
+      node: (
+<>
+      {stageRows.length > 0 ? (
+        <Funnel title="Pipeline by sales stage" description="Open deals that reached each stage, with the share of the stage before." stages={stageRows} />
+      ) : (
+        <ChartEmpty title="Pipeline by sales stage" action={{ href: ROUTES.partner.newDeal, label: "Register a deal" }}>No open deals at any stage yet.</ChartEmpty>
+      )}
+</>
+      ),
+    },
+    {
+      def: { id: "monthly", title: "Registrations per month", description: "Deals registered in each of the last 12 months.", span: 8, min: 6, max: 12 },
+      node: (
+<>
+      {series.monthly.some((m) => m.count > 0) ? (
+        <Columns
+          title="Registrations per month"
+          description="Deals registered in each of the last 12 months."
+          series={[{ key: "n", label: "Deals", color: PRODUCT_COLOR["CleanStart Images"] }]}
+          rows={series.monthly.map((m) => ({ label: monthLabel(m.month), values: [m.count] }))}
+        />
+      ) : (
+        <ChartEmpty title="Registrations per month" action={{ href: ROUTES.partner.newDeal, label: "Register a deal" }}>No registrations in the last 12 months. Register a deal to see the trend.</ChartEmpty>
+      )}
+</>
+      ),
+    },
+    {
+      def: { id: "windows", title: "Protection windows", description: "The next deals to lose protection.", span: 4, min: 4, max: 12 },
+      node: (
+<>
+      {windows.length > 0 ? (
+        <Timeline title="Protection windows" description="The next deals to lose protection; the line marks today." bars={windows} today={dayMs(today)} />
+      ) : (
+        <ChartEmpty title="Protection windows" action={{ href: `${ROUTES.partner.deals}?status=accepted`, label: "View protected deals" }}>No protection ends in the next 14 days.</ChartEmpty>
+      )}
+</>
+      ),
+    },
+    {
+      def: { id: "topdeals", title: "Top deals by value", description: "Your largest deals in the period.", span: 8, min: 6, max: 12 },
+      node: (
+<section className="card clip" aria-label="Top deals by value">
+      <CardHead id="top" title="Top deals by value" href={ROUTES.partner.deals} />
+      {series.topDeals.length === 0 ? (
+        <Empty>No deals with a value in USD yet. Add a deal value when you register a deal.</Empty>
+      ) : (
+        <ScrollRegion label="Top deals by value">
+          <table className="tbl">
+            <thead>
+              <tr>
+                <th scope="col">Customer</th>
+                <th scope="col" className="hide-sm">
+                  Product
+                </th>
+                <th scope="col" className="r">
+                  Value
+                </th>
+                <th scope="col" className="hide-sm">
+                  Stage
+                </th>
+                <th scope="col" className="r hide-sm">
+                  Protection ends
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {series.topDeals.map((t) => (
+                <tr key={t.id}>
+                  <td style={{ whiteSpace: "normal" }}>
+                    <Link href={ROUTES.partner.deal(t.id)} className="cust">
+                      <CustomerMark name={t.customer} />
+                      {t.customer}
+                    </Link>
+                  </td>
+                  <td className="hide-sm">
+                    <ProductChip product={CHIP_PRODUCT[t.product]} />
+                  </td>
+                  <td className="tnum r" data-hint={PRODUCT_LABEL[t.product]}>
+                    {formatUsd(t.value)}
+                  </td>
+                  <td className="t-sec hide-sm">{t.stage}</td>
+                  <td className="tnum r hide-sm">{t.protectionEnd ? fmtShort(t.protectionEnd, today) : "Not set"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </ScrollRegion>
+      )}
+</section>
+      ),
+    },
+    {
+      def: { id: "expiring", title: "Expiring soon", description: "Deals whose protection ends within 14 days.", span: 4, min: 4, max: 8 },
+      node: (
+<section className="card clip" aria-label="Expiring soon">
+      <CardHead id="expiring" title="Expiring soon" meta={d.expiring14.length ? `${d.expiring14.length}` : undefined} />
+      {d.expiring14.length === 0 ? <Empty>Nothing expires in the next 14 days.</Empty> : null}
+      {d.expiring14.slice(0, 6).map((e) => (
+        <Link href={ROUTES.partner.deal(e.id)} className="li" key={e.id}>
+          <span className="li-ic tone-amber">
+            <Icon name="hg" />
+          </span>
+          <span className="li-t">
+            <span className="li-n">{e.customer}</span>
+            <span className="li-s">
+              {e.daysLeft === 0 ? "Ends today" : `${plural(e.daysLeft, "day")} left`}, {fmtShort(e.protectionEnd, today)}
+            </span>
+          </span>
+        </Link>
+      ))}
+</section>
+      ),
+    },
+    {
+      def: { id: "attention", title: "Needs attention", description: "Items that wait for you.", span: 4, min: 4, max: 8 },
+      node: (
+<section className="card clip" aria-label="Needs attention">
+      <CardHead id="attention" title="Needs attention" meta={attention.length ? String(attention.length) : undefined} />
+      {attention.length === 0 ? <Empty>Nothing needs your attention.</Empty> : null}
+      {attention.map((a) => (
+        <Link href={a.href} className="li" key={a.key}>
+          <span className={`li-ic ${ATTENTION_STYLE[a.kind].tone}`}>
+            <Icon name={ATTENTION_STYLE[a.kind].icon} />
+          </span>
+          <span className="li-t">
+            <span className="li-n">{a.title}</span>
+            <span className="li-s">{a.meta}</span>
+          </span>
+        </Link>
+      ))}
+</section>
+      ),
+    },
+    {
+      def: { id: "newdocs", title: "New documents", description: "Documents added in the last 30 days.", span: 4, min: 4, max: 8 },
+      node: (
+<NewDocumentsCard documents={d.newDocuments} />
+      ),
+    },
+    {
+      def: { id: "mostopened", title: "Most opened documents", description: "The documents you open most.", span: 4, min: 4, max: 8 },
+      node: (
+<MostOpenedCard documents={d.mostOpenedDocuments} />
+      ),
+    },
+    {
+      def: { id: "country", title: "Value by customer country", description: "Open pipeline by the customer's country.", span: 4, min: 4, max: 12, defaultHidden: true },
+      node: (
+<BarList title="Value by customer country" description="Open pipeline, USD." data={countryBars} format={formatUsd} />
+      ),
+    },
+    {
+      def: { id: "industry", title: "Value by industry", description: "Open pipeline by customer industry.", span: 4, min: 4, max: 12, defaultHidden: true },
+      node: (
+<BarList title="Value by industry" description="Open pipeline, USD." data={industryBars} format={formatUsd} />
+      ),
+    },
+    {
+      def: { id: "team", title: "Registrations per team member", description: "Deals each person on your team registered.", span: 4, min: 4, max: 12, defaultHidden: true },
+      node: (
+<BarList
+  title="Registrations per team member"
+  description="Deals registered in the period."
+  data={d.team.filter((m) => m.deals > 0).map((m) => ({ key: m.userId, label: m.name, value: m.deals }))}
+  format={(n) => String(n)}
+/>
+      ),
+    },
+    {
+      def: { id: "heat", title: "Registration activity", description: "Deals registered each day over the last 12 weeks.", span: 8, min: 6, max: 12, defaultHidden: true },
+      node: (
+<>{heatIsEmpty(series.heat) ? (
+  <ChartEmpty title="Registration activity" action={{ href: ROUTES.partner.newDeal, label: "Register a deal" }}>No deals registered in the last 12 weeks.</ChartEmpty>
+) : (
+  <Heatmap title="Registration activity" description="Deals registered each day over the last 12 weeks." weeks={heatWeeks(series.heat)} unit="deals" />
+  )}</>
+      ),
+    },
+  ];
+
   return (
     <div className="wrap">
       <Header
@@ -237,162 +463,7 @@ export function PartnerOverview({ data, today, asOf }: PartnerOverviewProps): Re
         </section>
       ) : null}
 
-      <div className="dash">
-        <Cell span={4} className="">
-          {statusSlices.some((s) => s.value > 0) ? (
-            <Donut title="Deals by status" description="Registered deals in the period by status." totalLabel="deals" data={statusSlices} />
-          ) : (
-            <ChartEmpty title="Deals by status" action={{ href: ROUTES.partner.newDeal, label: "Register a deal" }}>No deals registered in this period. Choose a longer period or register a deal.</ChartEmpty>
-          )}
-        </Cell>
-        <Cell span={4} className="">
-          {productRows.length > 0 ? (
-            <BarList title="Pipeline value by product" description="Open deals (pending and accepted), USD." data={productRows} format={formatUsd} />
-          ) : (
-            <ChartEmpty title="Pipeline value by product" action={{ href: ROUTES.partner.newDeal, label: "Register a deal" }}>No open pipeline value for this period. Add a deal value when you register a deal.</ChartEmpty>
-          )}
-        </Cell>
-        <Cell span={4} className="">
-          {stageRows.length > 0 ? (
-            <Funnel title="Pipeline by sales stage" description="Open deals that reached each stage, with the share of the stage before." stages={stageRows} />
-          ) : (
-            <ChartEmpty title="Pipeline by sales stage" action={{ href: ROUTES.partner.newDeal, label: "Register a deal" }}>No open deals at any stage yet.</ChartEmpty>
-          )}
-        </Cell>
-        <Cell span={8} wide className="">
-          {series.monthly.some((m) => m.count > 0) ? (
-            <Columns
-              title="Registrations per month"
-              description="Deals registered in each of the last 12 months."
-              series={[{ key: "n", label: "Deals", color: PRODUCT_COLOR["CleanStart Images"] }]}
-              rows={series.monthly.map((m) => ({ label: monthLabel(m.month), values: [m.count] }))}
-            />
-          ) : (
-            <ChartEmpty title="Registrations per month" action={{ href: ROUTES.partner.newDeal, label: "Register a deal" }}>No registrations in the last 12 months. Register a deal to see the trend.</ChartEmpty>
-          )}
-        </Cell>
-        <Cell span={4} className="">
-          {windows.length > 0 ? (
-            <Timeline title="Protection windows" description="The next deals to lose protection; the line marks today." bars={windows} today={dayMs(today)} />
-          ) : (
-            <ChartEmpty title="Protection windows" action={{ href: `${ROUTES.partner.deals}?status=accepted`, label: "View protected deals" }}>No protection ends in the next 14 days.</ChartEmpty>
-          )}
-        </Cell>
-        {countryBars.length > 0 ? (
-          <Cell span={4} className="">
-            <BarList title="Value by customer country" description="Open pipeline, USD." data={countryBars} format={formatUsd} />
-          </Cell>
-        ) : null}
-        {industryBars.length > 0 ? (
-          <Cell span={4} className="">
-            <BarList title="Value by industry" description="Open pipeline, USD." data={industryBars} format={formatUsd} />
-          </Cell>
-        ) : null}
-        {d.team.length > 0 ? (
-          <Cell span={4} className="">
-            <BarList
-              title="Registrations per team member"
-              description="Deals registered in the period."
-              data={d.team.filter((m) => m.deals > 0).map((m) => ({ key: m.userId, label: m.name, value: m.deals }))}
-              format={(n) => String(n)}
-            />
-          </Cell>
-        ) : null}
-
-        <Cell span={8} wide className="">
-          {heatIsEmpty(series.heat) ? (
-            <ChartEmpty title="Registration activity" action={{ href: ROUTES.partner.newDeal, label: "Register a deal" }}>
-              No deals registered in the last 12 weeks.
-            </ChartEmpty>
-          ) : (
-            <Heatmap title="Registration activity" description="Deals registered each day over the last 12 weeks." weeks={heatWeeks(series.heat)} unit="deals" />
-          )}
-        </Cell>
-
-        <Cell span={8} wide label="Top deals by value" className="card clip">
-          <CardHead id="top" title="Top deals by value" href={ROUTES.partner.deals} />
-          {series.topDeals.length === 0 ? (
-            <Empty>No deals with a value in USD yet. Add a deal value when you register a deal.</Empty>
-          ) : (
-            <ScrollRegion label="Top deals by value">
-              <table className="tbl">
-                <thead>
-                  <tr>
-                    <th scope="col">Customer</th>
-                    <th scope="col" className="hide-sm">
-                      Product
-                    </th>
-                    <th scope="col" className="r">
-                      Value
-                    </th>
-                    <th scope="col" className="hide-sm">
-                      Stage
-                    </th>
-                    <th scope="col" className="r hide-sm">
-                      Protection ends
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {series.topDeals.map((t) => (
-                    <tr key={t.id}>
-                      <td style={{ whiteSpace: "normal" }}>
-                        <Link href={ROUTES.partner.deal(t.id)} className="cust">
-                          <CustomerMark name={t.customer} />
-                          {t.customer}
-                        </Link>
-                      </td>
-                      <td className="hide-sm">
-                        <ProductChip product={CHIP_PRODUCT[t.product]} />
-                      </td>
-                      <td className="tnum r" title={PRODUCT_LABEL[t.product]}>
-                        {formatUsd(t.value)}
-                      </td>
-                      <td className="t-sec hide-sm">{t.stage}</td>
-                      <td className="tnum r hide-sm">{t.protectionEnd ? fmtShort(t.protectionEnd, today) : "Not set"}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </ScrollRegion>
-          )}
-        </Cell>
-
-        <Cell span={4} label="Expiring soon" className="card clip">
-          <CardHead id="expiring" title="Expiring soon" meta={d.expiring14.length ? `${d.expiring14.length}` : undefined} />
-          {d.expiring14.length === 0 ? <Empty>Nothing expires in the next 14 days.</Empty> : null}
-          {d.expiring14.slice(0, 6).map((e) => (
-            <Link href={ROUTES.partner.deal(e.id)} className="li" key={e.id}>
-              <span className="li-ic tone-amber">
-                <Icon name="hg" />
-              </span>
-              <span className="li-t">
-                <span className="li-n">{e.customer}</span>
-                <span className="li-s">
-                  {e.daysLeft === 0 ? "Ends today" : `${plural(e.daysLeft, "day")} left`}, {fmtShort(e.protectionEnd, today)}
-                </span>
-              </span>
-            </Link>
-          ))}
-        </Cell>
-
-        <Cell span={4} label="Needs attention" className="card clip">
-          <CardHead id="attention" title="Needs attention" meta={attention.length ? String(attention.length) : undefined} />
-          {attention.length === 0 ? <Empty>Nothing needs your attention.</Empty> : null}
-          {attention.map((a) => (
-            <Link href={a.href} className="li" key={a.key}>
-              <span className={`li-ic ${ATTENTION_STYLE[a.kind].tone}`}>
-                <Icon name={ATTENTION_STYLE[a.kind].icon} />
-              </span>
-              <span className="li-t">
-                <span className="li-n">{a.title}</span>
-                <span className="li-s">{a.meta}</span>
-              </span>
-            </Link>
-          ))}
-        </Cell>
-        <DocumentLists newDocuments={d.newDocuments} mostOpened={d.mostOpenedDocuments} />
-      </div>
+      <DashboardGrid dashboard="partner-overview" cards={cards} saved={data.layout} />
     </div>
   );
 }

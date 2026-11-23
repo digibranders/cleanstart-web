@@ -5,6 +5,7 @@ import { type DashboardFilters, parseDashboardFilters } from "@/lib/dashboard-dt
 import { requireKind } from "@/server/auth/viewer";
 import { withViewer } from "@/server/repo/context";
 import { partnerDashboard } from "@/server/repo/dashboard";
+import { getDashboardLayout } from "@/server/repo/dashboard-layouts";
 import { listDocuments, listNewDocuments } from "@/server/repo/documents";
 
 export const metadata: Metadata = { title: "Overview" };
@@ -30,7 +31,11 @@ export default async function Page({
         .map((d) => ({ id: d.id, title: d.title, opens: d.ownOpens ?? 0, partners: 1 }));
       return { kind: "documents", filters, newDocuments, mostOpened };
     }
-    return { kind: "deals", dashboard: await partnerDashboard(tx, viewer, filters, systemClock) };
+    return {
+      kind: "deals",
+      dashboard: await partnerDashboard(tx, viewer, filters, systemClock),
+      layout: await getDashboardLayout(tx, viewer, "partner-overview"),
+    };
   });
   return <PartnerOverview data={data} today={systemClock.today()} asOf={now.toISOString()} />;
 }

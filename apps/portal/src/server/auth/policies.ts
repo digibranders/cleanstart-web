@@ -48,6 +48,8 @@ export const ACTIONS = [
   'account.manage_two_factor',
   'account.manage_sessions',
   'account.update_notifications',
+  // Arranging one's own dashboards. Always self only.
+  'dashboard.customize',
   // Deal registrations (master 2.1 to 2.4)
   'registration.create',
   'registration.read',
@@ -178,6 +180,7 @@ const RULES: Record<Action, Rule> = {
   'account.manage_two_factor': self,
   'account.manage_sessions': self,
   'account.update_notifications': self,
+  'dashboard.customize': self,
 
   'registration.create': (v, s) => dealUser(v, s) || isPartnerManager(v),
   'registration.read': (v, s) => ownDeals(v, s) || isPartnerManager(v) || (isStaffSales(v) && inScope(v, s)),

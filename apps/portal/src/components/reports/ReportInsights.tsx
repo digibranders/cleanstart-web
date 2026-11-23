@@ -15,7 +15,7 @@ const days = (n: number | null): string => (n === null ? 'None yet' : `${n} ${n 
 
 function Rollup({ id, title, firstHead, rows, empty, onExport }: { id: string; title: string; firstHead: string; rows: RollupRow[]; empty: string; onExport: () => void }): React.JSX.Element {
   return (
-    <section aria-labelledby={id} className="card clip">
+    <section aria-labelledby={id} className="card clip dash-c4">
       <div className="card-h">
         <h2 id={id} className="card-t">
           {title}
@@ -93,7 +93,7 @@ export function ReportInsights({ insights }: { insights: ReportInsightsDto }): R
 
   return (
     <>
-      <section aria-labelledby="ri-ttd" className="card clip">
+      <section aria-labelledby="ri-ttd" className="card clip dash-c6">
         <div className="card-h">
           <h2 id="ri-ttd" className="card-t">
             Time to decision
@@ -120,7 +120,7 @@ export function ReportInsights({ insights }: { insights: ReportInsightsDto }): R
                 <span className="kpi-f">{decision.waiting > 0 ? `${decision.waiting} still waiting` : 'Nothing waiting'}</span>
               </div>
             </div>
-            <div style={{ padding: '4px 16px 12px', maxWidth: 560 }}>
+            <div>
               <Line
                 title="Days to first decision"
                 description="Median and 90th percentile days from registration to the first accept or reject, by month registered."
@@ -136,49 +136,7 @@ export function ReportInsights({ insights }: { insights: ReportInsightsDto }): R
         )}
       </section>
 
-      <section aria-labelledby="ri-rej" className="card clip">
-        <div className="card-h">
-          <h2 id="ri-rej" className="card-t">
-            Rejection reasons
-          </h2>
-          <button type="button" className="btn btn-s" onClick={exportReasons} disabled={reasons.length === 0}>
-            Export CSV
-          </button>
-        </div>
-        {reasons.length === 0 ? (
-          <div className="empty">No deals were rejected in this range.</div>
-        ) : (
-          <ScrollRegion label="Rejection reasons">
-            <table className="tbl">
-              <thead>
-                <tr>
-                  <th scope="col">Reason</th>
-                  <th scope="col" className="r">
-                    Deals
-                  </th>
-                  <th scope="col" className="r">
-                    Share
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {reasons.map((r) => (
-                  <tr key={r.reason}>
-                    <td>
-                      <span style={{ display: 'block', overflowWrap: 'anywhere' }}>{r.reason}</span>
-                      <span aria-hidden="true" style={{ display: 'block', height: 4, marginTop: 4, borderRadius: 2, width: `${Math.max(2, Math.round(r.share * 100))}%`, background: '#4B23C8' }} />
-                    </td>
-                    <td className="tnum r">{r.count}</td>
-                    <td className="tnum r">{pct(r.share)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </ScrollRegion>
-        )}
-      </section>
-
-      <section aria-labelledby="ri-doc" className="card clip">
+      <section aria-labelledby="ri-doc" className="card clip dash-c6">
         <div className="card-h">
           <h2 id="ri-doc" className="card-t">
             Document engagement
@@ -229,6 +187,48 @@ export function ReportInsights({ insights }: { insights: ReportInsightsDto }): R
               </ScrollRegion>
             )}
           </>
+        )}
+      </section>
+
+      <section aria-labelledby="ri-rej" className="card clip dash-c4">
+        <div className="card-h">
+          <h2 id="ri-rej" className="card-t">
+            Rejection reasons
+          </h2>
+          <button type="button" className="btn btn-s" onClick={exportReasons} disabled={reasons.length === 0}>
+            Export CSV
+          </button>
+        </div>
+        {reasons.length === 0 ? (
+          <div className="empty">No deals were rejected in this range.</div>
+        ) : (
+          <ScrollRegion label="Rejection reasons">
+            <table className="tbl">
+              <thead>
+                <tr>
+                  <th scope="col">Reason</th>
+                  <th scope="col" className="r">
+                    Deals
+                  </th>
+                  <th scope="col" className="r">
+                    Share
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {reasons.map((r) => (
+                  <tr key={r.reason}>
+                    <td>
+                      <span style={{ display: 'block', overflowWrap: 'anywhere' }}>{r.reason}</span>
+                      <span aria-hidden="true" style={{ display: 'block', height: 4, marginTop: 4, borderRadius: 2, width: `${Math.max(2, Math.round(r.share * 100))}%`, background: '#4B23C8' }} />
+                    </td>
+                    <td className="tnum r">{r.count}</td>
+                    <td className="tnum r">{pct(r.share)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </ScrollRegion>
         )}
       </section>
 

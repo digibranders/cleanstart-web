@@ -400,11 +400,11 @@ button.search{background:transparent}
 .ch-scale{display:flex;align-items:center;gap:3px;font-size:11.5px;color:#6B687D}
 .ch-scale .ch-sw{margin:0 1px}
 .ch-spark{display:block;flex:none}
-.ch-table table{width:100%;margin-top:8px;border-collapse:collapse;font-size:12px}
-.ch-table th,.ch-table td{padding:5px 8px;border-bottom:1px solid #F0EFF4;text-align:left}
-.ch-table td{text-align:right}
-.ch-table thead th{font-weight:600;color:#5E5B6E}
-.ch-table tbody th{font-weight:500}
+.ch-tablebox table{width:100%;margin:0;border-collapse:collapse;font-size:12px}
+.ch-tablebox th,.ch-tablebox td{padding:5px 8px;border-bottom:1px solid #F0EFF4;text-align:left}
+.ch-tablebox td{text-align:right}
+.ch-tablebox thead th{font-weight:600;color:#5E5B6E}
+.ch-tablebox tbody th{font-weight:500}
 .st{display:flex;flex-direction:column;gap:2px;padding:10px 14px;min-width:0}
 .st-l{font-size:12px;font-weight:600;color:#5E5B6E}
 .st-row{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
@@ -554,15 +554,68 @@ textarea{scrollbar-gutter:stable}
 .vp-seek:focus-visible{outline:2px solid #FFFFFF;outline-offset:2px;border-radius:4px}
 .vp:fullscreen{border-radius:0}
 
-/* fields that were native: file row and disclosure toggle */
-.ch-toggle{display:inline-flex;align-items:center;gap:4px;border:0;background:transparent;padding:0;font:inherit;font-size:12px;font-weight:600;color:#4B23C8;border-radius:4px;cursor:pointer}
-.ch-toggle:focus-visible{outline:2px solid #4B23C8;outline-offset:2px}
-.ch-toggle .ic{width:11px;height:11px;transition:transform .15s}
-.ch-toggle[aria-expanded="true"] .ic{transform:rotate(180deg)}
-@media (prefers-reduced-motion:reduce){.hint-tip{animation:none}.ch-toggle .ic,.dd-menu{transition:none}}
+@media (prefers-reduced-motion:reduce){.hint-tip{animation:none}.dd-menu{transition:none}}
 
 /* chart canvas: the skeleton holds the space until ECharts has loaded */
 .ch-canvas{position:relative;width:100%}
 .ch-skel{position:absolute;inset:0;border-radius:10px;background:linear-gradient(100deg,#F4F3F8 30%,#FAF9FD 50%,#F4F3F8 70%);background-size:200% 100%;animation:ch-shimmer 1.4s linear infinite}
 @keyframes ch-shimmer{from{background-position:100% 0}to{background-position:-100% 0}}
 @media (prefers-reduced-motion:reduce){.ch-skel{animation:none}}
+
+/* chart card: header with the Chart/Table switch, body that fills the card, table that replaces the chart in place */
+.ch{height:100%}
+.ch-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.ch-switch{display:inline-flex;flex:none;padding:2px;gap:2px;border:1px solid #E4E2EA;border-radius:8px;background:#F8F7FB}
+.ch-sw-b{width:26px;height:24px;display:grid;place-items:center;border:0;border-radius:6px;background:transparent;color:#6B687D;cursor:pointer}
+.ch-sw-b .ic{width:14px;height:14px}
+.ch-sw-b:hover{color:#0F0E17}
+.ch-sw-b[aria-pressed="true"]{background:#FFFFFF;color:#4B23C8;box-shadow:0 1px 2px rgba(23,16,52,.1)}
+.ch-body{display:flex;flex-direction:column;gap:8px;flex:1;min-width:0}
+.ch-body[hidden],.ch-tablebox[hidden]{display:none}
+.ch-tablebox{overflow:auto;min-height:120px;flex:1}
+.ch-tablebox thead th{position:sticky;top:0;background:#FFFFFF}
+.dash{align-items:stretch}
+.dash>section:not(.kpis){display:flex;flex-direction:column}
+.dash>section>.ch,.dash>section.card{flex:1}
+.dash-c12{grid-column:1/-1}
+.card .ch{border:0;border-radius:0;padding:4px 16px 14px;height:auto;flex:1}
+
+/* customisable dashboard: a 12 column grid whose cards are sized by packSpans, with edit chrome on top of each card */
+.dc-tools{display:flex;align-items:center;justify-content:flex-end;gap:12px;flex-wrap:wrap;min-height:34px}
+.dc-hint{margin-right:auto;font-size:12.5px;color:#5E5B6E}
+.dc-actions{display:flex;gap:8px;flex-wrap:wrap}
+.dc-actions .btn .ic,.dc-open .ic{width:14px;height:14px}
+.dgrid{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;align-items:stretch}
+.dc{display:flex;flex-direction:column;min-width:0;border-radius:12px}
+.dc-body{display:flex;flex-direction:column;flex:1;min-width:0}
+.dc-body>*{flex:1}
+.dc-editing{padding:6px;background:#F7F5FE;outline:1.5px dashed #B7A3F0;outline-offset:-1px}
+.dc-editing.dc-over{outline:2px solid #5B2FE2;background:#EFEAFD}
+.dc-editing.dc-drag{opacity:.35}
+.dc-bar{display:flex;align-items:center;gap:8px;padding:2px 2px 6px}
+.dc-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12.5px;font-weight:600;color:#2A2838}
+.dc-grip,.dc-hide{width:26px;height:26px;display:grid;place-items:center;border:0;border-radius:6px;background:transparent;color:#6B687D;cursor:grab;flex:none}
+.dc-hide{cursor:pointer}
+.dc-grip:active{cursor:grabbing}
+.dc-grip:hover,.dc-hide:hover{background:#FFFFFF;color:#0F0E17}
+.dc-grip .ic,.dc-hide .ic{width:14px;height:14px}
+.dc-sizes{display:inline-flex;padding:2px;gap:2px;border:1px solid #E4E2EA;border-radius:8px;background:#FFFFFF;flex:none}
+.dc-size{min-width:26px;height:22px;padding:0 6px;border:0;border-radius:6px;background:transparent;font:inherit;font-size:11.5px;font-weight:600;color:#6B687D;cursor:pointer}
+.dc-size:hover{color:#0F0E17}
+.dc-size[aria-pressed="true"]{background:#4B23C8;color:#FFFFFF}
+.dc-ghost{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;background:#FFFFFF;border:1px solid #B7A3F0;box-shadow:0 8px 24px rgba(23,16,52,.18);font-size:13px;font-weight:600;color:#0F0E17;cursor:grabbing}
+.dc-ghost .ic{width:14px;height:14px;color:#6B687D}
+.dc-empty{display:flex;flex-direction:column;align-items:center;gap:10px;padding:40px 16px;border:1px dashed #D0CDDA;border-radius:12px;color:#5E5B6E}
+.dc-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.dc-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #F0EFF4}
+.dc-item-t{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+.dc-item-n{font-size:13.5px;font-weight:600;color:#0F0E17}
+.dc-item-s{font-size:12.5px;color:#5E5B6E}
+@media (min-width:960px){
+  .dgrid{grid-template-columns:repeat(12,minmax(0,1fr))}
+  .dc{grid-column:span var(--span,4)}
+}
+@media (max-width:959px){
+  .dc-tools,.dc-bar{display:none}
+  .dc-editing{padding:0;background:none;outline:0}
+}

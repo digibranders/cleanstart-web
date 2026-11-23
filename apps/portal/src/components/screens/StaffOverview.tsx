@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BarList, CATEGORICAL, Columns, Donut, Funnel, Heatmap, Line, PRODUCT_COLOR, STATUS_COLOR, StatTile } from "@/components/charts";
+import { type DashboardCard, DashboardGrid } from "@/components/dashboard/DashboardGrid";
 import { ExportKpisButton } from "@/components/dashboard/ExportKpisButton";
 import { OverviewFilters } from "@/components/dashboard/OverviewFilters";
 import {
@@ -17,6 +18,7 @@ import {
   workloadBars,
 } from "@/components/dashboard/overview-model";
 import { ScrollRegion } from "@/components/ui/scroll-region";
+import type { SavedLayout } from "@/lib/dashboard-layout";
 import type { DashboardFilters, DocumentUseRow, PartnerPerformanceRow, StaffDashboardDto } from "@/lib/dashboard-dto";
 import { fmtLong, fmtShort, plural } from "@/lib/dates";
 import { PRODUCT_LABEL } from "@/lib/domain";
@@ -35,7 +37,7 @@ export interface StaffOverviewFilterProps {
 
 /** Partner manager and staff sales get the deal dashboard; marketing has no deal access, so it gets document activity only. */
 export type StaffOverviewData =
-  | ({ kind: "deals"; dashboard: StaffDashboardDto; canApplications: boolean; crmCard: React.ReactNode } & StaffOverviewFilterProps)
+  | ({ kind: "deals"; dashboard: StaffDashboardDto; canApplications: boolean; crmCard: React.ReactNode; layout: SavedLayout | null } & StaffOverviewFilterProps)
   | { kind: "documents"; filters: DashboardFilters; mostOpened: DocumentUseRow[]; leastOpened: DocumentUseRow[]; newDocuments: { id: string; title: string; updatedAt: string }[] };
 
 interface StaffOverviewProps {
@@ -50,10 +52,10 @@ interface StaffOverviewProps {
 }
 
 
-function DocList({ kind, rows, meta, span = 6 }: { kind: "most" | "least"; rows: DocumentUseRow[]; meta?: string; span?: 4 | 6 }): React.JSX.Element {
+function DocList({ kind, rows, meta }: { kind: "most" | "least"; rows: DocumentUseRow[]; meta?: string }): React.JSX.Element {
   const title = kind === "most" ? "Most opened documents" : "Least opened documents";
   return (
-    <Cell span={span} label={title} className="card clip">
+    <section className="card clip" aria-label={title}>
       <CardHead id={kind} title={title} meta={meta} href={ROUTES.admin.documents} hrefLabel="All" />
       {rows.length === 0 ? <Empty>{kind === "most" ? "No documents opened in this period." : "No documents yet."}</Empty> : null}
       {rows.map((d) => (
@@ -64,7 +66,7 @@ function DocList({ kind, rows, meta, span = 6 }: { kind: "most" | "least"; rows:
           </span>
         </Link>
       ))}
-    </Cell>
+    </section>
   );
 }
 
@@ -111,8 +113,8 @@ export function StaffOverview({ data, today, asOf, scope, regions }: StaffOvervi
               </Link>
             ))}
           </Cell>
-          <DocList kind="most" rows={data.mostOpened} meta="All time" span={4} />
-          <DocList kind="least" rows={data.leastOpened} meta="All time" span={4} />
+          <Cell span={4} label="Most opened documents" className=""><DocList kind="most" rows={data.mostOpened} meta="All time" /></Cell>
+          <Cell span={4} label="Least opened documents" className=""><DocList kind="least" rows={data.leastOpened} meta="All time" /></Cell>
         </div>
       </div>
     );
@@ -125,7 +127,6 @@ export function StaffOverview({ data, today, asOf, scope, regions }: StaffOvervi
   const noDeals = Object.values(kpis.statusCounts).every((n) => n === 0);
   const regionRows = regionBars(series.byRegion, regionLabel);
   const productRows = productBars(series.byProduct);
-  const productSlices = productRows.map((p) => ({ key: p.key, label: p.label, value: p.value, ...(p.color ? { color: p.color } : {}) }));
   const reasons = reasonBars(series.rejectionReasons);
   const workload = workloadBars(d.managerWorkload);
   const funnel = [
@@ -140,9 +141,282 @@ export function StaffOverview({ data, today, asOf, scope, regions }: StaffOvervi
     { key: "inactive", label: "Inactive", value: d.partnerHealth.inactive, color: STATUS_COLOR.expired },
   ];
   const decided = series.approvalTime.reduce((n, b) => n + b.count, 0);
+  const dealsWaiting = `${ROUTES.admin.approvals}?status=waiting`;
   const partnersTable = topPartners(d);
   const f = d.filters;
-  const dealsWaiting = `${ROUTES.admin.approvals}?status=waiting`;
+
+  const cards: DashboardCard[] = [
+    {
+      def: { id: "status", title: "Registrations by status", description: "Deals registered in the period, split by status.", span: 4, min: 4, max: 8 },
+      node: (
+<>
+      {statusSlices.some((s) => s.value > 0) ? (
+        <Donut title="Registrations by status" description="Deals registered in the period by status." totalLabel="deals" data={statusSlices} />
+      ) : (
+        <ChartEmpty title="Registrations by status" action={{ href: ROUTES.admin.approvals, label: "Open the deals queue" }}>No deals registered in this period.</ChartEmpty>
+      )}
+</>
+      ),
+    },
+    {
+      def: { id: "weekly", title: "Submitted and decided per week", description: "Deals sent for approval against deals decided, week by week.", span: 8, min: 6, max: 12 },
+      node: (
+<>
+      {series.weekly.some((w) => w.submitted > 0 || w.decided > 0) ? (
+        <Line
+          title="Submitted and decided per week"
+          description="Deals sent for approval and deals decided in each week of the period."
+          labels={series.weekly.map((w) => weekLabel(w.weekStart))}
+          series={[
+            { key: "submitted", label: "Submitted", color: CATEGORICAL[0], values: series.weekly.map((w) => w.submitted) },
+            { key: "decided", label: "Decided", color: CATEGORICAL[1], values: series.weekly.map((w) => w.decided) },
+          ]}
+          format={(n) => String(Math.round(n))}
+        />
+      ) : (
+        <ChartEmpty title="Submitted and decided per week" action={{ href: `${ROUTES.admin.approvals}?status=all`, label: "See all deals" }}>No deals were submitted or decided in this period.</ChartEmpty>
+      )}
+</>
+      ),
+    },
+    {
+      def: { id: "region", title: "Pipeline value by region", description: "Open pipeline in USD for each region.", span: 4, min: 4, max: 12 },
+      node: (
+<>
+      {regionRows.length > 0 ? (
+        <BarList title="Pipeline value by region" description="Open deals (pending and accepted), USD." data={regionRows} format={formatUsd} />
+      ) : (
+        <ChartEmpty title="Pipeline value by region" action={{ href: `${ROUTES.admin.approvals}?status=all`, label: "See all deals" }}>No open pipeline value for this period.</ChartEmpty>
+      )}
+</>
+      ),
+    },
+    {
+      def: { id: "product", title: "Pipeline value by product", description: "Open pipeline in USD for each product.", span: 4, min: 4, max: 12 },
+      node: (
+<>
+      {productRows.length > 0 ? (
+        <BarList title="Pipeline value by product" description="Open deals (pending and accepted), USD." data={productRows} format={formatUsd} />
+      ) : (
+        <ChartEmpty title="Pipeline value by product" action={{ href: `${ROUTES.admin.approvals}?status=all`, label: "See all deals" }}>No open pipeline value for this period.</ChartEmpty>
+      )}
+</>
+      ),
+    },
+    {
+      def: { id: "funnel", title: "Application funnel", description: "How far partner applications got in the period.", span: 4, min: 4, max: 12 },
+      node: (
+<>
+      {d.funnel.applied > 0 ? (
+        <Funnel title="Application funnel" description="Applications received in the period and how far they got." stages={funnel} />
+      ) : (
+        <ChartEmpty title="Application funnel" action={{ href: ROUTES.admin.partners, label: "Open partners" }}>No partner applications in this period.</ChartEmpty>
+      )}
+</>
+      ),
+    },
+    {
+      def: { id: "rejections", title: "Rejection reasons", description: "Why deals were rejected in the period.", span: 4, min: 4, max: 12 },
+      node: (
+<>
+      {reasons.length > 0 ? (
+        <BarList title="Rejection reasons" description="Why deals were rejected in the period." data={reasons} format={(n) => String(n)} />
+      ) : (
+        <ChartEmpty title="Rejection reasons" action={{ href: `${ROUTES.admin.approvals}?status=rejected`, label: "See rejected deals" }}>No deals were rejected in this period.</ChartEmpty>
+      )}
+</>
+      ),
+    },
+    {
+      def: { id: "workload", title: "Manager workload", description: "Deals waiting for approval, per manager.", span: 4, min: 4, max: 12 },
+      node: (
+<>
+      {workload.length > 0 ? (
+        <BarList title="Manager workload" description="Deals waiting for approval, per manager." data={workload} format={(n) => String(n)} />
+      ) : (
+        <ChartEmpty title="Manager workload" action={{ href: `${ROUTES.admin.approvals}?status=all`, label: "See all deals" }}>Nothing is waiting for approval.</ChartEmpty>
+      )}
+</>
+      ),
+    },
+    {
+      def: { id: "dormant", title: "No activity in 30 days", description: "Active partners that have gone quiet.", span: 4, min: 4, max: 8 },
+      node: (
+<section className="card clip" aria-label="No activity in 30 days">
+      <CardHead id="dormant" title="No activity in 30 days" meta={d.dormantPartners.length ? String(d.dormantPartners.length) : undefined} href={ROUTES.admin.partners} />
+      {d.dormantPartners.length === 0 ? <Empty>Every active partner was active in the last 30 days.</Empty> : null}
+      {d.dormantPartners.map((p) => (
+        <Link href={`${ROUTES.admin.partners}?selected=${p.partnerId}`} className="li" key={p.partnerId}>
+          <span className="li-t">
+            <span className="li-n">{p.name}</span>
+            <span className="li-s">{p.daysQuiet === null ? "No activity on record" : `${plural(p.daysQuiet, "day")} quiet`}</span>
+          </span>
+        </Link>
+      ))}
+</section>
+      ),
+    },
+    {
+      def: { id: "toppartners", title: "Top partners", description: "Partners ranked by open pipeline and won value.", span: 8, min: 6, max: 12 },
+      node: (
+<section className="card clip" aria-label="Top partners">
+      <CardHead id="toppartners" title="Top partners" meta="By open pipeline" href={ROUTES.admin.partners} />
+      {partnersTable.length === 0 ? (
+        <Empty>No partner has pipeline or won deals in this period.</Empty>
+      ) : (
+        <ScrollRegion label="Top partners">
+          <table className="tbl">
+            <thead>
+              <tr>
+                <th scope="col">Partner</th>
+                <th scope="col" className="r">
+                  Pipeline
+                </th>
+                <th scope="col" className="r hide-sm">
+                  Won
+                </th>
+                <th scope="col" className="r hide-sm">
+                  Deals
+                </th>
+                <th scope="col" className="r hide-sm">
+                  Last active
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {partnersTable.map((p) => (
+                <tr key={p.partnerId}>
+                  <td style={{ whiteSpace: "normal" }}>
+                    <Link href={`${ROUTES.admin.partners}?selected=${p.partnerId}`} className="cust">
+                      <CustomerMark name={p.name} />
+                      {p.name}
+                    </Link>
+                  </td>
+                  <td className="tnum r">{formatUsd(p.pipelineValue)}</td>
+                  <td className="tnum r hide-sm">{p.wonCount ? `${formatUsd(p.wonValue)} (${p.wonCount})` : "None"}</td>
+                  <td className="tnum r hide-sm">{p.deals}</td>
+                  <td className="tnum r hide-sm">{p.lastActiveAt ? fmtShort(p.lastActiveAt.slice(0, 10), today) : "Never"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </ScrollRegion>
+      )}
+</section>
+      ),
+    },
+    {
+      def: { id: "mostopened", title: "Most opened documents", description: "The documents partners open most.", span: 4, min: 4, max: 8 },
+      node: (
+<DocList kind="most" rows={d.mostOpenedDocuments} />
+      ),
+    },
+    {
+      def: { id: "topdeals", title: "Top deals by value", description: "The largest deals in the period.", span: 8, min: 6, max: 12 },
+      node: (
+<section className="card clip" aria-label="Top deals by value">
+      <CardHead id="topdeals" title="Top deals by value" href={ROUTES.admin.approvals} />
+      {series.topDeals.length === 0 ? (
+        <Empty>No deals with a value in USD in this period.</Empty>
+      ) : (
+        <ScrollRegion label="Top deals by value">
+          <table className="tbl">
+            <thead>
+              <tr>
+                <th scope="col">Customer</th>
+                <th scope="col" className="hide-sm">
+                  Partner
+                </th>
+                <th scope="col" className="hide-sm">
+                  Product
+                </th>
+                <th scope="col" className="r">
+                  Value
+                </th>
+                <th scope="col" className="hide-sm">
+                  Stage
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {series.topDeals.map((t) => (
+                <tr key={t.id}>
+                  <td style={{ whiteSpace: "normal" }}>
+                    <Link href={`${ROUTES.admin.approvals}/${t.id}`} className="cust">
+                      <CustomerMark name={t.customer} />
+                      {t.customer}
+                    </Link>
+                  </td>
+                  <td className="t-sec hide-sm">{t.partnerName}</td>
+                  <td className="hide-sm">
+                    <ProductChip product={CHIP_PRODUCT[t.product]} />
+                  </td>
+                  <td className="tnum r" data-hint={PRODUCT_LABEL[t.product]}>
+                    {formatUsd(t.value)}
+                  </td>
+                  <td className="t-sec hide-sm">{t.stage}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </ScrollRegion>
+      )}
+</section>
+      ),
+    },
+    {
+      def: { id: "leastopened", title: "Least opened documents", description: "Documents few partners open.", span: 4, min: 4, max: 8 },
+      node: (
+<DocList kind="least" rows={d.leastOpenedDocuments} />
+      ),
+    },
+    {
+      def: { id: "health", title: "Partner health", description: "Active, onboarding and inactive partners.", span: 4, min: 4, max: 8, defaultHidden: true },
+      node: (
+<>
+      {health.some((h) => h.value > 0) ? (
+        <Donut title="Partner health" description="Partners by status." totalLabel="partners" data={health} />
+      ) : (
+        <ChartEmpty title="Partner health" action={{ href: ROUTES.admin.partners, label: "Open partners" }}>No partners in this view.</ChartEmpty>
+      )}
+</>
+      ),
+    },
+    {
+      def: { id: "decision", title: "Time to decision", description: "How long decided deals took, in business days.", span: 4, min: 4, max: 12, defaultHidden: true },
+      node: (
+<>
+      {decided > 0 ? (
+        <Columns
+          title="Time to decision"
+          description="Decided deals by business days from sent to decision."
+          series={[{ key: "n", label: "Deals", color: PRODUCT_COLOR["Clean Libraries"] }]}
+          rows={series.approvalTime.map((b) => ({ label: b.label, values: [b.count] }))}
+        />
+      ) : (
+        <ChartEmpty title="Time to decision" action={{ href: dealsWaiting, label: "Review waiting deals" }}>No deals were decided in this period.</ChartEmpty>
+      )}
+</>
+      ),
+    },
+    {
+      def: { id: "heat", title: "Registration activity", description: "Deals registered each day over the last 12 weeks.", span: 8, min: 6, max: 12, defaultHidden: true },
+      node: (
+<>
+      {heatIsEmpty(series.heat) ? (
+        <ChartEmpty title="Registration activity" action={{ href: ROUTES.admin.approvals, label: "Open the deals queue" }}>
+          No deals were registered in the last 12 weeks.
+        </ChartEmpty>
+      ) : (
+        <Heatmap title="Registration activity" description="Deals registered each day over the last 12 weeks." weeks={heatWeeks(series.heat)} unit="deals" />
+      )}
+</>
+      ),
+    },
+    ...(data.crmCard
+      ? [{ def: { id: "crm", title: "CRM sync", description: "The state of the connection to your CRM.", span: 12, min: 6, max: 12 }, node: <>{data.crmCard}</> }]
+      : []),
+  ];
 
   return (
     <div className="wrap">
@@ -191,211 +465,7 @@ export function StaffOverview({ data, today, asOf, scope, regions }: StaffOvervi
         </section>
       ) : null}
 
-      <div className="dash">
-        <Cell span={4} className="">
-          {statusSlices.some((s) => s.value > 0) ? (
-            <Donut title="Registrations by status" description="Deals registered in the period by status." totalLabel="deals" data={statusSlices} />
-          ) : (
-            <ChartEmpty title="Registrations by status" action={{ href: ROUTES.admin.approvals, label: "Open the deals queue" }}>No deals registered in this period.</ChartEmpty>
-          )}
-        </Cell>
-        <Cell span={8} wide className="">
-          {series.weekly.some((w) => w.submitted > 0 || w.decided > 0) ? (
-            <Line
-              title="Submitted and decided per week"
-              description="Deals sent for approval and deals decided in each week of the period."
-              labels={series.weekly.map((w) => weekLabel(w.weekStart))}
-              series={[
-                { key: "submitted", label: "Submitted", color: CATEGORICAL[0], values: series.weekly.map((w) => w.submitted) },
-                { key: "decided", label: "Decided", color: CATEGORICAL[1], values: series.weekly.map((w) => w.decided) },
-              ]}
-              format={(n) => String(Math.round(n))}
-            />
-          ) : (
-            <ChartEmpty title="Submitted and decided per week" action={{ href: `${ROUTES.admin.approvals}?status=all`, label: "See all deals" }}>No deals were submitted or decided in this period.</ChartEmpty>
-          )}
-        </Cell>
-
-        <Cell span={4} className="">
-          {regionRows.length > 0 ? (
-            <BarList title="Pipeline value by region" description="Open deals (pending and accepted), USD." data={regionRows} format={formatUsd} />
-          ) : (
-            <ChartEmpty title="Pipeline value by region" action={{ href: `${ROUTES.admin.approvals}?status=all`, label: "See all deals" }}>No open pipeline value for this period.</ChartEmpty>
-          )}
-        </Cell>
-        <Cell span={4} className="">
-          {productSlices.length > 0 ? (
-            <Donut title="Pipeline value by product" description="Open deals (pending and accepted), USD." totalLabel="pipeline" data={productSlices} format={formatUsd} />
-          ) : (
-            <ChartEmpty title="Pipeline value by product" action={{ href: `${ROUTES.admin.approvals}?status=all`, label: "See all deals" }}>No open pipeline value for this period.</ChartEmpty>
-          )}
-        </Cell>
-        <Cell span={4} className="">
-          {d.funnel.applied > 0 ? (
-            <Funnel title="Application funnel" description="Applications received in the period and how far they got." stages={funnel} />
-          ) : (
-            <ChartEmpty title="Application funnel" action={{ href: ROUTES.admin.partners, label: "Open partners" }}>No partner applications in this period.</ChartEmpty>
-          )}
-        </Cell>
-
-        <Cell span={4} className="">
-          {health.some((h) => h.value > 0) ? (
-            <Donut title="Partner health" description="Partners by status." totalLabel="partners" data={health} />
-          ) : (
-            <ChartEmpty title="Partner health" action={{ href: ROUTES.admin.partners, label: "Open partners" }}>No partners in this view.</ChartEmpty>
-          )}
-        </Cell>
-        <Cell span={4} className="">
-          {decided > 0 ? (
-            <Columns
-              title="Time to decision"
-              description="Decided deals by business days from sent to decision."
-              series={[{ key: "n", label: "Deals", color: PRODUCT_COLOR["Clean Libraries"] }]}
-              rows={series.approvalTime.map((b) => ({ label: b.label, values: [b.count] }))}
-            />
-          ) : (
-            <ChartEmpty title="Time to decision" action={{ href: dealsWaiting, label: "Review waiting deals" }}>No deals were decided in this period.</ChartEmpty>
-          )}
-        </Cell>
-        <Cell span={4} className="">
-          {reasons.length > 0 ? (
-            <BarList title="Rejection reasons" description="Why deals were rejected in the period." data={reasons} format={(n) => String(n)} />
-          ) : (
-            <ChartEmpty title="Rejection reasons" action={{ href: `${ROUTES.admin.approvals}?status=rejected`, label: "See rejected deals" }}>No deals were rejected in this period.</ChartEmpty>
-          )}
-        </Cell>
-
-        <Cell span={4} className="">
-          {workload.length > 0 ? (
-            <BarList title="Manager workload" description="Deals waiting for approval, per manager." data={workload} format={(n) => String(n)} />
-          ) : (
-            <ChartEmpty title="Manager workload" action={{ href: `${ROUTES.admin.approvals}?status=all`, label: "See all deals" }}>Nothing is waiting for approval.</ChartEmpty>
-          )}
-        </Cell>
-
-        <Cell span={8} wide className="">
-          {heatIsEmpty(series.heat) ? (
-            <ChartEmpty title="Registration activity" action={{ href: ROUTES.admin.approvals, label: "Open the deals queue" }}>
-              No deals were registered in the last 12 weeks.
-            </ChartEmpty>
-          ) : (
-            <Heatmap title="Registration activity" description="Deals registered each day over the last 12 weeks." weeks={heatWeeks(series.heat)} unit="deals" />
-          )}
-        </Cell>
-
-        <Cell span={8} wide label="Top partners" className="card clip">
-          <CardHead id="toppartners" title="Top partners" meta="By open pipeline" href={ROUTES.admin.partners} />
-          {partnersTable.length === 0 ? (
-            <Empty>No partner has pipeline or won deals in this period.</Empty>
-          ) : (
-            <ScrollRegion label="Top partners">
-              <table className="tbl">
-                <thead>
-                  <tr>
-                    <th scope="col">Partner</th>
-                    <th scope="col" className="r">
-                      Pipeline
-                    </th>
-                    <th scope="col" className="r hide-sm">
-                      Won
-                    </th>
-                    <th scope="col" className="r hide-sm">
-                      Deals
-                    </th>
-                    <th scope="col" className="r hide-sm">
-                      Last active
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {partnersTable.map((p) => (
-                    <tr key={p.partnerId}>
-                      <td style={{ whiteSpace: "normal" }}>
-                        <Link href={`${ROUTES.admin.partners}?selected=${p.partnerId}`} className="cust">
-                          <CustomerMark name={p.name} />
-                          {p.name}
-                        </Link>
-                      </td>
-                      <td className="tnum r">{formatUsd(p.pipelineValue)}</td>
-                      <td className="tnum r hide-sm">{p.wonCount ? `${formatUsd(p.wonValue)} (${p.wonCount})` : "None"}</td>
-                      <td className="tnum r hide-sm">{p.deals}</td>
-                      <td className="tnum r hide-sm">{p.lastActiveAt ? fmtShort(p.lastActiveAt.slice(0, 10), today) : "Never"}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </ScrollRegion>
-          )}
-        </Cell>
-        <Cell span={4} label="No activity in 30 days" className="card clip">
-          <CardHead id="dormant" title="No activity in 30 days" meta={d.dormantPartners.length ? String(d.dormantPartners.length) : undefined} href={ROUTES.admin.partners} />
-          {d.dormantPartners.length === 0 ? <Empty>Every active partner was active in the last 30 days.</Empty> : null}
-          {d.dormantPartners.map((p) => (
-            <Link href={`${ROUTES.admin.partners}?selected=${p.partnerId}`} className="li" key={p.partnerId}>
-              <span className="li-t">
-                <span className="li-n">{p.name}</span>
-                <span className="li-s">{p.daysQuiet === null ? "No activity on record" : `${plural(p.daysQuiet, "day")} quiet`}</span>
-              </span>
-            </Link>
-          ))}
-        </Cell>
-
-        <Cell span={8} wide label="Top deals by value" className="card clip">
-          <CardHead id="topdeals" title="Top deals by value" href={ROUTES.admin.approvals} />
-          {series.topDeals.length === 0 ? (
-            <Empty>No deals with a value in USD in this period.</Empty>
-          ) : (
-            <ScrollRegion label="Top deals by value">
-              <table className="tbl">
-                <thead>
-                  <tr>
-                    <th scope="col">Customer</th>
-                    <th scope="col" className="hide-sm">
-                      Partner
-                    </th>
-                    <th scope="col" className="hide-sm">
-                      Product
-                    </th>
-                    <th scope="col" className="r">
-                      Value
-                    </th>
-                    <th scope="col" className="hide-sm">
-                      Stage
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {series.topDeals.map((t) => (
-                    <tr key={t.id}>
-                      <td style={{ whiteSpace: "normal" }}>
-                        <Link href={`${ROUTES.admin.approvals}/${t.id}`} className="cust">
-                          <CustomerMark name={t.customer} />
-                          {t.customer}
-                        </Link>
-                      </td>
-                      <td className="t-sec hide-sm">{t.partnerName}</td>
-                      <td className="hide-sm">
-                        <ProductChip product={CHIP_PRODUCT[t.product]} />
-                      </td>
-                      <td className="tnum r" title={PRODUCT_LABEL[t.product]}>
-                        {formatUsd(t.value)}
-                      </td>
-                      <td className="t-sec hide-sm">{t.stage}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </ScrollRegion>
-          )}
-        </Cell>
-        <DocList kind="most" rows={d.mostOpenedDocuments} />
-        <DocList kind="least" rows={d.leastOpenedDocuments} />
-        {data.crmCard ? (
-          <Cell span={12} label="CRM sync" className="">
-            {data.crmCard}
-          </Cell>
-        ) : null}
-      </div>
+      <DashboardGrid dashboard="staff-overview" cards={cards} saved={data.layout} />
     </div>
   );
 }

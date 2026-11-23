@@ -52,6 +52,7 @@ import {
   USER_KINDS,
   USER_STATUSES,
 } from '@/lib/domain';
+import { DASHBOARD_IDS, type SavedLayout } from '@/lib/dashboard-layout';
 
 /** SQL fragment `col in ('a', 'b')`. Values are our own constants, never user input. */
 const inList = (column: AnyPgColumn, values: readonly string[]): SQL =>
@@ -647,6 +648,18 @@ export const notifications = pgTable(
     index('notifications_user_idx').on(t.userId, t.createdAt),
     check('notifications_kind_chk', inList(t.kind, NOTIFICATION_KINDS)),
   ],
+);
+
+/** One saved dashboard arrangement per person and dashboard (card order, hidden cards, chosen widths). */
+export const dashboardLayouts = pgTable(
+  'dashboard_layouts',
+  {
+    userId: uuid('user_id').notNull().references(() => users.id),
+    dashboard: text('dashboard', { enum: DASHBOARD_IDS }).notNull(),
+    layout: jsonb('layout').$type<SavedLayout>().notNull(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.dashboard] }), check('dashboard_layouts_dashboard_chk', inList(t.dashboard, DASHBOARD_IDS))],
 );
 
 export const notificationPrefs = pgTable(

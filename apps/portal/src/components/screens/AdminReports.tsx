@@ -72,8 +72,10 @@ export function AdminReports({ report, ranged, insights, today }: AdminReportsPr
         </div>
       </div>
 
-      <RangedReport report={ranged} today={today} />
-      <ReportInsights insights={insights} />
+      <div className="dash">
+        <RangedReport report={ranged} today={today} />
+        <ReportInsights insights={insights} />
+      </div>
 
       <h2 className="h1-sub" style={{ margin: '8px 0 0' }}>All time</h2>
       <section aria-label="All time summary" className="card kpis">

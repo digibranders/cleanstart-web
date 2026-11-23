@@ -10,6 +10,7 @@ import { ForbiddenError } from "@/server/errors";
 import { requireCan } from "@/server/auth/viewer";
 import { withViewer } from "@/server/repo/context";
 import { staffDashboard } from "@/server/repo/dashboard";
+import { getDashboardLayout } from "@/server/repo/dashboard-layouts";
 import { listDocuments, listNewDocuments } from "@/server/repo/documents";
 import { listPartners } from "@/server/repo/partners";
 
@@ -61,6 +62,7 @@ export default async function Page({
       regionSwitch: seesAllRegions,
       partners,
       canApplications: can(viewer, "application.read"),
+      layout: await getDashboardLayout(tx, viewer, "staff-overview"),
       crmCard: can(viewer, "integration.read_health") ? (
         <IntegrationHealthCard
           name="CRM"

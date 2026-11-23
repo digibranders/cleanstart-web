@@ -71,7 +71,7 @@ export function RangedReport({ report, today }: RangedReportProps): React.JSX.El
 
   return (
     <>
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+      <div className="dash-c12" style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
         <nav className="seg" aria-label="Date range">
           {REPORT_PRESETS.filter((p) => p !== 'custom').map((p) => (
             <Link
@@ -79,7 +79,7 @@ export function RangedReport({ report, today }: RangedReportProps): React.JSX.El
               href={href(p)}
               className={`seg-b${p === range.preset ? ' seg-on' : ''}`}
               aria-current={p === range.preset ? 'true' : undefined}
-              title={REPORT_PRESET_LABEL[p]}
+              data-hint={REPORT_PRESET_LABEL[p]}
               style={{ display: 'inline-flex', alignItems: 'center' }}
             >
               {SHORT[p]}
@@ -118,7 +118,7 @@ export function RangedReport({ report, today }: RangedReportProps): React.JSX.El
         </span>
       </div>
 
-      <section aria-label="Value and win rate" className="card kpis">
+      <section aria-label="Value and win rate" className="card kpis dash-c12">
         <div className="kpi">
           <span className="kpi-l">Total deal value</span>
           <span className="kpi-v tnum">{formatUsd(summary.totalValue)}</span>
@@ -144,7 +144,7 @@ export function RangedReport({ report, today }: RangedReportProps): React.JSX.El
         </div>
       </section>
 
-      <section aria-labelledby="rf" className="card clip">
+      <section aria-labelledby="rf" className="card clip dash-c6">
         <div className="card-h">
           <h2 id="rf" className="card-t">
             Pipeline funnel
@@ -157,7 +157,7 @@ export function RangedReport({ report, today }: RangedReportProps): React.JSX.El
           <div className="empty">No deals were registered in this range.</div>
         ) : (
           <>
-            <div style={{ padding: '4px 16px 8px', maxWidth: 560 }}>
+            <div>
               <Funnel
                 title="Funnel"
                 description="Deals registered in the range, how many were approved and how many were won."
@@ -165,79 +165,11 @@ export function RangedReport({ report, today }: RangedReportProps): React.JSX.El
                 format={(n) => String(Math.round(n))}
               />
             </div>
-            <ScrollRegion label="Funnel steps">
-              <table className="tbl">
-                <thead>
-                  <tr>
-                    <th scope="col">Step</th>
-                    <th scope="col" className="r">
-                      Deals
-                    </th>
-                    <th scope="col" className="r">
-                      Conversion
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {funnel.map((s) => (
-                    <tr key={s.key}>
-                      <td>{s.label}</td>
-                      <td className="tnum r">{s.count}</td>
-                      <td className="tnum r t-sec">{s.from === '' ? '' : `${pct(s.conversion)} of ${s.from}`}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </ScrollRegion>
           </>
         )}
       </section>
 
-      <section aria-labelledby="rl" className="card clip">
-        <div className="card-h">
-          <h2 id="rl" className="card-t">
-            Partner leaderboard
-          </h2>
-          <button type="button" className="btn btn-s" onClick={exportLeaderboard} disabled={leaderboard.length === 0}>
-            Export CSV
-          </button>
-        </div>
-        <ScrollRegion label="Partner leaderboard">
-          <table className="tbl">
-            <thead>
-              <tr>
-                <th scope="col">Partner</th>
-                <th scope="col" className="r">
-                  Deals
-                </th>
-                <th scope="col" className="r">
-                  Won
-                </th>
-                <th scope="col" className="r">
-                  Won value
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {leaderboard.map((r) => (
-                <tr key={r.partnerId}>
-                  <td>
-                    <Link href={`${ROUTES.admin.partners}?selected=${r.partnerId}`} className="cust">
-                      {r.name}
-                    </Link>
-                  </td>
-                  <td className="tnum r">{r.deals}</td>
-                  <td className="tnum r">{r.won}</td>
-                  <td className="tnum r">{formatUsd(r.wonValue)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          {leaderboard.length === 0 ? <div className="empty">No deals were registered in this range.</div> : null}
-        </ScrollRegion>
-      </section>
-
-      <section aria-labelledby="rp" className="card clip">
+      <section aria-labelledby="rp" className="card clip dash-c6">
         <div className="card-h">
           <h2 id="rp" className="card-t">
             By product
@@ -283,6 +215,50 @@ export function RangedReport({ report, today }: RangedReportProps): React.JSX.El
               ))}
             </tbody>
           </table>
+        </ScrollRegion>
+      </section>
+
+      <section aria-labelledby="rl" className="card clip dash-c12">
+        <div className="card-h">
+          <h2 id="rl" className="card-t">
+            Partner leaderboard
+          </h2>
+          <button type="button" className="btn btn-s" onClick={exportLeaderboard} disabled={leaderboard.length === 0}>
+            Export CSV
+          </button>
+        </div>
+        <ScrollRegion label="Partner leaderboard">
+          <table className="tbl">
+            <thead>
+              <tr>
+                <th scope="col">Partner</th>
+                <th scope="col" className="r">
+                  Deals
+                </th>
+                <th scope="col" className="r">
+                  Won
+                </th>
+                <th scope="col" className="r">
+                  Won value
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {leaderboard.map((r) => (
+                <tr key={r.partnerId}>
+                  <td>
+                    <Link href={`${ROUTES.admin.partners}?selected=${r.partnerId}`} className="cust">
+                      {r.name}
+                    </Link>
+                  </td>
+                  <td className="tnum r">{r.deals}</td>
+                  <td className="tnum r">{r.won}</td>
+                  <td className="tnum r">{formatUsd(r.wonValue)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {leaderboard.length === 0 ? <div className="empty">No deals were registered in this range.</div> : null}
         </ScrollRegion>
       </section>
     </>

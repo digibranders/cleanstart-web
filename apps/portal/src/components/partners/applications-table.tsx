@@ -198,7 +198,7 @@ export function ApplicationsTable({
                             type="button"
                             className="btn btn-d"
                             aria-label={`Decline ${a.company}`}
-                            title="Decline with a reason"
+                            data-hint="Decline with a reason"
                             onClick={() => startReject(a.id)}
                           >
                             Decline
@@ -207,7 +207,7 @@ export function ApplicationsTable({
                             type="button"
                             className="btn btn-p"
                             aria-label={`Approve and invite ${a.company}`}
-                            title="Creates the partner company, makes the applicant its partner admin and emails an invite"
+                            data-hint="Creates the partner company, makes the applicant its partner admin and emails an invite"
                             onClick={() => startApprove(a)}
                           >
                             Approve and invite

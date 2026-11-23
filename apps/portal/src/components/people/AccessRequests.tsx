@@ -122,7 +122,7 @@ export function AccessRequests({
                   className="btn btn-p"
                   style={BUTTON_STYLE}
                   aria-label={`Approve as ${PARTNER_ROLE_LABEL[roleOf(rq)]}, ${rq.name}`}
-                  title="Sends a login link"
+                  data-hint="Sends a login link"
                   onClick={() => setConfirming({ id: rq.id, decision: "approve" })}
                 >
                   Approve as {PARTNER_ROLE_LABEL[roleOf(rq)]}

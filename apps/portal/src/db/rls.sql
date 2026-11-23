@@ -66,7 +66,7 @@ BEGIN
     'regions', 'partners', 'users', 'staff_scopes', 'staff_regions', 'partner_checklist', 'applications', 'application_notes', 'application_tokens', 'invites', 'access_requests',
     'registrations', 'registration_contacts', 'registration_messages', 'registration_events', 'registration_reminders',
     'documents', 'document_audience', 'document_versions', 'document_opens', 'material_requests', 'email_change_requests',
-    'notifications', 'notification_prefs', 'audit_log', 'hubspot_outbox', 'hubspot_sync_state',
+    'notifications', 'notification_prefs', 'dashboard_layouts', 'audit_log', 'hubspot_outbox', 'hubspot_sync_state',
     'auth_session', 'auth_account', 'auth_verification', 'auth_two_factor'
   ] LOOP
     EXECUTE format('ALTER TABLE %I ENABLE ROW LEVEL SECURITY', t);
@@ -192,6 +192,10 @@ CREATE POLICY notifications_update ON notifications FOR UPDATE
 
 DROP POLICY IF EXISTS notification_prefs_all ON notification_prefs;
 CREATE POLICY notification_prefs_all ON notification_prefs FOR ALL
+  USING (app_is_system() OR user_id = app_user_id()) WITH CHECK (app_is_system() OR user_id = app_user_id());
+
+DROP POLICY IF EXISTS dashboard_layouts_all ON dashboard_layouts;
+CREATE POLICY dashboard_layouts_all ON dashboard_layouts FOR ALL
   USING (app_is_system() OR user_id = app_user_id()) WITH CHECK (app_is_system() OR user_id = app_user_id());
 
 -- ---------------------------------------------------------------- staff only
