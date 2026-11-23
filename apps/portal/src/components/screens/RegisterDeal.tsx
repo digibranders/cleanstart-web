@@ -23,10 +23,8 @@ import {
 import { REVIEW_SLA_BUSINESS_DAYS, PROTECTION_DAYS as PROTECTION_WINDOW_DAYS } from "@/lib/deal-rules";
 import {
   DEAL_CURRENCIES,
-  DEAL_REGIONS,
   type DealCurrency,
   type DealRegion,
-  PARTNER_REGION_LABEL,
   type PartnerRegion,
   PRODUCT_LABEL,
   PRODUCTS,
@@ -46,6 +44,7 @@ import { Icon } from "../icon";
 import { Dropdown } from "../ui/dropdown";
 import { ConfirmDialog } from "../ui/overlay";
 import { useToast } from "../ui/toast";
+import { useRegions } from "@/components/regions-context";
 
 const PRODUCT_DESC: Record<Product, string> = {
   images: "Zero-CVE hardened images",
@@ -73,7 +72,7 @@ interface RegisterDealProps {
   mine: RegistrationListItem[];
   managers: ManagerOptionDto[];
   partnerName: string;
-  /** The partner's own region; a partner based elsewhere starts on India. */
+  /** The partner's own region; a partner in a region that is no longer offered starts on the first active region. */
   partnerRegion: PartnerRegion | undefined;
   today: string;
   /** Keys the saved draft, so two people on one browser never see each other's. */
@@ -121,7 +120,10 @@ export function RegisterDeal({ mine, managers, partnerName: ownPartnerName, part
   const partnerName = onBehalf ? (pickedPartner?.name ?? "The partner") : ownPartnerName;
   const dealHref = (id: string): string => (onBehalf ? staffDealHref(id) : ROUTES.partner.deal(id));
   const listHref = onBehalf ? ROUTES.admin.approvals : ROUTES.partner.deals;
-  const homeRegion: DealRegion = partnerRegion === "middle_east" ? "middle_east" : "india";
+  const { offer } = useRegions();
+  const activeRegions = offer();
+  const regionFor = (key: string | undefined): DealRegion => (activeRegions.some((r) => r.key === key) ? (key as DealRegion) : (activeRegions[0]?.key ?? "india"));
+  const homeRegion = regionFor(partnerRegion);
   const blank = useMemo(() => blankForm(homeRegion, managerFor(managers, homeRegion)), [homeRegion, managers]);
   const [baseline, setBaseline] = useState<DealFormState>(() => (source ? fromSource(blank, source) : blank));
   const [form, setForm] = useState<DealFormState>(baseline);
@@ -303,7 +305,7 @@ export function RegisterDeal({ mine, managers, partnerName: ownPartnerName, part
 
   const pickPartner = (id: string): void => {
     setPartnerId(id);
-    const region: DealRegion = onBehalf?.partners.find((p) => p.id === id)?.region === "middle_east" ? "middle_east" : "india";
+    const region = regionFor(onBehalf?.partners.find((p) => p.id === id)?.region);
     if (id) patch({ region, managerId: managerFor(managers, region) });
   };
 
@@ -854,7 +856,7 @@ export function RegisterDeal({ mine, managers, partnerName: ownPartnerName, part
                           Region <span className="hint">(which CleanStart team reviews it)</span>
                         </span>
                         <div className="seg" role="group" aria-labelledby="rlabel" style={{ alignSelf: "flex-start" }}>
-                          {DEAL_REGIONS.map((region) => (
+                          {offer(form.region).map(({ key: region, name: regionLabel }) => (
                             <button
                               type="button"
                               key={region}
@@ -862,7 +864,7 @@ export function RegisterDeal({ mine, managers, partnerName: ownPartnerName, part
                               aria-pressed={form.region === region}
                               onClick={() => patch({ region, managerId: managerFor(managers, region) })}
                             >
-                              {PARTNER_REGION_LABEL[region]}
+                              {regionLabel}
                             </button>
                           ))}
                         </div>

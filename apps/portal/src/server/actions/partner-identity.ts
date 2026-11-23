@@ -1,7 +1,6 @@
 'use server';
 
 import { z } from 'zod';
-import { PARTNER_REGION_LABEL, PARTNER_REGIONS } from '@/lib/domain';
 import type { PartnerListRow } from '@/lib/dto';
 import { ROUTES } from '@/lib/routes';
 import { recordAudit } from '@/server/audit/record';
@@ -11,12 +10,13 @@ import { updatePartnerIdentity } from '@/server/repo/partner-identity';
 import { getPartnerDetail } from '@/server/repo/partners';
 import type { ActionResult } from './result';
 import { runViewerAction } from './run';
+import { regionName, regionKeySchema } from '@/lib/regions';
 
 const identitySchema = z.object({
   id: z.string().uuid(),
   name: z.string().trim().min(1, 'Enter the company name.').max(200).optional(),
   domain: z.string().trim().min(1, 'Enter the company domain.').max(253).optional(),
-  region: z.enum(PARTNER_REGIONS).optional(),
+  region: regionKeySchema.optional(),
 });
 
 /**
@@ -40,8 +40,8 @@ export async function updatePartnerIdentityAction(raw: unknown): Promise<ActionR
         await recordAudit(tx, ctx.viewer, {
           event: 'partner.region_changed',
           target,
-          before: PARTNER_REGION_LABEL[change.before.region],
-          after: PARTNER_REGION_LABEL[change.after.region],
+          before: regionName(change.before.region),
+          after: regionName(change.after.region),
           note: 'Existing registrations keep their region.',
           partnerId: change.partnerId,
           subject,

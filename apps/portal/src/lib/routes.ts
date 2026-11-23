@@ -33,6 +33,7 @@ export const ROUTES = {
     documents: "/admin/documents",
     reports: "/admin/reports",
     team: "/admin/team",
+    regions: "/admin/settings/regions",
     audit: "/admin/audit",
     account: "/admin/account",
     notifications: "/admin/notifications",
@@ -70,6 +71,7 @@ export const ADMIN_NAV: readonly NavItem[] = [
   { label: "Documents", href: ROUTES.admin.documents, icon: "docs", action: "document.upload" },
   { label: "Reports", href: ROUTES.admin.reports, icon: "chart", action: "report.read" },
   { label: "Team", href: ROUTES.admin.team, icon: "team", action: "staff.read" },
+  { label: "Regions", href: ROUTES.admin.regions, icon: "all", action: "region.manage" },
   { label: "Audit log", href: ROUTES.admin.audit, icon: "clk", action: "audit.read" },
   { label: "Help", href: ROUTES.admin.help, icon: "lib", action: "help.read" },
 ];

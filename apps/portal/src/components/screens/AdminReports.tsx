@@ -10,14 +10,15 @@ import { avatarClass, CATEGORY_BADGE, initialsOf } from '@/components/reports/pa
 import { Dropdown } from '@/components/ui/dropdown';
 import { useToast } from '@/components/ui/toast';
 import { fmtLong } from '@/lib/dates';
-import { PARTNER_CATEGORY_LABEL, PARTNER_REGION_LABEL } from '@/lib/domain';
+import { PARTNER_CATEGORY_LABEL } from '@/lib/domain';
+import { useRegions } from '@/components/regions-context';
 import type { AdminReportsDto } from '@/lib/dto';
 import {
   acceptRate,
   CATEGORY_OPTIONS,
   filterPartnerRows,
   partnersToCsv,
-  REGION_OPTIONS,
+  regionOptions,
   SORTS,
   type ReportSort,
 } from '@/lib/report-view';
@@ -33,6 +34,7 @@ interface AdminReportsProps {
 
 export function AdminReports({ report, ranged, today }: AdminReportsProps): React.JSX.Element {
   const toast = useToast();
+  const { regions, name: regionName } = useRegions();
   const [region, setRegion] = useState<string>('all');
   const [category, setCategory] = useState<string>('all');
   const [sort, setSort] = useState<ReportSort>('Most registered');
@@ -48,7 +50,7 @@ export function AdminReports({ report, ranged, today }: AdminReportsProps): Reac
   const rate = acceptRate(accepted, rejected);
 
   const exportCsv = (): void => {
-    downloadCsv(`partner-report-${today}.csv`, partnersToCsv(rows));
+    downloadCsv(`partner-report-${today}.csv`, partnersToCsv(rows, regions));
     toast(`Exported ${rows.length} partners to CSV`);
   };
 
@@ -107,7 +109,7 @@ export function AdminReports({ report, ranged, today }: AdminReportsProps): Reac
             <label className="sr" htmlFor="rr">
               Region
             </label>
-            <Dropdown id="rr" value={region} options={REGION_OPTIONS} onChange={setRegion} />
+            <Dropdown id="rr" value={region} options={regionOptions(regions)} onChange={setRegion} />
             <label className="sr" htmlFor="rc">
               Partner category
             </label>
@@ -163,7 +165,7 @@ export function AdminReports({ report, ranged, today }: AdminReportsProps): Reac
                   <td className="hide-sm">
                     <span className={`badge ${CATEGORY_BADGE[p.category]}`}>{PARTNER_CATEGORY_LABEL[p.category]}</span>
                   </td>
-                  <td className="t-sec hide-sm">{PARTNER_REGION_LABEL[p.region]}</td>
+                  <td className="t-sec hide-sm">{regionName(p.region)}</td>
                   <td className="tnum r">{p.registered}</td>
                   <td className="tnum r hide-sm">{p.accepted}</td>
                   <td

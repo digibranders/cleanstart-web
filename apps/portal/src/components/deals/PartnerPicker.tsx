@@ -1,7 +1,8 @@
 "use client";
 
 import { useId, useState } from "react";
-import { PARTNER_CATEGORY_LABEL, PARTNER_REGION_LABEL, type PartnerCategory, type PartnerRegion } from "@/lib/domain";
+import { PARTNER_CATEGORY_LABEL, type PartnerCategory, type PartnerRegion } from "@/lib/domain";
+import { RegionName } from "@/components/regions-context";
 
 export interface PartnerChoice {
   id: string;
@@ -49,7 +50,7 @@ export function PartnerPicker({ partners, value, onChange, error }: Props): Reac
         <span style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
           <span style={{ fontWeight: 600 }}>{chosen.name}</span>
           <span className="t-muted" style={{ fontSize: 12.5 }}>
-            {PARTNER_CATEGORY_LABEL[chosen.category]}, {PARTNER_REGION_LABEL[chosen.region]}
+            {PARTNER_CATEGORY_LABEL[chosen.category]}, <RegionName k={chosen.region} />
           </span>
           <button
             type="button"
@@ -94,7 +95,7 @@ export function PartnerPicker({ partners, value, onChange, error }: Props): Reac
             <button type="button" style={OPTION_STYLE} onClick={() => onChange(p.id)}>
               <span style={{ fontWeight: 600 }}>{p.name}</span>
               <span className="t-muted" style={{ fontSize: 12 }}>
-                {PARTNER_CATEGORY_LABEL[p.category]}, {PARTNER_REGION_LABEL[p.region]}
+                {PARTNER_CATEGORY_LABEL[p.category]}, <RegionName k={p.region} />
               </span>
             </button>
           </li>

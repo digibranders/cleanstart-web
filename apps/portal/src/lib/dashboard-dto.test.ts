@@ -14,7 +14,7 @@ describe('parseDashboardFilters', () => {
   });
 
   it('falls back on bad values instead of failing', () => {
-    const params = { period: '5y', region: 'mars', product: 'x', partnerId: 'not-a-uuid' };
+    const params = { period: '5y', region: 'Mars!', product: 'x', partnerId: 'not-a-uuid' };
     expect(parseDashboardFilters(params, { staff: true })).toEqual({ period: '90d' });
   });
 

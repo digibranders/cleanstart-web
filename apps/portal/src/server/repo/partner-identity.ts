@@ -6,6 +6,7 @@ import type { Viewer } from '@/server/auth/types';
 import { ConflictError, NotFoundError, ValidationError } from '@/server/errors';
 import { assertStaff, type Tx } from './context';
 import { defineIsolation } from './isolation.registry';
+import { assertRegionAssignable } from './regions';
 
 export interface PartnerIdentity {
   name: string;
@@ -43,6 +44,7 @@ export async function updatePartnerIdentity(
 
   const [current] = await tx.select().from(partners).where(eq(partners.id, input.id)).limit(1).for('update');
   if (!current) throw new NotFoundError('partner');
+  if (input.region !== undefined) await assertRegionAssignable(tx, input.region, current.region);
   const before: PartnerIdentity = { name: current.name, domain: current.domain, region: current.region };
   const after: PartnerIdentity = { name: name ?? before.name, domain: domain ?? before.domain, region: input.region ?? before.region };
 

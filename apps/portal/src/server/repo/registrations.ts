@@ -55,6 +55,7 @@ import { assertUuid, registrationScope } from '@/server/registrations/scope';
 import { assertStaff, type Tx } from './context';
 import { defineIsolation } from './isolation.registry';
 import { listManagerOptions } from './staff';
+import { assertRegionAssignable } from './regions';
 
 export interface ListRegistrationsInput {
   status?: RegistrationStatus[];
@@ -211,6 +212,7 @@ export async function createRegistrations(
     .where(eq(partners.id, partnerId))
     .limit(1);
   if (!partner) throw new NotFoundError('partner');
+  await assertRegionAssignable(tx, input.region);
   const managerId = await resolveManager(tx, viewer, input.managerId, input.region, partner.managerId);
 
   const taken = await tx

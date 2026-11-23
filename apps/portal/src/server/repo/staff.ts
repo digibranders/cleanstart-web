@@ -10,6 +10,7 @@ import { ConflictError, NotFoundError } from '@/server/errors';
 import { iso } from '@/server/people';
 import { assertStaff, type Tx } from './context';
 import { defineIsolation } from './isolation.registry';
+import { assertStaffScopeAssignable, listRegions } from './regions';
 
 /** People of the CleanStart team: users with a login plus teammates who only have an open invite (id is then the invite id). */
 export async function listStaff(tx: Tx, viewer: Viewer): Promise<StaffMemberDto[]> {
@@ -64,13 +65,14 @@ export async function listStaff(tx: Tx, viewer: Viewer): Promise<StaffMemberDto[
 
 /** The active partner managers a registration can be routed to, with their regions. Readable by partners (C.3). */
 export async function listManagerOptions(tx: Tx, _viewer: Viewer): Promise<ManagerOptionDto[]> {
+  const regionList = await listRegions(tx);
   const rows = await tx
     .select({ id: users.id, name: users.name, region: staffScopes.region })
     .from(users)
     .leftJoin(staffScopes, eq(staffScopes.userId, users.id))
     .where(and(eq(users.kind, 'staff'), eq(users.role, 'partner_manager'), eq(users.status, 'active')))
     .orderBy(asc(users.createdAt));
-  return rows.map((r) => ({ id: r.id, name: r.name, region: r.region ?? 'all', team: staffTeamLabel(r.region) }));
+  return rows.map((r) => ({ id: r.id, name: r.name, region: r.region ?? 'all', team: staffTeamLabel(r.region, regionList) }));
 }
 
 const loadTarget = async (tx: Tx, userId: string) => {
@@ -117,6 +119,8 @@ export async function changeStaffRegion(tx: Tx, viewer: Viewer, input: { userId:
   assertStaff(viewer);
   const target = await loadTarget(tx, input.userId);
   if (!target) throw new NotFoundError('staff member');
+  const [scope] = await tx.select({ region: staffScopes.region }).from(staffScopes).where(eq(staffScopes.userId, target.id)).limit(1);
+  await assertStaffScopeAssignable(tx, input.region, scope?.region);
   await tx
     .insert(staffScopes)
     .values({ userId: target.id, region: input.region })

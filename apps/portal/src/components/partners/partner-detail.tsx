@@ -4,10 +4,11 @@ import Link from "next/link";
 import { Drawer } from "@/components/ui/overlay";
 import { fmtShort, fmtLong } from "@/lib/dates";
 import { countryName } from "@/lib/deal-format";
-import { HEADCOUNT_BAND_LABEL, PARTNER_CATEGORY_LABEL, PARTNER_REGION_LABEL, PRODUCT_LABEL } from "@/lib/domain";
+import { HEADCOUNT_BAND_LABEL, PARTNER_CATEGORY_LABEL, PRODUCT_LABEL } from "@/lib/domain";
 import type { PartnerDetailDto } from "@/lib/dto";
 import { formatAgreement, initialsOf } from "@/lib/people";
 import { ROUTES } from "@/lib/routes";
+import { RegionName } from "@/components/regions-context";
 import { DealStatusBadge, PartnerStatusBadge, ProductMark } from "./badges";
 import { PartnerPeople } from "./partner-people";
 
@@ -78,7 +79,7 @@ export function PartnerDetail({
           <dt>Category</dt>
           <dd>{PARTNER_CATEGORY_LABEL[p.category]}</dd>
           <dt>Region</dt>
-          <dd>{PARTNER_REGION_LABEL[p.region]}</dd>
+          <dd><RegionName k={p.region} /></dd>
           <dt>Partner since</dt>
           <dd>{fmtLong(p.since)}</dd>
           <dt>Agreement</dt>

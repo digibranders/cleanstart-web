@@ -3,7 +3,7 @@
 import { z } from 'zod';
 import type { CustomerLookupResult } from '@/components/deals/types';
 import { normalizeDomain, sameCustomer } from '@/lib/customer';
-import { DEAL_CURRENCIES, DEAL_REGIONS, PRODUCT_LABEL, PRODUCTS } from '@/lib/domain';
+import { DEAL_CURRENCIES, PRODUCT_LABEL, PRODUCTS } from '@/lib/domain';
 import type { RegistrationListItem, RegistrationMessageDto } from '@/lib/dto';
 import { ROUTES } from '@/lib/routes';
 import { staffDealHref } from '@/lib/staff-deals-dto';
@@ -29,6 +29,7 @@ import {
 import { absoluteUrl } from '@/server/urls';
 import type { ActionResult } from './result';
 import { runViewerAction } from './run';
+import { regionKeySchema } from '@/lib/regions';
 
 const EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
@@ -60,7 +61,7 @@ const registerSchema = z.object({
   customer: z.string().trim().min(1, "Enter the customer's company name.").max(200),
   website: optionalText(200).refine((v) => v === null || normalizeDomain(v) !== null, 'Enter a website such as vardhancapital.in.'),
   products: z.array(z.enum(PRODUCTS)).min(1, 'Pick at least one product.'),
-  region: z.enum(DEAL_REGIONS),
+  region: regionKeySchema,
   managerId: z.string().uuid().nullish().transform((value) => value ?? null),
   contact: contactSchema.nullable().optional(),
   contacts: z

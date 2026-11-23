@@ -1,7 +1,7 @@
 'use server';
 
 import { z } from 'zod';
-import { PARTNER_CATEGORIES, PARTNER_CATEGORY_LABEL, PARTNER_REGION_LABEL, PARTNER_REGIONS, PARTNER_ROLE_LABEL } from '@/lib/domain';
+import { PARTNER_CATEGORIES, PARTNER_CATEGORY_LABEL, PARTNER_ROLE_LABEL } from '@/lib/domain';
 import type { ChecklistDto, CompanyDto, PartnerListRow } from '@/lib/dto';
 import { ROUTES } from '@/lib/routes';
 import { recordAudit } from '@/server/audit/record';
@@ -27,6 +27,7 @@ import {
 import { inviteUrl } from '@/server/urls';
 import type { ActionResult } from './result';
 import { runViewerAction } from './run';
+import { regionName, regionKeySchema } from '@/lib/regions';
 
 const companySchema = z.object({
   partnerId: z.string().uuid().optional(),
@@ -47,7 +48,7 @@ const newPartnerSchema = z.object({
   name: z.string().trim().min(1, 'Enter the company name.').max(200),
   website: z.string().trim().max(200),
   category: z.enum(PARTNER_CATEGORIES),
-  region: z.enum(PARTNER_REGIONS),
+  region: regionKeySchema,
   adminName: z.string().trim().max(120),
   adminEmail: z.string().trim().max(254),
   sendInvite: z.boolean(),
@@ -140,7 +141,7 @@ export async function createPartnerAction(raw: unknown): Promise<ActionResult<Pa
       await recordAudit(tx, ctx.viewer, {
         event: 'partner.created',
         target: result.partner.name,
-        note: `${PARTNER_CATEGORY_LABEL[input.category]}, ${PARTNER_REGION_LABEL[input.region]}. Partner admin ${input.adminName || input.adminEmail}${result.invite ? '. Invite sent.' : '. Invite not sent yet.'}`,
+        note: `${PARTNER_CATEGORY_LABEL[input.category]}, ${regionName(input.region)}. Partner admin ${input.adminName || input.adminEmail}${result.invite ? '. Invite sent.' : '. Invite not sent yet.'}`,
         partnerId: result.partner.id,
         subject: { type: 'partner', id: result.partner.id },
       });

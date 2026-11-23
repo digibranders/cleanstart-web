@@ -3,7 +3,8 @@ import { IntegrationHealthCard } from "@/components/audit/IntegrationHealthCard"
 import { StaffOverview, type StaffOverviewData } from "@/components/screens/StaffOverview";
 import { systemClock } from "@/lib/clock";
 import { type DashboardFilters, parseDashboardFilters } from "@/lib/dashboard-dto";
-import { STAFF_REGION_LABEL } from "@/lib/domain";
+import { regionName } from "@/lib/regions";
+import { listRegions } from "@/server/repo/regions";
 import { can } from "@/server/auth/policies";
 import { ForbiddenError } from "@/server/errors";
 import { requireCan } from "@/server/auth/viewer";
@@ -48,7 +49,8 @@ export default async function Page({
   const filters: DashboardFilters = seesAllRegions
     ? parsed
     : { period: parsed.period, ...(parsed.product ? { product: parsed.product } : {}), ...(parsed.partnerId ? { partnerId: parsed.partnerId } : {}) };
-  const scope = seesAllRegions ? "You see deals and partners in all regions." : `You see deals and partners in ${STAFF_REGION_LABEL[viewer.region]}.`;
+  const scopeRegions = await withViewer(viewer, (tx) => listRegions(tx, viewer));
+  const scope = seesAllRegions ? "You see deals and partners in all regions." : `You see deals and partners in ${regionName(viewer.region, scopeRegions)}.`;
 
   const data: StaffOverviewData = await withViewer(viewer, async (tx) => {
     const dashboard = await staffDashboard(tx, viewer, filters, systemClock);
@@ -73,5 +75,5 @@ export default async function Page({
       ) : null,
     };
   });
-  return <StaffOverview data={data} today={systemClock.today()} asOf={now.toISOString()} scope={scope} />;
+  return <StaffOverview data={data} today={systemClock.today()} asOf={now.toISOString()} scope={scope} regions={scopeRegions} />;
 }

@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { DASHBOARD_PERIOD_LABEL, DASHBOARD_PERIODS, DEFAULT_DASHBOARD_PERIOD, type DashboardPeriod } from "@/lib/dashboard-dto";
-import { DEAL_REGIONS, type DealRegion, PARTNER_CATEGORIES, PARTNER_CATEGORY_LABEL, type PartnerCategory, PARTNER_REGION_LABEL, PRODUCT_LABEL, PRODUCTS, type Product } from "@/lib/domain";
+import { type DealRegion, PARTNER_CATEGORIES, PARTNER_CATEGORY_LABEL, type PartnerCategory, PRODUCT_LABEL, PRODUCTS, type Product } from "@/lib/domain";
+import { useRegions } from "@/components/regions-context";
 
 const SHORT_PERIOD: Record<Exclude<DashboardPeriod, "custom">, string> = { "30d": "30 days", "90d": "90 days", "12m": "12 months", ytd: "Year to date" };
 
@@ -47,6 +48,8 @@ interface OverviewFiltersProps extends OverviewFilterState {
 export function OverviewFilters({ regionSwitch = false, categorySwitch = false, partners, ...state }: OverviewFiltersProps): React.JSX.Element {
   const pathname = usePathname();
   const router = useRouter();
+  const { offer } = useRegions();
+  const regions = offer(state.region);
   const go = (next: Partial<OverviewFilterState>): void => router.replace(overviewHref(pathname, { ...state, ...next }));
   return (
     <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
@@ -103,12 +106,12 @@ export function OverviewFilters({ regionSwitch = false, categorySwitch = false, 
           className="fsel"
           aria-label="Region"
           value={state.region ?? ""}
-          onChange={(e) => go({ region: (DEAL_REGIONS as readonly string[]).includes(e.target.value) ? (e.target.value as DealRegion) : undefined })}
+          onChange={(e) => go({ region: regions.some((r) => r.key === e.target.value) ? (e.target.value as DealRegion) : undefined })}
         >
           <option value="">All regions</option>
-          {DEAL_REGIONS.map((r) => (
-            <option key={r} value={r}>
-              {PARTNER_REGION_LABEL[r]}
+          {regions.map((r) => (
+            <option key={r.key} value={r.key}>
+              {r.name}
             </option>
           ))}
         </select>

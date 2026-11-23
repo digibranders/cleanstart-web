@@ -7,7 +7,8 @@ import { Drawer } from "@/components/ui/overlay";
 import { useToast } from "@/components/ui/toast";
 import { fmtLong } from "@/lib/dates";
 import { findCountry } from "@/lib/deal-form";
-import { PARTNER_CATEGORY_LABEL, PARTNER_REGION_LABEL, PRODUCT_LABEL, type Product } from "@/lib/domain";
+import { PARTNER_CATEGORY_LABEL, PRODUCT_LABEL, type Product } from "@/lib/domain";
+import { useRegions } from "@/components/regions-context";
 import type { ApplicationDto, ApplicationNoteDto } from "@/lib/dto";
 import {
   addApplicationNoteAction,
@@ -41,6 +42,7 @@ interface ApplicationDrawerProps {
 export function ApplicationDrawer({ application, onClose, canDecide }: ApplicationDrawerProps): React.JSX.Element | null {
   const toast = useToast();
   const router = useRouter();
+  const { name: regionName } = useRegions();
   const [notes, setNotes] = useState<ApplicationNoteDto[] | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [note, setNote] = useState("");
@@ -118,7 +120,7 @@ export function ApplicationDrawer({ application, onClose, canDecide }: Applicati
     ["Phone", a.phone ?? "Not given"],
     ["Company", `${a.company} (${a.domain})`],
     ["Partner type", a.category ? PARTNER_CATEGORY_LABEL[a.category] : "Not set"],
-    ["Region", a.region ? PARTNER_REGION_LABEL[a.region] : "Not set"],
+    ["Region", a.region ? regionName(a.region) : "Not set"],
     ["Country", country ?? "Not given"],
     ["Company size", a.companySize ?? "Not given"],
     ["Years in business", a.yearsInBusiness ?? "Not given"],

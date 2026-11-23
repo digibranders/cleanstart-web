@@ -5,7 +5,6 @@ import { useCallback, useState } from "react";
 import { fmtTimestamp } from "@/lib/dates";
 import {
   EVENT_SOURCE_LABEL,
-  PARTNER_REGION_LABEL,
   PRODUCT_LABEL,
   PRODUCTS,
 } from "@/lib/domain";
@@ -25,6 +24,7 @@ import type { ManagerContact } from "../deals/types";
 import { Icon } from "../icon";
 import { Dialog } from "../ui/overlay";
 import { useToast } from "../ui/toast";
+import { RegionName } from "@/components/regions-context";
 
 interface SummaryKpi {
   label: string;
@@ -352,7 +352,7 @@ export function DealDetail({ deal, siblings, today, partnerManager, senderEmail 
                 <dt>Product</dt>
                 <dd>{PRODUCT_LABEL[deal.product]}</dd>
                 <dt>Region</dt>
-                <dd>{PARTNER_REGION_LABEL[deal.region]}</dd>
+                <dd><RegionName k={deal.region} /></dd>
                 {deal.website ? (
                   <>
                     <dt>Website</dt>

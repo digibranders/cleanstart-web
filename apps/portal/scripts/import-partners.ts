@@ -4,7 +4,8 @@ import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 import { db, type Db } from '../src/db/client';
 import { partners } from '../src/db/schema';
-import { PARTNER_CATEGORIES, PARTNER_REGIONS } from '../src/lib/domain';
+import { PARTNER_CATEGORIES } from '../src/lib/domain';
+import { regionKeySchema } from '../src/lib/regions';
 import { recordAudit } from '../src/server/audit/record';
 import { SYSTEM_ACTORS } from '../src/server/auth/types';
 import { enqueue } from '../src/server/hubspot/outbox';
@@ -34,7 +35,7 @@ const rowSchema = z.object({
   name: z.string().trim().min(1),
   domain: z.string().trim().min(3).transform(normalizeDomain).pipe(z.string().min(3)),
   category: z.enum(PARTNER_CATEGORIES),
-  region: z.enum(PARTNER_REGIONS),
+  region: regionKeySchema,
 });
 export const partnerFileSchema = z.array(rowSchema).min(1);
 export type PartnerImportRow = z.output<typeof rowSchema>;

@@ -1,7 +1,7 @@
 import { addDays } from '../src/lib/dates';
 import { protectionEndFor } from '../src/lib/deal-rules';
 import type { DealRegion, PartnerRegion, Product, RegistrationStatus } from '../src/lib/domain';
-import { DEAL_REGIONS, PRODUCTS, STAGE_AWAITING_REVIEW, STAGE_NOT_ACCEPTED } from '../src/lib/domain';
+import { PRODUCTS, STAGE_AWAITING_REVIEW, STAGE_NOT_ACCEPTED } from '../src/lib/domain';
 
 /** Pure generator for the demo only: dated registrations over the last 12 months so the dashboards have something to draw. */
 
@@ -72,7 +72,14 @@ export function seededRandom(seed: number): () => number {
 const PREFIXES = ['Northwind', 'Helio', 'Orbit', 'Cobalt', 'Meridian', 'Zenith', 'Aurora', 'Vertex', 'Lumen', 'Quanta', 'Falcon', 'Nimbus', 'Atlas', 'Sable', 'Pinnacle', 'Cedar', 'Onyx', 'Harbor', 'Summit', 'Ember', 'Tidal', 'Granite', 'Solace', 'Marlin'];
 const SUFFIXES = ['Bank', 'Logistics', 'Health', 'Telecom', 'Retail', 'Energy', 'Insurance', 'Payments', 'Systems', 'Networks', 'Foods', 'Motors'];
 const INDUSTRIES = ['Banking', 'Financial services', 'Healthcare', 'Logistics', 'Telecom', 'Retail', 'Energy', 'Insurance', 'Payments', 'Manufacturing'];
-const COUNTRIES: Record<DealRegion, readonly string[]> = { india: ['IN', 'IN', 'IN', 'SG'], middle_east: ['AE', 'SA', 'QA', 'KW', 'OM'] };
+/** Customer countries per launch region. A partner in any other region (a region added later, or the legacy 'elsewhere') registers deals in one of these. */
+const COUNTRIES: Record<string, readonly string[]> = {
+  india: ['IN', 'IN', 'IN', 'SG'],
+  middle_east: ['AE', 'SA', 'QA', 'KW', 'OM'],
+  eu: ['DE', 'FR', 'NL', 'SE', 'GB'],
+  us: ['US', 'US', 'US', 'CA'],
+};
+const DEMO_REGIONS = Object.keys(COUNTRIES);
 const SALES_STAGES = ['Qualification', 'Discovery', 'Evaluation', 'Proposal', 'Negotiation'];
 const REJECTION_REASONS = [
   'This customer is already registered for this product.',
@@ -120,7 +127,7 @@ export function generateDemoHistory(input: DemoHistoryInput): DemoDeal[] {
     const person = pick(partner.people);
     const decider = pick(deciders);
     const product = pick(PRODUCTS);
-    const region: DealRegion = partner.region === 'elsewhere' ? pick(DEAL_REGIONS) : partner.region;
+    const region: DealRegion = partner.region in COUNTRIES ? partner.region : pick(DEMO_REGIONS);
     let customerName = `${pick(PREFIXES)} ${pick(SUFFIXES)}`;
     for (let n = 2; used.has(`${partner.id}|${customerName.toLowerCase()}|${product}`); n += 1) customerName = `${customerName.replace(/ \d+$/, '')} ${n}`;
     used.add(`${partner.id}|${customerName.toLowerCase()}|${product}`);
@@ -140,7 +147,7 @@ export function generateDemoHistory(input: DemoHistoryInput): DemoDeal[] {
       region,
       dealValue: Math.round((low + random() * (high - low)) / 500) * 500,
       currency: 'USD' as const,
-      customerCountry: pick(COUNTRIES[region]),
+      customerCountry: pick(COUNTRIES[region] ?? COUNTRIES.india ?? []),
       customerIndustry: pick(INDUSTRIES),
       seats: between(30, 400),
       registeredOn,

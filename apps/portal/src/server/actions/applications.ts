@@ -1,7 +1,7 @@
 'use server';
 
 import { z } from 'zod';
-import { PARTNER_CATEGORIES, PARTNER_CATEGORY_LABEL, PARTNER_REGION_LABEL, PARTNER_REGIONS } from '@/lib/domain';
+import { PARTNER_CATEGORIES, PARTNER_CATEGORY_LABEL } from '@/lib/domain';
 import { APPLICATION_LINK_TTL_DAYS } from '@/lib/apply';
 import type { ApplicationDto, ApplicationNoteDto } from '@/lib/dto';
 import type { ApplicationApprovalDto } from '@/lib/apply';
@@ -24,12 +24,13 @@ import {
 import { applicationReplyUrl, inviteUrl } from '@/server/urls';
 import type { ActionResult } from './result';
 import { runViewerAction } from './run';
+import { regionName, regionKeySchema } from '@/lib/regions';
 
 const idSchema = z.object({ id: z.string().uuid() });
 const approveSchema = z.object({
   id: z.string().uuid(),
   category: z.enum(PARTNER_CATEGORIES),
-  region: z.enum(PARTNER_REGIONS),
+  region: regionKeySchema,
   managerId: z.string().uuid().optional(),
 });
 const noteSchema = z.object({ id: z.string().uuid(), note: z.string().trim().min(1, 'Write the note first.').max(2000) });
@@ -53,7 +54,7 @@ export async function approveApplicationAction(raw: unknown): Promise<ActionResu
       await recordAudit(tx, ctx.viewer, {
         event: 'application.approved',
         target: before.company,
-        note: `Created ${result.partner.name} as ${PARTNER_CATEGORY_LABEL[input.category]}, ${PARTNER_REGION_LABEL[input.region]}. Invite sent to ${before.applicantName}.`,
+        note: `Created ${result.partner.name} as ${PARTNER_CATEGORY_LABEL[input.category]}, ${regionName(input.region)}. Invite sent to ${before.applicantName}.`,
         partnerId: result.partner.id,
         subject: { type: 'application', id: before.id },
       });

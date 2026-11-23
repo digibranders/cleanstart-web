@@ -1,5 +1,6 @@
 import { z } from 'zod';
-import { DEAL_REGIONS, PRODUCTS, REGISTRATION_STATUSES, type RegistrationStatus } from '@/lib/domain';
+import { PRODUCTS, REGISTRATION_STATUSES, type RegistrationStatus } from '@/lib/domain';
+import { regionKeySchema } from '@/lib/regions';
 import type { RegistrationListItem } from '@/lib/dto';
 import { ROUTES } from '@/lib/routes';
 
@@ -15,7 +16,7 @@ export const staffDealFiltersSchema = z.object({
   partnerId: z.string().uuid().optional(),
   managerId: z.string().uuid().optional(),
   product: z.enum(PRODUCTS).optional(),
-  region: z.enum(DEAL_REGIONS).optional(),
+  region: regionKeySchema.optional(),
   overdue: flag.default(false),
   conflict: flag.default(false),
   q: z.string().trim().max(100).optional(),

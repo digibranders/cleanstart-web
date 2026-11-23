@@ -1,5 +1,6 @@
 import { COMMON_FREE_EMAIL_DOMAINS, validateBusinessEmail } from '@cleanstart/forms';
 import { fmtLong, fmtShort, addDays } from '@/lib/dates';
+import { type RegionDto, regionTeamLabel } from '@/lib/regions';
 import type { PartnerRole, StaffRegion, StaffRole, UserKind } from '@/lib/domain';
 import { ROUTES } from '@/lib/routes';
 
@@ -110,6 +111,5 @@ export const landingPathFor = (kind: UserKind, role: PartnerRole | StaffRole): s
   return ROUTES.admin.overview;
 };
 
-/** "CleanStart India", "CleanStart Middle East", or plain "CleanStart" for every region or an unknown one. */
-export const staffTeamLabel = (region: StaffRegion | null): string =>
-  region === 'india' ? 'CleanStart India' : region === 'middle_east' ? 'CleanStart Middle East' : 'CleanStart';
+/** "CleanStart India", "CleanStart EU", or plain "CleanStart" for every region or an unknown one. */
+export const staffTeamLabel = (region: StaffRegion | null, regions?: readonly RegionDto[]): string => regionTeamLabel(region, regions);

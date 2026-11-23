@@ -22,7 +22,7 @@ export const isoDate = (value: string | null | undefined): string | null => {
   return Number.isFinite(ms) ? new Date(ms).toISOString().slice(0, 10) : null;
 };
 
-/** `product` and `region` are display labels (PRODUCT_LABEL, PARTNER_REGION_LABEL), not the stored codes. */
+/** `product` and `region` are display labels (PRODUCT_LABEL, the regions table name), not the stored codes. */
 export interface RegistrationForSync {
   id: string; customerName: string; product: string; region: string; protectionEnd: string;
   /** REG-YYMM-NNNN. */

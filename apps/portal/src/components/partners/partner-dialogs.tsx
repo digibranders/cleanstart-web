@@ -5,7 +5,8 @@ import { useState } from "react";
 import { Dropdown, type DropdownOption } from "@/components/ui/dropdown";
 import { Dialog } from "@/components/ui/overlay";
 import { useToast } from "@/components/ui/toast";
-import { isOneOf, PARTNER_CATEGORIES, PARTNER_CATEGORY_LABEL, PARTNER_REGION_LABEL, PARTNER_REGIONS, type PartnerCategory, type PartnerRegion } from "@/lib/domain";
+import { PARTNER_CATEGORIES, PARTNER_CATEGORY_LABEL, type PartnerCategory, type PartnerRegion } from "@/lib/domain";
+import { useRegions } from "@/components/regions-context";
 import type { ManagerOptionDto, PartnerDetailDto } from "@/lib/dto";
 import { codeFromLabel } from "@/lib/people";
 import { updatePartnerIdentityAction } from "@/server/actions/partner-identity";
@@ -112,12 +113,12 @@ export function ManagerDialog({
   );
 }
 
-const REGION_OPTIONS: readonly DropdownOption[] = PARTNER_REGIONS.map((value) => ({ value, label: PARTNER_REGION_LABEL[value] }));
-
 /** Name, sign-in domain and region. Partner managers only. The CRM company is not touched. */
 export function IdentityDialog({ partner, onClose }: { partner: PartnerDetailDto; onClose: () => void }): React.JSX.Element {
   const toast = useToast();
   const router = useRouter();
+  const { offer } = useRegions();
+  const regionOptions: readonly DropdownOption[] = offer(partner.region).map((r) => ({ value: r.key, label: r.name }));
   const [name, setName] = useState(partner.name);
   const [domain, setDomain] = useState(partner.domain);
   const [region, setRegion] = useState<PartnerRegion>(partner.region);
@@ -186,10 +187,8 @@ export function IdentityDialog({ partner, onClose }: { partner: PartnerDetailDto
           id="id-region"
           variant="field"
           value={region}
-          options={REGION_OPTIONS}
-          onChange={(v) => {
-            if (isOneOf(PARTNER_REGIONS, v)) setRegion(v);
-          }}
+          options={regionOptions}
+          onChange={setRegion}
         />
         <span className="hint">Existing registrations keep their region.</span>
       </div>

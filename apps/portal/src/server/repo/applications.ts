@@ -26,6 +26,7 @@ import { likePattern } from '@/server/people';
 import { assertStaff, type Tx } from './context';
 import { defineIsolation } from './isolation.registry';
 import { systemClock } from '@/lib/clock';
+import { assertRegionAssignable } from './regions';
 
 export interface NewApplicationRecord {
   company: string;
@@ -133,6 +134,7 @@ export async function createPortalApplication(
   input: NewApplicationRecord,
   clock: Clock,
 ): Promise<{ application: ApplicationDto; merged: boolean; statusToken: string }> {
+  if (input.region) await assertRegionAssignable(tx, input.region);
   const fields = {
     company: input.company,
     domain: input.domain,
@@ -355,6 +357,7 @@ export async function approveApplication(
   const row = await loadForUpdate(tx, input.id);
   if (!isOpenApplication(row.status)) throw notOpen();
 
+  await assertRegionAssignable(tx, input.region, row.region);
   let managerId = input.managerId ?? null;
   if (managerId) await assertActiveManager(tx, managerId);
   else managerId = await pickManagerId(tx, input.region);

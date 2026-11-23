@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dropdown, type DropdownOption } from "@/components/ui/dropdown";
 import { ConfirmDialog } from "@/components/ui/overlay";
 import { useToast } from "@/components/ui/toast";
-import { isOneOf, STAFF_REGIONS, STAFF_REGION_LABEL, STAFF_ROLE_LABEL, STAFF_ROLES, type StaffRegion, type StaffRole } from "@/lib/domain";
+import { ALL_REGIONS, isOneOf, STAFF_ROLE_LABEL, STAFF_ROLES, type StaffRegion, type StaffRole } from "@/lib/domain";
 import type { StaffMemberDto } from "@/lib/dto";
 import { initialsOf, lastSeenLabel, rowKey } from "@/lib/people";
 import { ROUTES } from "@/lib/routes";
@@ -20,9 +20,9 @@ import {
   removeStaffAction,
   resendStaffInviteAction,
 } from "@/server/actions/staff";
+import { useRegions } from "@/components/regions-context";
 import { ScrollRegion } from "@/components/ui/scroll-region";
 
-const REGION_OPTIONS: readonly DropdownOption[] = STAFF_REGIONS.map((value) => ({ value, label: STAFF_REGION_LABEL[value] }));
 const ROLE_OPTIONS: readonly DropdownOption[] = STAFF_ROLES.map((value) => ({ value, label: STAFF_ROLE_LABEL[value] }));
 
 // [action, partner manager, sales, marketing]
@@ -43,6 +43,9 @@ function roleToast(name: string, role: StaffRole): string {
 
 export function AdminTeam({ people, today }: { people: StaffMemberDto[]; today: string }): React.JSX.Element {
   const toast = useToast();
+  const { offer, name: regionName } = useRegions();
+  const scopeLabel = (key: string): string => (key === ALL_REGIONS ? "All regions" : regionName(key));
+  const scopeOptions = (current: string): DropdownOption[] => [{ value: ALL_REGIONS, label: "All regions" }, ...offer(current).map((r) => ({ value: r.key, label: r.name }))];
   const [confirming, setConfirming] = useState<string | null>(null);
   const [inviteOpen, setInviteOpen] = useState(false);
   const closeInvite = useCallback((): void => setInviteOpen(false), []);
@@ -57,7 +60,7 @@ export function AdminTeam({ people, today }: { people: StaffMemberDto[]; today: 
 
   const changeRegion = async (person: StaffMemberDto, region: StaffRegion): Promise<void> => {
     if (await report(changeStaffRegionAction({ userId: person.id, region }))) {
-      toast(`${person.name} now covers ${STAFF_REGION_LABEL[region]}`);
+      toast(`${person.name} now covers ${scopeLabel(region)}`);
     }
   };
 
@@ -171,16 +174,16 @@ export function AdminTeam({ people, today }: { people: StaffMemberDto[]; today: 
                   </td>
                   <td className="t-sec hide-sm">
                     {p.isYou || p.status === "invited" ? (
-                      STAFF_REGION_LABEL[p.region]
+                      scopeLabel(p.region)
                     ) : (
                       <Dropdown
                         variant="rsel"
                         id={`tregion-${rowKey(p.email)}`}
                         ariaLabel={`Region for ${p.name}`}
                         value={p.region}
-                        options={REGION_OPTIONS}
+                        options={scopeOptions(p.region)}
                         onChange={(v) => {
-                          if (isOneOf(STAFF_REGIONS, v) && v !== p.region) void changeRegion(p, v);
+                          if (v !== p.region) void changeRegion(p, v);
                         }}
                       />
                     )}
@@ -245,7 +248,7 @@ export function AdminTeam({ people, today }: { people: StaffMemberDto[]; today: 
             <div className="note note-amber" role="status">
               <Icon name="warn" />
               <span>
-                {warned.name} still manages {warned.partners.length} partners in {STAFF_REGION_LABEL[warned.region]}.
+                {warned.name} still manages {warned.partners.length} partners in {scopeLabel(warned.region)}.
                 Those partners need a new partner manager.{" "}
                 <Link href={ROUTES.admin.partners} style={{ fontWeight: 600 }}>
                   Reassign on Partners

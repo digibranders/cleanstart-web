@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { PARTNER_REGION_LABEL, PRODUCT_LABEL, REGISTRATION_STATUS_LABEL } from "@/lib/domain";
+import { PRODUCT_LABEL, REGISTRATION_STATUS_LABEL } from "@/lib/domain";
 import type { RegistrationListItem } from "@/lib/dto";
 import { ROUTES } from "@/lib/routes";
 import { downloadCsv } from "../deals/csv";
@@ -15,6 +15,7 @@ import { ProductChip } from "../ui/badge";
 import { Dropdown } from "../ui/dropdown";
 import { useToast } from "../ui/toast";
 import { ScrollRegion } from "@/components/ui/scroll-region";
+import { useRegions } from "@/components/regions-context";
 
 const TABS = ["All", "Pending", "Accepted", "Rejected", "Expired", "Won", "Lost"] as const;
 type Tab = (typeof TABS)[number];
@@ -23,7 +24,6 @@ const ALL_PRODUCTS = "All products";
 const ALL_REGIONS = "All regions";
 const ANY_MANAGER = "Any partner manager";
 const PRODUCT_OPTIONS = [ALL_PRODUCTS, "CleanStart Images", "Clean Libraries", "CleanSight"];
-const REGION_OPTIONS = [ALL_REGIONS, "India", "Middle East"];
 function protectionText(deal: RegistrationListItem, today: string): string {
   const view = protectionView(deal, "deals", today);
   return `${view.until} ${view.left}`.trim();
@@ -63,12 +63,14 @@ function SortHead({ label, field, sort, onSort, className }: SortHeadProps): Rea
 
 export function Deals({ deals, today, ownDealsOnly, initialStatus }: DealsProps): React.JSX.Element {
   const toast = useToast();
+  const { regions, offer, name: regionName } = useRegions();
   const managerOptions = [ANY_MANAGER, ...new Set(deals.flatMap((d) => (d.managerName ? [d.managerName] : [])))];
 
   const [tab, setTab] = useState<Tab>(TABS.find((t) => t.toLowerCase() === initialStatus?.toLowerCase()) ?? "All");
   const [q, setQ] = useState("");
   const [product, setProduct] = useState(ALL_PRODUCTS);
   const [region, setRegion] = useState(ALL_REGIONS);
+  const regionOptions = [ALL_REGIONS, ...offer(regions.find((r) => r.name === region)?.key).map((r) => r.name)];
   const [manager, setManager] = useState(ANY_MANAGER);
   const [sort, setSort] = useState<{ key: DealSortKey; dir: SortDir }>({ key: "registered", dir: "desc" });
   const onSort = (key: DealSortKey): void =>
@@ -80,7 +82,7 @@ export function Deals({ deals, today, ownDealsOnly, initialStatus }: DealsProps)
       (tab === "All" || REGISTRATION_STATUS_LABEL[d.status] === tab) &&
       (!needle || d.customer.toLowerCase().includes(needle)) &&
       (product === ALL_PRODUCTS || PRODUCT_LABEL[d.product] === product) &&
-      (region === ALL_REGIONS || PARTNER_REGION_LABEL[d.region] === region) &&
+      (region === ALL_REGIONS || regionName(d.region) === region) &&
       (manager === ANY_MANAGER || d.managerName === manager),
   );
   const rows = sortDeals(matching, sort.key, sort.dir);
@@ -117,7 +119,7 @@ export function Deals({ deals, today, ownDealsOnly, initialStatus }: DealsProps)
         d.customer,
         d.website ?? "",
         PRODUCT_LABEL[d.product],
-        PARTNER_REGION_LABEL[d.region],
+        regionName(d.region),
         REGISTRATION_STATUS_LABEL[d.status],
         d.stage,
         d.managerName ?? "",
@@ -197,7 +199,7 @@ export function Deals({ deals, today, ownDealsOnly, initialStatus }: DealsProps)
                   onChange={(e) => setQ(e.target.value)}
                 />
                 <Dropdown id="fp" ariaLabel="Product" value={product} options={PRODUCT_OPTIONS} onChange={setProduct} />
-                <Dropdown id="fr" ariaLabel="Region" value={region} options={REGION_OPTIONS} onChange={setRegion} />
+                <Dropdown id="fr" ariaLabel="Region" value={region} options={regionOptions} onChange={setRegion} />
                 <Dropdown
                   id="fm"
                   ariaLabel="Partner manager"
@@ -258,7 +260,7 @@ export function Deals({ deals, today, ownDealsOnly, initialStatus }: DealsProps)
                       <td className="hide-sm">
                         <ProductChip product={CHIP_PRODUCT[d.product]} />
                       </td>
-                      <td className="t-sec hide-sm">{PARTNER_REGION_LABEL[d.region]}</td>
+                      <td className="t-sec hide-sm">{regionName(d.region)}</td>
                       <td>
                         <StatusBadge status={d.status} />
                       </td>

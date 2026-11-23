@@ -17,8 +17,6 @@ import {
   APPLICATION_YEARS,
   PARTNER_CATEGORIES,
   PARTNER_CATEGORY_LABEL,
-  PARTNER_REGION_LABEL,
-  PARTNER_REGIONS,
   PRODUCT_LABEL,
   PRODUCTS,
   type Product,
@@ -27,6 +25,7 @@ import { codeFromLabel, emailDomain, isFreeEmail, isValidEmail, normaliseDomain 
 import { ROUTES } from "@/lib/routes";
 import { submitApplicationAction } from "@/server/actions/apply";
 import { issuesToErrors } from "@/server/actions/result";
+import type { RegionDto } from "@/lib/regions";
 
 const CATEGORY_OPTIONS: readonly string[] = PARTNER_CATEGORIES.map((code) => PARTNER_CATEGORY_LABEL[code]);
 /** Shorter labels for the segmented control on a phone, where "Channel partner" does not fit on one line. */
@@ -37,7 +36,6 @@ const FULL_CATEGORY: Record<string, string> = Object.fromEntries(
   Object.entries(SHORT_CATEGORY).map(([full, short]) => [short, full]),
 );
 const SEG_SHORT_MAX = 480;
-const REGIONS: readonly string[] = PARTNER_REGIONS.map((code) => PARTNER_REGION_LABEL[code]);
 
 const STEPS = [
   { title: "Apply", text: "Tell us about your company. It takes about 3 minutes." },
@@ -153,7 +151,7 @@ const EMPTY: Fields = {
   email: "",
   phone: "",
   category: PARTNER_CATEGORY_LABEL.channel,
-  region: PARTNER_REGION_LABEL.india,
+  region: "",
   how: "",
   vendors: [],
   vendorsOther: "",
@@ -174,10 +172,10 @@ function ErrorText({ id, children }: { id: string; children: React.ReactNode }):
   );
 }
 
-export function Apply({ turnstileSiteKey }: { turnstileSiteKey: string }): React.JSX.Element {
+export function Apply({ turnstileSiteKey, regions }: { turnstileSiteKey: string; regions: readonly RegionDto[] }): React.JSX.Element {
   const router = useRouter();
   const toast = useToast();
-  const [f, setF] = useState<Fields>(EMPTY);
+  const [f, setF] = useState<Fields>({ ...EMPTY, region: regions[0]?.name ?? "" });
   const [tried, setTried] = useState(false);
   const [busy, setBusy] = useState(false);
   const [token, setToken] = useState<string | null>(null);
@@ -225,7 +223,7 @@ export function Apply({ turnstileSiteKey }: { turnstileSiteKey: string }): React
     )
       return;
     const category = codeFromLabel(PARTNER_CATEGORY_LABEL, f.category);
-    const region = codeFromLabel(PARTNER_REGION_LABEL, f.region);
+    const region = regions.find((r) => r.name === f.region)?.key;
     if (!category || !region) return;
     setBusy(true);
     const result = await submitApplicationAction({
@@ -419,7 +417,7 @@ export function Apply({ turnstileSiteKey }: { turnstileSiteKey: string }): React
             <span id="ap-reg" className="lbl">
               Where you sell
             </span>
-            <Seg options={REGIONS} value={f.region} onChange={(v) => set("region", v)} labelledBy="ap-reg" />
+            <Seg options={regions.map((r) => r.name)} value={f.region} onChange={(v) => set("region", v)} labelledBy="ap-reg" />
           </div>
         </div>
         <div className="grid2" style={{ gridTemplateColumns: "repeat(2, minmax(0, 1fr))" }}>

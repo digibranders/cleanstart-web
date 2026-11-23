@@ -1,9 +1,10 @@
-import { type DealRegion, PARTNER_REGION_LABEL, PRODUCT_LABEL, type Product } from '@/lib/domain';
+import { type DealRegion, PRODUCT_LABEL, type Product } from '@/lib/domain';
 import { ROUTES } from '@/lib/routes';
 import { sendEmail } from '@/server/email/send';
 import { buildRegistrationReceived } from '@/server/email/templates';
 import type { EmailAddress } from '@/server/email/transport';
 import { absoluteUrl } from '@/server/urls';
+import { regionName } from '@/lib/regions';
 
 export interface PartnerReceipt {
   to: EmailAddress;
@@ -19,7 +20,7 @@ export async function sendPartnerReceipt(receipt: PartnerReceipt): Promise<void>
       to: receipt.to,
       customer: receipt.customer,
       productLabel: receipt.products.map((p) => PRODUCT_LABEL[p]).join(', '),
-      regionLabel: PARTNER_REGION_LABEL[receipt.region],
+      regionLabel: regionName(receipt.region),
       dealsUrl: absoluteUrl(ROUTES.partner.deals),
     }),
   );

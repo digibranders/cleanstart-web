@@ -57,6 +57,13 @@
       "when": 1795300000000,
       "tag": "0007_company_profile",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1795400000000,
+      "tag": "0008_regions",
+      "breakpoints": true
     }
   ]
 }

@@ -1,7 +1,7 @@
 'use server';
 
 import { z } from 'zod';
-import { DEAL_REGIONS, PRODUCT_LABEL } from '@/lib/domain';
+import { PRODUCT_LABEL } from '@/lib/domain';
 import type { RegistrationDetailDto } from '@/lib/dto';
 import { ROUTES } from '@/lib/routes';
 import { staffDealHref } from '@/lib/staff-deals-dto';
@@ -13,11 +13,12 @@ import { reassignRegistration, routingLabel } from '@/server/repo/registration-r
 import { lockRegistration } from '@/server/repo/registrations';
 import type { ActionResult } from './result';
 import { runViewerAction } from './run';
+import { regionKeySchema } from '@/lib/regions';
 
 const reassignSchema = z.object({
   id: z.string().uuid(),
   managerId: z.string().uuid('Pick a partner manager.'),
-  region: z.enum(DEAL_REGIONS),
+  region: regionKeySchema,
 });
 
 /** Partner manager only, and only while the registration is waiting. */

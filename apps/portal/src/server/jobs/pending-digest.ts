@@ -2,7 +2,7 @@ import { and, asc, eq } from 'drizzle-orm';
 import { partners, registrations, staffScopes, users } from '@/db/schema';
 import { type Clock, systemClock } from '@/lib/clock';
 import { REVIEW_SLA_BUSINESS_DAYS, isOverSla, waitingBusinessDays } from '@/lib/deal-rules';
-import { type DealRegion, PARTNER_REGION_LABEL, PRODUCT_LABEL, type Product, type StaffRegion, type StaffRole } from '@/lib/domain';
+import { type DealRegion, PRODUCT_LABEL, type Product, type StaffRegion, type StaffRole } from '@/lib/domain';
 import { ROUTES } from '@/lib/routes';
 import { SYSTEM_ACTORS } from '@/server/auth/types';
 import { sendEmail } from '@/server/email/send';
@@ -11,6 +11,7 @@ import type { EmailTransport } from '@/server/email/transport';
 import { log } from '@/server/log';
 import { withSystem } from '@/server/repo/context';
 import { absoluteUrl } from '@/server/urls';
+import { regionName } from '@/lib/regions';
 
 export interface DigestReviewer {
   id: string;
@@ -69,7 +70,7 @@ export function buildDigests(
           customer: row.customer,
           partnerName: row.partnerName,
           productLabel: PRODUCT_LABEL[row.product],
-          regionLabel: PARTNER_REGION_LABEL[row.region],
+          regionLabel: regionName(row.region),
           waitingBusinessDays: days,
           pastTarget: isOverSla(row.since, today),
           overdue: days > OVERDUE_BUSINESS_DAYS,
