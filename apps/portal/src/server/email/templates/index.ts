@@ -19,5 +19,6 @@ export * from './new-document-notice';
 export * from './manager-message';
 export * from './team-change-notice';
 export * from './password-changed';
+export * from './email-change';
 export * from './password-reset';
 export * from './pending-digest';

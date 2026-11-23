@@ -29,6 +29,8 @@ export interface IssueInviteInput {
   role: string;
   staffRegion: StaffRegion | null;
   invitedBy: string | null;
+  /** The name the inviter gave, if any. */
+  name?: string | null | undefined;
 }
 
 /**
@@ -63,6 +65,7 @@ export async function issueInvite(tx: Tx, input: IssueInviteInput, clock: Clock)
       tokenHash,
       expiresAt: inviteExpiresAt(clock.now()),
       invitedBy: input.invitedBy,
+      name: input.name?.trim() || null,
     })
     .returning();
   if (!row) throw new Error('invite insert returned no row');

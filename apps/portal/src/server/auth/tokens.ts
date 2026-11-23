@@ -2,6 +2,7 @@ import { createHash, randomBytes, randomInt, timingSafeEqual } from 'node:crypto
 import type { InviteState } from '@/lib/dto';
 
 export const INVITE_TTL_DAYS = 7;
+export const EMAIL_CHANGE_TTL_HOURS = 24;
 export const OTP_TTL_MINUTES = 10;
 export const OTP_MAX_ATTEMPTS = 5;
 
@@ -17,6 +18,8 @@ export function generateInviteToken(): { token: string; tokenHash: string } {
 }
 
 export const inviteExpiresAt = (now: Date): Date => new Date(now.getTime() + INVITE_TTL_DAYS * DAY_MS);
+
+export const emailChangeExpiresAt = (now: Date): Date => new Date(now.getTime() + EMAIL_CHANGE_TTL_HOURS * 3_600_000);
 
 /** A used invite stays "used" even if it was also withdrawn; a withdrawn one stays "revoked" after it expires. */
 export function inviteState(

@@ -226,6 +226,8 @@ export const invites = pgTable(
     resentCount: integer('resent_count').notNull().default(0),
     invitedBy: uuid('invited_by').references(() => users.id),
     userId: uuid('user_id').references(() => users.id),
+    /** The name the inviter gave; null when they gave none. */
+    name: text('name'),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
@@ -263,6 +265,28 @@ export const accessRequests = pgTable(
     uniqueIndex('access_requests_open_key').on(t.partnerId, t.email).where(sql`${t.status} = 'open'`),
     check('access_requests_email_lower', sql`${t.email} = lower(${t.email})`),
     check('access_requests_status_chk', inList(t.status, ACCESS_REQUEST_STATUSES)),
+  ],
+);
+
+/** A partner admin's request to move a colleague's sign-in to a new address. The link goes to the new address and works once. */
+export const emailChangeRequests = pgTable(
+  'email_change_requests',
+  {
+    id: id(),
+    partnerId: uuid('partner_id').notNull().references(() => partners.id),
+    userId: uuid('user_id').notNull().references(() => users.id),
+    newEmail: text('new_email').notNull(),
+    tokenHash: text('token_hash').notNull(),
+    requestedBy: uuid('requested_by').references(() => users.id),
+    expiresAt: ts('expires_at').notNull(),
+    usedAt: ts('used_at'),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [
+    uniqueIndex('email_change_requests_token_hash_key').on(t.tokenHash),
+    index('email_change_requests_user_idx').on(t.userId),
+    check('email_change_requests_email_lower', sql`${t.newEmail} = lower(${t.newEmail})`),
   ],
 );
 

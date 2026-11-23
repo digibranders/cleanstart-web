@@ -16,6 +16,8 @@ export interface PersonRow {
   email: string;
   role: PartnerRole;
   status: 'active' | 'invited';
+  title: string | null;
+  phone: string | null;
   lastLoginAt: Date | null;
   invitedAt: Date | null;
 }
@@ -41,6 +43,8 @@ export async function loadPartnerPeople(tx: Tx, partnerId: string): Promise<Pers
     email: u.email,
     role: u.role as PartnerRole,
     status: u.status === 'active' ? 'active' : 'invited',
+    title: u.title,
+    phone: u.phone,
     lastLoginAt: u.lastLoginAt,
     invitedAt: u.invitedAt,
   }));
@@ -50,10 +54,12 @@ export async function loadPartnerPeople(tx: Tx, partnerId: string): Promise<Pers
       id: invite.id,
       userId: null,
       inviteId: invite.id,
-      name: nameFromEmail(invite.email),
+      name: invite.name ?? nameFromEmail(invite.email),
       email: invite.email,
       role: invite.role as PartnerRole,
       status: 'invited',
+      title: null,
+      phone: null,
       lastLoginAt: null,
       invitedAt: invite.createdAt,
     });

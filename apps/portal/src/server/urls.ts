@@ -10,6 +10,10 @@ export function inviteUrl(token: string): string {
   return absoluteUrl(`${ROUTES.acceptInvite}?token=${encodeURIComponent(token)}`);
 }
 
+export function confirmEmailUrl(token: string): string {
+  return absoluteUrl(`${ROUTES.confirmEmail}?token=${encodeURIComponent(token)}`);
+}
+
 export function resetPasswordUrl(token: string): string {
   return absoluteUrl(`${ROUTES.resetPassword}?token=${encodeURIComponent(token)}`);
 }

@@ -76,7 +76,7 @@ export async function previewInvite(tx: Tx, _actor: SystemActor, token: string, 
     kind: invite.kind,
     role: invite.role as PartnerRole | StaffRole,
     partnerName: partner?.name ?? null,
-    name: application?.name ?? null,
+    name: invite.name ?? application?.name ?? null,
     needsAgreement: needsAgreementFor(invite, partner),
     ...(partner?.agreementVersion ? { agreementVersion: partner.agreementVersion } : {}),
   };
@@ -186,7 +186,7 @@ export async function acceptInvite(tx: Tx, _actor: SystemActor, input: AcceptInv
 }
 
 export type NewInviteInput =
-  | { kind: 'partner'; partnerId: string; email: string; role: PartnerRole }
+  | { kind: 'partner'; partnerId: string; email: string; role: PartnerRole; name?: string | null | undefined }
   | { kind: 'staff'; email: string; role: StaffRole; region: StaffRegion };
 
 /** Partner admin on own company, partner manager on any, partner manager for staff invites (M1.6, M1.8). */
@@ -199,7 +199,7 @@ export async function createInvite(tx: Tx, viewer: Viewer, input: NewInviteInput
   if (viewer.kind === 'partner' && input.partnerId !== viewer.partnerId) throw new NotFoundError('partner');
   const [partner] = await tx.select({ id: partners.id }).from(partners).where(eq(partners.id, input.partnerId)).limit(1);
   if (!partner) throw new NotFoundError('partner');
-  return issueInvite(tx, { kind: 'partner', partnerId: partner.id, email: input.email, role: input.role, staffRegion: null, invitedBy: viewer.id }, clock);
+  return issueInvite(tx, { kind: 'partner', partnerId: partner.id, email: input.email, role: input.role, staffRegion: null, invitedBy: viewer.id, name: input.name }, clock);
 }
 
 const loadOpenForUpdate = async (tx: Tx, viewer: Viewer, inviteId: string) => {

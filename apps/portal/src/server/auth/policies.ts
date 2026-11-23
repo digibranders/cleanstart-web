@@ -1,4 +1,4 @@
-import type { DealRegion, PartnerRegion } from '@/lib/domain';
+import { type DealRegion, PARTNER_ROLES, type PartnerRegion, type PartnerRole } from '@/lib/domain';
 import { ForbiddenError } from '@/server/errors';
 import type { Viewer } from './types';
 import { roleKey } from './types';
@@ -26,6 +26,8 @@ export const ACTIONS = [
   'team.revoke_invite',
   'team.change_role',
   'team.remove',
+  'team.edit_member',
+  'team.reactivate',
   'access_request.decide',
   // CleanStart staff (master 1.8)
   'staff.read',
@@ -147,6 +149,8 @@ const RULES: Record<Action, Rule> = {
   'team.revoke_invite': teamAdmin,
   'team.change_role': teamAdmin,
   'team.remove': teamAdmin,
+  'team.edit_member': teamAdmin,
+  'team.reactivate': teamAdmin,
   'access_request.decide': teamAdmin,
 
   'staff.read': managerOnly,
@@ -212,3 +216,31 @@ export function assertCan(viewer: Viewer, action: Action, subject?: PolicySubjec
 
 /** For the permission test: the actions a role may attempt with no subject. */
 export const allowedActions = (viewer: Viewer): Action[] => ACTIONS.filter((a) => can(viewer, a));
+
+/** The rows of the Team screen's "What each role can do" table: a label, and the actions that must all be allowed. */
+const PARTNER_CAPABILITIES: ReadonlyArray<{ label: string; actions: readonly Action[] }> = [
+  { label: 'Register and track deals', actions: ['registration.create', 'registration.read'] },
+  { label: 'See the Overview', actions: ['overview.read'] },
+  { label: 'Message CleanStart about a deal', actions: ['registration.message'] },
+  { label: 'Request a deal extension', actions: ['registration.request_extension'] },
+  { label: 'Open documents', actions: ['document.open'] },
+  { label: 'Invite or remove people', actions: ['team.invite', 'team.remove'] },
+  { label: 'Edit company profile', actions: ['partner.update_profile'] },
+];
+
+const probeViewer = (role: PartnerRole): Viewer => ({
+  id: 'probe',
+  kind: 'partner',
+  role,
+  partnerId: 'probe',
+  partnerName: '',
+  email: '',
+  name: '',
+});
+
+/** Per capability, whether each partner role may do it, read from the policies above so the table cannot drift from them. */
+export const partnerPermissionTable = (): Array<{ label: string; roles: Record<PartnerRole, boolean> }> =>
+  PARTNER_CAPABILITIES.map(({ label, actions }) => ({
+    label,
+    roles: Object.fromEntries(PARTNER_ROLES.map((role) => [role, actions.every((a) => can(probeViewer(role), a))])) as Record<PartnerRole, boolean>,
+  }));

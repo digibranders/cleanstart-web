@@ -5,6 +5,7 @@ import type { Viewer } from "@/server/auth/types";
 export const ROUTES = {
   signIn: "/sign-in",
   resetPassword: "/reset-password",
+  confirmEmail: "/confirm-email",
   apply: "/apply",
   applyDone: "/apply/done",
   acceptInvite: "/accept-invite",
