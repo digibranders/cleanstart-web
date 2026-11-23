@@ -228,6 +228,15 @@ export async function revokeInvite(tx: Tx, viewer: Viewer, input: { inviteId: st
   return toInviteDto(revoked, clock.now());
 }
 
+/** Changes the role an open partner invite will give on acceptance. Staff invites are not touched here. */
+export async function changeInviteRole(tx: Tx, viewer: Viewer, input: { inviteId: string; role: PartnerRole }): Promise<InviteDto> {
+  const row = await loadOpenForUpdate(tx, viewer, input.inviteId);
+  if (row.kind !== 'partner') throw new NotFoundError('invite');
+  const [updated] = await tx.update(invites).set({ role: input.role }).where(eq(invites.id, row.id)).returning();
+  if (!updated) throw new Error('invite role change returned no row');
+  return toInviteDto(updated, new Date());
+}
+
 /** Open invites of one partner (partner viewers: their own), or all staff invites when kind is 'staff' (M1.6, M1.8). Expired ones are included, flagged by state. */
 export async function listOpenInvites(
   tx: Tx,
@@ -256,7 +265,7 @@ export async function listOpenInvites(
 }
 
 export const isolation = defineIsolation<
-  'previewInvite' | 'acceptInvite' | 'createInvite' | 'resendInvite' | 'revokeInvite' | 'listOpenInvites'
+  'previewInvite' | 'acceptInvite' | 'createInvite' | 'resendInvite' | 'revokeInvite' | 'changeInviteRole' | 'listOpenInvites'
 >({
   previewInvite: { scope: 'public', reason: 'Public invite page. Takes a SystemActor; covered by invites.test.ts.' },
   acceptInvite: { scope: 'public', reason: 'Public invite flow. Takes a SystemActor; covered by invites.test.ts and actions/invites.test.ts.' },
@@ -274,6 +283,12 @@ export const isolation = defineIsolation<
   revokeInvite: {
     scope: 'tenant',
     probe: (tx, viewer, ctx) => revokeInvite(tx, viewer, { inviteId: ctx.b.inviteId }, systemClock),
+    expect: 'not_found',
+    untouched: (ctx) => [{ table: 'invites', id: ctx.b.inviteId }],
+  },
+  changeInviteRole: {
+    scope: 'tenant',
+    probe: (tx, viewer, ctx) => changeInviteRole(tx, viewer, { inviteId: ctx.b.inviteId, role: 'sales' }),
     expect: 'not_found',
     untouched: (ctx) => [{ table: 'invites', id: ctx.b.inviteId }],
   },

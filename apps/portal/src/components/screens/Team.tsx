@@ -162,7 +162,7 @@ export function Team({ team, today }: { team: TeamDto; today: string }): React.J
                       </span>
                     </td>
                     <td>
-                      {m.isYou || m.status === "invited" ? (
+                      {m.isYou ? (
                         <Badge tone={ROLE_TONE[m.role]}>{PARTNER_ROLE_LABEL[m.role]}</Badge>
                       ) : (
                         <Dropdown
