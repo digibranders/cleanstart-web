@@ -14,6 +14,7 @@ import { type NewNotification, notifyUsers, resolveEmailRecipients } from '@/ser
 import { rateLimit } from '@/server/rate-limit';
 import { crmSuggestions } from '@/server/registrations/customer-lookup';
 import { readOnlyHubspot } from '@/server/registrations/hubspot-read';
+import { sendPartnerReceipt } from '@/server/registrations/partner-receipt';
 import { sendSubmissionAlert } from '@/server/registrations/staff-alert';
 import { withViewer } from '@/server/repo/context';
 import { postMessage } from '@/server/repo/messages';
@@ -121,6 +122,16 @@ export async function registerDealsAction(raw: unknown): Promise<ActionResult<Re
           items: outcome.items,
         }),
       );
+      if (ctx.viewer.kind === 'partner') {
+        ctx.afterCommit(() =>
+          sendPartnerReceipt({
+            to: { email: ctx.viewer.email, name: ctx.viewer.name },
+            customer: first.customer,
+            products: outcome.created.map((r) => r.product),
+            region: first.region,
+          }),
+        );
+      }
     }
     return outcome.created;
   });

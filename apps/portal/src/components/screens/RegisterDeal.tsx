@@ -57,6 +57,7 @@ const EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 interface Submitted {
   customer: string;
   products: Product[];
+  ids: string[];
 }
 
 function dealMeta(deal: RegistrationListItem, today: string): string {
@@ -196,7 +197,7 @@ export function RegisterDeal({ mine, managers, partnerName, partnerRegion, today
     }
     setErrors({});
     setFormError(null);
-    setSubmitted({ customer, products: result.data.map((d) => d.product) });
+    setSubmitted({ customer, products: result.data.map((d) => d.product), ids: result.data.map((d) => d.id) });
     setTried(false);
     toast(result.data.length > 1 ? `${result.data.length} registrations sent for approval` : "Submitted for approval");
   };
@@ -232,6 +233,13 @@ export function RegisterDeal({ mine, managers, partnerName, partnerRegion, today
                   {submitted.products.length > 1 ? "Each one is" : "It is"} pending until CleanStart reviews it. You get
                   an email for every decision.
                 </p>
+                <ul style={{ margin: "4px 0 0", padding: 0, listStyle: "none", fontSize: 13 }}>
+                  {submitted.ids.map((id, i) => (
+                    <li key={id}>
+                      <Link href={ROUTES.partner.deal(id)}>Open the {PRODUCT_LABEL[submitted.products[i] as Product]} deal</Link>
+                    </li>
+                  ))}
+                </ul>
                 <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
                   <Link href={ROUTES.partner.deals} className="btn btn-p">
                     View deals
