@@ -240,6 +240,11 @@ export function DealDetail({ deal, siblings, today, partnerManager, senderEmail 
               Fix and resubmit
             </button>
           ) : null}
+          {deal.status === "expired" || deal.status === "lost" || deal.status === "rejected" ? (
+            <Link href={`${ROUTES.partner.newDeal}?from=${deal.id}`} className="btn btn-s">
+              Register again
+            </Link>
+          ) : null}
           {deal.status === "pending" ? (
             <button type="button" className="btn btn-s" onClick={() => setWithdrawOpen(true)}>
               Withdraw registration

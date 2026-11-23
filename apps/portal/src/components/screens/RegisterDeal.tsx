@@ -1,9 +1,38 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
-import { DEAL_REGIONS, type DealRegion, PARTNER_REGION_LABEL, type PartnerRegion, PRODUCT_LABEL, PRODUCTS, type Product } from "@/lib/domain";
-import type { CustomerSuggestionDto, ManagerOptionDto, RegistrationListItem } from "@/lib/dto";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  blankForm,
+  COUNTRIES,
+  type DealDraft,
+  type DealFormState,
+  draftKey,
+  findCountry,
+  hasContent,
+  INDUSTRIES,
+  MAX_CONTACTS,
+  newContact,
+  parseDraft,
+  SALES_STAGES,
+  serializeDraft,
+  toRegisterInput,
+  validateDealForm,
+} from "@/lib/deal-form";
+import { REVIEW_SLA_BUSINESS_DAYS, PROTECTION_DAYS as PROTECTION_WINDOW_DAYS } from "@/lib/deal-rules";
+import {
+  DEAL_CURRENCIES,
+  DEAL_REGIONS,
+  type DealCurrency,
+  type DealRegion,
+  PARTNER_REGION_LABEL,
+  type PartnerRegion,
+  PRODUCT_LABEL,
+  PRODUCTS,
+  type Product,
+} from "@/lib/domain";
+import type { CustomerSuggestionDto, ManagerOptionDto, RegisterAgainDto, RegistrationListItem } from "@/lib/dto";
 import { ROUTES } from "@/lib/routes";
 import { lookupCustomerAction, registerDealsAction } from "@/server/actions/registrations";
 import { issuesToErrors } from "@/server/actions/result";
@@ -13,6 +42,7 @@ import { ProductMark, StatusBadge } from "../deals/parts";
 import type { CustomerLookupResult } from "../deals/types";
 import { Icon } from "../icon";
 import { Dropdown } from "../ui/dropdown";
+import { ConfirmDialog } from "../ui/overlay";
 import { useToast } from "../ui/toast";
 
 const PRODUCT_DESC: Record<Product, string> = {
@@ -21,43 +51,14 @@ const PRODUCT_DESC: Record<Product, string> = {
   cleansight: "Vulnerability detection",
 };
 
-interface FormState {
-  customer: string;
-  site: string;
-  contactName: string;
-  contactRole: string;
-  contactEmail: string;
-  contactPhone: string;
-  picked: Product[];
-  region: DealRegion;
-  managerId: string;
-  close: string;
-  details: string;
-}
-
-const BLANK: FormState = {
-  customer: "",
-  site: "",
-  contactName: "",
-  contactRole: "",
-  contactEmail: "",
-  contactPhone: "",
-  picked: [],
-  region: "india",
-  managerId: "",
-  close: "",
-  details: "",
-};
-
 const EMPTY_OWN: CustomerSuggestionDto[] = [];
 
-/** The same rule the server applies to a contact email. */
-const EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+const SECTION_STYLE = { border: 0, margin: 0, padding: "14px 14px 16px" } as const;
+const COLUMN_STYLE = { display: "flex", flexDirection: "column", gap: 12 } as const;
 
 interface Submitted {
   customer: string;
-  products: Product[];
-  ids: string[];
+  deals: Array<{ id: string; product: Product; reference: string }>;
 }
 
 function dealMeta(deal: RegistrationListItem, today: string): string {
@@ -73,22 +74,70 @@ interface RegisterDealProps {
   /** The partner's own region; a partner based elsewhere starts on India. */
   partnerRegion: PartnerRegion | undefined;
   today: string;
+  /** Keys the saved draft, so two people on one browser never see each other's. */
+  userId: string;
+  /** Set by /partner/deals/new?from=<id>: the customer to register again. */
+  source: RegisterAgainDto | null;
 }
 
-export function RegisterDeal({ mine, managers, partnerName, partnerRegion, today }: RegisterDealProps): React.JSX.Element {
+const fromSource = (base: DealFormState, source: RegisterAgainDto): DealFormState => ({
+  ...base,
+  customer: source.customer,
+  site: source.website ?? "",
+  country: source.country ? (findCountry(source.country)?.name ?? source.country) : "",
+  industry: source.industry ?? "",
+  contacts:
+    source.contacts.length > 0
+      ? source.contacts.map((c) => newContact({ name: c.name, role: c.role ?? "", email: c.email ?? "", phone: c.phone ?? "" }))
+      : [newContact()],
+});
+
+function readDraft(userId: string): DealDraft | null {
+  try {
+    return parseDraft(window.localStorage.getItem(draftKey(userId)));
+  } catch {
+    return null;
+  }
+}
+
+function writeDraft(userId: string, raw: string | null): void {
+  try {
+    if (raw === null) window.localStorage.removeItem(draftKey(userId));
+    else window.localStorage.setItem(draftKey(userId), raw);
+  } catch {
+    // Storage can be full or blocked; the form still works without a draft.
+  }
+}
+
+export function RegisterDeal({ mine, managers, partnerName, partnerRegion, today, userId, source }: RegisterDealProps): React.JSX.Element {
   const toast = useToast();
+  const router = useRouter();
   const homeRegion: DealRegion = partnerRegion === "middle_east" ? "middle_east" : "india";
-  const blank: FormState = { ...BLANK, region: homeRegion, managerId: managerFor(managers, homeRegion) };
-  const [form, setForm] = useState<FormState>(blank);
+  const blank = useMemo(() => blankForm(homeRegion, managerFor(managers, homeRegion)), [homeRegion, managers]);
+  const [baseline, setBaseline] = useState<DealFormState>(() => (source ? fromSource(blank, source) : blank));
+  const [form, setForm] = useState<DealFormState>(baseline);
   const [tried, setTried] = useState(false);
-  const [emailLeft, setEmailLeft] = useState(false);
+  const [touched, setTouched] = useState<ReadonlySet<string>>(new Set());
   const [busy, setBusy] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [serverErrors, setServerErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState<Submitted | null>(null);
   const [remote, setRemote] = useState<{ q: string; data: CustomerLookupResult } | null>(null);
+  const [draft, setDraft] = useState<DealDraft | null>(null);
+  const [draftChecked, setDraftChecked] = useState(false);
+  const [leaveTo, setLeaveTo] = useState<string | null>(null);
+  const leaving = useRef(false);
 
-  const patch = (change: Partial<FormState>): void => setForm((prev) => ({ ...prev, ...change }));
+  const patch = (change: Partial<DealFormState>): void => {
+    setForm((prev) => ({ ...prev, ...change }));
+    setServerErrors({});
+  };
+  const touch = (key: string): void => setTouched((prev) => (prev.has(key) ? prev : new Set(prev).add(key)));
+  const live = useMemo(() => validateDealForm(form, today), [form, today]);
+  const fieldError = (key: string): string | undefined => ((tried || touched.has(key)) && live[key]) || serverErrors[key];
+
+  const dirty = !submitted && hasContent(form, baseline);
+
   const customer = form.customer.trim();
   const needle = customer.toLowerCase();
 
@@ -151,25 +200,70 @@ export function RegisterDeal({ mine, managers, partnerName, partnerRegion, today
     };
   }, [customer]);
 
+  // A draft is offered once, on arrival, and never when the partner came to register a customer again.
+  useEffect(() => {
+    const saved = source ? null : readDraft(userId);
+    if (saved && hasContent(saved.form, blank)) setDraft(saved);
+    setDraftChecked(true);
+  }, [source, userId, blank]);
+
+  // Saved a moment after the last keystroke; paused while the restore notice waits for an answer.
+  useEffect(() => {
+    if (!draftChecked || draft || submitted) return;
+    const timer = setTimeout(() => writeDraft(userId, hasContent(form, baseline) ? serializeDraft(form, new Date()) : null), 400);
+    return () => clearTimeout(timer);
+  }, [form, baseline, draft, draftChecked, submitted, userId]);
+
+  useEffect(() => {
+    if (!dirty) return;
+    const warn = (event: BeforeUnloadEvent): void => {
+      if (!leaving.current) event.preventDefault();
+    };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [dirty]);
+
+  // Next has no route-change blocker, so a click on any in-app link is held until the partner confirms.
+  useEffect(() => {
+    if (!dirty) return;
+    const hold = (event: MouseEvent): void => {
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const link = (event.target as Element | null)?.closest("a[href]");
+      if (!(link instanceof HTMLAnchorElement) || (link.target && link.target !== "_self") || link.hasAttribute("download")) return;
+      const url = new URL(link.href, window.location.href);
+      if (url.origin !== window.location.origin || url.pathname === window.location.pathname) return;
+      event.preventDefault();
+      event.stopPropagation();
+      setLeaveTo(`${url.pathname}${url.search}${url.hash}`);
+    };
+    document.addEventListener("click", hold, true);
+    return () => document.removeEventListener("click", hold, true);
+  }, [dirty]);
+
+  const restoreDraft = (): void => {
+    if (!draft) return;
+    setForm(draft.form);
+    setDraft(null);
+  };
+  const discardDraft = (): void => {
+    writeDraft(userId, null);
+    setDraft(null);
+  };
+
   const hasSuggestions = suggestions.length > 0 || crmSuggestions.length > 0;
-  const customerErr = tried && !customer;
-  const productErr = tried && form.picked.length === 0;
-  // The server stores a contact only with a name, so an email or phone alone would be dropped without a word.
-  const contactEmail = form.contactEmail.trim();
-  const contactNameErr =
-    tried && !form.contactName.trim() && (contactEmail !== "" || form.contactPhone.trim() !== "");
-  const contactEmailBad = contactEmail !== "" && !EMAIL.test(contactEmail);
-  const contactEmailErr = (emailLeft || tried) && contactEmailBad ? "Enter a valid email." : errors["contact.email"];
   const lookupDone = remote?.q === customer;
 
   const togglePicked = (product: Product): void =>
     patch({ picked: form.picked.includes(product) ? form.picked.filter((p) => p !== product) : [...form.picked, product] });
 
+  const setContact = (key: string, change: Partial<{ name: string; role: string; email: string; phone: string }>): void =>
+    patch({ contacts: form.contacts.map((c) => (c.key === key ? { ...c, ...change } : c)) });
+
   const submit = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
-    const contactBlocked = !form.contactName.trim() && (contactEmail !== "" || form.contactPhone.trim() !== "");
-    if (!customer || form.picked.length === 0 || contactBlocked || contactEmailBad) {
+    if (Object.keys(live).length > 0) {
       setTried(true);
+      setTimeout(() => document.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus(), 0);
       return;
     }
     if (held.length > 0) {
@@ -177,30 +271,50 @@ export function RegisterDeal({ mine, managers, partnerName, partnerRegion, today
       return;
     }
     setBusy(true);
-    const result = await registerDealsAction({
-      customer,
-      website: form.site,
-      products: form.picked,
-      region: form.region,
-      managerId: form.managerId || null,
-      contact: form.contactName.trim()
-        ? { name: form.contactName, role: form.contactRole.trim() || null, email: form.contactEmail, phone: form.contactPhone }
-        : null,
-      expectedClose: form.close,
-      notes: form.details,
-    });
+    const result = await registerDealsAction(toRegisterInput(form));
     setBusy(false);
     if (!result.ok) {
-      setErrors(issuesToErrors(result.error));
+      setServerErrors(issuesToErrors(result.error));
       setFormError(result.error.issues?.length ? null : result.error.message);
       return;
     }
-    setErrors({});
+    writeDraft(userId, null);
+    setServerErrors({});
     setFormError(null);
-    setSubmitted({ customer, products: result.data.map((d) => d.product), ids: result.data.map((d) => d.id) });
+    setSubmitted({ customer, deals: result.data.map((d) => ({ id: d.id, product: d.product, reference: d.reference })) });
     setTried(false);
+    setTouched(new Set());
     toast(result.data.length > 1 ? `${result.data.length} registrations sent for approval` : "Submitted for approval");
   };
+
+  const registerAnother = (): void => {
+    const next = blankForm(form.region, form.managerId);
+    setBaseline(next);
+    setForm(next);
+    setSubmitted(null);
+  };
+
+  const leave = (): void => {
+    if (!leaveTo) return;
+    leaving.current = true;
+    router.push(leaveTo);
+  };
+
+  const errorId = (key: string): string => `err-${key.replace(/\./g, "-")}`;
+  const inputProps = (key: string): { "aria-invalid"?: true; "aria-describedby"?: string; onBlur: () => void } => ({
+    ...(fieldError(key) ? { "aria-invalid": true as const, "aria-describedby": errorId(key) } : {}),
+    onBlur: () => touch(key),
+  });
+  const errorLine = (key: string): React.JSX.Element | null => {
+    const message = fieldError(key);
+    return message ? (
+      <span className="err" id={errorId(key)}>
+        {message}
+      </span>
+    ) : null;
+  };
+  const cls = (key: string, extra = ""): string => `field${extra ? ` ${extra}` : ""}${fieldError(key) ? " field-err" : ""}`;
+  const contactsError = fieldError("contacts");
 
   return (
     <div className="wrap">
@@ -212,7 +326,7 @@ export function RegisterDeal({ mine, managers, partnerName, partnerRegion, today
       </div>
 
       <div className="row">
-        <div style={{ flex: "1 1 620px", minWidth: 0 }}>
+        <div style={{ flex: "1 1 620px", minWidth: 0, display: "flex", flexDirection: "column", gap: 10 }}>
           {submitted ? (
             <section
               className="card card-b"
@@ -224,19 +338,19 @@ export function RegisterDeal({ mine, managers, partnerName, partnerRegion, today
               </span>
               <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 4 }}>
                 <h2 style={{ margin: 0, fontSize: 14, fontWeight: 700 }}>
-                  {submitted.products.length > 1
-                    ? `${submitted.products.length} registrations sent for approval`
-                    : "Submitted for approval"}
+                  {submitted.deals.length > 1 ? `${submitted.deals.length} registrations sent for approval` : "Submitted for approval"}
                 </h2>
                 <p style={{ margin: 0, fontSize: 13, color: "#5E5B6E" }}>
-                  {submitted.customer}: {submitted.products.map((p) => PRODUCT_LABEL[p]).join(", ")}.{" "}
-                  {submitted.products.length > 1 ? "Each one is" : "It is"} pending until CleanStart reviews it. You get
-                  an email for every decision.
+                  {submitted.customer}. {submitted.deals.length > 1 ? "Each one is" : "It is"} pending until CleanStart reviews it. You get an
+                  email for every decision.
                 </p>
-                <ul style={{ margin: "4px 0 0", padding: 0, listStyle: "none", fontSize: 13 }}>
-                  {submitted.ids.map((id, i) => (
-                    <li key={id}>
-                      <Link href={ROUTES.partner.deal(id)}>Open the {PRODUCT_LABEL[submitted.products[i] as Product]} deal</Link>
+                <ul style={{ margin: "4px 0 0", padding: 0, listStyle: "none", fontSize: 13, display: "flex", flexDirection: "column", gap: 2 }}>
+                  {submitted.deals.map((deal) => (
+                    <li key={deal.id}>
+                      <span className="tnum" style={{ fontWeight: 600 }}>
+                        {deal.reference}
+                      </span>{" "}
+                      <Link href={ROUTES.partner.deal(deal.id)}>Open the {PRODUCT_LABEL[deal.product]} deal</Link>
                     </li>
                   ))}
                 </ul>
@@ -244,51 +358,64 @@ export function RegisterDeal({ mine, managers, partnerName, partnerRegion, today
                   <Link href={ROUTES.partner.deals} className="btn btn-p">
                     View deals
                   </Link>
-                  <button
-                    type="button"
-                    className="btn btn-s"
-                    onClick={() => {
-                      setForm(blank);
-                      setSubmitted(null);
-                    }}
-                  >
+                  <button type="button" className="btn btn-s" onClick={registerAnother}>
                     Register another
                   </button>
                 </div>
               </div>
             </section>
           ) : (
-            <form onSubmit={submit} className="card" noValidate>
-              <fieldset style={{ border: 0, margin: 0, padding: "14px 14px 16px" }}>
-                <legend className="sr">Customer</legend>
-                <div className="sec-h">
-                  <h2 className="sec-t">Customer</h2>
-                  <span className="sec-s">The company and your contact there</span>
+            <>
+              {draft ? (
+                <div className="note note-violet" role="status" style={{ alignItems: "center" }}>
+                  <Icon name="info" />
+                  <span style={{ flex: 1 }}>
+                    <b>You have an unsent draft</b> from {fmtLong(draft.savedAt.slice(0, 10))}
+                    {draft.form.customer.trim() ? `, for ${draft.form.customer.trim()}` : ""}.
+                  </span>
+                  <button type="button" className="btn btn-p" onClick={restoreDraft}>
+                    Restore draft
+                  </button>
+                  <button type="button" className="btn btn-s" onClick={discardDraft}>
+                    Discard
+                  </button>
                 </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                  <div className="grid2">
-                    <div className="fg" style={{ position: "relative" }}>
-                      <label htmlFor="customer" className="lbl">
-                        Company name
-                      </label>
-                      <input
-                        id="customer"
-                        autoComplete="off"
-                        aria-autocomplete="list"
-                        aria-controls={hasSuggestions ? "cust-sugg" : undefined}
-                        className={`field${customerErr ? " field-err" : ""}`}
-                        type="text"
-                        value={form.customer}
-                        onChange={(e) => patch({ customer: e.target.value })}
-                        aria-invalid={customerErr || undefined}
-                        aria-describedby={customerErr ? "customer-err" : undefined}
-                        placeholder="For example, Vardhan Capital"
-                      />
-                      {customerErr ? (
-                        <span className="err" id="customer-err">
-                          Enter the customer's company name.
-                        </span>
-                      ) : null}
+              ) : null}
+              {source && baseline.customer === source.customer ? (
+                <div className="note note-violet" role="status">
+                  <Icon name="info" />
+                  <span>
+                    <b>Registering {source.customer} again.</b> The customer, country and contacts come from your earlier registration. Pick the
+                    products and fill in the new opportunity.
+                  </span>
+                </div>
+              ) : null}
+              <form onSubmit={submit} className="card" noValidate>
+                <fieldset style={SECTION_STYLE}>
+                  <legend className="sr">Customer and contacts</legend>
+                  <div className="sec-h">
+                    <h2 className="sec-t">1. Customer and contacts</h2>
+                    <span className="sec-s">The company and the people we can reach there</span>
+                  </div>
+                  <div style={COLUMN_STYLE}>
+                    <div className="grid2">
+                      <div className="fg" style={{ position: "relative" }}>
+                        <label htmlFor="customer" className="lbl">
+                          Company name
+                        </label>
+                        <input
+                          id="customer"
+                          autoComplete="off"
+                          aria-autocomplete="list"
+                          aria-controls={hasSuggestions ? "cust-sugg" : undefined}
+                          className={cls("customer")}
+                          type="text"
+                          value={form.customer}
+                          onChange={(e) => patch({ customer: e.target.value })}
+                          placeholder="For example, Vardhan Capital"
+                          {...inputProps("customer")}
+                        />
+                        {errorLine("customer")}
                       {hasSuggestions ? (
                         // biome-ignore lint/a11y/useFocusableInteractive: the options are buttons and focusable; the list itself is not a tab stop
                         <div className="sugg" id="cust-sugg" role="listbox" aria-label="Your existing customers">
@@ -331,245 +458,460 @@ export function RegisterDeal({ mine, managers, partnerName, partnerRegion, today
                         </div>
                       ) : null}
                     </div>
-                    <div className="fg">
-                      <label htmlFor="site" className="lbl">
-                        Website <span className="hint">(optional, helps match the account)</span>
-                      </label>
-                      <input
-                        id="site"
-                        className={`field${errors.website ? " field-err" : ""}`}
-                        type="text"
-                        value={form.site}
-                        onChange={(e) => patch({ site: e.target.value })}
-                        aria-invalid={errors.website ? true : undefined}
-                        aria-describedby={errors.website ? "site-err" : undefined}
-                      />
-                      {errors.website ? (
-                        <span className="err" id="site-err">
-                          {errors.website}
-                        </span>
-                      ) : null}
+                      <div className="fg">
+                        <label htmlFor="site" className="lbl">
+                          Website <span className="hint">(optional, helps match the account)</span>
+                        </label>
+                        <input
+                          id="site"
+                          className={cls("website")}
+                          type="text"
+                          inputMode="url"
+                          value={form.site}
+                          onChange={(e) => patch({ site: e.target.value })}
+                          placeholder="vardhancapital.in"
+                          {...inputProps("website")}
+                        />
+                        {errorLine("website")}
+                      </div>
                     </div>
-                  </div>
-                  <div className="grid2">
-                    <div className="fg">
-                      <label htmlFor="contact" className="lbl">
-                        Contact name <span className="hint">(optional)</span>
-                      </label>
-                      <input
-                        id="contact"
-                        className={`field${contactNameErr ? " field-err" : ""}`}
-                        type="text"
-                        value={form.contactName}
-                        onChange={(e) => patch({ contactName: e.target.value })}
-                        aria-invalid={contactNameErr || undefined}
-                        aria-describedby={contactNameErr ? "contact-err" : undefined}
-                      />
-                      {contactNameErr ? (
-                        <span className="err" id="contact-err">
-                          Add the contact's name or clear these fields.
-                        </span>
-                      ) : null}
+                    <div className="grid2">
+                      <div className="fg">
+                        <label htmlFor="country" className="lbl">
+                          Customer country <span className="hint">(optional, start typing to search)</span>
+                        </label>
+                        <input
+                          id="country"
+                          className={cls("customerCountry")}
+                          type="text"
+                          list="countries"
+                          autoComplete="off"
+                          value={form.country}
+                          onChange={(e) => patch({ country: e.target.value })}
+                          placeholder="India"
+                          {...inputProps("customerCountry")}
+                          onBlur={() => {
+                            touch("customerCountry");
+                            const match = findCountry(form.country);
+                            if (match && match.name !== form.country) patch({ country: match.name });
+                          }}
+                        />
+                        <datalist id="countries">
+                          {COUNTRIES.map((c) => (
+                            <option key={c.code} value={c.name} />
+                          ))}
+                        </datalist>
+                        {errorLine("customerCountry")}
+                      </div>
+                      <div className="fg">
+                        <label htmlFor="industry" className="lbl">
+                          Industry <span className="hint">(optional)</span>
+                        </label>
+                        <select id="industry" className="field" value={form.industry} onChange={(e) => patch({ industry: e.target.value })}>
+                          <option value="">Not sure or not listed</option>
+                          {form.industry && !(INDUSTRIES as readonly string[]).includes(form.industry) ? (
+                            <option value={form.industry}>{form.industry}</option>
+                          ) : null}
+                          {INDUSTRIES.map((name) => (
+                            <option key={name} value={name}>
+                              {name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
                     </div>
-                    <div className="fg">
-                      <label htmlFor="crole" className="lbl">
-                        Contact role <span className="hint">(optional, for example CISO)</span>
-                      </label>
-                      <input
-                        id="crole"
-                        className="field"
-                        type="text"
-                        maxLength={120}
-                        value={form.contactRole}
-                        onChange={(e) => patch({ contactRole: e.target.value })}
-                      />
-                    </div>
-                  </div>
-                  <div className="grid2">
-                    <div className="fg">
-                      <label htmlFor="cemail" className="lbl">
-                        Contact email <span className="hint">(optional)</span>
-                      </label>
-                      <input
-                        id="cemail"
-                        className={`field${contactEmailErr ? " field-err" : ""}`}
-                        type="email"
-                        value={form.contactEmail}
-                        onChange={(e) => patch({ contactEmail: e.target.value })}
-                        onBlur={() => setEmailLeft(true)}
-                        aria-invalid={contactEmailErr ? true : undefined}
-                        aria-describedby={contactEmailErr ? "cemail-err" : undefined}
-                      />
-                      {contactEmailErr ? (
-                        <span className="err" id="cemail-err">
-                          {contactEmailErr}
-                        </span>
-                      ) : null}
-                    </div>
-                    <div className="fg">
-                      <label htmlFor="cphone" className="lbl">
-                        Contact phone <span className="hint">(optional)</span>
-                      </label>
-                      <input
-                        id="cphone"
-                        className="field tnum"
-                        type="tel"
-                        value={form.contactPhone}
-                        onChange={(e) => patch({ contactPhone: e.target.value })}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </fieldset>
-              <hr className="hr" />
-              <fieldset style={{ border: 0, margin: 0, padding: "14px 14px 16px" }}>
-                <legend className="sr">Opportunity</legend>
-                <div className="sec-h">
-                  <h2 className="sec-t">Opportunity</h2>
-                  <span className="sec-s">What they are buying</span>
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                  <div className="fg">
-                    <span id="plabel" className="lbl">
-                      Products <span className="hint">(pick one or more; each becomes its own registration)</span>
-                    </span>
-                    <div role="group" aria-labelledby="plabel" className="grid3">
-                      {PRODUCTS.map((product) => {
-                        const on = form.picked.includes(product);
-                        return (
-                          <button
-                            type="button"
-                            key={product}
-                            className={`opt${on ? " opt-on" : ""}`}
-                            aria-pressed={on}
-                            onClick={() => togglePicked(product)}
-                          >
-                            <ProductMark product={product} large />
-                            <span style={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
-                              <span style={{ fontSize: 13, fontWeight: 700 }}>{PRODUCT_LABEL[product]}</span>
-                              <span style={{ fontSize: 11.5, color: "#6B687D" }}>{PRODUCT_DESC[product]}</span>
+
+                    <div className="fg" role="group" aria-labelledby="contacts-label">
+                      <span id="contacts-label" className="lbl">
+                        Contacts{" "}
+                        <span className="hint">(at least one with an email or phone; the first is the primary contact)</span>
+                      </span>
+                      {form.contacts.map((c, i) => (
+                        <div
+                          key={c.key}
+                          style={{ border: "1px solid #ECEBF1", borderRadius: 8, padding: "10px 10px 12px", display: "flex", flexDirection: "column", gap: 8 }}
+                        >
+                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+                            <span className="hint" style={{ fontWeight: 600 }}>
+                              {i === 0 ? "Primary contact" : `Contact ${i + 1}`}
                             </span>
-                            <span className="chk">
-                              <Icon name="check" />
-                            </span>
-                          </button>
-                        );
-                      })}
+                            {form.contacts.length > 1 ? (
+                              <button
+                                type="button"
+                                className="btn btn-g"
+                                onClick={() => patch({ contacts: form.contacts.filter((x) => x.key !== c.key) })}
+                                aria-label={`Remove contact ${i + 1}`}
+                              >
+                                Remove
+                              </button>
+                            ) : null}
+                          </div>
+                          <div className="grid2" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))" }}>
+                            <div className="fg">
+                              <label htmlFor={`cname-${i}`} className="lbl">
+                                Name
+                              </label>
+                              <input
+                                id={`cname-${i}`}
+                                className={cls(`contacts.${i}.name`)}
+                                type="text"
+                                autoComplete="off"
+                                value={c.name}
+                                onChange={(e) => setContact(c.key, { name: e.target.value })}
+                                {...inputProps(`contacts.${i}.name`)}
+                              />
+                              {errorLine(`contacts.${i}.name`)}
+                            </div>
+                            <div className="fg">
+                              <label htmlFor={`crole-${i}`} className="lbl">
+                                Role <span className="hint">(for example CISO)</span>
+                              </label>
+                              <input
+                                id={`crole-${i}`}
+                                className="field"
+                                type="text"
+                                maxLength={120}
+                                value={c.role}
+                                onChange={(e) => setContact(c.key, { role: e.target.value })}
+                              />
+                            </div>
+                            <div className="fg">
+                              <label htmlFor={`cemail-${i}`} className="lbl">
+                                Email
+                              </label>
+                              <input
+                                id={`cemail-${i}`}
+                                className={cls(`contacts.${i}.email`)}
+                                type="email"
+                                autoComplete="off"
+                                value={c.email}
+                                onChange={(e) => setContact(c.key, { email: e.target.value })}
+                                {...inputProps(`contacts.${i}.email`)}
+                              />
+                              {errorLine(`contacts.${i}.email`)}
+                            </div>
+                            <div className="fg">
+                              <label htmlFor={`cphone-${i}`} className="lbl">
+                                Phone
+                              </label>
+                              <input
+                                id={`cphone-${i}`}
+                                className={cls(`contacts.${i}.phone`, "tnum")}
+                                type="tel"
+                                autoComplete="off"
+                                value={c.phone}
+                                onChange={(e) => setContact(c.key, { phone: e.target.value })}
+                                {...inputProps(`contacts.${i}.phone`)}
+                              />
+                              {errorLine(`contacts.${i}.phone`)}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                      {contactsError ? (
+                        <span className="err" role="alert">
+                          {contactsError}
+                        </span>
+                      ) : null}
+                      {form.contacts.length < MAX_CONTACTS ? (
+                        <button
+                          type="button"
+                          className="btn btn-s"
+                          style={{ alignSelf: "flex-start" }}
+                          onClick={() => patch({ contacts: [...form.contacts, newContact()] })}
+                        >
+                          Add another contact
+                        </button>
+                      ) : null}
                     </div>
-                    {productErr ? (
-                      <span className="err" role="alert">
-                        Pick at least one product.
-                      </span>
-                    ) : null}
                   </div>
-                  {held.map(({ deal }) => (
-                    <div className="note note-amber" role="status" key={deal.id}>
-                      <Icon name="warn" />
-                      <span>
-                        <b>Already registered.</b>{" "}
-                        {deal.status === "accepted" && deal.protectionEnd
-                          ? `Your company holds an accepted ${PRODUCT_LABEL[deal.product]} deal at ${deal.customer}, protected until ${fmtLong(deal.protectionEnd)}.`
-                          : `Your company already has ${PRODUCT_LABEL[deal.product]} at ${deal.customer} waiting for review.`}{" "}
-                        Take it out of your picks to continue.
-                      </span>
-                    </div>
-                  ))}
-                  <div className="grid3">
+                </fieldset>
+                <hr className="hr" />
+                <fieldset style={SECTION_STYLE}>
+                  <legend className="sr">Opportunity</legend>
+                  <div className="sec-h">
+                    <h2 className="sec-t">2. Opportunity</h2>
+                    <span className="sec-s">What they are buying and when</span>
+                  </div>
+                  <div style={COLUMN_STYLE}>
                     <div className="fg">
-                      <span id="rlabel" className="lbl">
-                        Region
+                      <span id="plabel" className="lbl">
+                        Products <span className="hint">(pick one or more; each becomes its own registration)</span>
                       </span>
-                      <div className="seg" role="group" aria-labelledby="rlabel" style={{ alignSelf: "flex-start" }}>
-                        {DEAL_REGIONS.map((region) => (
-                          <button
-                            type="button"
-                            key={region}
-                            className={`seg-b${form.region === region ? " seg-on" : ""}`}
-                            aria-pressed={form.region === region}
-                            onClick={() => patch({ region, managerId: managerFor(managers, region) })}
+                      <div role="group" aria-labelledby="plabel" className="grid3">
+                        {PRODUCTS.map((product) => {
+                          const on = form.picked.includes(product);
+                          return (
+                            <button
+                              type="button"
+                              key={product}
+                              className={`opt${on ? " opt-on" : ""}`}
+                              aria-pressed={on}
+                              onClick={() => togglePicked(product)}
+                            >
+                              <ProductMark product={product} large />
+                              <span style={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
+                                <span style={{ fontSize: 13, fontWeight: 700 }}>{PRODUCT_LABEL[product]}</span>
+                                <span style={{ fontSize: 11.5, color: "#6B687D" }}>{PRODUCT_DESC[product]}</span>
+                              </span>
+                              <span className="chk">
+                                <Icon name="check" />
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                      {tried && live.products ? (
+                        <span className="err" role="alert">
+                          {live.products}
+                        </span>
+                      ) : (
+                        errorLine("products")
+                      )}
+                    </div>
+                    {held.map(({ deal }) => (
+                      <div className="note note-amber" role="status" key={deal.id}>
+                        <Icon name="warn" />
+                        <span>
+                          <b>Already registered.</b>{" "}
+                          {deal.status === "accepted" && deal.protectionEnd
+                            ? `Your company holds an accepted ${PRODUCT_LABEL[deal.product]} deal at ${deal.customer}, protected until ${fmtLong(deal.protectionEnd)}.`
+                            : `Your company already has ${PRODUCT_LABEL[deal.product]} at ${deal.customer} waiting for review.`}{" "}
+                          Take it out of your picks to continue.
+                        </span>
+                      </div>
+                    ))}
+                    <div className="grid3">
+                      <div className="fg">
+                        <label htmlFor="value" className="lbl">
+                          Deal value <span className="hint">(optional, your best estimate)</span>
+                        </label>
+                        <div style={{ display: "flex", gap: 6 }}>
+                          <select
+                            aria-label="Currency"
+                            className="field"
+                            style={{ width: 84, flex: "none" }}
+                            value={form.currency}
+                            onChange={(e) => patch({ currency: e.target.value as DealCurrency })}
                           >
-                            {PARTNER_REGION_LABEL[region]}
-                          </button>
-                        ))}
+                            {DEAL_CURRENCIES.map((code) => (
+                              <option key={code} value={code}>
+                                {code}
+                              </option>
+                            ))}
+                          </select>
+                          <input
+                            id="value"
+                            className={cls("dealValue", "tnum")}
+                            type="text"
+                            inputMode="decimal"
+                            autoComplete="off"
+                            value={form.dealValue}
+                            onChange={(e) => patch({ dealValue: e.target.value })}
+                            placeholder="125000"
+                            {...inputProps("dealValue")}
+                          />
+                        </div>
+                        {errorLine("dealValue")}
+                      </div>
+                      <div className="fg">
+                        <label htmlFor="stage" className="lbl">
+                          Sales stage <span className="hint">(optional)</span>
+                        </label>
+                        <select id="stage" className="field" value={form.salesStage} onChange={(e) => patch({ salesStage: e.target.value })}>
+                          <option value="">Not set</option>
+                          {SALES_STAGES.map((stage) => (
+                            <option key={stage} value={stage}>
+                              {stage}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="fg">
+                        <label htmlFor="seats" className="lbl">
+                          Seats or volume <span className="hint">(optional)</span>
+                        </label>
+                        <input
+                          id="seats"
+                          className={cls("seats", "tnum")}
+                          type="text"
+                          inputMode="numeric"
+                          autoComplete="off"
+                          value={form.seats}
+                          onChange={(e) => patch({ seats: e.target.value })}
+                          placeholder="For example 250 users"
+                          {...inputProps("seats")}
+                        />
+                        {errorLine("seats")}
+                      </div>
+                    </div>
+                    <div className="grid3">
+                      <div className="fg">
+                        <label htmlFor="close" className="lbl">
+                          Expected close <span className="hint">(optional)</span>
+                        </label>
+                        <input
+                          id="close"
+                          className={cls("expectedClose", "tnum")}
+                          type="date"
+                          min={today}
+                          value={form.close}
+                          onChange={(e) => patch({ close: e.target.value })}
+                          {...inputProps("expectedClose")}
+                        />
+                        {errorLine("expectedClose")}
+                      </div>
+                      <div className="fg">
+                        <label htmlFor="decision" className="lbl">
+                          Decision date <span className="hint">(optional, vendor decision)</span>
+                        </label>
+                        <input
+                          id="decision"
+                          className={cls("decisionDate", "tnum")}
+                          type="date"
+                          value={form.decisionDate}
+                          onChange={(e) => patch({ decisionDate: e.target.value })}
+                          {...inputProps("decisionDate")}
+                        />
+                        {errorLine("decisionDate")}
+                      </div>
+                      <div className="fg">
+                        <label htmlFor="competitor" className="lbl">
+                          Competing product <span className="hint">(optional)</span>
+                        </label>
+                        <input
+                          id="competitor"
+                          className="field"
+                          type="text"
+                          maxLength={200}
+                          value={form.competitor}
+                          onChange={(e) => patch({ competitor: e.target.value })}
+                          placeholder="Who else is in the deal"
+                        />
                       </div>
                     </div>
                     <div className="fg">
-                      <label htmlFor="am" className="lbl">
-                        Partner manager
+                      <label htmlFor="usecase" className="lbl">
+                        Use case <span className="hint">(optional, what problem they want solved)</span>
                       </label>
-                      <Dropdown
-                        id="am"
-                        variant="field"
-                        value={form.managerId}
-                        options={managers.map((m) => ({ value: m.id, label: m.name }))}
-                        onChange={(managerId) => patch({ managerId })}
+                      <textarea
+                        id="usecase"
+                        className="field"
+                        rows={2}
+                        maxLength={1000}
+                        value={form.useCase}
+                        onChange={(e) => patch({ useCase: e.target.value })}
+                        style={{ height: "auto", padding: "7px 10px" }}
+                      />
+                    </div>
+                    <div className="grid2">
+                      <div className="fg">
+                        <span id="rlabel" className="lbl">
+                          Region <span className="hint">(which CleanStart team reviews it)</span>
+                        </span>
+                        <div className="seg" role="group" aria-labelledby="rlabel" style={{ alignSelf: "flex-start" }}>
+                          {DEAL_REGIONS.map((region) => (
+                            <button
+                              type="button"
+                              key={region}
+                              className={`seg-b${form.region === region ? " seg-on" : ""}`}
+                              aria-pressed={form.region === region}
+                              onClick={() => patch({ region, managerId: managerFor(managers, region) })}
+                            >
+                              {PARTNER_REGION_LABEL[region]}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="fg">
+                        <label htmlFor="am" className="lbl">
+                          Partner manager <span className="hint">(reviews this registration)</span>
+                        </label>
+                        <Dropdown
+                          id="am"
+                          variant="field"
+                          value={form.managerId}
+                          options={managers.map((m) => ({ value: m.id, label: m.name }))}
+                          onChange={(managerId) => patch({ managerId })}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </fieldset>
+                <hr className="hr" />
+                <fieldset style={SECTION_STYLE}>
+                  <legend className="sr">Notes and consent</legend>
+                  <div className="sec-h">
+                    <h2 className="sec-t">3. Notes and consent</h2>
+                    <span className="sec-s">Anything else the reviewer should know</span>
+                  </div>
+                  <div style={COLUMN_STYLE}>
+                    <div className="fg">
+                      <label htmlFor="details" className="lbl">
+                        Additional information <span className="hint">(optional)</span>
+                      </label>
+                      <textarea
+                        id="details"
+                        className="field"
+                        rows={3}
+                        maxLength={2000}
+                        value={form.details}
+                        onChange={(e) => patch({ details: e.target.value })}
+                        style={{ height: "auto", padding: "7px 10px" }}
                       />
                     </div>
                     <div className="fg">
-                      <label htmlFor="close" className="lbl">
-                        Expected close <span className="hint">(optional)</span>
+                      <label htmlFor="consent" style={{ display: "flex", gap: 8, alignItems: "flex-start", fontSize: 13, cursor: "pointer" }}>
+                        <input
+                          id="consent"
+                          type="checkbox"
+                          checked={form.consent}
+                          onChange={(e) => patch({ consent: e.target.checked })}
+                          style={{ marginTop: 3 }}
+                          {...inputProps("consent")}
+                        />
+                        <span>I confirm that this information is accurate and that the customer is aware of this registration.</span>
                       </label>
-                      <input
-                        id="close"
-                        className="field tnum"
-                        type="date"
-                        min={today}
-                        value={form.close}
-                        onChange={(e) => patch({ close: e.target.value })}
-                      />
+                      {errorLine("consent")}
                     </div>
                   </div>
+                </fieldset>
+                {formError ? (
+                  <div className="note note-amber" role="alert" style={{ margin: "0 14px 10px" }}>
+                    <Icon name="warn" />
+                    <span>{formError}</span>
+                  </div>
+                ) : null}
+                <div
+                  style={{
+                    position: "sticky",
+                    bottom: 0,
+                    zIndex: 5,
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    flexWrap: "wrap",
+                    gap: 8,
+                    padding: "10px 14px",
+                    borderTop: "1px solid #F0EFF4",
+                    background: "#FCFCFD",
+                    borderRadius: "0 0 10px 10px",
+                  }}
+                >
+                  <span className="hint">
+                    CleanStart reviews it within {REVIEW_SLA_BUSINESS_DAYS} business days. Accepted deals are protected for {PROTECTION_WINDOW_DAYS} days.
+                  </span>
+                  <span style={{ display: "flex", gap: 6 }}>
+                    <Link href={ROUTES.partner.deals} className="btn btn-s">
+                      Cancel
+                    </Link>
+                    <button type="submit" className="btn btn-p" disabled={busy}>
+                      Submit for approval
+                    </button>
+                  </span>
                 </div>
-              </fieldset>
-              <hr className="hr" />
-              <fieldset style={{ border: 0, margin: 0, padding: "14px 14px 16px" }}>
-                <legend className="sr">Additional information</legend>
-                <div className="sec-h">
-                  <h2 className="sec-t">Additional information</h2>
-                  <span className="sec-s">Optional</span>
-                </div>
-                <label htmlFor="details" className="sr">
-                  Additional information
-                </label>
-                <textarea
-                  id="details"
-                  className="field"
-                  rows={3}
-                  value={form.details}
-                  onChange={(e) => patch({ details: e.target.value })}
-                />
-              </fieldset>
-              {formError ? (
-                <div className="note note-amber" role="alert" style={{ margin: "0 14px 10px" }}>
-                  <Icon name="warn" />
-                  <span>{formError}</span>
-                </div>
-              ) : null}
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  gap: 8,
-                  padding: "10px 14px",
-                  borderTop: "1px solid #F0EFF4",
-                  background: "#FCFCFD",
-                  borderRadius: "0 0 10px 10px",
-                }}
-              >
-                <span className="hint">
-                  CleanStart reviews it within 2 business days. Accepted deals are protected for 90 days.
-                </span>
-                <span style={{ display: "flex", gap: 6 }}>
-                  <Link href={ROUTES.partner.deals} className="btn btn-s">
-                    Cancel
-                  </Link>
-                  <button type="submit" className="btn btn-p" disabled={busy}>
-                    Submit for approval
-                  </button>
-                </span>
-              </div>
-            </form>
+              </form>
+            </>
           )}
         </div>
 
@@ -613,6 +955,14 @@ export function RegisterDeal({ mine, managers, partnerName, partnerRegion, today
           )}
         </aside>
       </div>
+      <ConfirmDialog
+        open={leaveTo !== null}
+        onClose={() => setLeaveTo(null)}
+        onConfirm={leave}
+        title="Leave this form?"
+        body="Your draft is saved on this device. You can restore it the next time you open Register deal."
+        confirmLabel="Leave"
+      />
     </div>
   );
 }

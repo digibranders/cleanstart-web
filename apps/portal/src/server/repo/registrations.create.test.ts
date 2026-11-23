@@ -8,6 +8,7 @@ import { withViewer } from './context';
 import {
   createRegistrations,
   customerSuggestions,
+  getRegisterAgainSource,
   getRegistration,
   listRegistrations,
   type NewRegistrationsInput,
@@ -275,5 +276,50 @@ describe('customerSuggestions', () => {
   it('is for partner users only', async () => {
     const manager = await asStaff(db, 'partner_manager', 'all');
     await expect(withViewer(manager, (tx) => customerSuggestions(tx, manager, { q: 'x' }))).rejects.toBeInstanceOf(ForbiddenError);
+  });
+});
+
+describe('several contacts and the register-again source', () => {
+  it('stores every contact on each registration, primary first', async () => {
+    await asStaff(db, 'partner_manager', 'india');
+    const partner = await makePartner(db, {});
+    const viewer = await asPartner(db, { partnerId: partner.id, role: 'partner_admin' });
+    const created = await withViewer(viewer, (tx) =>
+      createRegistrations(
+        tx,
+        viewer,
+        input({
+          products: ['images', 'libraries'],
+          contacts: [
+            { name: 'Primary One', role: 'CISO', email: 'one@vardhancapital.in', phone: null },
+            { name: 'Second Two', role: null, email: null, phone: '+91 98204 31786' },
+            { name: 'Third Three', role: null, email: 'three@vardhancapital.in', phone: null },
+          ],
+        }),
+        clock,
+      ),
+    );
+    for (const reg of created) {
+      const detail = await withViewer(viewer, (tx) => getRegistration(tx, viewer, reg.id));
+      expect(detail.contacts.map((c) => c.name)).toEqual(['Primary One', 'Second Two', 'Third Three']);
+    }
+  });
+
+  it('loads the customer, country, industry and contacts for the own company and nothing for another', async () => {
+    await asStaff(db, 'partner_manager', 'india');
+    const mine = await makePartner(db, {});
+    const other = await makePartner(db, {});
+    const viewer = await asPartner(db, { partnerId: mine.id, role: 'partner_admin' });
+    const stranger = await asPartner(db, { partnerId: other.id, role: 'partner_admin' });
+    const [reg] = await withViewer(viewer, (tx) =>
+      createRegistrations(tx, viewer, input({ customerCountry: 'IN', customerIndustry: 'Telecom' }), clock),
+    );
+    const source = await withViewer(viewer, (tx) => getRegisterAgainSource(tx, viewer, reg!.id));
+    expect(source).toMatchObject({ customer: 'Vardhan Capital', website: 'vardhancapital.in', country: 'IN', industry: 'Telecom' });
+    expect(source?.contacts).toEqual([
+      { name: 'Rohan Mehta', role: 'Head of Security', email: 'rohan.mehta@vardhancapital.in', phone: '+91 98204 31786' },
+    ]);
+    expect(await withViewer(stranger, (tx) => getRegisterAgainSource(tx, stranger, reg!.id))).toBeNull();
+    expect(await withViewer(viewer, (tx) => getRegisterAgainSource(tx, viewer, 'not-a-uuid'))).toBeNull();
   });
 });

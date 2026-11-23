@@ -39,6 +39,7 @@ import type {
   DecisionResult,
   ExtensionDecisionResult,
   ExtensionResult,
+  RegisterAgainDto,
   ReminderCandidateDto,
   RegistrationCheckDto,
   RegistrationDetailDto,
@@ -77,6 +78,8 @@ export interface NewRegistrationsInput {
   /** Must be one of listManagerOptions(). Defaults to the manager whose scope covers `region`. */
   managerId?: string | null;
   contact: { name: string; role: string | null; email: string | null; phone: string | null } | null;
+  /** Several contacts, the first one primary. When given it replaces `contact`. */
+  contacts?: Array<{ name: string; role: string | null; email: string | null; phone: string | null }>;
   expectedClose: string | null;
   notes: string | null;
   /** The deal details below are all optional. A missing currency is stored as USD. */
@@ -268,9 +271,21 @@ export async function createRegistrations(
     throw error;
   }
 
-  if (input.contact) {
-    const { name, role, email, phone } = input.contact;
-    await tx.insert(registrationContacts).values(created.map(({ id }) => ({ registrationId: id, name, role, email, phone })));
+  const contacts = input.contacts ?? (input.contact ? [input.contact] : []);
+  if (contacts.length > 0) {
+    // Contacts read newest first (see loadDetails), so the primary one gets the latest timestamp and leads.
+    await tx.insert(registrationContacts).values(
+      created.flatMap(({ id }) =>
+        contacts.map(({ name, role, email, phone }, index) => ({
+          registrationId: id,
+          name,
+          role,
+          email,
+          phone,
+          createdAt: new Date(now.getTime() - index),
+        })),
+      ),
+    );
   }
   await tx.insert(registrationEvents).values(
     created.map(({ id }) => ({ registrationId: id, at: now, text: 'Registered', byLabel: viewer.name, source: 'portal' as const })),
@@ -329,6 +344,26 @@ export async function resubmitRegistration(
     source: 'portal',
   });
   return getRegistration(tx, viewer, current.id);
+}
+
+/** What the register-again form prefills from an earlier registration of the viewer's own company. */
+export async function getRegisterAgainSource(tx: Tx, viewer: Viewer, id: string): Promise<RegisterAgainDto | null> {
+  if (viewer.kind !== 'partner') return null;
+  let source: RegistrationDetailDto;
+  try {
+    source = await getRegistration(tx, viewer, id);
+  } catch (error) {
+    if (error instanceof NotFoundError) return null;
+    throw error;
+  }
+  if (source.partnerId !== viewer.partnerId) return null;
+  return {
+    customer: source.customer,
+    website: source.website,
+    country: source.customerCountry,
+    industry: source.customerIndustry,
+    contacts: source.contacts.map(({ name, role, email, phone }) => ({ name, role, email, phone })),
+  };
 }
 
 /** The customers this company already registered, for the form's lookup. Partner viewers only; never another company's data. */
@@ -800,7 +835,7 @@ const probeClock = fixedClock('2026-11-06T14:02:00Z');
 
 export const isolation = defineIsolation<
   | 'listRegistrations' | 'getRegistration' | 'lockRegistration' | 'createRegistrations' | 'resubmitRegistration'
-  | 'customerSuggestions' | 'acceptRegistration' | 'rejectRegistration' | 'undoDecision' | 'conflictChecks'
+  | 'customerSuggestions' | 'getRegisterAgainSource' | 'acceptRegistration' | 'rejectRegistration' | 'undoDecision' | 'conflictChecks'
   | 'listApprovalQueue' | 'countWaiting' | 'conflictInputs' | 'requestExtension' | 'decideExtension'
   | 'listReminderCandidates' | 'markReminderSent' | 'listExtensionRequests'
 >({
@@ -828,6 +863,7 @@ export const isolation = defineIsolation<
     probe: (tx, viewer, ctx) =>
       resubmitRegistration(tx, viewer, { id: ctx.b.registrationId, contact: { name: 'Probe', role: null, email: 'probe@example.com' }, note: null }, probeClock),
   },
+  getRegisterAgainSource: { scope: 'tenant', expect: 'empty', probe: (tx, viewer, ctx) => getRegisterAgainSource(tx, viewer, ctx.b.registrationId) },
   customerSuggestions: {
     scope: 'tenant',
     expect: 'empty',
