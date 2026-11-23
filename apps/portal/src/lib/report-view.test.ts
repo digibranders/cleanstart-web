@@ -10,7 +10,7 @@ const row = (over: Partial<PartnerReportRow>): PartnerReportRow => ({
 const ROWS: PartnerReportRow[] = [
   row({ name: 'Kestrel Systems', category: 'channel', region: 'india', registered: 10, accepted: 7, rejected: 1, won: 2, protectedNow: 3 }),
   row({ name: 'Saffron Secure', category: 'distributor', region: 'india', registered: 9, accepted: 7, rejected: 1, won: 3, protectedNow: 6 }),
-  row({ name: 'Arbor Cyber', category: 'integrator', region: 'middle_east', registered: 5, accepted: 3, rejected: 1, won: 1, protectedNow: 2 }),
+  row({ name: 'Arbor Cyber', category: 'channel', region: 'middle_east', registered: 5, accepted: 3, rejected: 1, won: 1, protectedNow: 2 }),
   row({ name: 'Qamar Solutions', category: 'channel', region: 'middle_east' }),
 ];
 
@@ -25,7 +25,7 @@ describe('acceptRate', () => {
 describe('filterPartnerRows', () => {
   it('filters by region and category', () => {
     expect(filterPartnerRows(ROWS, 'india', 'all', 'Name').map((r) => r.name)).toEqual(['Kestrel Systems', 'Saffron Secure']);
-    expect(filterPartnerRows(ROWS, 'all', 'channel', 'Name').map((r) => r.name)).toEqual(['Kestrel Systems', 'Qamar Solutions']);
+    expect(filterPartnerRows(ROWS, 'all', 'channel', 'Name').map((r) => r.name)).toEqual(['Arbor Cyber', 'Kestrel Systems', 'Qamar Solutions']);
     expect(filterPartnerRows(ROWS, 'middle_east', 'distributor', 'Name')).toEqual([]);
   });
 
@@ -43,10 +43,10 @@ describe('filterPartnerRows', () => {
 
 describe('partnersToCsv', () => {
   it('writes labels, the rate text and quotes cells that need it', () => {
-    const csv = partnersToCsv(filterPartnerRows([row({ name: 'Acme, Inc', category: 'integrator', region: 'middle_east', registered: 2, accepted: 1, rejected: 1, won: 1, protectedNow: 1 }), row({ name: 'Idle Co' })], 'all', 'all', 'Name'));
+    const csv = partnersToCsv(filterPartnerRows([row({ name: 'Acme, Inc', category: 'channel', region: 'middle_east', registered: 2, accepted: 1, rejected: 1, won: 1, protectedNow: 1 }), row({ name: 'Idle Co' })], 'all', 'all', 'Name'));
     expect(csv.split('\n')).toEqual([
       'Partner,Category,Region,Registered,Accepted,Accept rate,Won,Protected now',
-      '"Acme, Inc",System integrator,Middle East,2,1,50%,1,1',
+      '"Acme, Inc",Channel partner,Middle East,2,1,50%,1,1',
       'Idle Co,Channel partner,India,0,0,None yet,0,0',
     ]);
   });

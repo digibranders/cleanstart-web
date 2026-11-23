@@ -14,10 +14,9 @@ import { submitApplicationAction } from "@/server/actions/apply";
 import { issuesToErrors } from "@/server/actions/result";
 
 const CATEGORY_OPTIONS: readonly string[] = PARTNER_CATEGORIES.map((code) => PARTNER_CATEGORY_LABEL[code]);
-/** Shorter labels for the segmented control on a phone, where "System integrator" does not fit on one line. */
+/** Shorter labels for the segmented control on a phone, where "Channel partner" does not fit on one line. */
 const SHORT_CATEGORY: Record<string, string> = {
   [PARTNER_CATEGORY_LABEL.channel]: "Channel",
-  [PARTNER_CATEGORY_LABEL.integrator]: "Integrator",
 };
 const FULL_CATEGORY: Record<string, string> = Object.fromEntries(
   Object.entries(SHORT_CATEGORY).map(([full, short]) => [short, full]),

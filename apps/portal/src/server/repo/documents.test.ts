@@ -112,7 +112,7 @@ describe('the three audience implementations agree', () => {
     { name: 'all, channel', kind: 'all', categories: [], listed: false, category: 'channel' },
     { name: 'categories include me', kind: 'categories', categories: ['distributor', 'channel'], listed: false, category: 'channel' },
     { name: 'categories exclude me', kind: 'categories', categories: ['distributor'], listed: false, category: 'channel' },
-    { name: 'categories, integrator', kind: 'categories', categories: ['integrator'], listed: false, category: 'integrator' },
+    { name: 'categories, only channel', kind: 'categories', categories: ['channel'], listed: false, category: 'channel' },
     { name: 'named, listed', kind: 'named', categories: [], listed: true, category: 'channel' },
     { name: 'named, not listed', kind: 'named', categories: [], listed: false, category: 'channel' },
   ];
@@ -269,9 +269,9 @@ describe('updateDocument', () => {
     const swapped = await withViewer(staff, (tx) => updateDocument(tx, staff, { id: doc.id, audience: { kind: 'named', partnerIds: [p2.id] } }, clock));
     expect(swapped.document.audience.partners.map((p) => p.id)).toEqual([p2.id]);
     const toCategories = await withViewer(staff, (tx) =>
-      updateDocument(tx, staff, { id: doc.id, audience: { kind: 'categories', categories: ['integrator'] } }, clock),
+      updateDocument(tx, staff, { id: doc.id, audience: { kind: 'categories', categories: ['channel'] } }, clock),
     );
-    expect(toCategories.document.audience).toEqual({ kind: 'categories', categories: ['integrator'], partners: [] });
+    expect(toCategories.document.audience).toEqual({ kind: 'categories', categories: ['channel'], partners: [] });
   });
 });
 

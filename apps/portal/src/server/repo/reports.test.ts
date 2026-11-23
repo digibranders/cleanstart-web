@@ -32,7 +32,7 @@ describe('getAdminReports on the seed', () => {
 describe('getAdminReports', () => {
   it('counts every status the way the report defines it', async () => {
     const manager = await asStaff(db, 'partner_manager', 'all');
-    const partner = await makePartner(db, { name: 'Acme', category: 'integrator', region: 'middle_east' });
+    const partner = await makePartner(db, { name: 'Acme', category: 'channel', region: 'middle_east' });
     const add = (status: NonNullable<Parameters<typeof makeRegistration>[1]['status']>, n: number, product: 'images' | 'libraries' | 'cleansight' = 'images') =>
       Promise.all(Array.from({ length: n }, (_, i) => makeRegistration(db, { partnerId: partner.id, customerName: `${status}-${product}-${i}`, product, status })));
     await add('pending', 1);
@@ -43,7 +43,7 @@ describe('getAdminReports', () => {
     await add('rejected', 2);
     const report = await withViewer(manager, (tx) => getAdminReports(tx, manager, clock));
     expect(report.partners.find((p) => p.partnerId === partner.id)).toEqual({
-      partnerId: partner.id, name: 'Acme', category: 'integrator', region: 'middle_east',
+      partnerId: partner.id, name: 'Acme', category: 'channel', region: 'middle_east',
       registered: 8, waiting: 1, accepted: 5, rejected: 2, won: 1, protectedNow: 2,
     });
     expect(report.products).toEqual([

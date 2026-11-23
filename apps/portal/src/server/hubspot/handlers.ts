@@ -8,7 +8,7 @@ import { dealProperties } from './mappers';
 import type { Handlers } from './outbox';
 import { DependencyPending, type HubspotApi } from './types';
 
-const CATEGORY_VALUE = { distributor: 'distributor', channel: 'channel_partner', integrator: 'system_integrator' } as const;
+const CATEGORY_VALUE = { distributor: 'distributor', channel: 'channel_partner' } as const;
 
 const need = <T>(value: T | undefined | null, what: string): T => {
   if (value === undefined || value === null) throw new Error(`${what} not found`);

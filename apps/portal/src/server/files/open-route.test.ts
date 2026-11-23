@@ -51,7 +51,7 @@ describe('handleFileOpen', () => {
 
   it('lets staff open any live document without recording an open', async () => {
     const staff = await asStaff(db, 'marketing');
-    const doc = await makeDocument(db, { audienceKind: 'categories', audienceCategories: ['integrator'] });
+    const doc = await makeDocument(db, { audienceKind: 'categories', audienceCategories: ['channel'] });
     const res = await handleFileOpen(doc.id, { viewer: staff, storage: new FakeFileStorage(clock), clock });
     expect(res.status).toBe(302);
     expect(await db.select().from(documentOpens)).toHaveLength(0);

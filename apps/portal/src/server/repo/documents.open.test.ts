@@ -84,7 +84,7 @@ describe('recordDocumentOpen', () => {
 
   it('refuses, and records nothing, for a document outside the partner audience', async () => {
     const { viewer } = await partnerFixture('channel');
-    const doc = await makeDocument(db, { audienceKind: 'categories', audienceCategories: ['integrator'] });
+    const doc = await makeDocument(db, { audienceKind: 'categories', audienceCategories: ['distributor'] });
     await expect(withViewer(viewer, (tx) => recordDocumentOpen(tx, viewer, { id: doc.id }, clock))).rejects.toBeInstanceOf(NotFoundError);
     expect(await db.select().from(documentOpens)).toHaveLength(0);
   });

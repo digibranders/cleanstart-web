@@ -1,14 +1,12 @@
-export const PARTNER_CATEGORIES = ['distributor', 'channel', 'integrator'] as const;
+export const PARTNER_CATEGORIES = ['distributor', 'channel'] as const;
 export type PartnerCategory = (typeof PARTNER_CATEGORIES)[number];
 export const PARTNER_CATEGORY_LABEL: Record<PartnerCategory, string> = {
   distributor: 'Distributor',
   channel: 'Channel partner',
-  integrator: 'System integrator',
 };
 export const PARTNER_CATEGORY_PLURAL: Record<PartnerCategory, string> = {
   distributor: 'Distributors',
   channel: 'Channel partners',
-  integrator: 'System integrators',
 };
 
 export const PARTNER_REGIONS = ['india', 'middle_east', 'elsewhere'] as const;

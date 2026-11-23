@@ -21,6 +21,12 @@ describe('domain enums', () => {
     }
   });
 
+  it('has exactly two partner categories and no system integrator', () => {
+    expect([...PARTNER_CATEGORIES]).toEqual(['distributor', 'channel']);
+    expect(isOneOf(PARTNER_CATEGORIES, 'integrator')).toBe(false);
+    expect(isOneOf(PARTNER_CATEGORIES, 'system_integrator')).toBe(false);
+  });
+
   it('narrows with isOneOf', () => {
     expect(isOneOf(PARTNER_CATEGORIES, 'channel')).toBe(true);
     expect(isOneOf(PARTNER_CATEGORIES, 'Channel partner')).toBe(false);
