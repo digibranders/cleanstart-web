@@ -143,7 +143,7 @@ export interface Check {
   why: string;
   whyCls: string;
   /** The other partner's registration, when two partners claim the same customer and product. */
-  rival?: { partnerName: string; registeredOn: string; registeredFirst: boolean };
+  rival?: { id: string; partnerName: string; registeredOn: string; registeredFirst: boolean };
 }
 
 type CheckedDeal = Pick<RegistrationListItem, "partnerName" | "registeredOn" | "product">;
@@ -166,7 +166,7 @@ export function describeCheck(deal: CheckedDeal, check: RegistrationCheckDto, hi
       tone: "pending",
       why,
       whyCls: "why why-amber",
-      rival: { partnerName: other.partnerName, registeredOn: other.registeredOn, registeredFirst: other.registeredFirst },
+      rival: { id: other.id, partnerName: other.partnerName, registeredOn: other.registeredOn, registeredFirst: other.registeredFirst },
     };
   }
   if (hint) {

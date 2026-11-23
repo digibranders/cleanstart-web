@@ -55,6 +55,7 @@ const MATRIX: Record<Action, string> = {
   'registration.resubmit': 'own mine - - - -',
   'registration.decide': '- - - Y region -',
   'registration.undo_decision': '- - - Y region -',
+  'registration.reassign': '- - - Y - -',
   'registration.message': 'own mine - Y region -',
   'registration.request_extension': 'own mine - - - -',
   'registration.decide_extension': '- - - Y region -',

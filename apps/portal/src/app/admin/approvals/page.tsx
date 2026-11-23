@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { AdminApprovals } from "@/components/screens/AdminApprovals";
 import { systemClock } from "@/lib/clock";
 import { parseStaffDealFacet, parseStaffDealParams } from "@/lib/staff-deals-dto";
+import { can } from "@/server/auth/policies";
 import { homeFor, requireCan } from "@/server/auth/viewer";
 import { withViewer } from "@/server/repo/context";
 import { listPartners } from "@/server/repo/partners";
@@ -43,6 +44,7 @@ export default async function Page({
       deals={data.deals}
       filters={filters}
       partners={data.partners}
+      canReassign={can(viewer, "registration.reassign")}
     />
   );
 }

@@ -24,3 +24,6 @@ export const extendedEnd = (currentEnd: string): string => addDays(currentEnd, E
 export const waitingBusinessDays = (since: string, today: string): number => businessDaysBetween(since, today);
 export const isOverSla = (since: string, today: string): boolean => businessDaysBetween(since, today) > REVIEW_SLA_BUSINESS_DAYS;
 export const daysUntil = (endIso: string, today: string): number => daysBetween(today, endIso);
+
+/** The most registrations one bulk accept or reject may carry. */
+export const BULK_DECIDE_MAX = 25;

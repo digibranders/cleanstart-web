@@ -5,6 +5,9 @@ import { useEffect, useMemo, useState } from "react";
 import { fmtTimestamp } from "@/lib/dates";
 import { PARTNER_CATEGORY_LABEL, PARTNER_REGION_LABEL, PRODUCT_LABEL, type StaffRegion } from "@/lib/domain";
 import type { ApprovalQueueDto, ManagerOptionDto, RegistrationDetailDto } from "@/lib/dto";
+import { BULK_DECIDE_MAX } from "@/lib/deal-rules";
+import { type BulkItemResult, bulkDecideAction } from "@/server/actions/bulk-decide";
+import { ROUTES } from "@/lib/routes";
 import {
   acceptRegistrationAction,
   hubspotConflictHintsAction,
@@ -32,6 +35,7 @@ import {
 } from "../deals/derive";
 import type { HubspotHintDto } from "../deals/types";
 import { Icon } from "../icon";
+import { ReassignControl } from "../deals/ReassignControl";
 import { ProductChip } from "../ui/badge";
 import { Dropdown } from "../ui/dropdown";
 import { Drawer } from "../ui/overlay";
@@ -75,6 +79,20 @@ interface AdminApprovalsProps {
   deals: StaffDealsPageDto;
   filters: StaffDealFilters;
   partners: { id: string; name: string }[];
+  /** Partner managers: reassign a waiting registration and register a deal for a partner. */
+  canReassign: boolean;
+}
+
+const chunked = <T,>(list: T[], size: number): T[][] =>
+  Array.from({ length: Math.ceil(list.length / size) }, (_, i) => list.slice(i * size, (i + 1) * size));
+
+function RegisterForPartnerLink(): React.JSX.Element {
+  return (
+    <Link href={ROUTES.admin.newDeal} className="btn btn-p">
+      <Icon name="reg" />
+      Register deal for a partner
+    </Link>
+  );
 }
 
 export function AdminApprovals({
@@ -88,6 +106,7 @@ export function AdminApprovals({
   deals,
   filters,
   partners,
+  canReassign,
 }: AdminApprovalsProps): React.JSX.Element {
   const toast = useToast();
 
@@ -104,6 +123,11 @@ export function AdminApprovals({
   const [reply, setReply] = useState("");
   const [replyTried, setReplyTried] = useState(false);
   const [replying, setReplying] = useState(false);
+  const [selected, setSelected] = useState<ReadonlySet<string>>(new Set());
+  const [bulkReason, setBulkReason] = useState<string | null>(null);
+  const [bulkTried, setBulkTried] = useState(false);
+  const [bulkBusy, setBulkBusy] = useState(false);
+  const [rowErrors, setRowErrors] = useState<Record<string, string>>({});
 
   const waitingIds = queue.rows
     .filter((r) => r.registration.status === "pending")
@@ -253,6 +277,54 @@ export function AdminApprovals({
     toast(`Exported ${visible.length} registrations to CSV`);
   };
 
+  const selectable = visible.filter((r) => r.state === "open").map((r) => r.deal.id);
+  const chosen = selectable.filter((id) => selected.has(id));
+  const allChosen = selectable.length > 0 && chosen.length === selectable.length;
+
+  const toggleOne = (id: string): void =>
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (!next.delete(id)) next.add(id);
+      return next;
+    });
+  const toggleAll = (): void => setSelected(allChosen ? new Set() : new Set(selectable));
+  const clearSelection = (): void => {
+    setSelected(new Set());
+    setBulkReason(null);
+    setBulkTried(false);
+  };
+
+  const runBulk = async (decision: "accept" | "reject"): Promise<void> => {
+    if (decision === "reject" && !bulkReason?.trim()) {
+      setBulkTried(true);
+      return;
+    }
+    setBulkBusy(true);
+    const items: BulkItemResult[] = [];
+    let failure: string | null = null;
+    for (const ids of chunked(chosen, BULK_DECIDE_MAX)) {
+      const result = await bulkDecideAction({ decision, ids, reason: bulkReason ?? undefined });
+      if (!result.ok) {
+        failure = issuesToErrors(result.error).reason ?? result.error.message;
+        break;
+      }
+      items.push(...result.data.items);
+    }
+    setBulkBusy(false);
+    const done = items.filter((i) => i.status === "done").map((i) => i.id);
+    const skipped = items.filter((i) => i.status === "skipped").length;
+    const failed = items.filter((i) => i.status === "failed").length;
+    setRowErrors(Object.fromEntries(items.filter((i) => i.message).map((i) => [i.id, i.message ?? ""])));
+    setSelected((prev) => new Set([...prev].filter((id) => !done.includes(id))));
+    if (done.length > 0 && failed + skipped === 0) {
+      setBulkReason(null);
+      setBulkTried(false);
+    }
+    const verb = decision === "accept" ? "accepted" : "rejected";
+    const rest = [skipped ? `${skipped} skipped` : "", failed ? `${failed} failed` : ""].filter(Boolean).join(", ");
+    toast(failure ?? `${done.length} ${verb}${rest ? `, ${rest}` : ""}.${skipped + failed > 0 ? " See the rows marked below." : ""}`);
+  };
+
   const queues: { key: "mine" | "all"; label: string; count: number }[] = [
     { key: "mine", label: "My queue", count: waiting.filter((r) => inMyQueue(r.deal)).length },
     { key: "all", label: "All regions", count: waiting.length },
@@ -263,6 +335,7 @@ export function AdminApprovals({
       <div className="wrap">
         <div className="head">
           <h1 className="h1">Deals</h1>
+          {canReassign ? <RegisterForPartnerLink /> : null}
         </div>
         <StaffDealFacetBar facet={facet} counts={deals.counts} filters={filters} />
         <StaffDealsTable facet={facet} deals={deals} filters={filters} partners={partners} managers={managers} />
@@ -280,6 +353,7 @@ export function AdminApprovals({
           </span>
         </div>
         <div style={{ display: "flex", gap: 6 }}>
+          {canReassign ? <RegisterForPartnerLink /> : null}
           <button type="button" className="btn btn-s" onClick={exportCsv}>
             <Icon name="dl" />
             Export
@@ -348,6 +422,15 @@ export function AdminApprovals({
           <table className="tbl">
             <thead>
               <tr>
+                <th scope="col" style={{ width: 32 }}>
+                  <input
+                    type="checkbox"
+                    aria-label="Select all waiting registrations shown"
+                    checked={allChosen}
+                    disabled={selectable.length === 0}
+                    onChange={toggleAll}
+                  />
+                </th>
                 <th scope="col" className="hide-sm">
                   Partner
                 </th>
@@ -374,6 +457,16 @@ export function AdminApprovals({
                 const reasonErr = entry?.tried && !entry.reason.trim();
                 const tr = (
                   <tr key={deal.id}>
+                    <td>
+                      {state === "open" ? (
+                        <input
+                          type="checkbox"
+                          aria-label={`Select ${deal.customer} from ${deal.partnerName}`}
+                          checked={selected.has(deal.id)}
+                          onChange={() => toggleOne(deal.id)}
+                        />
+                      ) : null}
+                    </td>
                     <td className="hide-sm">
                       <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
                         <span className={`av ${avOf(deal.partnerName)}`}>{initialsOf(deal.partnerName)}</span>
@@ -396,8 +489,19 @@ export function AdminApprovals({
                       {row.over ? <span className="why why-amber">Over 2-day target</span> : null}
                     </td>
                     <td style={{ whiteSpace: "normal" }}>
-                      <span className={`badge b-${check.tone}`}>{check.label}</span>
+                      {check.rival ? (
+                        <Link href={staffDealHref(check.rival.id)} className={`badge b-${check.tone}`} title="Open the other registration">
+                          {check.label}
+                        </Link>
+                      ) : (
+                        <span className={`badge b-${check.tone}`}>{check.label}</span>
+                      )}
                       {check.why && state !== "rejecting" ? <span className={`${check.whyCls} hide-sm`}>{check.why}</span> : null}
+                      {rowErrors[deal.id] ? (
+                        <span className="err" role="alert">
+                          {rowErrors[deal.id]}
+                        </span>
+                      ) : null}
                     </td>
                     <td className="r">
                       {state === "open" ? (
@@ -448,7 +552,7 @@ export function AdminApprovals({
                 return [
                   tr,
                   <tr key={`${deal.id}-reason`}>
-                    <td colSpan={7} style={{ paddingTop: 0, whiteSpace: "normal" }}>
+                    <td colSpan={8} style={{ paddingTop: 0, whiteSpace: "normal" }}>
                       <div
                         style={{
                           display: "flex",
@@ -499,6 +603,64 @@ export function AdminApprovals({
           {visible.length === 0 ? <div className="empty">No registrations match these filters.</div> : null}
         </ScrollRegion>
       </section>
+
+      {chosen.length > 0 ? (
+        <div
+          role="region"
+          aria-label="Bulk decision"
+          className="card"
+          style={{
+            position: "sticky",
+            bottom: 12,
+            zIndex: 6,
+            display: "flex",
+            gap: 8,
+            alignItems: "flex-end",
+            flexWrap: "wrap",
+            padding: "10px 14px",
+            boxShadow: "0 6px 24px rgba(23, 20, 43, 0.14)",
+          }}
+        >
+          <span style={{ fontSize: 13, fontWeight: 600, alignSelf: "center" }}>{chosen.length} selected</span>
+          {bulkReason !== null ? (
+            <div className="fg" style={{ flex: "1 1 280px" }}>
+              <label htmlFor="bulk-reason" className="lbl">
+                Reason every partner will see <span className="t-muted">(required)</span>
+              </label>
+              <input
+                id="bulk-reason"
+                className={`field${bulkTried && !bulkReason.trim() ? " field-err" : ""}`}
+                type="text"
+                maxLength={500}
+                value={bulkReason}
+                onChange={(e) => setBulkReason(e.target.value)}
+                aria-invalid={bulkTried && !bulkReason.trim() ? true : undefined}
+              />
+              {bulkTried && !bulkReason.trim() ? <span className="err">Add a reason the partners will see.</span> : null}
+            </div>
+          ) : null}
+          <span style={{ display: "inline-flex", gap: 8, flexWrap: "wrap", marginLeft: "auto" }}>
+            <button type="button" className="btn btn-s" disabled={bulkBusy} onClick={bulkReason === null ? clearSelection : () => setBulkReason(null)}>
+              {bulkReason === null ? "Clear" : "Cancel"}
+            </button>
+            {bulkReason === null ? (
+              <>
+                <button type="button" className="btn btn-d" disabled={bulkBusy} onClick={() => setBulkReason("")}>
+                  Reject selected
+                </button>
+                <button type="button" className="btn btn-p" disabled={bulkBusy} onClick={() => runBulk("accept")}>
+                  <Icon name="checkIcon" />
+                  Accept selected
+                </button>
+              </>
+            ) : (
+              <button type="button" className="btn btn-dd" disabled={bulkBusy} onClick={() => runBulk("reject")}>
+                Reject {chosen.length} and email
+              </button>
+            )}
+          </span>
+        </div>
+      ) : null}
 
       {visibleExtensions.length > 0 ? (
         <section aria-labelledby="extreq" className="card clip">
@@ -731,11 +893,19 @@ export function AdminApprovals({
               <span style={{ fontSize: 13, lineHeight: 1.55, whiteSpace: "pre-wrap" }}>{viewing.deal.notes}</span>
             </div>
           ) : null}
+          {canReassign && viewing.state === "open" ? (
+            <ReassignControl key={`${viewing.deal.id}-${viewing.deal.managerId}-${viewing.deal.region}`} deal={viewing.deal} managers={managers} />
+          ) : null}
           <div className="fg">
             <span className="lbl">Checks</span>
             <span>
               <span className={`badge b-${viewing.check.tone}`}>{viewing.check.label}</span>
             </span>
+            {viewing.check.rival ? (
+              <Link href={staffDealHref(viewing.check.rival.id)} className="linkbtn">
+                Open the other registration
+              </Link>
+            ) : null}
             {viewing.check.why ? (
               <span className={viewing.check.whyCls} style={{ maxWidth: "none" }}>
                 {viewing.check.why}

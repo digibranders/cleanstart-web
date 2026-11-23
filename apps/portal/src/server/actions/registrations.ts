@@ -116,7 +116,10 @@ export async function registerDealsAction(raw: unknown): Promise<ActionResult<Re
         await recordAudit(tx, ctx.viewer, {
           event: 'registration.submitted',
           target: `${reg.customer}, ${PRODUCT_LABEL[reg.product]}, from ${reg.partnerName}`,
-          note: 'Sent for approval. CleanStart reviews it within 2 business days.',
+          note:
+            ctx.viewer.kind === 'staff'
+              ? `Registered on behalf of ${reg.partnerName} by ${ctx.viewer.name}. Sent for approval.`
+              : 'Sent for approval. CleanStart reviews it within 2 business days.',
           partnerId: reg.partnerId,
           subject: { type: 'registration', id: reg.id },
         });

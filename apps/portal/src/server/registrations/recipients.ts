@@ -20,12 +20,12 @@ async function activeRegistrant(tx: Tx, userId: string | null): Promise<string |
   const [row] = await tx
     .select({ id: users.id })
     .from(users)
-    .where(and(eq(users.id, userId), eq(users.status, 'active')))
+    .where(and(eq(users.id, userId), eq(users.kind, 'partner'), eq(users.status, 'active')))
     .limit(1);
   return row?.id ?? null;
 }
 
-/** Who hears about a decision or a stage change: the person who registered it, or the partner admins when they are gone. */
+/** Who hears about a decision or a stage change: the person who registered it, or the partner admins when they are gone (or when CleanStart staff registered it on the partner's behalf). */
 export async function decisionRecipients(tx: Tx, reg: RegistrationParty): Promise<string[]> {
   const registrant = await activeRegistrant(tx, reg.registeredById);
   return registrant ? [registrant] : activeAdmins(tx, reg.partnerId);

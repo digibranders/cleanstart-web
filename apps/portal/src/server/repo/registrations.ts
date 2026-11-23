@@ -288,7 +288,13 @@ export async function createRegistrations(
     );
   }
   await tx.insert(registrationEvents).values(
-    created.map(({ id }) => ({ registrationId: id, at: now, text: 'Registered', byLabel: viewer.name, source: 'portal' as const })),
+    created.map(({ id }) => ({
+      registrationId: id,
+      at: now,
+      text: viewer.kind === 'staff' ? 'Registered by CleanStart on behalf of the partner' : 'Registered',
+      byLabel: viewer.name,
+      source: 'portal' as const,
+    })),
   );
   await tx.update(partners).set({ status: 'active' }).where(and(eq(partners.id, partnerId), eq(partners.status, 'onboarding')));
 
