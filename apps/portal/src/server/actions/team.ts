@@ -15,7 +15,7 @@ import type { EmailMessage } from '@/server/email/transport';
 import { NotFoundError, ValidationError } from '@/server/errors';
 import { type NewNotification, notifyUsers, resolveEmailRecipients } from '@/server/notify';
 import { type Tx, withViewer } from '@/server/repo/context';
-import { createInvite, resendInvite, revokeInvite } from '@/server/repo/invites';
+import { changeInviteRole, createInvite, resendInvite, revokeInvite } from '@/server/repo/invites';
 import { getCompany, listPartnerAdminRecipients } from '@/server/repo/partners';
 import { changeMemberRole, decideAccessRequest, getTeam, removeMember } from '@/server/repo/team';
 import { inviteUrl } from '@/server/urls';
@@ -128,17 +128,26 @@ export async function changeMemberRoleAction(raw: unknown): Promise<ActionResult
   return runViewerAction({ name: 'team.change_role', schema: roleSchema }, raw, async (ctx, input): Promise<TeamMemberDto> => {
     const changed = await withViewer(ctx.viewer, async (tx) => {
       const team = await loadTeam(tx, ctx.viewer, input.partnerId);
-      const before = team.members.find((m) => m.id === input.userId && m.inviteId !== m.id);
+      const before = team.members.find((m) => m.id === input.userId);
       if (!before) throw new NotFoundError('user');
       assertCan(ctx.viewer, 'team.change_role', { partnerId: team.partnerId });
-      const after = await changeMemberRole(tx, ctx.viewer, { userId: input.userId, role: input.role });
+      let after: TeamMemberDto;
+      if (before.inviteId === before.id) {
+        // An invite-only row: the role is what the person gets on accepting.
+        await changeInviteRole(tx, ctx.viewer, { inviteId: before.id, role: input.role });
+        const reloaded = (await loadTeam(tx, ctx.viewer, input.partnerId)).members.find((m) => m.id === before.id);
+        if (!reloaded) throw new NotFoundError('invite');
+        after = reloaded;
+      } else {
+        after = await changeMemberRole(tx, ctx.viewer, { userId: input.userId, role: input.role });
+      }
       if (before.role !== after.role) {
         await recordAudit(tx, ctx.viewer, {
           event: 'team.role_changed',
           target: `${after.name}, at ${team.partnerName}`,
           note: `${PARTNER_ROLE_LABEL[before.role]} to ${PARTNER_ROLE_LABEL[after.role]}.`,
           partnerId: team.partnerId,
-          subject: { type: 'user', id: after.id },
+          subject: { type: before.inviteId === before.id ? 'invite' : 'user', id: after.id },
         });
       }
       return after;
