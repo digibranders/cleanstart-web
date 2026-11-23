@@ -5,6 +5,7 @@ import { Pool } from 'pg';
 import { poolConnection } from '../src/db/connection';
 import { DemoModeError, assertDemoModeAllowed, isDemoMode } from '../src/server/demo';
 import { DEMO_FILES_DDL } from '../src/server/files/demo-store';
+import { DEMO_HISTORY_COUNT, generateDemoHistory } from './demo-history';
 import { migrateDatabase } from './migrate';
 
 type Command = 'setup' | 'reset';
@@ -45,6 +46,63 @@ export async function assertDemoDatabase(command: Command, owner: Pick<Pool, 'qu
   }
 }
 
+/** Demo only (not in src/db/fixtures.ts, whose counts tests rely on): about 60 dated registrations over the last 12 months for the seeded active partners. */
+export async function addDemoHistory(today: string): Promise<number> {
+  const [{ db }, { partners, registrations, users }, { nextRegistrationReference }, { and, eq, inArray }] = await Promise.all([
+    import('../src/db/client'),
+    import('../src/db/schema'),
+    import('../src/server/registrations/reference'),
+    import('drizzle-orm'),
+  ]);
+  const active = await db.select({ id: partners.id, region: partners.region, managerId: partners.managerId }).from(partners).where(eq(partners.status, 'active'));
+  const people = await db
+    .select({ id: users.id, name: users.name, partnerId: users.partnerId })
+    .from(users)
+    .where(and(eq(users.kind, 'partner'), eq(users.status, 'active'), inArray(users.role, ['partner_admin', 'sales'])));
+  const deciders = await db
+    .select({ id: users.id, name: users.name })
+    .from(users)
+    .where(and(eq(users.kind, 'staff'), eq(users.status, 'active'), eq(users.role, 'partner_manager')));
+  const deals = generateDemoHistory({
+    today,
+    partners: active.map((p) => ({ ...p, people: people.filter((u) => u.partnerId === p.id) })),
+    deciders,
+    count: DEMO_HISTORY_COUNT,
+  });
+  const at = (date: string, time: string): Date => new Date(`${date}T${time}:00Z`);
+  for (const deal of deals) {
+    await db.insert(registrations).values({
+      reference: await nextRegistrationReference(db, at(deal.registeredOn, '09:00')),
+      partnerId: deal.partnerId,
+      registeredBy: deal.registeredBy,
+      registeredByName: deal.registeredByName,
+      customerName: deal.customerName,
+      customerDomain: deal.customerDomain,
+      product: deal.product,
+      region: deal.region,
+      managerId: deal.managerId,
+      dealValue: deal.dealValue,
+      currency: deal.currency,
+      customerCountry: deal.customerCountry,
+      customerIndustry: deal.customerIndustry,
+      seats: deal.seats,
+      salesStage: deal.salesStage,
+      decisionDate: deal.decisionDate,
+      status: deal.status,
+      stage: deal.stage,
+      registeredOn: deal.registeredOn,
+      decidedBy: deal.decidedBy,
+      decidedByLabel: deal.decidedByLabel,
+      decidedAt: deal.decidedOn ? at(deal.decidedOn, '12:00') : null,
+      rejectionReason: deal.rejectionReason,
+      protectionEnd: deal.protectionEnd,
+      closedOn: deal.closedOn,
+      createdAt: at(deal.registeredOn, '09:00'),
+    });
+  }
+  return deals.length;
+}
+
 /** Migrate, create the demo upload table, then seed the mock data once. Safe to run any number of times. */
 async function setup(ownerUrl: string): Promise<void> {
   await migrateDatabase({
@@ -77,6 +135,7 @@ async function setup(ownerUrl: string): Promise<void> {
       const renamed = await db.execute(sql`update users set email = ${login.to} where email = ${login.from}`);
       if (renamed.rowCount !== 1) throw new DemoModeError(`demo:setup could not rename the account ${login.from}: ${renamed.rowCount ?? 0} rows matched.`);
     }
+    console.info(`added ${await addDemoHistory(systemClock.today())} dated registrations for the dashboards`);
   } finally {
     await pool.end();
   }
