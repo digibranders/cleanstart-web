@@ -3,10 +3,7 @@ import {
   FilterSidebarCard,
   MobileTabStrip,
 } from "@/components/sections/_shared/SidebarFilters";
-import {
-  type JobDepartmentOption,
-  type JobLocation,
-} from "@/lib/jobs-utils";
+import type { JobDepartmentOption, JobLocation } from "@/lib/jobs-utils";
 
 interface CareersSidebarProps {
   activeDepartment: string;

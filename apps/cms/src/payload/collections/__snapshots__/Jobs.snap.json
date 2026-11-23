@@ -122,6 +122,19 @@
       "name": "remote"
     },
     {
+      "type": "textarea",
+      "name": "abstract"
+    },
+    {
+      "type": "upload",
+      "name": "descriptionPdf",
+      "relationTo": "media"
+    },
+    {
+      "type": "richText",
+      "name": "body"
+    },
+    {
       "type": "group",
       "name": "salaryRange",
       "fields": [
@@ -152,19 +165,6 @@
           ]
         }
       ]
-    },
-    {
-      "type": "textarea",
-      "name": "abstract"
-    },
-    {
-      "type": "richText",
-      "name": "body"
-    },
-    {
-      "type": "upload",
-      "name": "descriptionPdf",
-      "relationTo": "media"
     },
     {
       "type": "text",
