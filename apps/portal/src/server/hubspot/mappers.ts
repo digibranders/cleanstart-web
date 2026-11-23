@@ -25,12 +25,43 @@ export const isoDate = (value: string | null | undefined): string | null => {
 /** `product` and `region` are display labels (PRODUCT_LABEL, PARTNER_REGION_LABEL), not the stored codes. */
 export interface RegistrationForSync {
   id: string; customerName: string; product: string; region: string; protectionEnd: string;
+  /** REG-YYMM-NNNN. */
+  reference?: string;
+  dealValue?: number | null;
+  currency?: string;
+  customerCountry?: string | null;
+  customerIndustry?: string | null;
+  useCase?: string | null;
+  competitor?: string | null;
+  seats?: number | null;
+  salesStage?: string | null;
+  decisionDate?: string | null;
 }
 export interface PartnerForSync { name: string; hubspotCompanyId: string }
+
+/** Optional registration details, written only when the partner gave them. `amount` and `deal_currency_code` are HubSpot's own deal properties. */
+const optionalDealProperties = (reg: RegistrationForSync): Record<string, string> => {
+  const out: Record<string, string> = {};
+  const put = (name: string, value: string | number | null | undefined): void => {
+    if (value !== null && value !== undefined && value !== '') out[name] = String(value);
+  };
+  put('portal_reference', reg.reference);
+  put('amount', reg.dealValue);
+  if (reg.dealValue !== null && reg.dealValue !== undefined) put('deal_currency_code', reg.currency);
+  put('customer_country', reg.customerCountry);
+  put('customer_industry', reg.customerIndustry);
+  put('use_case', reg.useCase);
+  put('competitor', reg.competitor);
+  put('seats', reg.seats);
+  put('sales_stage', reg.salesStage);
+  put('decision_date', reg.decisionDate);
+  return out;
+};
 
 export const dealProperties = (
   reg: RegistrationForSync, partner: PartnerForSync, stageIds: StageIds, pipelineId: string,
 ): Record<string, string> => ({
+  ...optionalDealProperties(reg),
   dealname: `${reg.customerName} | ${reg.product} | ${partner.name}`,
   pipeline: pipelineId,
   dealstage: stageIds.Accepted,

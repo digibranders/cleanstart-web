@@ -3,8 +3,8 @@ export const GROUP = { name: 'partner_portal', label: 'Partner portal' } as cons
 export interface PropertySpec {
   name: string;
   label: string;
-  type: 'string' | 'date' | 'enumeration';
-  fieldType: 'text' | 'textarea' | 'date' | 'select' | 'booleancheckbox';
+  type: 'string' | 'date' | 'enumeration' | 'number';
+  fieldType: 'text' | 'textarea' | 'date' | 'select' | 'booleancheckbox' | 'number';
   hasUniqueValue?: boolean;
   options?: ReadonlyArray<{ label: string; value: string }>;
 }
@@ -58,7 +58,18 @@ export const DEAL_PROPERTIES: PropertySpec[] = [
     options: opt('India', 'Middle East'),
   },
   { name: 'partner_company_id', label: 'Partner company id', type: 'string', fieldType: 'text' },
+  { name: 'portal_reference', label: 'Portal reference', type: 'string', fieldType: 'text' },
+  { name: 'customer_country', label: 'Customer country', type: 'string', fieldType: 'text' },
+  { name: 'customer_industry', label: 'Customer industry', type: 'string', fieldType: 'text' },
+  { name: 'use_case', label: 'Use case', type: 'string', fieldType: 'textarea' },
+  { name: 'competitor', label: 'Competitor', type: 'string', fieldType: 'text' },
+  { name: 'seats', label: 'Seats', type: 'number', fieldType: 'number' },
+  { name: 'sales_stage', label: 'Sales stage at registration', type: 'string', fieldType: 'text' },
+  { name: 'decision_date', label: 'Decision date', type: 'date', fieldType: 'date' },
 ];
+
+/** HubSpot's own deal properties that mappers.dealProperties also writes: the deal value and its currency. */
+export const STANDARD_DEAL_PROPERTIES = ['amount', 'deal_currency_code'] as const;
 
 /** Deal properties that mappers.dealProperties writes but this spec does not create. */
 export const EXTERNAL_DEAL_PROPERTIES = ['partner_name'] as const;

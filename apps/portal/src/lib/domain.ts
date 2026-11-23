@@ -61,6 +61,11 @@ export const STAFF_REGION_LABEL: Record<StaffRegion, string> = {
   all: 'All regions',
 };
 
+/** Currencies a deal value can be entered in. USD is the default. */
+export const DEAL_CURRENCIES = ['USD', 'EUR', 'GBP', 'INR', 'AED', 'SAR'] as const;
+export type DealCurrency = (typeof DEAL_CURRENCIES)[number];
+export const DEFAULT_DEAL_CURRENCY: DealCurrency = 'USD';
+
 export const PRODUCTS = ['images', 'libraries', 'cleansight'] as const;
 export type Product = (typeof PRODUCTS)[number];
 export const PRODUCT_LABEL: Record<Product, string> = {

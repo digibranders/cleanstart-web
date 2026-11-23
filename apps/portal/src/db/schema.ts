@@ -8,6 +8,7 @@ import {
   index,
   integer,
   jsonb,
+  numeric,
   pgSequence,
   pgTable,
   primaryKey,
@@ -26,6 +27,7 @@ import {
   AUDIT_KINDS,
   AUDIT_WHO,
   CHECKLIST_STEPS,
+  DEAL_CURRENCIES,
   DEAL_REGIONS,
   DOC_PRODUCTS,
   DOCUMENT_TYPES,
@@ -266,10 +268,14 @@ export const accessRequests = pgTable(
 
 /* ---------------------------------------------------------------- registrations */
 
+/** REG-YYMM-NNNN. The repo formats nextval; the yymm part is the month of registration. */
+export const registrationReferenceSeq = pgSequence('registration_reference_seq', { startWith: 1, increment: 1 });
+
 export const registrations = pgTable(
   'registrations',
   {
     id: id(),
+    reference: text('reference').notNull(),
     partnerId: uuid('partner_id').notNull().references(() => partners.id),
     registeredBy: uuid('registered_by').references(() => users.id),
     registeredByName: text('registered_by_name').notNull(),
@@ -280,6 +286,15 @@ export const registrations = pgTable(
     managerId: uuid('manager_id').references(() => users.id),
     expectedClose: text('expected_close'),
     notes: text('notes'),
+    dealValue: numeric('deal_value', { precision: 14, scale: 2, mode: 'number' }),
+    currency: text('currency', { enum: DEAL_CURRENCIES }).notNull().default('USD'),
+    customerCountry: text('customer_country'),
+    customerIndustry: text('customer_industry'),
+    useCase: text('use_case'),
+    competitor: text('competitor'),
+    seats: integer('seats'),
+    salesStage: text('sales_stage'),
+    decisionDate: date('decision_date', { mode: 'string' }),
     status: text('status', { enum: REGISTRATION_STATUSES }).notNull().default('pending'),
     stage: text('stage').notNull().default(STAGE_AWAITING_REVIEW),
     registeredOn: date('registered_on', { mode: 'string' }).notNull(),
@@ -303,6 +318,7 @@ export const registrations = pgTable(
     updatedAt: updatedAt(),
   },
   (t) => [
+    uniqueIndex('registrations_reference_key').on(t.reference),
     uniqueIndex('registrations_open_unique')
       .on(t.partnerId, sql`lower(${t.customerName})`, t.product)
       .where(sql`${t.status} in ('pending', 'accepted')`),
@@ -315,6 +331,9 @@ export const registrations = pgTable(
     check('registrations_region_chk', inList(t.region, DEAL_REGIONS)),
     check('registrations_product_chk', inList(t.product, PRODUCTS)),
     check('registrations_extension_chk', inList(t.extensionStatus, EXTENSION_STATUSES)),
+    check('registrations_currency_chk', inList(t.currency, DEAL_CURRENCIES)),
+    check('registrations_deal_value_chk', sql`${t.dealValue} is null or ${t.dealValue} >= 0`),
+    check('registrations_seats_chk', sql`${t.seats} is null or ${t.seats} >= 0`),
   ],
 );
 

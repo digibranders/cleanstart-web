@@ -3,7 +3,7 @@
 import { z } from 'zod';
 import type { CustomerLookupResult } from '@/components/deals/types';
 import { normalizeDomain, sameCustomer } from '@/lib/customer';
-import { DEAL_REGIONS, PRODUCT_LABEL, PRODUCTS } from '@/lib/domain';
+import { DEAL_CURRENCIES, DEAL_REGIONS, PRODUCT_LABEL, PRODUCTS } from '@/lib/domain';
 import type { RegistrationListItem, RegistrationMessageDto } from '@/lib/dto';
 import { ROUTES } from '@/lib/routes';
 import { recordAudit } from '@/server/audit/record';
@@ -40,6 +40,13 @@ const optionalText = (max: number) =>
     .nullish()
     .transform((value) => (value ? value : null));
 
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+
+/** A country is the ISO 3166 code (IN, AE) or the name (India). Stored as typed. */
+const COUNTRY = /^(?:[A-Za-z]{2}|[A-Za-z][A-Za-z .,'()-]{2,79})$/;
+
+const optionalNumber = (schema: z.ZodNumber) => schema.nullish().transform((value) => value ?? null);
+
 const registerSchema = z.object({
   partnerId: z.string().uuid().optional(),
   customer: z.string().trim().min(1, "Enter the customer's company name.").max(200),
@@ -57,6 +64,15 @@ const registerSchema = z.object({
     .nullable(),
   expectedClose: optionalText(60),
   notes: optionalText(2000),
+  dealValue: optionalNumber(z.number().finite('Enter a number.').min(0, 'The deal value cannot be negative.').max(1e12, 'That deal value is too large.')),
+  currency: z.enum(DEAL_CURRENCIES).optional(),
+  customerCountry: optionalText(80).refine((v) => v === null || COUNTRY.test(v), 'Enter a country code such as IN or a country name.'),
+  customerIndustry: optionalText(120),
+  useCase: optionalText(1000),
+  competitor: optionalText(200),
+  seats: optionalNumber(z.number().int('Enter a whole number.').min(0, 'Seats cannot be negative.').max(10_000_000, 'That is too many seats.')),
+  salesStage: optionalText(80),
+  decisionDate: optionalText(10).refine((v) => v === null || (ISO_DATE.test(v) && new Date(v).toISOString().slice(0, 10) === v), 'Enter the date as YYYY-MM-DD.'),
 });
 
 export async function registerDealsAction(raw: unknown): Promise<ActionResult<RegistrationListItem[]>> {
@@ -78,6 +94,15 @@ export async function registerDealsAction(raw: unknown): Promise<ActionResult<Re
           contact: input.contact,
           expectedClose: input.expectedClose,
           notes: input.notes,
+          dealValue: input.dealValue,
+          ...(input.currency ? { currency: input.currency } : {}),
+          customerCountry: input.customerCountry,
+          customerIndustry: input.customerIndustry,
+          useCase: input.useCase,
+          competitor: input.competitor,
+          seats: input.seats,
+          salesStage: input.salesStage,
+          decisionDate: input.decisionDate,
         },
         ctx.clock,
       );

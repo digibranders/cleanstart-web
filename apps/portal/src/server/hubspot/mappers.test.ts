@@ -27,6 +27,33 @@ describe('dealProperties', () => {
   });
 });
 
+describe('dealProperties registration details', () => {
+  const base = { id: 'r1', customerName: 'Vardhan Capital', product: 'Clean Libraries', region: 'India', protectionEnd: '2027-02-02' };
+  const partner = { name: 'Kestrel Systems', hubspotCompanyId: '55' };
+
+  it('writes the details the partner gave, as strings', () => {
+    const props = dealProperties(
+      {
+        ...base, reference: 'REG-2611-0007', dealValue: 125000.5, currency: 'INR', customerCountry: 'IN', customerIndustry: 'Banking',
+        useCase: 'Image hardening', competitor: 'Chainguard', seats: 40, salesStage: 'Evaluation', decisionDate: '2027-03-31',
+      },
+      partner, stageIds, 'pipe-1',
+    );
+    expect(props).toMatchObject({
+      portal_reference: 'REG-2611-0007', amount: '125000.5', deal_currency_code: 'INR', customer_country: 'IN',
+      customer_industry: 'Banking', use_case: 'Image hardening', competitor: 'Chainguard', seats: '40',
+      sales_stage: 'Evaluation', decision_date: '2027-03-31',
+    });
+  });
+
+  it('omits empty details and sends no currency without a value, but keeps a zero value', () => {
+    const none = dealProperties({ ...base, dealValue: null, currency: 'USD', customerCountry: null, seats: null, useCase: '' }, partner, stageIds, 'pipe-1');
+    expect(Object.keys(none)).not.toEqual(expect.arrayContaining(['amount', 'deal_currency_code', 'customer_country', 'seats', 'use_case']));
+    const zero = dealProperties({ ...base, dealValue: 0, currency: 'USD', seats: 0 }, partner, stageIds, 'pipe-1');
+    expect(zero).toMatchObject({ amount: '0', deal_currency_code: 'USD', seats: '0' });
+  });
+});
+
 describe('isoDate', () => {
   it('reads a date or an epoch at midnight UTC', () => {
     expect(isoDate('2027-02-02')).toBe('2027-02-02');

@@ -30,6 +30,53 @@ const input = (over: Partial<NewRegistrationsInput> = {}): NewRegistrationsInput
   ...over,
 });
 
+describe('createRegistrations deal details and reference', () => {
+  it('numbers each registration REG-YYMM-NNNN and stores the optional deal details; unset ones read as null and USD', async () => {
+    await asStaff(db, 'partner_manager', 'india');
+    const partner = await makePartner(db, {});
+    const viewer = await asPartner(db, { partnerId: partner.id, role: 'partner_admin' });
+
+    const [plain] = await withViewer(viewer, (tx) => createRegistrations(tx, viewer, input({ customer: 'Plain Co' }), clock));
+    expect(plain).toMatchObject({ reference: 'REG-2611-0001', dealValue: null, currency: 'USD', customerCountry: null });
+
+    const created = await withViewer(viewer, (tx) =>
+      createRegistrations(
+        tx,
+        viewer,
+        input({
+          products: ['images', 'cleansight'],
+          dealValue: 125000.5,
+          currency: 'INR',
+          customerCountry: 'IN',
+          customerIndustry: 'Banking',
+          useCase: 'Hardened images',
+          competitor: 'Chainguard',
+          seats: 40,
+          salesStage: 'Evaluation',
+          decisionDate: '2027-03-31',
+        }),
+        clock,
+      ),
+    );
+    expect(Object.fromEntries(created.map((r) => [r.product, r.reference]))).toEqual({
+      images: 'REG-2611-0002',
+      cleansight: 'REG-2611-0003',
+    });
+    const detail = await withViewer(viewer, (tx) => getRegistration(tx, viewer, created[0]!.id));
+    expect(detail).toMatchObject({
+      dealValue: 125000.5,
+      currency: 'INR',
+      customerCountry: 'IN',
+      customerIndustry: 'Banking',
+      useCase: 'Hardened images',
+      competitor: 'Chainguard',
+      seats: 40,
+      salesStage: 'Evaluation',
+      decisionDate: '2027-03-31',
+    });
+  });
+});
+
 describe('createRegistrations', () => {
   it('creates one pending registration per product, routed to the manager of the region, and activates an onboarding partner', async () => {
     const gaurav = await asStaff(db, 'partner_manager', 'india');

@@ -38,6 +38,7 @@ export const selectRows = (tx: Tx) =>
 
 export const toListItem = (row: ListRow): RegistrationListItem => ({
   id: row.id,
+  reference: row.reference,
   customer: row.customerName,
   website: row.customerDomain,
   partnerId: row.partnerId,
@@ -63,6 +64,9 @@ export const toListItem = (row: ListRow): RegistrationListItem => ({
   crmSyncedAt: row.hubspotSyncedAt ? row.hubspotSyncedAt.toISOString() : null,
   extensionStatus: row.extensionStatus,
   expectedClose: row.expectedClose,
+  dealValue: row.dealValue,
+  currency: row.currency,
+  customerCountry: row.customerCountry,
 });
 
 export const toMessageDto = (m: MessageRow): RegistrationMessageDto => ({
@@ -82,6 +86,12 @@ const toDetail = (
 ): RegistrationDetailDto => ({
   ...toListItem(row),
   notes: row.notes,
+  customerIndustry: row.customerIndustry,
+  useCase: row.useCase,
+  competitor: row.competitor,
+  seats: row.seats,
+  salesStage: row.salesStage,
+  decisionDate: row.decisionDate,
   extensionRequestedAt: row.extensionRequestedAt ? row.extensionRequestedAt.toISOString() : null,
   extensionReason: row.extensionReason,
   extensionGrantedAt: row.extensionGrantedAt ? row.extensionGrantedAt.toISOString() : null,
