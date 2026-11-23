@@ -5,6 +5,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { Icon } from '@/components/icon';
 import { DocumentEditDrawer } from '@/components/documents/DocumentEditDrawer';
 import { DocumentPreview } from '@/components/documents/DocumentPreview';
+import { RequestsInbox, type RequestPerson } from '@/components/documents/RequestsInbox';
 import { UploadDocumentForm } from '@/components/documents/UploadDocumentForm';
 import { CHIP_PRODUCT, TYPE_ICON, TYPE_TONE } from '@/components/documents/doc-style';
 import { adminUpdatedLabel, audienceTone } from '@/components/documents/doc-view';
@@ -13,6 +14,7 @@ import { Badge, ProductChip } from '@/components/ui/badge';
 import { Dropdown } from '@/components/ui/dropdown';
 import { useToast } from '@/components/ui/toast';
 import type { AudiencePartnerDto } from '@/lib/document-upload';
+import type { MaterialRequestDto } from '@/lib/dto';
 import { plural } from '@/lib/dates';
 import { DOC_PRODUCT_LABEL, DOC_PRODUCTS, DOCUMENT_TYPE_LABEL, DOCUMENT_TYPES } from '@/lib/domain';
 import type { DocumentDto } from '@/lib/dto';
@@ -32,13 +34,21 @@ const PRODUCT_FILTER = [
 export function AdminDocuments({
   docs,
   partners,
+  requests,
+  assignees,
+  openRequestCount,
   today,
 }: {
   docs: readonly DocumentDto[];
   partners: readonly AudiencePartnerDto[];
+  /** Null for a role that cannot work requests: the tab is not shown. */
+  requests: readonly MaterialRequestDto[] | null;
+  assignees: readonly RequestPerson[];
+  openRequestCount: number;
   today: string;
 }): React.JSX.Element {
   const [uploadOpen, setUploadOpen] = useState(false);
+  const [tab, setTab] = useState<'library' | 'requests'>(useSearchParams().get('tab') === 'requests' && requests ? 'requests' : 'library');
   // The Audit log links here with ?doc=<id> to open that document's edit drawer.
   const [editingId, setEditingId] = useState<string | null>(useSearchParams().get('doc'));
   const [q, setQ] = useState('');
@@ -108,7 +118,24 @@ export function AdminDocuments({
         )}
       </div>
 
-      <div className="row">
+      {requests ? (
+        <div className="tabs" role="group" aria-label="Documents sections" style={{ padding: '0 8px' }}>
+          <button type="button" className={`tab${tab === 'library' ? ' tab-on' : ''}`} aria-pressed={tab === 'library'} onClick={() => setTab('library')}>
+            Library
+            <span className="cnt">{docs.length}</span>
+          </button>
+          <button type="button" className={`tab${tab === 'requests' ? ' tab-on' : ''}`} aria-pressed={tab === 'requests'} onClick={() => setTab('requests')}>
+            Requests
+            <span className="cnt" aria-label={`${openRequestCount} open`}>
+              {openRequestCount}
+            </span>
+          </button>
+        </div>
+      ) : null}
+
+      {tab === 'requests' && requests ? <RequestsInbox requests={requests} assignees={assignees} docs={docs} /> : null}
+
+      <div className="row" style={tab === 'requests' ? { display: 'none' } : undefined}>
         {uploadOpen ? <UploadDocumentForm onClose={closeUpload} partners={partners} /> : null}
 
         <section
@@ -159,6 +186,9 @@ export function AdminDocuments({
                   <th scope="col" className="r hide-sm">
                     Opened by
                   </th>
+                  <th scope="col" className="r hide-sm">
+                    Last opened
+                  </th>
                   <th scope="col" className="r">
                     Actions
                   </th>
@@ -193,10 +223,23 @@ export function AdminDocuments({
                     </td>
                     <td>
                       <Badge tone={audienceTone(d.audience.kind)}>{audienceLabel(d.audience)}</Badge>
+                      {d.status === 'draft' ? (
+                        <>
+                          {' '}
+                          <Badge tone="pending">Draft</Badge>
+                        </>
+                      ) : null}
+                      {d.expired ? (
+                        <>
+                          {' '}
+                          <Badge tone="expired">Expired</Badge>
+                        </>
+                      ) : null}
                     </td>
                     <td className="tnum r t-sec hide-sm">{adminUpdatedLabel(d.updatedAt, today)}</td>
                     <td className="tnum r">{d.opens ?? 0}</td>
                     <td className="tnum r t-sec hide-sm">{plural(d.partnerCount ?? 0, 'partner')}</td>
+                    <td className="tnum r t-sec hide-sm">{d.lastOpenedAt ? adminUpdatedLabel(d.lastOpenedAt, today) : 'Never'}</td>
                     <td className="r">
                       <ActionMenu
                         label="Actions"

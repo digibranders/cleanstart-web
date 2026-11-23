@@ -65,7 +65,7 @@ BEGIN
   FOREACH t IN ARRAY ARRAY[
     'partners', 'users', 'staff_scopes', 'partner_checklist', 'applications', 'application_notes', 'application_tokens', 'invites', 'access_requests',
     'registrations', 'registration_contacts', 'registration_messages', 'registration_events', 'registration_reminders',
-    'documents', 'document_audience', 'document_versions', 'document_opens', 'email_change_requests',
+    'documents', 'document_audience', 'document_versions', 'document_opens', 'material_requests', 'email_change_requests',
     'notifications', 'notification_prefs', 'audit_log', 'hubspot_outbox', 'hubspot_sync_state',
     'auth_session', 'auth_account', 'auth_verification', 'auth_two_factor'
   ] LOOP
@@ -154,7 +154,7 @@ DROP POLICY IF EXISTS documents_update ON documents;
 CREATE POLICY documents_select ON documents FOR SELECT USING (
   app_is_staff()
   OR (
-    deleted_at IS NULL AND (
+    deleted_at IS NULL AND status = 'published' AND (expires_at IS NULL OR expires_at > now()) AND (
       audience_kind = 'all'
       OR (audience_kind = 'categories'
           AND (SELECT p.category FROM partners p WHERE p.id = app_partner_id()) = ANY (audience_categories))
@@ -172,6 +172,14 @@ DROP POLICY IF EXISTS document_audience_delete ON document_audience;
 CREATE POLICY document_audience_select ON document_audience FOR SELECT USING (app_is_staff() OR partner_id = app_partner_id());
 CREATE POLICY document_audience_insert ON document_audience FOR INSERT WITH CHECK (app_is_staff());
 CREATE POLICY document_audience_delete ON document_audience FOR DELETE USING (app_is_staff());
+
+-- A partner reads and creates its own company's material requests; only staff change them (status, response, linked document).
+DROP POLICY IF EXISTS material_requests_select ON material_requests;
+DROP POLICY IF EXISTS material_requests_insert ON material_requests;
+DROP POLICY IF EXISTS material_requests_update ON material_requests;
+CREATE POLICY material_requests_select ON material_requests FOR SELECT USING (app_is_staff() OR partner_id = app_partner_id());
+CREATE POLICY material_requests_insert ON material_requests FOR INSERT WITH CHECK (app_is_staff() OR partner_id = app_partner_id());
+CREATE POLICY material_requests_update ON material_requests FOR UPDATE USING (app_is_staff()) WITH CHECK (app_is_staff());
 
 -- ---------------------------------------------------------------- user private
 DROP POLICY IF EXISTS notifications_select ON notifications;

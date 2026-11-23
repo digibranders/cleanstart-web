@@ -180,6 +180,18 @@ export const DOCUMENT_TYPE_LABEL: Record<DocumentType, string> = {
   video: 'Video',
   enablement_guide: 'Enablement guide',
 };
+export const DOCUMENT_STATUSES = ['draft', 'published'] as const;
+export type DocumentStatus = (typeof DOCUMENT_STATUSES)[number];
+
+export const MATERIAL_REQUEST_STATUSES = ['open', 'in_progress', 'done', 'declined'] as const;
+export type MaterialRequestStatus = (typeof MATERIAL_REQUEST_STATUSES)[number];
+export const MATERIAL_REQUEST_STATUS_LABEL: Record<MaterialRequestStatus, string> = {
+  open: 'Open',
+  in_progress: 'In progress',
+  done: 'Done',
+  declined: 'Declined',
+};
+
 export const AUDIENCE_KINDS = ['all', 'categories', 'named'] as const;
 export type AudienceKind = (typeof AUDIENCE_KINDS)[number];
 
@@ -226,6 +238,7 @@ export const NOTIFICATION_KINDS = [
   'team_joined',
   'team_removed',
   'role_changed',
+  'material_request_update',
 ] as const;
 export type NotificationKind = (typeof NOTIFICATION_KINDS)[number];
 
@@ -250,6 +263,7 @@ export const NOTIFICATION_CATEGORY_OF: Record<NotificationKind, NotificationCate
   team_joined: 'team',
   team_removed: 'team',
   role_changed: 'team',
+  material_request_update: 'docs',
 };
 
 export const CHECKLIST_STEPS = ['agreement', 'company', 'team', 'kickoff', 'playbook', 'deal'] as const;

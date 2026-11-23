@@ -71,6 +71,7 @@ export const ACTIONS = [
   'document.delete',
   'document.read_stats',
   'document.request_material',
+  'document.manage_requests',
   // Cross cutting (master 4.2 to 4.4, HubSpot 4.10)
   'audit.read',
   'audit.export',
@@ -197,6 +198,7 @@ const RULES: Record<Action, Rule> = {
   'document.delete': (v) => isPartnerManager(v) || isMarketing(v),
   'document.read_stats': (v) => isPartnerManager(v) || isMarketing(v),
   'document.request_material': (v) => v.kind === 'partner',
+  'document.manage_requests': (v) => isPartnerManager(v) || isMarketing(v),
 
   'audit.read': managerOnly,
   'audit.export': managerOnly,

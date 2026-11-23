@@ -2,6 +2,7 @@ import {
   and,
   desc,
   eq,
+  gt,
   gte,
   ilike,
   inArray,
@@ -9,6 +10,7 @@ import {
   isNull,
   lte,
   notLike,
+  or,
   type SQL,
   sql,
 } from 'drizzle-orm';
@@ -26,6 +28,7 @@ import { type Clock, systemClock } from '@/lib/clock';
 import {
   type AudienceKind,
   type DocProduct,
+  type DocumentStatus,
   type DocumentType,
   PARTNER_CATEGORIES,
   type PartnerCategory,
@@ -60,6 +63,9 @@ export interface NewDocumentInput {
   audience: { kind: 'all' } | { kind: 'categories'; categories: PartnerCategory[] } | { kind: 'named'; partnerIds: string[] };
   /** From verifyUpload (upload.ts): the object is in R2 and its size and type were checked. */
   file: UploadedFile;
+  /** Default 'published'. A draft is staff only. */
+  status?: DocumentStatus;
+  expiresAt?: Date | null;
 }
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -85,9 +91,15 @@ const audienceAllows = (partnerId: string): SQL =>
         and exists (select 1 from document_audience a where a.document_id = ${documents.id} and a.partner_id = ${partnerId}::uuid))
   )`;
 
-/** Not deleted, and for a partner inside the audience. RLS enforces the same; this is the repo layer's own filter. */
+/** Published and not past its expiry. Same rule as documents_select in rls.sql. */
+const liveForPartners = (): SQL | undefined =>
+  and(eq(documents.status, 'published'), or(isNull(documents.expiresAt), gt(documents.expiresAt, sql`now()`)));
+
+/** Not deleted, and for a partner published, not expired and inside the audience. RLS enforces the same; this is the repo layer's own filter. */
 const visibleTo = (viewer: Viewer): SQL | undefined =>
-  viewer.kind === 'staff' ? isNull(documents.deletedAt) : and(isNull(documents.deletedAt), audienceAllows(viewer.partnerId));
+  viewer.kind === 'staff'
+    ? isNull(documents.deletedAt)
+    : and(isNull(documents.deletedAt), liveForPartners(), audienceAllows(viewer.partnerId));
 
 const toListItem = (row: DocumentRow): DocumentListItemDto => ({
   id: row.id,
@@ -120,6 +132,7 @@ async function hydrate(tx: Tx, viewer: Viewer, rows: readonly DocumentRow[]): Pr
       documentId: documentOpens.documentId,
       opens: sql<number>`count(*)::int`,
       partnerCount: sql<number>`count(distinct ${documentOpens.partnerId})::int`,
+      lastOpenedAt: sql<Date | null>`max(${documentOpens.openedAt})`,
       own,
     })
     .from(documentOpens)
@@ -158,6 +171,10 @@ async function hydrate(tx: Tx, viewer: Viewer, rows: readonly DocumentRow[]): Pr
       opens: staff ? (s?.opens ?? 0) : null,
       partnerCount: staff ? (s?.partnerCount ?? 0) : null,
       ownOpens: viewer.kind === 'staff' ? null : (s?.own ?? 0),
+      lastOpenedAt: staff && s?.lastOpenedAt ? new Date(s.lastOpenedAt).toISOString() : null,
+      status: row.status,
+      expiresAt: row.expiresAt ? row.expiresAt.toISOString() : null,
+      expired: row.expiresAt !== null && row.expiresAt.getTime() <= Date.now(),
     };
   });
 }
@@ -300,6 +317,8 @@ export async function createDocument(tx: Tx, viewer: Viewer, input: NewDocumentI
       mime: input.file.mime,
       originalName: input.file.originalName,
       durationMinutes: input.durationMinutes,
+      status: input.status ?? 'published',
+      expiresAt: input.expiresAt ?? null,
       version: 1,
       uploadedBy: viewer.id,
       createdAt: now,
@@ -317,7 +336,7 @@ export async function createDocument(tx: Tx, viewer: Viewer, input: NewDocumentI
 export async function replaceDocumentFile(
   tx: Tx,
   viewer: Viewer,
-  input: { id: string; file: UploadedFile },
+  input: { id: string; file: UploadedFile; changeNote?: string | null },
   clock: Clock,
 ): Promise<{ document: DocumentDto; previousVersion: number }> {
   assertStaff(viewer);
@@ -336,6 +355,7 @@ export async function replaceDocumentFile(
     fileSize: current.fileSize,
     mime: current.mime,
     originalName: current.originalName,
+    changeNote: current.changeNote,
     replacedAt: now,
     purgeAfter: shiftDays(now, OLD_KEY_RETENTION_DAYS),
     replacedBy: viewer.id,
@@ -348,6 +368,7 @@ export async function replaceDocumentFile(
       mime: input.file.mime,
       originalName: input.file.originalName,
       version: next,
+      changeNote: input.changeNote?.trim() || null,
       uploadedBy: viewer.id,
       updatedAt: now,
     })
@@ -368,9 +389,12 @@ export async function updateDocument(
     product?: DocProduct;
     summary?: string | null;
     audience?: NewDocumentInput['audience'];
+    status?: DocumentStatus;
+    /** undefined keeps it, null clears it. */
+    expiresAt?: Date | null;
   },
   clock: Clock,
-): Promise<{ document: DocumentDto; changed: Array<'details' | 'audience'>; audienceBefore: string; audienceAfter: string }> {
+): Promise<{ document: DocumentDto; changed: Array<'details' | 'audience' | 'status' | 'expiry'>; audienceBefore: string; audienceAfter: string }> {
   assertStaff(viewer);
   const current = await lockLive(tx, input.id);
   const currentNamed = await loadNamedPartnerIds(tx, current.id);
@@ -385,8 +409,16 @@ export async function updateDocument(
     const summary = input.summary?.trim() || null;
     if (summary !== current.summary) patch.summary = summary;
   }
-  const changed: Array<'details' | 'audience'> = [];
+  const changed: Array<'details' | 'audience' | 'status' | 'expiry'> = [];
   if (Object.keys(patch).length > 0) changed.push('details');
+  if (input.status !== undefined && input.status !== current.status) {
+    patch.status = input.status;
+    changed.push('status');
+  }
+  if (input.expiresAt !== undefined && (input.expiresAt?.getTime() ?? null) !== (current.expiresAt?.getTime() ?? null)) {
+    patch.expiresAt = input.expiresAt;
+    changed.push('expiry');
+  }
 
   let audienceAfter = audienceBefore;
   let nextNamed = currentNamed;
@@ -522,6 +554,7 @@ export async function listDocumentRecipients(tx: Tx, viewer: Viewer, input: { id
         eq(users.status, 'active'),
         inArray(partners.status, ['onboarding', 'active']),
         isNull(documents.deletedAt),
+        liveForPartners(),
         sql`(
           ${documents.audienceKind} = 'all'
           or (${documents.audienceKind} = 'categories' and ${partners.category} = any (${documents.audienceCategories}))
