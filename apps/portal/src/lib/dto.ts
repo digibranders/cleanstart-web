@@ -279,6 +279,15 @@ export interface RegistrationContactDto {
   phone: string | null;
 }
 
+/** The customer details a partner carries over when registering the same customer again. */
+export interface RegisterAgainDto {
+  customer: string;
+  website: string | null;
+  country: string | null;
+  industry: string | null;
+  contacts: Array<Omit<RegistrationContactDto, 'id'>>;
+}
+
 export interface RegistrationMessageDto {
   id: string;
   authorId: string | null;

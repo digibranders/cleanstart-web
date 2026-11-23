@@ -47,6 +47,13 @@ const COUNTRY = /^(?:[A-Za-z]{2}|[A-Za-z][A-Za-z .,'()-]{2,79})$/;
 
 const optionalNumber = (schema: z.ZodNumber) => schema.nullish().transform((value) => value ?? null);
 
+const contactSchema = z.object({
+  name: z.string().trim().min(1, 'Enter the contact name.').max(120),
+  role: optionalText(120),
+  email: optionalText(254).refine((v) => v === null || EMAIL.test(v), 'Enter a valid email.'),
+  phone: optionalText(40),
+});
+
 const registerSchema = z.object({
   partnerId: z.string().uuid().optional(),
   customer: z.string().trim().min(1, "Enter the customer's company name.").max(200),
@@ -54,14 +61,12 @@ const registerSchema = z.object({
   products: z.array(z.enum(PRODUCTS)).min(1, 'Pick at least one product.'),
   region: z.enum(DEAL_REGIONS),
   managerId: z.string().uuid().nullish().transform((value) => value ?? null),
-  contact: z
-    .object({
-      name: z.string().trim().min(1, 'Enter the contact name.').max(120),
-      role: optionalText(120),
-      email: optionalText(254).refine((v) => v === null || EMAIL.test(v), 'Enter a valid email.'),
-      phone: optionalText(40),
-    })
-    .nullable(),
+  contact: contactSchema.nullable().optional(),
+  contacts: z
+    .array(contactSchema)
+    .max(10, 'Add at most 10 contacts.')
+    .refine((list) => list.length === 0 || list.some((c) => c.email !== null || c.phone !== null), 'Give an email or phone for at least one contact.')
+    .optional(),
   expectedClose: optionalText(60),
   notes: optionalText(2000),
   dealValue: optionalNumber(z.number().finite('Enter a number.').min(0, 'The deal value cannot be negative.').max(1e12, 'That deal value is too large.')),
@@ -91,7 +96,8 @@ export async function registerDealsAction(raw: unknown): Promise<ActionResult<Re
           products: input.products,
           region: input.region,
           managerId: input.managerId,
-          contact: input.contact,
+          contact: input.contact ?? null,
+          ...(input.contacts ? { contacts: input.contacts } : {}),
           expectedClose: input.expectedClose,
           notes: input.notes,
           dealValue: input.dealValue,
