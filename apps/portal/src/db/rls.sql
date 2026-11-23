@@ -102,6 +102,16 @@ CREATE POLICY registration_events_delete ON registration_events FOR DELETE USING
 DROP POLICY IF EXISTS registration_messages_delete ON registration_messages;
 CREATE POLICY registration_messages_delete ON registration_messages FOR DELETE USING (app_is_staff());
 
+-- A partner removes a contact only while the registration is still pending (B4); once accepted the manager owns the contacts.
+DROP POLICY IF EXISTS registration_contacts_delete ON registration_contacts;
+CREATE POLICY registration_contacts_delete ON registration_contacts FOR DELETE USING (
+  app_is_system()
+  OR (
+    partner_id = app_partner_id()
+    AND EXISTS (SELECT 1 FROM registrations r WHERE r.id = registration_contacts.registration_id AND r.status = 'pending')
+  )
+);
+
 -- ---------------------------------------------------------------- partners
 DROP POLICY IF EXISTS partners_select ON partners;
 DROP POLICY IF EXISTS partners_insert ON partners;

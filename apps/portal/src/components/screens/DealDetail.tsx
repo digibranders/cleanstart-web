@@ -9,11 +9,12 @@ import {
   PRODUCT_LABEL,
   PRODUCTS,
 } from "@/lib/domain";
-import type { RegistrationDetailDto, RegistrationListItem } from "@/lib/dto";
+import type { RegistrationContactDto, RegistrationDetailDto, RegistrationListItem } from "@/lib/dto";
 import { ROUTES } from "@/lib/routes";
 import { requestExtensionAction } from "@/server/actions/extension";
 import { postMessageAction } from "@/server/actions/registrations";
 import { withdrawRegistrationAction } from "@/server/actions/withdraw";
+import { ContactDrawer, EditRegistrationDrawer, RemoveContactDialog } from "../deals/EditRegistrationDrawers";
 import { daysLeft, fmtLong, fmtShort, plural, PROTECTION_DAYS } from "../deals/dates";
 import { acceptedOn, firstWord, initialsOf, protectionLength, stageTrack, waitDays } from "../deals/derive";
 import { ManagerMessageDrawer } from "../deals/ManagerMessageDrawer";
@@ -133,6 +134,9 @@ export function DealDetail({ deal, siblings, today, partnerManager, senderEmail 
   const [fixing, setFixing] = useState(false);
   const [withdrawOpen, setWithdrawOpen] = useState(false);
   const [withdrawBusy, setWithdrawBusy] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [contactEdit, setContactEdit] = useState<RegistrationContactDto | "new" | null>(null);
+  const [contactRemove, setContactRemove] = useState<RegistrationContactDto | null>(null);
   const [messageSubject, setMessageSubject] = useState<string | null>(null);
   // stable, because the overlay re-focuses its first field whenever onClose changes
   const closeExt = useCallback(() => setExtOpen(false), []);
@@ -246,6 +250,11 @@ export function DealDetail({ deal, siblings, today, partnerManager, senderEmail 
             </Link>
           ) : null}
           {deal.status === "pending" ? (
+            <button type="button" className="btn btn-s" onClick={() => setEditing(true)}>
+              Edit registration
+            </button>
+          ) : null}
+          {deal.status === "pending" ? (
             <button type="button" className="btn btn-s" onClick={() => setWithdrawOpen(true)}>
               Withdraw registration
             </button>
@@ -265,6 +274,14 @@ export function DealDetail({ deal, siblings, today, partnerManager, senderEmail 
           <Icon name="warn" />
           <span>
             <b>Not accepted.</b> {deal.rejectionReason}
+          </span>
+        </div>
+      ) : null}
+
+      {deal.status === "accepted" ? (
+        <div className="note note-violet">
+          <span>
+            <b>Accepted registrations are changed by your partner manager.</b> Ask {managerFirst} in the conversation below.
           </span>
         </div>
       ) : null}
@@ -531,11 +548,17 @@ export function DealDetail({ deal, siblings, today, partnerManager, senderEmail 
               <h2 id="contacts" className="card-t">
                 Contacts
               </h2>
-              <span className="card-meta">{deal.contacts.length}</span>
+              {deal.status === "pending" ? (
+                <button type="button" className="link-sm" style={{ background: "none", border: 0, padding: 0, cursor: "pointer" }} onClick={() => setContactEdit("new")}>
+                  Add
+                </button>
+              ) : (
+                <span className="card-meta">{deal.contacts.length}</span>
+              )}
             </div>
             {deal.contacts.length === 0 ? <div className="empty">No contacts added yet.</div> : null}
             {deal.contacts.map((c, index) => (
-              <div className="li" key={`${c.name}-${index}`}>
+              <div className="li" key={c.id}>
                 <span className="av av-3 av-r">{c.name.split(" ").map((w) => w.charAt(0)).join("").slice(0, 2)}</span>
                 <span className="li-t">
                   <span className="li-n">{c.name}</span>
@@ -543,6 +566,16 @@ export function DealDetail({ deal, siblings, today, partnerManager, senderEmail 
                     {index === 0 ? (c.role ? `${c.role}, primary contact` : "Primary contact") : (c.role ?? "Contact")}
                   </span>
                 </span>
+                {deal.status === "pending" ? (
+                  <span style={{ display: "flex", gap: 2, flex: "none" }}>
+                    <button type="button" className="btn btn-g" style={{ height: 24, padding: "0 6px", fontSize: 12 }} onClick={() => setContactEdit(c)} aria-label={`Edit ${c.name}`}>
+                      Edit
+                    </button>
+                    <button type="button" className="btn btn-g" style={{ height: 24, padding: "0 6px", fontSize: 12 }} onClick={() => setContactRemove(c)} aria-label={`Remove ${c.name}`}>
+                      Remove
+                    </button>
+                  </span>
+                ) : null}
               </div>
             ))}
           </section>
@@ -608,6 +641,20 @@ export function DealDetail({ deal, siblings, today, partnerManager, senderEmail 
         <span className="hint">You can register this customer again later.</span>
       </Dialog>
 
+      {editing && deal.status === "pending" ? (
+        <EditRegistrationDrawer deal={deal} today={today} onClose={() => setEditing(false)} />
+      ) : null}
+      {contactEdit !== null && deal.status === "pending" ? (
+        <ContactDrawer
+          key={contactEdit === "new" ? "new" : contactEdit.id}
+          deal={deal}
+          contact={contactEdit === "new" ? null : contactEdit}
+          onClose={() => setContactEdit(null)}
+        />
+      ) : null}
+      {contactRemove !== null && deal.status === "pending" ? (
+        <RemoveContactDialog deal={deal} contact={contactRemove} onClose={() => setContactRemove(null)} />
+      ) : null}
       {fixing && deal.status === "rejected" ? (
         <RejectedDealDrawer
           deal={deal}
