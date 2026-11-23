@@ -134,6 +134,11 @@ describe('describeCheck', () => {
     },
   });
 
+  it('carries the other registration id so the badge can open it, and a CRM-only hint has none', () => {
+    expect(describeCheck(deal, rival()).rival?.id).toBe('o');
+    expect(describeCheck(deal, { kind: 'none' }, { registrationId: 'r', holder: 'Dunes Networks', openDeals: 1 }).rival).toBeUndefined();
+  });
+
   it('says who was first when two partners wait', () => {
     expect(describeCheck(deal, rival())).toMatchObject({
       kind: 'conflict', label: 'Conflict', tone: 'pending', whyCls: 'why why-amber',

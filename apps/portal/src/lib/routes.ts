@@ -23,6 +23,7 @@ export const ROUTES = {
   admin: {
     overview: "/admin/overview",
     approvals: "/admin/approvals",
+    newDeal: "/admin/approvals/new",
     partners: "/admin/partners",
     documents: "/admin/documents",
     reports: "/admin/reports",

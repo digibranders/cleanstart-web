@@ -34,10 +34,12 @@ import {
 } from "@/lib/domain";
 import type { CustomerSuggestionDto, ManagerOptionDto, RegisterAgainDto, RegistrationListItem } from "@/lib/dto";
 import { ROUTES } from "@/lib/routes";
+import { staffDealHref } from "@/lib/staff-deals-dto";
 import { lookupCustomerAction, registerDealsAction } from "@/server/actions/registrations";
 import { issuesToErrors } from "@/server/actions/result";
 import { fmtLong, fmtShort } from "../deals/dates";
 import { managerFor, protectionView, reviewSince, sameCustomer } from "../deals/derive";
+import { type PartnerChoice, PartnerPicker } from "../deals/PartnerPicker";
 import { ProductMark, StatusBadge } from "../deals/parts";
 import type { CustomerLookupResult } from "../deals/types";
 import { Icon } from "../icon";
@@ -78,6 +80,8 @@ interface RegisterDealProps {
   userId: string;
   /** Set by /partner/deals/new?from=<id>: the customer to register again. */
   source: RegisterAgainDto | null;
+  /** Staff (partner managers) registering for a partner: adds the partner picker and points the links at the staff screens. */
+  onBehalf?: { partners: PartnerChoice[] };
 }
 
 const fromSource = (base: DealFormState, source: RegisterAgainDto): DealFormState => ({
@@ -109,9 +113,14 @@ function writeDraft(userId: string, raw: string | null): void {
   }
 }
 
-export function RegisterDeal({ mine, managers, partnerName, partnerRegion, today, userId, source }: RegisterDealProps): React.JSX.Element {
+export function RegisterDeal({ mine, managers, partnerName: ownPartnerName, partnerRegion, today, userId, source, onBehalf }: RegisterDealProps): React.JSX.Element {
   const toast = useToast();
   const router = useRouter();
+  const [partnerId, setPartnerId] = useState("");
+  const pickedPartner = onBehalf?.partners.find((p) => p.id === partnerId);
+  const partnerName = onBehalf ? (pickedPartner?.name ?? "The partner") : ownPartnerName;
+  const dealHref = (id: string): string => (onBehalf ? staffDealHref(id) : ROUTES.partner.deal(id));
+  const listHref = onBehalf ? ROUTES.admin.approvals : ROUTES.partner.deals;
   const homeRegion: DealRegion = partnerRegion === "middle_east" ? "middle_east" : "india";
   const blank = useMemo(() => blankForm(homeRegion, managerFor(managers, homeRegion)), [homeRegion, managers]);
   const [baseline, setBaseline] = useState<DealFormState>(() => (source ? fromSource(blank, source) : blank));
@@ -180,7 +189,8 @@ export function RegisterDeal({ mine, managers, partnerName, partnerRegion, today
       : [];
 
   useEffect(() => {
-    if (customer.length < 3) {
+    // The customer lookup is a partner permission; staff rely on the server's duplicate check at submit.
+    if (customer.length < 3 || onBehalf) {
       setRemote(null);
       return;
     }
@@ -198,7 +208,7 @@ export function RegisterDeal({ mine, managers, partnerName, partnerRegion, today
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [customer]);
+  }, [customer, onBehalf]);
 
   // A draft is offered once, on arrival, and never when the partner came to register a customer again.
   useEffect(() => {
@@ -270,8 +280,12 @@ export function RegisterDeal({ mine, managers, partnerName, partnerRegion, today
       setFormError("Take the products you already registered for this customer out of your picks to continue.");
       return;
     }
+    if (onBehalf && !partnerId) {
+      setTried(true);
+      return;
+    }
     setBusy(true);
-    const result = await registerDealsAction(toRegisterInput(form));
+    const result = await registerDealsAction({ ...toRegisterInput(form), ...(onBehalf ? { partnerId } : {}) });
     setBusy(false);
     if (!result.ok) {
       setServerErrors(issuesToErrors(result.error));
@@ -287,7 +301,14 @@ export function RegisterDeal({ mine, managers, partnerName, partnerRegion, today
     toast(result.data.length > 1 ? `${result.data.length} registrations sent for approval` : "Submitted for approval");
   };
 
+  const pickPartner = (id: string): void => {
+    setPartnerId(id);
+    const region: DealRegion = onBehalf?.partners.find((p) => p.id === id)?.region === "middle_east" ? "middle_east" : "india";
+    if (id) patch({ region, managerId: managerFor(managers, region) });
+  };
+
   const registerAnother = (): void => {
+    setPartnerId("");
     const next = blankForm(form.region, form.managerId);
     setBaseline(next);
     setForm(next);
@@ -320,8 +341,12 @@ export function RegisterDeal({ mine, managers, partnerName, partnerRegion, today
     <div className="wrap">
       <div className="head">
         <div style={{ display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
-          <h1 className="h1">Register deal</h1>
-          <span className="h1-sub">One registration per product. Protection starts when CleanStart accepts it.</span>
+          <h1 className="h1">{onBehalf ? "Register deal for a partner" : "Register deal"}</h1>
+          <span className="h1-sub">
+            {onBehalf
+              ? "Recorded in the audit log as registered on the partner's behalf. The partner gets no receipt email."
+              : "One registration per product. Protection starts when CleanStart accepts it."}
+          </span>
         </div>
       </div>
 
@@ -341,8 +366,9 @@ export function RegisterDeal({ mine, managers, partnerName, partnerRegion, today
                   {submitted.deals.length > 1 ? `${submitted.deals.length} registrations sent for approval` : "Submitted for approval"}
                 </h2>
                 <p style={{ margin: 0, fontSize: 13, color: "#5E5B6E" }}>
-                  {submitted.customer}. {submitted.deals.length > 1 ? "Each one is" : "It is"} pending until CleanStart reviews it. You get an
-                  email for every decision.
+                  {submitted.customer}, for {partnerName}. {submitted.deals.length > 1 ? "Each one is" : "It is"} pending until CleanStart reviews
+                  it.{" "}
+                  {onBehalf ? "The partner's team is told about each decision." : "You get an email for every decision."}
                 </p>
                 <ul style={{ margin: "4px 0 0", padding: 0, listStyle: "none", fontSize: 13, display: "flex", flexDirection: "column", gap: 2 }}>
                   {submitted.deals.map((deal) => (
@@ -350,12 +376,12 @@ export function RegisterDeal({ mine, managers, partnerName, partnerRegion, today
                       <span className="tnum" style={{ fontWeight: 600 }}>
                         {deal.reference}
                       </span>{" "}
-                      <Link href={ROUTES.partner.deal(deal.id)}>Open the {PRODUCT_LABEL[deal.product]} deal</Link>
+                      <Link href={dealHref(deal.id)}>Open the {PRODUCT_LABEL[deal.product]} deal</Link>
                     </li>
                   ))}
                 </ul>
                 <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
-                  <Link href={ROUTES.partner.deals} className="btn btn-p">
+                  <Link href={listHref} className="btn btn-p">
                     View deals
                   </Link>
                   <button type="button" className="btn btn-s" onClick={registerAnother}>
@@ -391,6 +417,24 @@ export function RegisterDeal({ mine, managers, partnerName, partnerRegion, today
                 </div>
               ) : null}
               <form onSubmit={submit} className="card" noValidate>
+                {onBehalf ? (
+                  <>
+                    <fieldset style={SECTION_STYLE}>
+                      <legend className="sr">Partner</legend>
+                      <div className="sec-h">
+                        <h2 className="sec-t">Partner</h2>
+                        <span className="sec-s">Who this registration is for</span>
+                      </div>
+                      <PartnerPicker
+                        partners={onBehalf.partners}
+                        value={partnerId}
+                        onChange={pickPartner}
+                        error={tried && !partnerId ? "Pick the partner." : undefined}
+                      />
+                    </fieldset>
+                    <hr className="hr" />
+                  </>
+                ) : null}
                 <fieldset style={SECTION_STYLE}>
                   <legend className="sr">Customer and contacts</legend>
                   <div className="sec-h">
@@ -902,7 +946,7 @@ export function RegisterDeal({ mine, managers, partnerName, partnerRegion, today
                     CleanStart reviews it within {REVIEW_SLA_BUSINESS_DAYS} business days. Accepted deals are protected for {PROTECTION_WINDOW_DAYS} days.
                   </span>
                   <span style={{ display: "flex", gap: 6 }}>
-                    <Link href={ROUTES.partner.deals} className="btn btn-s">
+                    <Link href={listHref} className="btn btn-s">
                       Cancel
                     </Link>
                     <button type="submit" className="btn btn-p" disabled={busy}>
@@ -943,7 +987,9 @@ export function RegisterDeal({ mine, managers, partnerName, partnerRegion, today
                 </h2>
               </div>
               <div className="card-b" style={{ fontSize: 12.5, lineHeight: 1.55, color: "#5E5B6E" }}>
-                {customer.length < 3
+                {onBehalf
+                  ? "CleanStart checks this partner's open registrations when you submit."
+                  : customer.length < 3
                   ? "Type the company name to check for existing registrations."
                   : hasSuggestions
                     ? "Pick a match from the list to see your deals at that customer."

@@ -8,6 +8,7 @@ export const AUDIT_EVENTS = {
   'registration.rejected': { kind: 'deal_decisions', action: 'Rejected a registration' },
   'registration.decision_undone': { kind: 'deal_decisions', action: 'Undid a decision' },
   'registration.resubmitted': { kind: 'deal_decisions', action: 'Resubmitted a registration' },
+  'registration.reassigned': { kind: 'deal_decisions', action: 'Reassigned a pending registration' },
   'registration.edited': { kind: 'deal_decisions', action: 'Edited a pending registration' },
   'registration.confirmation_downloaded': { kind: 'deal_decisions', action: 'Downloaded a registration confirmation' },
   'registration.extension_requested': { kind: 'deal_decisions', action: 'Requested a protection extension' },

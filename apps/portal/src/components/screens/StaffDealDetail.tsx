@@ -5,13 +5,14 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { fmtTimestamp } from "@/lib/dates";
 import { EVENT_SOURCE_LABEL, PARTNER_CATEGORY_LABEL, PARTNER_REGION_LABEL, PRODUCT_LABEL } from "@/lib/domain";
-import type { RegistrationCheckDto, RegistrationDetailDto } from "@/lib/dto";
+import type { ManagerOptionDto, RegistrationCheckDto, RegistrationDetailDto } from "@/lib/dto";
 import { ROUTES } from "@/lib/routes";
 import { acceptRegistrationAction, rejectRegistrationAction } from "@/server/actions/decisions";
 import { issuesToErrors } from "@/server/actions/result";
 import { fmtLong } from "../deals/dates";
 import { defaultRejectReason, describeCheck, initialsOf, reviewSince } from "../deals/derive";
 import { ConfirmationButton, OptionalFields } from "../deals/OptionalFields";
+import { ReassignControl } from "../deals/ReassignControl";
 import { StatusBadge } from "../deals/parts";
 import { Icon } from "../icon";
 import { useToast } from "../ui/toast";
@@ -20,9 +21,12 @@ interface Props {
   deal: RegistrationDetailDto | null;
   check: RegistrationCheckDto;
   today: string;
+  /** Partner managers only; the control shows on a waiting registration. */
+  canReassign: boolean;
+  managers: ManagerOptionDto[];
 }
 
-export function StaffDealDetail({ deal, check, today }: Props): React.JSX.Element {
+export function StaffDealDetail({ deal, check, today, canReassign, managers }: Props): React.JSX.Element {
   const router = useRouter();
   const toast = useToast();
   const [busy, setBusy] = useState(false);
@@ -199,6 +203,7 @@ export function StaffDealDetail({ deal, check, today }: Props): React.JSX.Elemen
             </>
           ) : null}
         </dl>
+        {canReassign && waiting ? <ReassignControl deal={deal} managers={managers} /> : null}
         {deal.notes ? (
           <div className="fg">
             <span className="lbl">Partner notes</span>
