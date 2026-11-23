@@ -686,7 +686,7 @@ export interface AuditEntryDto {
   subjectId: string | null;
 }
 
-export type AuditPeriod = '7d' | '30d' | '90d';
+export type AuditPeriod = '24h' | '7d' | '30d' | '90d' | 'custom';
 
 export interface SearchHitDto {
   group: 'registrations' | 'partners' | 'documents' | 'people';

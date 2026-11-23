@@ -78,6 +78,7 @@ export const ACTIONS = [
   'audit.export',
   'search.use',
   'notification.read',
+  'help.read',
   'integration.read_health',
   'integration.retry_failed',
 ] as const;
@@ -206,6 +207,7 @@ const RULES: Record<Action, Rule> = {
   'audit.export': managerOnly,
   'search.use': anyone,
   'notification.read': anyone,
+  'help.read': anyone,
   'integration.read_health': managerOnly,
   'integration.retry_failed': managerOnly,
 };

@@ -1,4 +1,4 @@
-import { and, count, desc, eq, getTableColumns, gte, ilike, or, type SQL, sql } from 'drizzle-orm';
+import { and, count, desc, eq, getTableColumns, gte, ilike, lt, or, type SQL, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { auditLog } from '@/db/schema';
 import { type Clock, systemClock } from '@/lib/clock';
@@ -11,7 +11,11 @@ import { defineIsolation } from './isolation.registry';
 
 export interface AuditFilter {
   period: AuditPeriod;
+  /** Custom range, UTC days, inclusive. Used only when period is 'custom'. */
+  from?: string;
+  to?: string;
   kind?: AuditKind;
+  event?: string;
   who?: AuditWho;
   q?: string;
   partnerId?: string;
@@ -19,7 +23,7 @@ export interface AuditFilter {
   limit?: number;
 }
 
-const PERIOD_DAYS: Record<AuditPeriod, number> = { '7d': 7, '30d': 30, '90d': 90 };
+const PERIOD_DAYS: Record<Exclude<AuditPeriod, 'custom'>, number> = { '24h': 1, '7d': 7, '30d': 30, '90d': 90 };
 const DAY_MS = 86_400_000;
 const DEFAULT_LIMIT = 50;
 const MAX_LIMIT = 200;
@@ -47,8 +51,17 @@ const decodeCursor = (cursor: string): z.infer<typeof cursorSchema> => {
 const escapeLike = (value: string): string => value.replace(/[\\%_]/g, '\\$&');
 
 function conditions(input: Omit<AuditFilter, 'cursor' | 'limit'>, clock: Clock): SQL[] {
-  const since = new Date(clock.now().getTime() - PERIOD_DAYS[input.period] * DAY_MS);
-  const parts: SQL[] = [gte(auditLog.at, since)];
+  const parts: SQL[] = [];
+  if (input.period === 'custom') {
+    if (!input.from || !input.to || input.from > input.to) {
+      throw new ValidationError([{ path: 'period', message: 'Pick a start day and an end day, start first.' }]);
+    }
+    parts.push(gte(auditLog.at, new Date(`${input.from}T00:00:00Z`)));
+    parts.push(lt(auditLog.at, new Date(new Date(`${input.to}T00:00:00Z`).getTime() + DAY_MS)));
+  } else {
+    parts.push(gte(auditLog.at, new Date(clock.now().getTime() - PERIOD_DAYS[input.period] * DAY_MS)));
+  }
+  if (input.event) parts.push(eq(auditLog.event, input.event));
   if (input.kind) parts.push(eq(auditLog.kind, input.kind));
   if (input.who) parts.push(eq(auditLog.who, input.who));
   if (input.partnerId) parts.push(eq(auditLog.partnerId, input.partnerId));

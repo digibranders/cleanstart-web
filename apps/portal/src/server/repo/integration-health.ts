@@ -6,6 +6,7 @@ import { hubspotOutbox, hubspotSyncState } from '@/db/schema';
 import type { IntegrationHealthDto } from '@/lib/dto';
 import type { Viewer } from '@/server/auth/types';
 import { assertStaff, type Tx } from './context';
+import { safeSyncError } from './failed-syncs';
 import { defineIsolation } from './isolation.registry';
 
 export async function integrationHealth(db: Pick<Db | Tx, 'select'>): Promise<IntegrationHealthDto> {
@@ -13,7 +14,7 @@ export async function integrationHealth(db: Pick<Db | Tx, 'select'>): Promise<In
   const n = (s: string): number => byStatus.find((r) => r.status === s)?.n ?? 0;
   const failed = (await db.select().from(hubspotOutbox).where(eq(hubspotOutbox.status, 'failed')).orderBy(desc(hubspotOutbox.updatedAt)).limit(1))[0];
   const cursor = (await db.select().from(hubspotSyncState).where(eq(hubspotSyncState.key, 'deals_cursor')))[0];
-  return { pending: n('pending'), failed: n('failed'), lastPollAt: cursor?.updatedAt ?? null, lastError: failed?.lastError ?? null };
+  return { pending: n('pending'), failed: n('failed'), lastPollAt: cursor?.updatedAt ?? null, lastError: safeSyncError(failed?.lastError ?? null) };
 }
 
 /** Partner manager only (the action checks the role; this guard keeps a partner viewer out before RLS runs). */

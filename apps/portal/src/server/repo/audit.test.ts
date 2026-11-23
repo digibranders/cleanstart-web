@@ -170,3 +170,47 @@ describe('exportAudit', () => {
     );
   });
 });
+
+describe('period presets, custom range and event type', () => {
+  it('last 24 hours keeps only the past day', async () => {
+    const staff = await asStaff(db);
+    await insertRows([{ at: daysAgo(0.5), target: 'Today' }, { at: daysAgo(2), target: 'Two days ago' }]);
+    const page = await withViewer(staff, (tx) => listAudit(tx, staff, { period: '24h' }, clock));
+    expect(page.rows.map((r) => r.target)).toEqual(['Today']);
+  });
+
+  it('a custom range includes both end days whole and nothing outside them', async () => {
+    const staff = await asStaff(db);
+    await insertRows([
+      { at: new Date('2026-10-09T23:59:59Z'), target: 'Before' },
+      { at: new Date('2026-10-10T00:00:00Z'), target: 'First instant' },
+      { at: new Date('2026-10-12T23:59:59Z'), target: 'Last instant' },
+      { at: new Date('2026-10-13T00:00:00Z'), target: 'After' },
+    ]);
+    const input = { period: 'custom', from: '2026-10-10', to: '2026-10-12' } as const;
+    const page = await withViewer(staff, (tx) => listAudit(tx, staff, input, clock));
+    expect(page.rows.map((r) => r.target).sort()).toEqual(['First instant', 'Last instant']);
+    const exported = await withViewer(staff, (tx) => exportAudit(tx, staff, input, clock));
+    expect(exported).toHaveLength(2);
+  });
+
+  it('rejects a custom range with a missing or reversed day', async () => {
+    const staff = await asStaff(db);
+    await expect(withViewer(staff, (tx) => listAudit(tx, staff, { period: 'custom' }, clock))).rejects.toMatchObject({
+      issues: [{ path: 'period' }],
+    });
+    await expect(
+      withViewer(staff, (tx) => listAudit(tx, staff, { period: 'custom', from: '2026-10-12', to: '2026-10-10' }, clock)),
+    ).rejects.toBeInstanceOf(ValidationError);
+  });
+
+  it('filters by event type', async () => {
+    const staff = await asStaff(db);
+    await insertRows([
+      { at: daysAgo(1), event: 'registration.accepted', target: 'Accepted one' },
+      { at: daysAgo(1), event: 'registration.rejected', target: 'Rejected one' },
+    ]);
+    const page = await withViewer(staff, (tx) => listAudit(tx, staff, { period: '7d', event: 'registration.rejected' }, clock));
+    expect(page.rows.map((r) => r.target)).toEqual(['Rejected one']);
+  });
+});
