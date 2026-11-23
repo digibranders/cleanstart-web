@@ -62,6 +62,7 @@ export const toListItem = (row: ListRow): RegistrationListItem => ({
   crmRef: row.hubspotDealId ? `HS-${row.hubspotDealId}` : null,
   crmSyncedAt: row.hubspotSyncedAt ? row.hubspotSyncedAt.toISOString() : null,
   extensionStatus: row.extensionStatus,
+  expectedClose: row.expectedClose,
 });
 
 export const toMessageDto = (m: MessageRow): RegistrationMessageDto => ({
@@ -80,7 +81,6 @@ const toDetail = (
   parts: { contacts: ContactRow[]; messages: MessageRow[]; events: EventRow[] },
 ): RegistrationDetailDto => ({
   ...toListItem(row),
-  expectedClose: row.expectedClose,
   notes: row.notes,
   extensionRequestedAt: row.extensionRequestedAt ? row.extensionRequestedAt.toISOString() : null,
   extensionReason: row.extensionReason,

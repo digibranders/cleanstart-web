@@ -34,7 +34,7 @@ export function PartnerOverview({ overview, today, asOf }: PartnerOverviewProps)
       <div className="head">
         <div style={{ display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
           <h1 className="h1">Overview</h1>
-          <span className="h1-sub">Updated {fmtLong(today)}, {asOf.slice(11, 16)}</span>
+          <span className="h1-sub">Updated {fmtLong(today)}, {asOf.slice(11, 16)} UTC</span>
         </div>
         <div style={{ display: "flex", gap: 6 }}>
           <Link href={ROUTES.partner.newDeal} className="btn btn-p">
@@ -165,6 +165,11 @@ export function PartnerOverview({ overview, today, asOf }: PartnerOverviewProps)
                 All
               </Link>
             </div>
+            {newDocuments.length === 0 ? (
+              <div className="empty">
+                <p style={{ margin: 0 }}>No new documents yet.</p>
+              </div>
+            ) : null}
             {newDocuments.map((f) => (
               <Link href={ROUTES.partner.documents} className="li" key={f.id}>
                 <span className="li-ic">

@@ -304,14 +304,26 @@ export function DealDetail({ deal, siblings, today, partnerManager, senderEmail 
                 <dd>{PRODUCT_LABEL[deal.product]}</dd>
                 <dt>Region</dt>
                 <dd>{PARTNER_REGION_LABEL[deal.region]}</dd>
+                {deal.website ? (
+                  <>
+                    <dt>Website</dt>
+                    <dd>{deal.website}</dd>
+                  </>
+                ) : null}
                 <dt>Partner manager</dt>
                 <dd>{deal.managerName ?? "Not assigned"}</dd>
+                {deal.expectedClose ? (
+                  <>
+                    <dt>Expected close</dt>
+                    <dd>{/^\d{4}-\d{2}-\d{2}$/.test(deal.expectedClose) ? fmtLong(deal.expectedClose) : deal.expectedClose}</dd>
+                  </>
+                ) : null}
               </dl>
               <dl className="dl">
                 {primary ? (
                   <>
                     <dt>Contact</dt>
-                    <dd>{primary.name}</dd>
+                    <dd>{primary.role ? `${primary.name}, ${primary.role}` : primary.name}</dd>
                   </>
                 ) : null}
                 {primary?.email ? (
@@ -328,6 +340,17 @@ export function DealDetail({ deal, siblings, today, partnerManager, senderEmail 
                 ) : null}
                 <dt>Registered by</dt>
                 <dd>{deal.registeredByName}</dd>
+                {deal.extensionReason ? (
+                  <>
+                    <dt>Extension reason</dt>
+                    <dd>
+                      {deal.extensionReason}
+                      {deal.extensionStatus === "granted" && deal.extensionDays
+                        ? ` (granted, ${plural(deal.extensionDays, "day")})`
+                        : ""}
+                    </dd>
+                  </>
+                ) : null}
               </dl>
             </div>
             {deal.notes ? (

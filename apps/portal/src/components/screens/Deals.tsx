@@ -6,12 +6,10 @@ import { PARTNER_REGION_LABEL, PRODUCT_LABEL, REGISTRATION_STATUS_LABEL } from "
 import type { RegistrationListItem } from "@/lib/dto";
 import { ROUTES } from "@/lib/routes";
 import { downloadCsv } from "../deals/csv";
-import { fmtShort } from "../deals/dates";
+import { fmtLong, fmtShort } from "../deals/dates";
 import { CHIP_PRODUCT, protectionView } from "../deals/derive";
-import { ManagerMessageDrawer } from "../deals/ManagerMessageDrawer";
 import { CustomerMark, PLUS_PATH, ProtectionCell, StatusBadge } from "../deals/parts";
-import { RejectedDealDrawer } from "../deals/RejectedDealDrawer";
-import type { ManagerContact } from "../deals/types";
+import { type DealSortKey, type SortDir, closeDate, sortDeals } from "../deals/sort";
 import { Icon } from "../icon";
 import { ProductChip } from "../ui/badge";
 import { Dropdown } from "../ui/dropdown";
@@ -34,11 +32,34 @@ function protectionText(deal: RegistrationListItem, today: string): string {
 interface DealsProps {
   deals: RegistrationListItem[];
   today: string;
-  partnerManager: ManagerContact | null;
-  senderEmail: string;
+  /** Partner sales see only the deals they registered. */
+  ownDealsOnly: boolean;
 }
 
-export function Deals({ deals, today, partnerManager, senderEmail }: DealsProps): React.JSX.Element {
+const closeText = (deal: RegistrationListItem): string =>
+  closeDate(deal) ? fmtLong(deal.expectedClose ?? "") : (deal.expectedClose ?? "");
+
+interface SortHeadProps {
+  label: string;
+  field: DealSortKey;
+  sort: { key: DealSortKey; dir: SortDir };
+  onSort: (key: DealSortKey) => void;
+  className?: string;
+}
+
+function SortHead({ label, field, sort, onSort, className }: SortHeadProps): React.JSX.Element {
+  const on = sort.key === field;
+  return (
+    <th scope="col" className={className} aria-sort={on ? (sort.dir === "asc" ? "ascending" : "descending") : "none"}>
+      <button type="button" className="linkbtn" onClick={() => onSort(field)} style={{ font: "inherit", color: "inherit" }}>
+        {label}
+        {on ? (sort.dir === "asc" ? " \u2191" : " \u2193") : ""}
+      </button>
+    </th>
+  );
+}
+
+export function Deals({ deals, today, ownDealsOnly }: DealsProps): React.JSX.Element {
   const toast = useToast();
   const managerOptions = [ANY_MANAGER, ...new Set(deals.flatMap((d) => (d.managerName ? [d.managerName] : [])))];
 
@@ -47,11 +68,12 @@ export function Deals({ deals, today, partnerManager, senderEmail }: DealsProps)
   const [product, setProduct] = useState(ALL_PRODUCTS);
   const [region, setRegion] = useState(ALL_REGIONS);
   const [manager, setManager] = useState(ANY_MANAGER);
-  const [rejectedId, setRejectedId] = useState<string | null>(null);
-  const [messageSubject, setMessageSubject] = useState<string | null>(null);
+  const [sort, setSort] = useState<{ key: DealSortKey; dir: SortDir }>({ key: "registered", dir: "desc" });
+  const onSort = (key: DealSortKey): void =>
+    setSort((prev) => ({ key, dir: prev.key === key && prev.dir === "asc" ? "desc" : "asc" }));
 
   const needle = q.trim().toLowerCase();
-  const rows = deals.filter(
+  const matching = deals.filter(
     (d) =>
       (tab === "All" || REGISTRATION_STATUS_LABEL[d.status] === tab) &&
       (!needle || d.customer.toLowerCase().includes(needle)) &&
@@ -59,10 +81,10 @@ export function Deals({ deals, today, partnerManager, senderEmail }: DealsProps)
       (region === ALL_REGIONS || PARTNER_REGION_LABEL[d.region] === region) &&
       (manager === ANY_MANAGER || d.managerName === manager),
   );
+  const rows = sortDeals(matching, sort.key, sort.dir);
   const filtered = tab !== "All" || Boolean(needle) || product !== ALL_PRODUCTS || region !== ALL_REGIONS || manager !== ANY_MANAGER;
   const countFor = (label: Tab): number =>
     label === "All" ? deals.length : deals.filter((d) => REGISTRATION_STATUS_LABEL[d.status] === label).length;
-  const rejected = deals.find((d) => d.id === rejectedId && d.status === "rejected");
 
   const clear = (): void => {
     setTab("All");
@@ -74,16 +96,35 @@ export function Deals({ deals, today, partnerManager, senderEmail }: DealsProps)
 
   const exportCsv = (): void => {
     downloadCsv("deals.csv", [
-      ["Customer", "Product", "Status", "Stage", "Partner manager", "Registered by", "Registered", "Protection"],
+      [
+        "Customer",
+        "Website",
+        "Product",
+        "Region",
+        "Status",
+        "Stage",
+        "Partner manager",
+        "Registered by",
+        "Registered",
+        "Expected close",
+        "Protection",
+        "CRM reference",
+        "Rejection reason",
+      ],
       ...rows.map((d) => [
         d.customer,
+        d.website ?? "",
         PRODUCT_LABEL[d.product],
+        PARTNER_REGION_LABEL[d.region],
         REGISTRATION_STATUS_LABEL[d.status],
         d.stage,
         d.managerName ?? "",
         d.registeredByName,
-        fmtShort(d.registeredOn),
+        d.registeredOn,
+        closeText(d),
         protectionText(d, today),
+        d.crmRef ?? "",
+        d.rejectionReason ?? "",
       ]),
     ]);
     toast(`Exported ${rows.length} deals to CSV`);
@@ -94,7 +135,10 @@ export function Deals({ deals, today, partnerManager, senderEmail }: DealsProps)
       <div className="head">
         <div style={{ display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
           <h1 className="h1">Deals</h1>
-          <span className="h1-sub">Stages update from CleanStart's CRM.</span>
+          <span className="h1-sub">
+            Stages update from CleanStart's CRM.
+            {ownDealsOnly ? " You see the deals you registered; your partner admin sees all of them." : ""}
+          </span>
         </div>
         <div style={{ display: "flex", gap: 6 }}>
           {deals.length > 0 ? (
@@ -180,11 +224,12 @@ export function Deals({ deals, today, partnerManager, senderEmail }: DealsProps)
               <table className="tbl">
                 <thead>
                   <tr>
-                    <th scope="col">Customer</th>
+                    <SortHead label="Customer" field="customer" sort={sort} onSort={onSort} />
                     <th scope="col" className="hide-sm">
                       Product
                     </th>
-                    <th scope="col">Status</th>
+                    <SortHead label="Region" field="region" sort={sort} onSort={onSort} className="hide-sm" />
+                    <SortHead label="Status" field="status" sort={sort} onSort={onSort} />
                     <th scope="col" className="hide-sm">
                       Stage
                     </th>
@@ -194,33 +239,24 @@ export function Deals({ deals, today, partnerManager, senderEmail }: DealsProps)
                     <th scope="col" className="hide-sm">
                       Registered by
                     </th>
-                    <th scope="col" className="r hide-sm">
-                      Registered
-                    </th>
-                    <th scope="col" className="r">
-                      Protection
-                    </th>
+                    <SortHead label="Registered" field="registered" sort={sort} onSort={onSort} className="r hide-sm" />
+                    <SortHead label="Expected close" field="close" sort={sort} onSort={onSort} className="r hide-sm" />
+                    <SortHead label="Protection" field="protection" sort={sort} onSort={onSort} className="r" />
                   </tr>
                 </thead>
                 <tbody>
                   {rows.map((d) => (
                     <tr key={d.id}>
                       <td style={{ whiteSpace: "normal" }}>
-                        {d.status === "rejected" ? (
-                          <button type="button" className="cust linkbtn" onClick={() => setRejectedId(d.id)}>
-                            <CustomerMark name={d.customer} />
-                            {d.customer}
-                          </button>
-                        ) : (
-                          <Link href={ROUTES.partner.deal(d.id)} className="cust">
-                            <CustomerMark name={d.customer} />
-                            {d.customer}
-                          </Link>
-                        )}
+                        <Link href={ROUTES.partner.deal(d.id)} className="cust">
+                          <CustomerMark name={d.customer} />
+                          {d.customer}
+                        </Link>
                       </td>
                       <td className="hide-sm">
                         <ProductChip product={CHIP_PRODUCT[d.product]} />
                       </td>
+                      <td className="t-sec hide-sm">{PARTNER_REGION_LABEL[d.region]}</td>
                       <td>
                         <StatusBadge status={d.status} />
                       </td>
@@ -228,6 +264,7 @@ export function Deals({ deals, today, partnerManager, senderEmail }: DealsProps)
                       <td className="t-sec hide-sm">{d.managerName}</td>
                       <td className="t-sec hide-sm">{d.registeredByName}</td>
                       <td className="tnum r t-sec hide-sm">{fmtShort(d.registeredOn)}</td>
+                      <td className="tnum r t-sec hide-sm">{closeText(d) || "None"}</td>
                       <ProtectionCell deal={d} mode="deals" today={today} />
                     </tr>
                   ))}
@@ -246,26 +283,6 @@ export function Deals({ deals, today, partnerManager, senderEmail }: DealsProps)
         )}
       </section>
 
-      {rejected ? (
-        <RejectedDealDrawer
-          key={rejected.id}
-          deal={rejected}
-          onClose={() => setRejectedId(null)}
-          onMessage={() => {
-            setRejectedId(null);
-            setMessageSubject(`${rejected.customer}, ${PRODUCT_LABEL[rejected.product]}`);
-          }}
-        />
-      ) : null}
-      {messageSubject !== null && partnerManager ? (
-        <ManagerMessageDrawer
-          key={messageSubject}
-          manager={partnerManager}
-          senderEmail={senderEmail}
-          initialSubject={messageSubject}
-          onClose={() => setMessageSubject(null)}
-        />
-      ) : null}
     </div>
   );
 }

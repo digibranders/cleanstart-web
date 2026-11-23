@@ -82,6 +82,7 @@ export async function getShell(tx: Tx, viewer: Viewer): Promise<ShellDto> {
     roleLabel: PARTNER_ROLE_LABEL[viewer.role],
     orgName: viewer.partnerName,
     orgSub: `${PARTNER_CATEGORY_LABEL[partner.category]}, ${PARTNER_REGION_LABEL[partner.region]}`,
+    partnerRegion: partner.region,
     manager: manager ? { id: manager.id, name: manager.name, email: manager.email, team: teamLabel(manager.region ?? 'all') } : null,
     waitingApprovals: 0,
     unreadNotifications,

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { DEAL_REGIONS, type DealRegion, PARTNER_REGION_LABEL, PRODUCT_LABEL, PRODUCTS, type Product } from "@/lib/domain";
+import { DEAL_REGIONS, type DealRegion, PARTNER_REGION_LABEL, type PartnerRegion, PRODUCT_LABEL, PRODUCTS, type Product } from "@/lib/domain";
 import type { CustomerSuggestionDto, ManagerOptionDto, RegistrationListItem } from "@/lib/dto";
 import { ROUTES } from "@/lib/routes";
 import { lookupCustomerAction, registerDealsAction } from "@/server/actions/registrations";
@@ -25,6 +25,7 @@ interface FormState {
   customer: string;
   site: string;
   contactName: string;
+  contactRole: string;
   contactEmail: string;
   contactPhone: string;
   picked: Product[];
@@ -38,6 +39,7 @@ const BLANK: FormState = {
   customer: "",
   site: "",
   contactName: "",
+  contactRole: "",
   contactEmail: "",
   contactPhone: "",
   picked: [],
@@ -67,12 +69,16 @@ interface RegisterDealProps {
   mine: RegistrationListItem[];
   managers: ManagerOptionDto[];
   partnerName: string;
+  /** The partner's own region; a partner based elsewhere starts on India. */
+  partnerRegion: PartnerRegion | undefined;
   today: string;
 }
 
-export function RegisterDeal({ mine, managers, partnerName, today }: RegisterDealProps): React.JSX.Element {
+export function RegisterDeal({ mine, managers, partnerName, partnerRegion, today }: RegisterDealProps): React.JSX.Element {
   const toast = useToast();
-  const [form, setForm] = useState<FormState>({ ...BLANK, managerId: managerFor(managers, "india") });
+  const homeRegion: DealRegion = partnerRegion === "middle_east" ? "middle_east" : "india";
+  const blank: FormState = { ...BLANK, region: homeRegion, managerId: managerFor(managers, homeRegion) };
+  const [form, setForm] = useState<FormState>(blank);
   const [tried, setTried] = useState(false);
   const [emailLeft, setEmailLeft] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -177,7 +183,7 @@ export function RegisterDeal({ mine, managers, partnerName, today }: RegisterDea
       region: form.region,
       managerId: form.managerId || null,
       contact: form.contactName.trim()
-        ? { name: form.contactName, role: null, email: form.contactEmail, phone: form.contactPhone }
+        ? { name: form.contactName, role: form.contactRole.trim() || null, email: form.contactEmail, phone: form.contactPhone }
         : null,
       expectedClose: form.close,
       notes: form.details,
@@ -234,7 +240,7 @@ export function RegisterDeal({ mine, managers, partnerName, today }: RegisterDea
                     type="button"
                     className="btn btn-s"
                     onClick={() => {
-                      setForm(BLANK);
+                      setForm(blank);
                       setSubmitted(null);
                     }}
                   >
@@ -337,7 +343,7 @@ export function RegisterDeal({ mine, managers, partnerName, today }: RegisterDea
                       ) : null}
                     </div>
                   </div>
-                  <div className="grid3">
+                  <div className="grid2">
                     <div className="fg">
                       <label htmlFor="contact" className="lbl">
                         Contact name <span className="hint">(optional)</span>
@@ -357,6 +363,21 @@ export function RegisterDeal({ mine, managers, partnerName, today }: RegisterDea
                         </span>
                       ) : null}
                     </div>
+                    <div className="fg">
+                      <label htmlFor="crole" className="lbl">
+                        Contact role <span className="hint">(optional, for example CISO)</span>
+                      </label>
+                      <input
+                        id="crole"
+                        className="field"
+                        type="text"
+                        maxLength={120}
+                        value={form.contactRole}
+                        onChange={(e) => patch({ contactRole: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                  <div className="grid2">
                     <div className="fg">
                       <label htmlFor="cemail" className="lbl">
                         Contact email <span className="hint">(optional)</span>
@@ -482,8 +503,9 @@ export function RegisterDeal({ mine, managers, partnerName, today }: RegisterDea
                       </label>
                       <input
                         id="close"
-                        className="field"
-                        type="text"
+                        className="field tnum"
+                        type="date"
+                        min={today}
                         value={form.close}
                         onChange={(e) => patch({ close: e.target.value })}
                       />
