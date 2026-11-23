@@ -279,7 +279,7 @@ main().catch((err: unknown) => {
 });
 ```
 
-- [ ] **Step 6: Dry run against the developer account, then apply** (manual: needs a person and a developer account token, so it is not run in an unattended build; steps 1 to 5 and 7 are)
+- [ ] **Step 6: Dry run against the developer account, then apply** (manual: needs a person and a developer account token, so it is not run in an unattended build; steps 1 to 5 and 7 are) (needs: a person with the HubSpot developer account token)
 
 Run: `cd apps/portal && pnpm exec tsx --env-file=.env scripts/provision-hubspot.ts`
 Expected: lines starting `[dry-run] would create` for every property, the pipeline and both labels.
@@ -2391,7 +2391,7 @@ export const triggerPoll = (): Promise<boolean> => runLocked(pool, 'hubspot-poll
 
 The route test (`webhook/route.test.ts`) mocks `@/env` (the secret set, then unset) and `triggerPoll`, and asserts: the secret unset returns 503 without calling it; a bad signature returns 401 without calling it; a valid one returns 200 and calls it once; a rejected `triggerPoll` still returns 200 and reaches Sentry. Verify the header names and which secret signs a private app's webhooks against HubSpot's current docs for the app type Task 0.1 found before relying on them.
 
-- [ ] **Step 5: Configure the subscription (manual, developer account or sandbox first).** In the private app's Webhooks settings: target URL `https://partners.cleanstart.com/api/hubspot/webhook`, subscriptions `deal.propertyChange` for `dealstage` and for `protection_end_date`. While developing, expose the local server with a Cloudflare Tunnel (`cloudflared`), not ngrok, whose interstitial page breaks requests. In production, make sure the Cloudflare WAF rule set in front of `partners.cleanstart.com` does not challenge HubSpot's requests to `/api/hubspot/webhook` (a skip rule scoped to that path, with the signature check as the real gate).
+- [ ] **Step 5: Configure the subscription (manual, developer account or sandbox first).** In the private app's Webhooks settings: target URL `https://partners.cleanstart.com/api/hubspot/webhook`, subscriptions `deal.propertyChange` for `dealstage` and for `protection_end_date`. While developing, expose the local server with a Cloudflare Tunnel (`cloudflared`), not ngrok, whose interstitial page breaks requests. In production, make sure the Cloudflare WAF rule set in front of `partners.cleanstart.com` does not challenge HubSpot's requests to `/api/hubspot/webhook` (a skip rule scoped to that path, with the signature check as the real gate). (needs: a person with HubSpot developer account access and a Cloudflare WAF change for `partners.cleanstart.com`)
 
 - [x] **Step 6: Run tests, commit**
 

@@ -127,7 +127,7 @@ jobs:
           missing=""
           for key in APP_URL PORTAL_OWNER_DB_PASSWORD PORTAL_APP_DB_PASSWORD AUTH_SECRET BREVO_API_KEY \
                      BREVO_SENDER_EMAIL R2_ENDPOINT R2_BUCKET R2_ACCESS_KEY_ID R2_SECRET_ACCESS_KEY \
-                     HUBSPOT_PORTAL_TOKEN HUBSPOT_PARTNER_PIPELINE_ID HUBSPOT_WEBHOOK_SECRET \
+                     HUBSPOT_PORTAL_TOKEN HUBSPOT_PARTNER_PIPELINE_ID \
                      TURNSTILE_SECRET_KEY NEXT_PUBLIC_TURNSTILE_SITE_KEY SENTRY_DSN; do
             if [ -z "${!key:-}" ]; then missing="$missing $key"; fi
           done
@@ -176,6 +176,7 @@ jobs:
             emit HUBSPOT_PORTAL_TOKEN "$HUBSPOT_PORTAL_TOKEN"
             emit HUBSPOT_PARTNER_PIPELINE_ID "$HUBSPOT_PARTNER_PIPELINE_ID"
             emit HUBSPOT_USE_ASSOCIATION_LABELS "$HUBSPOT_USE_ASSOCIATION_LABELS"
+            # Optional: nothing subscribes to webhooks, so the route answers 404 when this is unset. emit skips an empty value.
             emit HUBSPOT_WEBHOOK_SECRET "$HUBSPOT_WEBHOOK_SECRET"
             emit HUBSPOT_PORTAL_ID "$HUBSPOT_PORTAL_ID"
             emit PORTAL_JOBS_ENABLED "${PORTAL_JOBS_ENABLED:-true}"

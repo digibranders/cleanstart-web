@@ -11,6 +11,7 @@ import { recordAudit } from '@/server/audit/record';
 import { assertCan } from '@/server/auth/policies';
 import { sendEmail } from '@/server/email/send';
 import { buildDealAccepted, buildDealRejected } from '@/server/email/templates';
+import { readHubspotConfig } from '@/server/hubspot/client';
 import { enqueue } from '@/server/hubspot/outbox';
 import { type NewNotification, notifyUsers, resolveEmailRecipients } from '@/server/notify';
 import { rateLimit } from '@/server/rate-limit';
@@ -163,6 +164,6 @@ export async function hubspotConflictHintsAction(raw: unknown): Promise<ActionRe
     assertCan(ctx.viewer, 'registration.read_queue');
     rateLimit(`hints:user:${ctx.viewer.id}`, { limit: 6, windowSeconds: 60 });
     const inputs = await withViewer(ctx.viewer, (tx) => conflictInputs(tx, ctx.viewer, { registrationIds: input.ids }));
-    return hubspotConflictHints(readOnlyHubspot(), env.HUBSPOT_PARTNER_PIPELINE_ID ?? null, inputs);
+    return hubspotConflictHints(readOnlyHubspot(), readHubspotConfig()?.pipelineId ?? env.HUBSPOT_PARTNER_PIPELINE_ID ?? null, inputs);
   });
 }

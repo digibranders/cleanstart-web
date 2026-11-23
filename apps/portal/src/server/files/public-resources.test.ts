@@ -115,3 +115,17 @@ describe('listPublicDatasheets', () => {
     expect(init.signal).toBeInstanceOf(AbortSignal);
   });
 });
+
+
+describe('listPublicDatasheets in demo mode', () => {
+  it('lists none and makes no request, so the demo never calls a CMS', async () => {
+    vi.stubEnv('PORTAL_DEMO_MODE', '1');
+    const fetchImpl = vi.fn();
+    try {
+      expect(await listPublicDatasheets({ baseUrl, fetchImpl })).toEqual([]);
+      expect(fetchImpl).not.toHaveBeenCalled();
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+});

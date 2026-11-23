@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { TURNSTILE_TEST_SECRET_KEY, TURNSTILE_TEST_SITE_KEY, assertDemoModeAllowed, isDemoMode } from './server/demo';
 import { isHttpsOrLoopback } from './server/security/app-url';
 
 const bool = z
@@ -6,10 +7,6 @@ const bool = z
   .transform((v) => v === 'true' || v === '1');
 
 const optionalString = z.string().min(1).optional();
-
-/** Cloudflare's published always-pass Turnstile test keys. Used only when NODE_ENV is not 'production'. */
-const TURNSTILE_TEST_SITE_KEY = '1x00000000000000000000AA';
-const TURNSTILE_TEST_SECRET_KEY = '1x0000000000000000000000000000000AA';
 
 const schema = z
   .object({
@@ -48,6 +45,7 @@ const schema = z
     HUBSPOT_PORTAL_TOKEN: optionalString,
     HUBSPOT_PARTNER_PIPELINE_ID: optionalString,
     HUBSPOT_USE_ASSOCIATION_LABELS: bool.default('false'),
+    // Not required in production: the portal polls and nothing subscribes to webhooks. The route answers 404 while this is unset.
     HUBSPOT_WEBHOOK_SECRET: optionalString,
     HUBSPOT_PORTAL_ID: optionalString,
     HUBSPOT_DEV_PORTAL_ID: optionalString,
@@ -70,6 +68,12 @@ const schema = z
     // Shared password gate in front of the hosted portal. It stays until launch; removing it is a launch step.
     PORTAL_REVIEW_PASSWORD: optionalString,
 
+    // Demo mode (docs/partner-portal/DEMO.md). Read from the process environment by server/demo.ts; listed here so the variables are documented in one place.
+    // Plain optional strings: an empty value means off or unset, never a parse failure in the real portal.
+    PORTAL_DEMO_MODE: z.string().optional(),
+    PORTAL_DEMO_DENY_HOSTS: z.string().optional(),
+    PORTAL_DEMO_DATABASE_HOSTS: z.string().optional(),
+
     // Tests only. Never read by application code.
     PORTAL_TEST_DATABASE_URL: z.string().url().optional(),
     PORTAL_TEST_OWNER_URL: z.string().url().optional(),
@@ -78,6 +82,7 @@ const schema = z
     for (const key of ['DATABASE_URL', 'AUTH_SECRET'] as const) {
       if (!value[key]) ctx.addIssue({ code: z.ZodIssueCode.custom, path: [key], message: `${key} is required` });
     }
+    const demo = isDemoMode({ PORTAL_DEMO_MODE: value.PORTAL_DEMO_MODE });
     if (value.NODE_ENV !== 'production') return;
     if (value.APP_URL !== undefined && !isHttpsOrLoopback(value.APP_URL)) {
       ctx.addIssue({
@@ -86,11 +91,16 @@ const schema = z
         message: `APP_URL must start with https:// in production (got ${value.APP_URL}); cookies, invite links and reset links would travel in the clear. Loopback hosts (localhost, 127.0.0.1, [::1]) are the only exception.`,
       });
     }
-    const required = [
-      'APP_URL', 'DATABASE_OWNER_URL', 'BREVO_API_KEY', 'BREVO_SENDER_EMAIL', 'R2_ENDPOINT', 'R2_BUCKET', 'R2_ACCESS_KEY_ID',
-      'R2_SECRET_ACCESS_KEY', 'HUBSPOT_PORTAL_TOKEN', 'HUBSPOT_PARTNER_PIPELINE_ID', 'HUBSPOT_WEBHOOK_SECRET',
-      'TURNSTILE_SECRET_KEY', 'NEXT_PUBLIC_TURNSTILE_SITE_KEY', 'SENTRY_DSN',
-    ] as const;
+    // The demo swaps every outside service for a fake, so only what the app itself needs stays required. The running app
+    // never uses DATABASE_OWNER_URL: demo mode leaves it optional (the guard still checks it when present, demo:setup requires it).
+    // The review password and the Turnstile test keys are enforced by assertDemoModeAllowed, which also runs under SKIP_ENV_VALIDATION.
+    const required = demo
+      ? (['APP_URL'] as const)
+      : ([
+          'APP_URL', 'DATABASE_OWNER_URL', 'BREVO_API_KEY', 'BREVO_SENDER_EMAIL', 'R2_ENDPOINT', 'R2_BUCKET', 'R2_ACCESS_KEY_ID',
+          'R2_SECRET_ACCESS_KEY', 'HUBSPOT_PORTAL_TOKEN', 'HUBSPOT_PARTNER_PIPELINE_ID',
+          'TURNSTILE_SECRET_KEY', 'NEXT_PUBLIC_TURNSTILE_SITE_KEY', 'SENTRY_DSN',
+        ] as const);
     for (const key of required) {
       if (!value[key]) ctx.addIssue({ code: z.ZodIssueCode.custom, path: [key], message: `${key} is required in production` });
     }
@@ -101,15 +111,18 @@ const schema = z
     // superRefine has already failed the parse when either is missing, so these never fall back.
     DATABASE_URL: value.DATABASE_URL ?? '',
     AUTH_SECRET: value.AUTH_SECRET ?? '',
+    // Demo mode never runs the scheduler: there is no real HubSpot, R2 or mail behind it to work on.
+    PORTAL_JOBS_ENABLED: isDemoMode({ PORTAL_DEMO_MODE: value.PORTAL_DEMO_MODE }) ? false : value.PORTAL_JOBS_ENABLED,
     TURNSTILE_SECRET_KEY:
-      value.TURNSTILE_SECRET_KEY ?? (value.NODE_ENV === 'production' ? '' : TURNSTILE_TEST_SECRET_KEY),
+      value.TURNSTILE_SECRET_KEY ?? (value.NODE_ENV === 'production' && !isDemoMode({ PORTAL_DEMO_MODE: value.PORTAL_DEMO_MODE }) ? '' : TURNSTILE_TEST_SECRET_KEY),
     NEXT_PUBLIC_TURNSTILE_SITE_KEY:
-      value.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? (value.NODE_ENV === 'production' ? '' : TURNSTILE_TEST_SITE_KEY),
+      value.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? (value.NODE_ENV === 'production' && !isDemoMode({ PORTAL_DEMO_MODE: value.PORTAL_DEMO_MODE }) ? '' : TURNSTILE_TEST_SITE_KEY),
   }));
 
 export type Env = z.output<typeof schema>;
 
 export const loadEnv = (source: Record<string, string | undefined>): Env => {
+  assertDemoModeAllowed(source);
   const parsed = schema.safeParse(source);
   if (!parsed.success) {
     const lines = parsed.error.issues.map((i) => `${i.path.join('.') || 'env'}: ${i.message}`);

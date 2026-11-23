@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { env } from '@/env';
+import { isDemoMode } from '@/server/demo';
 import { IntegrationError } from '@/server/errors';
 
 /** The public website. A datasheet row links to its resource page here. */
@@ -67,6 +68,8 @@ export interface ListPublicDatasheetsOptions {
  * a non 2xx answer or a body that is not the expected shape; rows that fail validation are skipped.
  */
 export async function listPublicDatasheets(options: ListPublicDatasheetsOptions = {}): Promise<PublicDatasheetDto[]> {
+  // Demo mode has no CMS behind it: an empty list, not a request to a host that does not exist.
+  if (isDemoMode()) return [];
   const baseUrl = (options.baseUrl ?? env.CMS_API_URL).replace(/\/+$/, '');
   const fetchImpl = options.fetchImpl ?? fetch;
   const init: RequestInit & { next: { revalidate: number } } = {

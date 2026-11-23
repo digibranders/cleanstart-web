@@ -4,6 +4,8 @@ The partner portal is `apps/portal`: one Next.js container on the production dro
 
 Sections 1 to 3 are written by the build (M0.6). Sections 4 to 11 are the operations half (M5.9).
 
+A hosted demo of the same app on mock data (`PORTAL_DEMO_MODE=1`, fake HubSpot, files and email, no jobs) is described in `docs/partner-portal/DEMO.md`. It never runs on the droplet: the app refuses to start in demo mode against this database.
+
 ## 1. One-time droplet setup (a person, once)
 
 Nothing here is automated. Read each command before you run it. Take a droplet snapshot first.
@@ -88,7 +90,7 @@ Repository variables (Settings, Secrets and variables, Variables):
 | `HUBSPOT_PARTNER_PIPELINE_ID`, `HUBSPOT_PORTAL_ID`, `HUBSPOT_USE_ASSOCIATION_LABELS` | from `docs/partner-portal/HUBSPOT-PROVISIONING.md` |
 | `PORTAL_JOBS_ENABLED` | leave unset (the workflow renders `true`) |
 
-Repository secrets: `PORTAL_OWNER_DB_PASSWORD`, `PORTAL_APP_DB_PASSWORD` (the two hex passwords from step 1.4), `PORTAL_AUTH_SECRET` (`openssl rand -base64 32`), `BREVO_API_KEY` (shared with the CMS: it is the same Brevo account), `PORTAL_R2_ACCESS_KEY_ID`, `PORTAL_R2_SECRET_ACCESS_KEY` (scoped to the private bucket only), `PORTAL_HUBSPOT_TOKEN`, `PORTAL_HUBSPOT_WEBHOOK_SECRET`, `PORTAL_CMS_INTAKE_API_KEY` (the CMS service user's API key), `PORTAL_TURNSTILE_SECRET_KEY`, `PORTAL_SENTRY_DSN`, and optionally `PORTAL_REVIEW_PASSWORD`. `DROPLET_SSH_KEY`, `DROPLET_HOST` and `DROPLET_USER` already exist for the CMS deploy.
+Repository secrets: `PORTAL_OWNER_DB_PASSWORD`, `PORTAL_APP_DB_PASSWORD` (the two hex passwords from step 1.4), `PORTAL_AUTH_SECRET` (`openssl rand -base64 32`), `BREVO_API_KEY` (shared with the CMS: it is the same Brevo account), `PORTAL_R2_ACCESS_KEY_ID`, `PORTAL_R2_SECRET_ACCESS_KEY` (scoped to the private bucket only), `PORTAL_HUBSPOT_TOKEN`, `PORTAL_CMS_INTAKE_API_KEY` (the CMS service user's API key), `PORTAL_TURNSTILE_SECRET_KEY`, `PORTAL_SENTRY_DSN`, and optionally `PORTAL_REVIEW_PASSWORD` and `PORTAL_HUBSPOT_WEBHOOK_SECRET` (leave the latter unset: nothing subscribes to webhooks). `DROPLET_SSH_KEY`, `DROPLET_HOST` and `DROPLET_USER` already exist for the CMS deploy.
 
 ## 3. Deploy and roll back
 
@@ -190,7 +192,7 @@ grep '^PORTAL_JOBS_ENABLED=' portal.env                           # must be true
 
 - HubSpot owns a deal after approval. The portal writes through an outbox, so an approval never waits for HubSpot. If HubSpot is down, approvals keep working, the "Waiting to send" figure on the Audit log card grows, and the queue drains by itself when HubSpot is back. Each change carries an idempotency key, so a retry does not duplicate a deal.
 - "Failed" above zero means a change failed six times. Read the last error on the card, fix the cause (a revoked token, a renamed property), then press "Retry failed syncs" (partner manager). A retry that queues anything writes an audit entry.
-- Rotating the token: create a new private app token in HubSpot, update the GitHub secret `PORTAL_HUBSPOT_TOKEN`, run the deploy workflow; it renders the value as `HUBSPOT_PORTAL_TOKEN`. The webhook secret works the same way (`PORTAL_HUBSPOT_WEBHOOK_SECRET`, rendered as `HUBSPOT_WEBHOOK_SECRET`). The webhook is not used while the portal polls only, but `src/env.ts` still requires the secret in production, so rotate it with the token anyway.
+- Rotating the token: create a new private app token in HubSpot, update the GitHub secret `PORTAL_HUBSPOT_TOKEN`, run the deploy workflow; it renders the value as `HUBSPOT_PORTAL_TOKEN`. The webhook secret is optional: the portal polls only, `src/env.ts` does not require `HUBSPOT_WEBHOOK_SECRET` in production, and `/api/hubspot/webhook` answers 404 while it is unset. If you ever set it (`PORTAL_HUBSPOT_WEBHOOK_SECRET`, rendered as `HUBSPOT_WEBHOOK_SECRET`), the route verifies signatures again and you rotate it with the token.
 - HubSpot capability check (`docs/partner-portal/HUBSPOT-CAPABILITIES.md`): the product owner decided on 2026-11-16 to poll only (the 5 minute poll is the only inbound path; the webhook route is deployed but stays unsubscribed, so add no webhook subscription and no Cloudflare skip rule for it) and reported that unique-value properties are allowed, so `provision-hubspot.ts` has no `--no-unique` flag. Association labels passed a UI check but not a token check, so `HUBSPOT_USE_ASSOCIATION_LABELS` stays `false`. The rate limit (c) and `hs_lastmodifieddate` search (e) are still UNVERIFIED.
 - Provisioning and the production checklist: `docs/partner-portal/HUBSPOT-PROVISIONING.md`. That file names the two HubSpot secrets without the `PORTAL_` prefix; the names the deploy workflow reads are the ones in section 2 above.
 

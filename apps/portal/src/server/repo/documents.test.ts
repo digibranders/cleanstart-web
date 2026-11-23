@@ -334,7 +334,7 @@ describe('listAudiencePartners and listMaterialRequestRecipients', () => {
   });
 
   it("returns the partner's manager and active marketing staff once each", async () => {
-    const manager = await makeUser(db, { kind: 'staff', role: 'partner_manager', email: 'pm@cleanstart.test', name: 'Farhan' });
+    const manager = await makeUser(db, { kind: 'staff', role: 'partner_manager', email: 'pm@cleanstart.test', name: 'Gaurav' });
     await makeUser(db, { kind: 'staff', role: 'marketing', email: 'mk@cleanstart.test', name: 'Ishita' });
     await makeUser(db, { kind: 'staff', role: 'marketing', email: 'old@cleanstart.test', status: 'disabled' });
     await makeUser(db, { kind: 'staff', role: 'sales', email: 'sales@cleanstart.test' });

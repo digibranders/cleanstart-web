@@ -981,7 +981,7 @@ The design follows from the verified Auth.js behaviour: Credentials always yield
 - Create: `apps/portal/src/server/auth/totp.ts`, `apps/portal/src/server/auth/second-step.ts`, `apps/portal/src/server/auth/reset.ts`, `apps/portal/src/app/api/auth/[...nextauth]/route.ts` and four small route handlers under `apps/portal/src/app/api/auth/`
 - Test: one test file per new module, plus `auth.spike.test.ts` rewritten against Auth.js
 
-- [ ] **Step 1: Swap the packages (orchestrator, blocked rule)**
+- [ ] **Step 1: Swap the packages (orchestrator, blocked rule)** (not applicable: the Task M0.7 gate printed `DECISION: better-auth` and `better-auth` 1.7.22 is in use, so this Auth.js fallback is skipped; left unticked on purpose)
 
 The handoff forbids a track from editing `package.json`. Log `blocked` with this exact need, and the orchestrator runs:
 
@@ -999,7 +999,7 @@ grep -n "only supported if JWT strategy is enabled" apps/portal/node_modules/nex
 
 Expected: one line. If `next-auth` hoists `@auth/core` elsewhere, use `find apps/portal/node_modules -path '*@auth/core/lib/actions/callback/index.js'`. If the line is gone, a newer Auth.js supports credential database sessions: read its release notes, and use its database strategy instead of the `sid` row in Step 4, keeping the rest.
 
-- [ ] **Step 2: TOTP and backup codes (test first)**
+- [ ] **Step 2: TOTP and backup codes (test first)** (not applicable: the Task M0.7 gate printed `DECISION: better-auth` and `better-auth` 1.7.22 is in use, so this Auth.js fallback is skipped; left unticked on purpose)
 
 Create `apps/portal/src/server/auth/totp.test.ts` with these cases, then run it and see it fail on the missing module: `generateTotpSecret()` returns 32 base32 characters; `totpUri({ secret, email })` starts with `otpauth://totp/CleanStart%20Partner%20Portal:` and carries the secret and `issuer`; `verifyTotp({ secret, code, now })` accepts the current code and one step either side, rejects two steps away, rejects a non digit code; `generateBackupCodes()` returns 10 codes of the form `XXXXX-XXXXX`; `verifyBackupCode({ stored, code })` returns the list without the used code, and `null` for an unknown or already used code. The expected codes in the test come from `totpCode` in `test-totp.ts` (Task M0.7), which is an independent RFC 6238 implementation.
 
@@ -1070,11 +1070,11 @@ export function verifyBackupCode(input: { stored: string[]; code: string }): str
 
 Run `pnpm --filter @cleanstart/portal exec vitest run src/server/auth/totp.test.ts`. Expected: all cases pass.
 
-- [ ] **Step 3: Second step token and password reset (tests first)**
+- [ ] **Step 3: Second step token and password reset (tests first)** (not applicable: the Task M0.7 gate printed `DECISION: better-auth` and `better-auth` 1.7.22 is in use, so this Auth.js fallback is skipped; left unticked on purpose)
 
 `second-step.ts` signs a 10 minute token that proves "this person passed the password step" using `encode` and `decode` from `next-auth/jwt` with the salt `second-step` and `AUTH_SECRET`; `beginSecondStep(userId, now)` returns the token, `completeSecondStep(token, now)` returns the user id or null for a tampered or expired token. `reset.ts` writes a hashed single use token into `auth_verification` (`identifier = 'reset:<userId>'`, `value = hashToken(token)`, `expiresAt` one hour on), `consumeResetToken(token, now)` returns the user id and deletes the row, or null. Write `second-step.test.ts` and `reset.test.ts` first (expired, reused and tampered tokens each give null; a second request for the same user replaces the first), run them to see them fail, then implement with `hashToken`, `generateInviteToken` from `tokens.ts` and `db` from `@/db/client`. Run both test files; expected: pass.
 
-- [ ] **Step 4: The Auth.js instance**
+- [ ] **Step 4: The Auth.js instance** (not applicable: the Task M0.7 gate printed `DECISION: better-auth` and `better-auth` 1.7.22 is in use, so this Auth.js fallback is skipped; left unticked on purpose)
 
 Replace `apps/portal/src/server/auth/auth.ts` with an Auth.js v5 config and no adapter:
 
@@ -1164,15 +1164,15 @@ export const { handlers, auth: authJs } = NextAuth({
 
 Verify: the exact option names of `next-auth@5.0.0-beta.32` (`NextAuth`, the `jwt` callback `trigger: 'signIn'`, `MicrosoftEntraID` taking an `issuer`) by running `pnpm --filter @cleanstart/portal typecheck` after writing the file; the beta renames options between releases, and a type error here is fixed by reading `node_modules/next-auth/index.d.ts` and `providers/microsoft-entra-id.d.ts`, not by guessing. The `await hashPassword` at module top level needs ESM top level await, which Next 16 supports; if the build rejects it, compute the dummy hash lazily inside `authorize`. Write the Auth.js version of the S1 to S5 and S7 checks in `auth.spike.test.ts` (same titles, same assertions on outcomes, calling the Auth.js handlers with `new Request` for sign in and reading the `authjs.session-token` cookie) and make them pass; the gate script is unchanged. S2's "API sign up refused" is true by construction (Auth.js has no sign up), S3 uses `beginSecondStep`, `verifyTotp` and `verifyBackupCode`.
 
-- [ ] **Step 5: `getViewer` and the guards read the Auth.js cookie**
+- [ ] **Step 5: `getViewer` and the guards read the Auth.js cookie** (not applicable: the Task M0.7 gate printed `DECISION: better-auth` and `better-auth` 1.7.22 is in use, so this Auth.js fallback is skipped; left unticked on purpose)
 
 In `apps/portal/src/server/auth/viewer.ts` replace the body of `viewerFromHeaders` with: decode the cookie from `requestHeaders` using `decode` from `next-auth/jwt` (salt and cookie name `authjs.session-token`, or `__Secure-authjs.session-token` on https), reject when it has no `sid`, load the `auth_session` row by id, reject when the row is missing or expired, then `return loadViewer(row.userId)`. Everything else in the file (`loadViewer`, `getViewer`, `homeFor`, the guards) is unchanged. In `apps/portal/src/proxy.ts` replace `getSessionCookie(request)` with a check for either cookie name. Write the viewer tests first (they already exist from Task M1.1d, S4 in the spike): they must pass unchanged except for how the cookie is produced.
 
-- [ ] **Step 6: The sign in client calls**
+- [ ] **Step 6: The sign in client calls** (not applicable: the Task M0.7 gate printed `DECISION: better-auth` and `better-auth` 1.7.22 is in use, so this Auth.js fallback is skipped; left unticked on purpose)
 
 Auth.js has no browser client with these methods, so add four small route handlers and call them from `SignIn.tsx` and the reset page with `fetch`: `POST /api/auth/step-one` (verifies email and password, returns `{ secondStep: true, token }` when the user has the second step, otherwise signs in), `POST /api/auth/second-step` (verifies a TOTP or backup code against `auth_two_factor` and then signs in with the token), `POST /api/auth/request-reset` (always answers 200, sends `buildPasswordReset`), `POST /api/auth/reset` (validates the password rule with `assertPasswordOk`, consumes the token, updates the `credential` row, deletes the user's sessions). Each handler gets a test first. Replace `apps/portal/src/lib/auth-client.ts` with a small module exporting `signInWithPassword`, `verifySecondStep`, `requestPasswordReset`, `resetPassword` that call these routes, and change the matching calls in Task M1.1g's `SignIn.tsx` edits (G7, G8, G9 and the `authClient.twoFactor` calls) to use them. Rate limit the four routes with `rateLimit` from `@/server/rate-limit` (10 per 60 seconds per IP and 10 per 600 seconds per email on step one).
 
-- [ ] **Step 7: Run the gate again**
+- [ ] **Step 7: Run the gate again** (not applicable: the Task M0.7 gate printed `DECISION: better-auth` and `better-auth` 1.7.22 is in use, so this Auth.js fallback is skipped; left unticked on purpose)
 
 ```bash
 pnpm --filter @cleanstart/portal exec tsx scripts/auth-spike-gate.ts; echo "exit=$?"
@@ -1180,11 +1180,11 @@ pnpm --filter @cleanstart/portal exec tsx scripts/auth-spike-gate.ts; echo "exit
 
 Expected: `DECISION: better-auth` is not printed any more; the script's verdict line text is fixed, so read the per item `pass` lines: S1 to S5 and S7 must all print `pass`. If one fails after three attempts, stop and log `blocked`: the plan's last option is Clerk or WorkOS, which the product owner ruled out, so the owner decides.
 
-- [ ] **Step 8: Port the hardening of Task M1.1c**
+- [ ] **Step 8: Port the hardening of Task M1.1c** (not applicable: the Task M0.7 gate printed `DECISION: better-auth` and `better-auth` 1.7.22 is in use, so this Auth.js fallback is skipped; left unticked on purpose)
 
 M1.1c's behaviours must hold on Auth.js. Port each as code plus the test from `auth.test.ts` that pins it: a disabled user, invited user, suspended company and unknown address are all answered like a wrong password (already true: `authorize` returns null in every case); per email limits on step one and request reset; the password rule on `reset` (Step 6); `password_changed_at`, the `account.password_changed` audit entry and the changed notice after a reset (in the `reset` route, using `recordAudit` and `sendPasswordChangedEmail`); `last_login_at` (done in the `jwt` callback). Run `auth.test.ts` adapted to call the route handlers; expected: pass.
 
-- [ ] **Step 9: Gate A, Gate B, commit, log**
+- [ ] **Step 9: Gate A, Gate B, commit, log** (not applicable: the Task M0.7 gate printed `DECISION: better-auth` and `better-auth` 1.7.22 is in use, so this Auth.js fallback is skipped; left unticked on purpose)
 
 Run Gate A. Commit with the paths changed in this task and `docs/partner-portal/AUTH-SPIKE.md`, message `feat(portal): M0.7 Auth.js v5 fallback`, and log `done` with the note `Auth.js v5, Better Auth failed S<n>`. Update the plan file's checkboxes in the same commit.
 
@@ -7065,7 +7065,7 @@ printf '%s\n' "$(date '+%Y-%m-%d %H:%M') IST | M0.5d | done | W0 | $(git rev-par
 Each is checked by the task named, as a first step or at the first run; the fallback is stated.
 
 1. **Better Auth version drift.** The code was run against 1.7.22. Task M0.7 Step 1 compares the installed version and Step 2 greps the two facts that matter. A different 1.7.x is expected to work; a different minor means re-running the whole checklist before relying on any option name. Fallback: pin the installed version in the orchestrator's `package.json` edit to 1.7.22.
-2. **Google and Microsoft sign in end to end.** Not provable without dev OAuth apps. Only the configuration is tested (S6). The result stays `PROVISIONAL (OAuth unverified)` until a person runs the three steps in `AUTH-SPIKE.md`. In particular the Entra app registration must add the optional claims `email` and `xms_edov`; if Microsoft does not send `xms_edov`, a Microsoft login fails closed (no link, no session), which is safe but must be noticed. Fallback: Google only, or Auth.js (Task M0.7-F).
+2. **(Removed 2026-11-16: there is no OAuth sign in to verify.)** Google and Microsoft sign in end to end. Not provable without dev OAuth apps. Only the configuration is tested (S6). The result stays `PROVISIONAL (OAuth unverified)` until a person runs the three steps in `AUTH-SPIKE.md`. In particular the Entra app registration must add the optional claims `email` and `xms_edov`; if Microsoft does not send `xms_edov`, a Microsoft login fails closed (no link, no session), which is safe but must be noticed. Fallback: Google only, or Auth.js (Task M0.7-F).
 3. **Real Postgres with row level security versus the scratch run.** Every test in this plan was run against PGlite with stand-in helpers, which has no `portal_app` role and no row level security. The tests that depend on RLS (the `getShell` isolation probe, `getShell` reading the manager and `staff_scopes` as a partner) are first run for real in Task M1.1d Steps 8 and 9. Fallback if the probe or the manager lookup fails: the `partners_select`, `users_select` or `staff_scopes_select` policy in `src/db/rls.sql` differs from the contracts; report `blocked`, do not weaken the test.
 4. **`hashPassword` before the auth module exists.** Resolved at the integration review: W0-b ships `makeUser` without `password`, and Task M0.7 Step 6b adds the option (and the seeded logins) after Step 6 creates `passwords.ts`, with a test.
 5. **The per IP limit key behind Caddy and Cloudflare.** Better Auth reads `x-forwarded-for` by default. Any client can send that header unless the proxy replaces it. The per email limits do not depend on it. The IP header trust setting (`advanced.ipAddress.ipAddressHeaders`) is a Task M5.1 (security pass) decision, with the Caddy and Cloudflare configuration in front of it.

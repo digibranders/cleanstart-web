@@ -14,7 +14,7 @@ import {
 } from './index';
 
 const PERSON = { email: 'person@example.com', name: 'Person' };
-const STAFF = [{ email: 'farhan@cleanstart.example' }, { email: 'omar@cleanstart.example' }];
+const STAFF = [{ email: 'gaurav@cleanstart.example' }, { email: 'omar@cleanstart.example' }];
 
 const CASES: TemplateCase[] = [
   {
@@ -63,7 +63,7 @@ const CASES: TemplateCase[] = [
       }),
     subject: 'New registration: Gulfway Freight from Kestrel Systems',
     contains: ['New deal registration', 'Aditi Rao at Kestrel Systems registered a deal', 'Middle East', 'Open the approvals queue'],
-    to: ['farhan@cleanstart.example', 'omar@cleanstart.example'],
+    to: ['gaurav@cleanstart.example', 'omar@cleanstart.example'],
   },
   {
     name: 'buildDealSubmittedStaffAlert (resubmitted)',
@@ -80,7 +80,7 @@ const CASES: TemplateCase[] = [
       }),
     subject: 'Resubmitted: Gulfway Freight from Kestrel Systems',
     contains: ['Registration resubmitted', 'resubmitted a deal'],
-    to: ['farhan@cleanstart.example', 'omar@cleanstart.example'],
+    to: ['gaurav@cleanstart.example', 'omar@cleanstart.example'],
   },
   {
     name: 'buildDealMessage',
@@ -88,14 +88,14 @@ const CASES: TemplateCase[] = [
       buildDealMessage({
         to: PERSON,
         recipientName: f('recipientName', 'Aditi Rao'),
-        authorName: f('authorName', 'Farhan Qureshi'),
+        authorName: f('authorName', 'Gaurav Jadhav'),
         authorOrg: f('authorOrg', 'CleanStart'),
         customer: f('customer', 'Tejas Health Network'),
         excerpt: f('excerpt', 'Can you confirm the contact at the hospital group?'),
         dealUrl: 'https://partners.example.com/partner/deals/3',
       }),
     subject: 'New message about Tejas Health Network',
-    contains: ['New message on a deal', 'Farhan Qureshi (CleanStart) wrote on the Tejas Health Network deal', 'Can you confirm the contact', 'Open the conversation'],
+    contains: ['New message on a deal', 'Gaurav Jadhav (CleanStart) wrote on the Tejas Health Network deal', 'Can you confirm the contact', 'Open the conversation'],
     to: ['person@example.com'],
   },
   {
@@ -126,7 +126,7 @@ const CASES: TemplateCase[] = [
       }),
     subject: 'Extension requested: Al Noor Logistics from Kestrel Systems',
     contains: ['Protection extension requested', 'The customer moved the pilot to January', 'Review the request'],
-    to: ['farhan@cleanstart.example', 'omar@cleanstart.example'],
+    to: ['gaurav@cleanstart.example', 'omar@cleanstart.example'],
   },
   {
     name: 'buildExtensionDecision (granted)',
@@ -191,7 +191,7 @@ const CASES: TemplateCase[] = [
       }),
     subject: 'Material request from Kestrel Systems',
     contains: ['Material request', 'A one page comparison with the incumbent scanner', 'Reply to this email to answer Aditi Rao directly.'],
-    to: ['farhan@cleanstart.example', 'omar@cleanstart.example'],
+    to: ['gaurav@cleanstart.example', 'omar@cleanstart.example'],
     replyTo: 'aditi@kestrel.example',
   },
   {
@@ -213,9 +213,9 @@ const CASES: TemplateCase[] = [
     name: 'buildManagerMessage',
     build: (f) =>
       buildManagerMessage({
-        to: { email: 'farhan@cleanstart.example', name: 'Farhan Qureshi' },
+        to: { email: 'gaurav@cleanstart.example', name: 'Gaurav Jadhav' },
         replyTo: { email: 'aditi@kestrel.example', name: 'Aditi Rao' },
-        managerName: f('managerName', 'Farhan Qureshi'),
+        managerName: f('managerName', 'Gaurav Jadhav'),
         senderName: f('senderName', 'Aditi Rao'),
         partnerName: f('partnerName', 'Kestrel Systems'),
         subject: f('subject', 'Question about the portal'),
@@ -223,7 +223,7 @@ const CASES: TemplateCase[] = [
       }),
     subject: 'Kestrel Systems: Question about the portal',
     contains: ['Message from Aditi Rao', 'How do I add a second contact to a deal?', 'Reply to this email to answer Aditi Rao.'],
-    to: ['farhan@cleanstart.example'],
+    to: ['gaurav@cleanstart.example'],
     replyTo: 'aditi@kestrel.example',
   },
 ];

@@ -17,7 +17,7 @@ beforeEach(async () => {
 
 describe('partnerListRows', () => {
   it('counts people with a login or an open invite, registration figures and the manager', async () => {
-    const manager = await makeUser(db, { kind: 'staff', role: 'partner_manager', name: 'Farhan Qureshi', region: 'india' });
+    const manager = await makeUser(db, { kind: 'staff', role: 'partner_manager', name: 'Gaurav Jadhav', region: 'india' });
     const partner = await makePartner(db, { name: 'Kestrel Systems', domain: 'kestrelsystems.in', managerId: manager.id, hubspotCompanyId: '91822044' });
     const admin = await makeUser(db, { partnerId: partner.id, role: 'partner_admin', name: 'Aditi Rao' });
     await makeUser(db, { partnerId: partner.id, role: 'sales' });
@@ -36,7 +36,7 @@ describe('partnerListRows', () => {
       protectedCount: 1,
       won: 1,
       adminName: 'Aditi Rao',
-      managerName: 'Farhan Qureshi',
+      managerName: 'Gaurav Jadhav',
       managerId: manager.id,
       hubspotCompanyId: '91822044',
       lastActiveAt: '2026-11-10T09:00:00.000Z',

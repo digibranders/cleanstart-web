@@ -195,7 +195,7 @@ describe('handleUpdateDocument and handleDeleteDocument', () => {
 
 describe('handleRequestMaterial', () => {
   const world = async () => {
-    const manager = await makeUser(db, { kind: 'staff', role: 'partner_manager', email: 'pm@cleanstart.test', name: 'Farhan' });
+    const manager = await makeUser(db, { kind: 'staff', role: 'partner_manager', email: 'pm@cleanstart.test', name: 'Gaurav' });
     await makeUser(db, { kind: 'staff', role: 'marketing', email: 'mk@cleanstart.test', name: 'Ishita' });
     const partner = await makePartner(db, { name: 'Kestrel Systems', managerId: manager.id });
     const requester = await makeUser(db, { partnerId: partner.id, role: 'technical', name: 'Aditi Rao', email: 'aditi@kestrel.test' });

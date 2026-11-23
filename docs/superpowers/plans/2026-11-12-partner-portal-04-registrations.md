@@ -143,7 +143,7 @@ Test files sit beside the module under test. Files marked "beyond the module map
 
 Rules this task implements: one registration per product and customer (hard block while pending or accepted, contracts M.3 item 24); a new registration is `pending` with stage `Awaiting review`, routed to a manager from `listManagerOptions`; an `onboarding` partner becomes `active` on its first registration; partner sales see only their own deals, partner admin the company's, technical nothing; the customer lookup returns the company's own customers plus, from HubSpot, only name and website, rate limited 10 per 60 seconds per user.
 
-- [ ] **Step 1: Verify the library behaviours this task relies on**
+- [x] **Step 1: Verify the library behaviours this task relies on** (done without the scratch file: the three behaviours are exercised by committed tests that pass, `pg-errors.test.ts` for the 23505 shape, `registrations.create.test.ts` for the duplicate block and the `getTableColumns` joins in `mappers.ts`, and `lockRegistration` in `repo/registrations.ts` uses `.limit(1).for('update')` and type checks)
 
 Create the scratch test `apps/portal/src/server/registrations/verify.scratch.test.ts`, run it, read the output, then delete the file (it is never committed).
 

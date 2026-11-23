@@ -45,7 +45,7 @@ describe('seedMockData', () => {
 
   it('keeps the partner manager routing and the HubSpot ids of accepted deals', async () => {
     const vardhan = await rows("select hubspot_deal_id, hubspot_synced_at, protection_end::text as protection_end, (select name from users where id = manager_id) as manager from registrations where customer_name = 'Vardhan Capital' and product = 'cleansight'");
-    expect(vardhan[0]).toMatchObject({ hubspot_deal_id: '48213', protection_end: '2027-01-12', manager: 'Farhan Qureshi' });
+    expect(vardhan[0]).toMatchObject({ hubspot_deal_id: '48213', protection_end: '2027-01-12', manager: 'Gaurav Jadhav' });
     expect(new Date(String(vardhan[0]?.hubspot_synced_at)).toISOString()).toBe('2026-11-06T14:02:00.000Z');
   });
 
