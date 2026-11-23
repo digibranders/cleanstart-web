@@ -194,7 +194,9 @@ export function Documents({
                             {isFresh(d.updatedAt, today) ? <Badge tone="violet">New</Badge> : null}
                           </span>
                           <span className="li-s">
-                            {d.summary ?? `${DOCUMENT_TYPE_LABEL[d.type]}, ${formatLabel(d)}`}
+                            {d.summary
+                              ? `${d.summary} (${formatLabel(d)})`
+                              : `${DOCUMENT_TYPE_LABEL[d.type]}, ${formatLabel(d)}`}
                           </span>
                         </span>
                       </span>

@@ -36,6 +36,8 @@ export function UploadDocumentForm({
   const [docType, setDocType] = useState<DocumentType>('datasheet');
   const [product, setProduct] = useState<DocProduct>('all');
   const [draft, setDraft] = useState<AudienceDraft>(emptyAudienceDraft);
+  const [summary, setSummary] = useState('');
+  const [minutes, setMinutes] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [tried, setTried] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -47,6 +49,12 @@ export function UploadDocumentForm({
   const titleErr =
     serverErrors.title ?? (tried && title.trim() === '' ? 'Give the document a title.' : null);
   const fileErr = serverErrors.file ?? (tried && file === null ? 'Choose a file to upload.' : null);
+  const minutesNum = minutes.trim() === '' ? null : Number(minutes);
+  const minutesErr =
+    serverErrors.durationMinutes ??
+    (docType === 'video' && minutesNum !== null && (!Number.isInteger(minutesNum) || minutesNum < 1 || minutesNum > 600)
+      ? 'Enter whole minutes, 1 to 600.'
+      : null);
   const audienceErr =
     tried && !audience.ok
       ? audience.error
@@ -57,7 +65,7 @@ export function UploadDocumentForm({
     setTried(true);
     setFormError(null);
     setServerErrors({});
-    if (busy || title.trim() === '' || file === null || !audience.ok) return;
+    if (busy || title.trim() === '' || file === null || !audience.ok || minutesErr) return;
     setBusy(true);
     setProgress(0);
     const uploaded = await uploadFile({
@@ -75,8 +83,8 @@ export function UploadDocumentForm({
       title: title.trim(),
       type: docType,
       product,
-      summary: null,
-      durationMinutes: null,
+      summary: summary.trim() === '' ? null : summary.trim(),
+      durationMinutes: docType === 'video' ? minutesNum : null,
       audience: audience.audience,
       file: uploaded.data,
     });
@@ -206,6 +214,46 @@ export function UploadDocumentForm({
             />
           </div>
         </div>
+        <div className="fg">
+          <label htmlFor="dsu" className="lbl">
+            Summary
+          </label>
+          <textarea
+            id="dsu"
+            className="field"
+            rows={2}
+            maxLength={300}
+            value={summary}
+            placeholder="One line partners see under the title"
+            onChange={(e) => setSummary(e.target.value)}
+            disabled={busy}
+          />
+        </div>
+        {docType === 'video' ? (
+          <div className="fg">
+            <label htmlFor="ddu" className="lbl">
+              Length in minutes
+            </label>
+            <input
+              id="ddu"
+              className={`field${minutesErr ? ' field-err' : ''}`}
+              type="number"
+              inputMode="numeric"
+              min={1}
+              max={600}
+              value={minutes}
+              onChange={(e) => setMinutes(e.target.value)}
+              disabled={busy}
+              aria-invalid={minutesErr ? true : undefined}
+              aria-describedby={minutesErr ? 'ddu-err' : undefined}
+            />
+            {minutesErr ? (
+              <span id="ddu-err" className="err">
+                {minutesErr}
+              </span>
+            ) : null}
+          </div>
+        ) : null}
         <AudiencePicker
           idPrefix="up"
           draft={draft}

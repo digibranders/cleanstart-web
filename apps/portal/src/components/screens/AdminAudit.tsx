@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState, useTransition } from 'react';
 import { Icon } from '@/components/icon';
 import { AuditDrawer } from '@/components/people/AuditDrawer';
 import { downloadCsv } from '@/components/reports/download-csv';
-import { Dropdown } from '@/components/ui/dropdown';
+import { Dropdown, type DropdownOption } from '@/components/ui/dropdown';
 import { useToast } from '@/components/ui/toast';
 import { auditToCsv } from '@/lib/audit-csv';
 import {
@@ -21,21 +21,41 @@ import {
 import { fmtTimestamp, plural } from '@/lib/dates';
 import { AUDIT_KINDS, AUDIT_WHO, EVENT_SOURCE_LABEL, isOneOf } from '@/lib/domain';
 import type { AuditEntryDto, PageDto } from '@/lib/dto';
+import { ROUTES } from '@/lib/routes';
 import { exportAuditAction } from '@/server/actions/audit';
 import { ScrollRegion } from "@/components/ui/scroll-region";
 
 const SEARCH_DEBOUNCE_MS = 300;
+const ALL_PARTNERS = '';
+
+/** The admin page an entry's object lives on, or null when it has none (people, invites). */
+function subjectHref(entry: AuditEntryDto): string | null {
+  if (!entry.subjectId) return null;
+  const id = encodeURIComponent(entry.subjectId);
+  switch (entry.subjectType) {
+    case 'partner':
+      return `${ROUTES.admin.partners}?selected=${id}`;
+    case 'registration':
+      return `${ROUTES.admin.approvals}?deal=${id}`;
+    case 'document':
+      return `${ROUTES.admin.documents}?doc=${id}`;
+    default:
+      return null;
+  }
+}
 
 export interface AdminAuditProps {
   page: PageDto<AuditEntryDto>;
   view: AuditView;
+  /** Every partner, for the company filter. */
+  partners: DropdownOption[];
   /** The server's UTC date, for "Today" and "Yesterday" labels. */
   today: string;
   /** The HubSpot sync health card, rendered by the page (a server component) so this screen does not depend on it. */
   healthSlot: React.ReactNode;
 }
 
-export function AdminAudit({ page, view, today, healthSlot }: AdminAuditProps): React.JSX.Element {
+export function AdminAudit({ page, view, partners, today, healthSlot }: AdminAuditProps): React.JSX.Element {
   const toast = useToast();
   const router = useRouter();
   const pathname = usePathname();
@@ -73,7 +93,7 @@ export function AdminAudit({ page, view, today, healthSlot }: AdminAuditProps): 
   };
 
   const selected = page.rows.find((e) => e.id === viewing) ?? null;
-  const filtered = view.kind !== null || view.who !== null || view.q !== '';
+  const filtered = view.kind !== null || view.who !== null || view.partnerId !== null || view.q !== '';
 
   return (
     <div className="wrap">
@@ -115,6 +135,12 @@ export function AdminAudit({ page, view, today, healthSlot }: AdminAuditProps): 
               value={view.who ?? ''}
               options={WHO_CHOICES}
               onChange={(v) => go({ ...view, who: isOneOf(AUDIT_WHO, v) ? v : null, cursor: null })}
+            />
+            <Dropdown
+              ariaLabel="Partner"
+              value={view.partnerId ?? ALL_PARTNERS}
+              options={[{ value: ALL_PARTNERS, label: 'All partners' }, ...partners]}
+              onChange={(v) => go({ ...view, partnerId: v === ALL_PARTNERS ? null : v, cursor: null })}
             />
             <Dropdown
               ariaLabel="Period"
@@ -160,7 +186,13 @@ export function AdminAudit({ page, view, today, healthSlot }: AdminAuditProps): 
                     </button>
                   </td>
                   <td className="hide-sm" style={{ whiteSpace: 'normal' }}>
-                    {e.target}
+                    {subjectHref(e) ? (
+                      <Link href={subjectHref(e) ?? ''} className="linkbtn">
+                        {e.target}
+                      </Link>
+                    ) : (
+                      e.target
+                    )}
                   </td>
                   <td className="t-muted hide-sm">{EVENT_SOURCE_LABEL[e.source]}</td>
                 </tr>
@@ -174,7 +206,7 @@ export function AdminAudit({ page, view, today, healthSlot }: AdminAuditProps): 
                 <button
                   type="button"
                   className="btn btn-g"
-                  onClick={() => go({ period: '90d', kind: null, who: null, q: '', cursor: null })}
+                  onClick={() => go({ period: '90d', kind: null, who: null, partnerId: null, q: '', cursor: null })}
                   style={{ height: 24, padding: '0 6px', fontSize: 12 }}
                 >
                   Clear filters
