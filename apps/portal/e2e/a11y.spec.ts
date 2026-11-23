@@ -37,8 +37,8 @@ const GROUPS: Group[] = [
   },
   { as: 'kestrelSales', paths: ['/partner/overview', '/partner/deals', '/partner/documents'] },
   { as: 'kestrelTechnical', paths: ['/partner/documents'] },
-  { as: 'manager', paths: ['/admin/approvals', '/admin/partners', '/admin/documents', '/admin/reports', '/admin/team', '/admin/audit'] },
-  { as: 'marketing', paths: ['/admin/documents'] },
+  { as: 'manager', paths: ['/admin/overview', '/admin/approvals', '/admin/partners', '/admin/documents', '/admin/reports', '/admin/team', '/admin/audit'] },
+  { as: 'marketing', paths: ['/admin/overview', '/admin/documents'] },
 ];
 
 async function scan(page: Page, label: string, testInfo: TestInfo, path: string): Promise<void> {
@@ -96,8 +96,8 @@ const ACCESS: Access[] = [
   },
   {
     as: 'marketing',
-    home: '/admin/documents',
-    open: ['/admin/documents'],
+    home: '/admin/overview',
+    open: ['/admin/overview', '/admin/documents'],
     redirected: ['/admin/approvals', '/admin/partners', '/admin/reports', '/admin/team', '/admin/audit'],
   },
 ];

@@ -77,9 +77,9 @@ describe('homeFor', () => {
     ['partner.partner_admin', partner('partner_admin'), '/partner/overview', 'overview.read'],
     ['partner.sales', partner('sales'), '/partner/overview', 'overview.read'],
     ['partner.technical', partner('technical'), '/partner/documents', 'document.read'],
-    ['staff.partner_manager', staff('partner_manager'), '/admin/approvals', 'registration.read_queue'],
-    ['staff.sales', staff('sales'), '/admin/approvals', 'registration.read_queue'],
-    ['staff.marketing', staff('marketing'), '/admin/documents', 'document.upload'],
+    ['staff.partner_manager', staff('partner_manager'), '/admin/overview', 'overview.read_staff'],
+    ['staff.sales', staff('sales'), '/admin/overview', 'overview.read_staff'],
+    ['staff.marketing', staff('marketing'), '/admin/overview', 'overview.read_staff'],
   ];
 
   it.each(HOMES)('%s lands on %s and may open it', (_key, viewer, home, action) => {
@@ -122,9 +122,9 @@ describe('guards', () => {
     const manager = await makeUser(testDb(), { kind: 'staff', role: 'partner_manager', password: PASSWORD });
     const marketing = await makeUser(testDb(), { kind: 'staff', role: 'marketing', password: PASSWORD });
     await signInAs(manager.email);
-    expect(await redirectOf(() => requireKind('partner'))).toBe('/admin/approvals');
+    expect(await redirectOf(() => requireKind('partner'))).toBe('/admin/overview');
     await signInAs(marketing.email);
-    expect(await redirectOf(() => requireKind('partner'))).toBe('/admin/documents');
+    expect(await redirectOf(() => requireKind('partner'))).toBe('/admin/overview');
   });
 
   it('returns the viewer when the kind matches', async () => {

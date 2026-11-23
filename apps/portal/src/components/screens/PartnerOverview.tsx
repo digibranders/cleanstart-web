@@ -38,8 +38,8 @@ interface PartnerOverviewProps {
 const MONTH = new Intl.DateTimeFormat("en-GB", { month: "short", timeZone: "UTC" });
 const monthLabel = (ym: string): string => MONTH.format(new Date(`${ym}-01T00:00:00Z`));
 
-const STATUS_ORDER: readonly RegistrationStatus[] = ["pending", "accepted", "won", "lost", "rejected", "expired"];
-const STATUS_NAME: Record<RegistrationStatus, string> = {
+export const STATUS_ORDER: readonly RegistrationStatus[] = ["pending", "accepted", "won", "lost", "rejected", "expired"];
+export const STATUS_NAME: Record<RegistrationStatus, string> = {
   pending: "Pending",
   accepted: "Accepted",
   won: "Won",
@@ -49,7 +49,7 @@ const STATUS_NAME: Record<RegistrationStatus, string> = {
 };
 
 /** A chart or table card in the dashboard grid. `span` is the desktop column span out of 12. */
-function Cell({ span, wide, children, label, className = "" }: { span: 4 | 6 | 8 | 12; wide?: boolean; children: React.ReactNode; label?: string; className?: string }): React.JSX.Element {
+export function Cell({ span, wide, children, label, className = "" }: { span: 4 | 6 | 8 | 12; wide?: boolean; children: React.ReactNode; label?: string; className?: string }): React.JSX.Element {
   // A chart draws its own card (.ch), so a chart cell is bare; tables and lists pass "card clip".
   return (
     <section className={`dash-c${span}${wide ? " dash-wide" : ""} ${className}`} aria-label={label}>
@@ -58,7 +58,7 @@ function Cell({ span, wide, children, label, className = "" }: { span: 4 | 6 | 8
   );
 }
 
-function Empty({ children }: { children: React.ReactNode }): React.JSX.Element {
+export function Empty({ children }: { children: React.ReactNode }): React.JSX.Element {
   return (
     <div className="empty" style={{ padding: "20px 12px" }}>
       <p style={{ margin: 0 }}>{children}</p>
@@ -67,7 +67,7 @@ function Empty({ children }: { children: React.ReactNode }): React.JSX.Element {
 }
 
 /** The empty state of a chart: its own card, with the chart title so the grid does not lose a slot. */
-function ChartEmpty({ title, children }: { title: string; children: React.ReactNode }): React.JSX.Element {
+export function ChartEmpty({ title, children }: { title: string; children: React.ReactNode }): React.JSX.Element {
   return (
     <div className="card" style={{ minHeight: 120 }}>
       <div className="card-h">
@@ -78,7 +78,7 @@ function ChartEmpty({ title, children }: { title: string; children: React.ReactN
   );
 }
 
-function CardHead({ id, title, meta, href, hrefLabel }: { id: string; title: string; meta?: string | undefined; href?: string; hrefLabel?: string }): React.JSX.Element {
+export function CardHead({ id, title, meta, href, hrefLabel }: { id: string; title: string; meta?: string | undefined; href?: string; hrefLabel?: string }): React.JSX.Element {
   return (
     <div className="card-h">
       <h2 id={id} className="card-t">

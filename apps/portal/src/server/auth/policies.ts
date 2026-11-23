@@ -55,6 +55,8 @@ export const ACTIONS = [
   // Dashboards (master 2.6)
   'overview.read',
   'report.read',
+  'overview.read_staff',
+  'dashboard.read_staff',
   // Documents (master 3.1, 3.2)
   'document.read',
   'document.open',
@@ -173,6 +175,9 @@ const RULES: Record<Action, Rule> = {
 
   'overview.read': (v) => isPartnerAdmin(v) || isPartnerSales(v),
   'report.read': (v) => isPartnerManager(v) || isStaffSales(v),
+  /** The staff Overview page: every staff role. Marketing gets documents only; the deal figures need dashboard.read_staff. */
+  'overview.read_staff': (v) => v.kind === 'staff',
+  'dashboard.read_staff': (v) => isPartnerManager(v) || isStaffSales(v),
 
   'document.read': anyone,
   'document.open': anyone,

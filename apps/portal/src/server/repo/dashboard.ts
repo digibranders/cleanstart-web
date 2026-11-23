@@ -148,14 +148,14 @@ async function documentUse(tx: Tx, from: string): Promise<DocumentUseRow[]> {
   return rows;
 }
 
-async function funnel(tx: Tx, filters: DashboardFilters, from: string): Promise<FunnelDto> {
+async function funnel(tx: Tx, region: DashboardFilters['region'] | StaffRegion | undefined, from: string): Promise<FunnelDto> {
   const apps = await tx
     .select({ status: applications.status, partnerId: applications.partnerId })
     .from(applications)
     .where(
       and(
         gte(applications.createdAt, dayStart(from)),
-        filters.region ? eq(applications.region, filters.region) : undefined,
+        region && region !== 'all' ? eq(applications.region, region) : undefined,
       ),
     );
   const approved = apps.filter((a) => a.status === 'approved');
@@ -195,6 +195,7 @@ export async function staffDashboard(tx: Tx, viewer: Viewer, filters: DashboardF
     .where(
       and(
         filters.partnerId ? eq(partners.id, filters.partnerId) : undefined,
+        filters.region ? eq(partners.region, filters.region) : undefined,
         regionLimit && regionLimit !== 'all' ? eq(partners.region, regionLimit) : undefined,
       ),
     )
@@ -248,7 +249,12 @@ export async function staffDashboard(tx: Tx, viewer: Viewer, filters: DashboardF
   );
   const workload: ManagerWorkloadRow[] = counts.map((c) => ({ ...c, name: c.managerId ? (names.get(c.managerId) ?? 'Former staff member') : 'Unassigned' }));
 
-  const [openApplications] = await tx.select({ n: count() }).from(applications).where(eq(applications.status, 'new'));
+  // Staff sales see applications of their own region only, as they see partners and deals.
+  const appRegion = filters.region ?? regionLimit;
+  const [openApplications] = await tx
+    .select({ n: count() })
+    .from(applications)
+    .where(and(eq(applications.status, 'new'), appRegion && appRegion !== 'all' ? eq(applications.region, appRegion) : undefined));
   const docs = await documentUse(tx, window.from);
   const integrations = await integrationHealth(tx);
 
@@ -259,8 +265,9 @@ export async function staffDashboard(tx: Tx, viewer: Viewer, filters: DashboardF
     kpis,
     series: dealSeries(inRange, all, window),
     activePartners: health.active,
+    protectedNow: protectedCount(all, today),
     openApplications: openApplications?.n ?? 0,
-    funnel: await funnel(tx, filters, window.from),
+    funnel: await funnel(tx, appRegion, window.from),
     partnerHealth: health,
     topByPipeline: rank('pipelineValue'),
     topByWon: rank('wonValue'),
@@ -269,7 +276,7 @@ export async function staffDashboard(tx: Tx, viewer: Viewer, filters: DashboardF
     expiring14: expiringSoon(all, today),
     mostOpenedDocuments: docs.filter((d) => d.opens > 0).slice(0, LIST_SIZE),
     leastOpenedDocuments: [...docs].sort((a, b) => a.opens - b.opens || a.title.localeCompare(b.title)).slice(0, LIST_SIZE),
-    integrations: { pending: integrations.pending, failed: integrations.failed, lastPollAt: iso(integrations.lastPollAt) },
+    integrations: { pending: integrations.pending, failed: integrations.failed, lastPollAt: iso(integrations.lastPollAt), lastError: integrations.lastError },
   };
 }
 

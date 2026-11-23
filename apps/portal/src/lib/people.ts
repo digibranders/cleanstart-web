@@ -107,7 +107,7 @@ export const landingPathFor = (kind: UserKind, role: PartnerRole | StaffRole): s
     if (role === 'partner_admin') return ROUTES.partner.welcome;
     return role === 'technical' ? ROUTES.partner.documents : ROUTES.partner.overview;
   }
-  return role === 'marketing' ? ROUTES.admin.documents : ROUTES.admin.approvals;
+  return ROUTES.admin.overview;
 };
 
 /** "CleanStart India", "CleanStart Middle East", or plain "CleanStart" for every region or an unknown one. */

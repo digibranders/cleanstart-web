@@ -233,6 +233,8 @@ export interface StaffDashboardDto {
   kpis: DealKpis;
   series: DealSeries;
   activePartners: number;
+  /** Accepted deals whose protection is still running. */
+  protectedNow: number;
   openApplications: number;
   funnel: FunnelDto;
   partnerHealth: PartnerHealthDto;
@@ -243,5 +245,5 @@ export interface StaffDashboardDto {
   expiring14: ExpiringRow[];
   mostOpenedDocuments: DocumentUseRow[];
   leastOpenedDocuments: DocumentUseRow[];
-  integrations: Pick<IntegrationHealthDto, 'pending' | 'failed'> & { lastPollAt: IsoTimestamp | null };
+  integrations: Pick<IntegrationHealthDto, 'pending' | 'failed' | 'lastError'> & { lastPollAt: IsoTimestamp | null };
 }

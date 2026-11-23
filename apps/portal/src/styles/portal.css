@@ -455,3 +455,15 @@ button.search{background:transparent}
 .kt:nth-child(3n+1){border-left:1px solid #F0EFF4}
 .kt:nth-child(6n+1){border-left:0}
 }
+/* staff overview: eight tiles, 2 columns on a phone, 4 from tablet up (two rows) */
+.dash-kpis-8{grid-template-columns:repeat(2,minmax(0,1fr))}
+.dash-kpis-8 .kt{border-left:1px solid #F0EFF4;border-top:1px solid #F0EFF4}
+.dash-kpis-8 .kt:nth-child(2n+1){border-left:0}
+.dash-kpis-8 .kt:nth-child(-n+2){border-top:0}
+@media (min-width:768px){
+.dash-kpis-8{grid-template-columns:repeat(4,minmax(0,1fr))}
+.dash-kpis-8 .kt:nth-child(2n+1){border-left:1px solid #F0EFF4}
+.dash-kpis-8 .kt:nth-child(4n+1){border-left:0}
+.dash-kpis-8 .kt:nth-child(-n+2){border-top:1px solid #F0EFF4}
+.dash-kpis-8 .kt:nth-child(-n+4){border-top:0}
+}

@@ -96,9 +96,9 @@ test.describe('@portal csp does not block the app', () => {
 
   test.describe('partner manager', () => {
     test.use({ storageState: PERSONAS.manager.file });
-    test('approvals, partners, documents, reports, team and audit', async ({ page }) => {
+    test('overview, approvals, partners, documents, reports, team and audit', async ({ page }) => {
       const violations = await watchViolations(page);
-      for (const path of ['/admin/approvals', '/admin/partners', '/admin/documents', '/admin/reports', '/admin/team', '/admin/audit']) {
+      for (const path of ['/admin/overview', '/admin/approvals', '/admin/partners', '/admin/documents', '/admin/reports', '/admin/team', '/admin/audit']) {
         await visit(page, path);
       }
       expect(violations).toEqual([]);

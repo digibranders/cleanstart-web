@@ -161,7 +161,7 @@ describe('acceptInviteAction', () => {
 
   it('accepts a staff invite without HubSpot or a company', async () => {
     const { token } = await makeInvite(db, { kind: 'staff', partnerId: null, role: 'marketing', staffRegion: 'all', email: 'ishita@cleanstart.com', expiresAt: future });
-    expect(await acceptInviteAction(form(token, { name: 'Ishita Bose', acceptAgreement: false }))).toEqual({ ok: true, data: { signedIn: true, redirectTo: '/admin/documents' } });
+    expect(await acceptInviteAction(form(token, { name: 'Ishita Bose', acceptAgreement: false }))).toEqual({ ok: true, data: { signedIn: true, redirectTo: '/admin/overview' } });
     expect(await db.select().from(staffScopes)).toHaveLength(1);
     expect(await db.select().from(hubspotOutbox)).toHaveLength(0);
   });

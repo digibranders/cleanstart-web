@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import type { BreakdownRow, PartnerDashboardDto } from '@/lib/dashboard-dto';
-import { buildDashboardTiles, formatUsd, protectionBars, stageFunnel, valueBars } from './overview-model';
+import type { BreakdownRow, PartnerDashboardDto, StaffDashboardDto } from '@/lib/dashboard-dto';
+import { buildDashboardTiles, buildStaffTiles, formatUsd, protectionBars, stageFunnel, tilesCsv, valueBars, workloadBars } from './overview-model';
 
 const row = (key: string, count: number, value = 0): BreakdownRow => ({ key, count, value });
 
@@ -66,5 +66,40 @@ describe('chart data', () => {
     const [bar] = protectionBars([{ id: 'a', partnerId: 'p', customer: 'Acme', partnerName: 'P', protectionEnd: '2026-12-01', daysLeft: 8 }]);
     expect(bar && (bar.end - bar.start) / 86_400_000).toBe(90);
     expect(bar?.state).toBe('expiring');
+  });
+});
+
+describe('buildStaffTiles', () => {
+  const staffDto = {
+    waiting: { count: 3, overdue: 1 },
+    kpis: { ...dashboard().kpis, decidedWithinTarget: 0.75, avgDecisionDays: 1.5, pipeline: { count: 2, value: 12_000 }, won: { count: 1, value: 4_000 } },
+    series: { monthly: [{ month: '2026-10', count: 1, value: 5 }] },
+    activePartners: 4,
+    openApplications: 2,
+    protectedNow: 5,
+    partnerHealth: { active: 4, onboarding: 1, inactive: 0 },
+    expiring14: [],
+  } as unknown as StaffDashboardDto;
+
+  it('builds eight tiles that open Deals or Partners', () => {
+    const tiles = buildStaffTiles(staffDto, true);
+    expect(tiles).toHaveLength(8);
+    expect(tiles.map((t) => t.value)).toEqual(['3', '75%', '1.5 days', '4', '2', '$12K', '1', '5']);
+    expect(tiles[0]?.href).toBe('/admin/approvals?status=waiting');
+    expect(tiles[4]?.href).toBe('/admin/partners?astatus=new');
+    expect(buildStaffTiles(staffDto, false)[4]?.href).toBe('/admin/partners');
+  });
+
+  it('exports the tiles as CSV rows', () => {
+    expect(tilesCsv(buildStaffTiles(staffDto, true))[0]).toEqual(['Waiting for approval', '3', '1 past the 2 day target']);
+  });
+
+  it('ranks the workload and leaves out managers with nothing waiting', () => {
+    const rows = [
+      { managerId: 'a', name: 'Asha', waiting: 1, overdue: 0, decided: 4 },
+      { managerId: null, name: 'Unassigned', waiting: 3, overdue: 1, decided: 0 },
+      { managerId: 'b', name: 'Bo', waiting: 0, overdue: 0, decided: 2 },
+    ];
+    expect(workloadBars(rows).map((b) => b.label)).toEqual(['Unassigned', 'Asha']);
   });
 });
