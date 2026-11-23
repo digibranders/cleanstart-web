@@ -5,6 +5,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { DASHBOARD_PERIOD_LABEL, DASHBOARD_PERIODS, DEFAULT_DASHBOARD_PERIOD, type DashboardPeriod } from "@/lib/dashboard-dto";
 import { type DealRegion, PARTNER_CATEGORIES, PARTNER_CATEGORY_LABEL, type PartnerCategory, PRODUCT_LABEL, PRODUCTS, type Product } from "@/lib/domain";
 import { useRegions } from "@/components/regions-context";
+import { DatePicker } from "@/components/ui/date-picker";
+import { Dropdown } from "@/components/ui/dropdown";
 
 const SHORT_PERIOD: Record<Exclude<DashboardPeriod, "custom">, string> = { "30d": "30 days", "90d": "90 days", "12m": "12 months", ytd: "Year to date" };
 
@@ -60,7 +62,7 @@ export function OverviewFilters({ regionSwitch = false, categorySwitch = false, 
             href={overviewHref(pathname, { ...state, period: p })}
             className={`seg-b${p === state.period ? " seg-on" : ""}`}
             aria-current={p === state.period ? "true" : undefined}
-            title={DASHBOARD_PERIOD_LABEL[p]}
+            data-hint={DASHBOARD_PERIOD_LABEL[p]}
             style={{ display: "inline-flex", alignItems: "center" }}
           >
             {SHORT_PERIOD[p]}
@@ -68,76 +70,53 @@ export function OverviewFilters({ regionSwitch = false, categorySwitch = false, 
         ))}
       </nav>
       <span style={{ display: "inline-flex", gap: 4, alignItems: "center" }}>
-        <input
-          key={`from-${state.from ?? ""}`}
-          type="date"
-          className="fsel"
-          aria-label="From date"
-          defaultValue={state.from ?? ""}
-          onChange={(e) => e.target.value && go({ period: "custom", from: e.target.value, to: state.to && state.to >= e.target.value ? state.to : e.target.value })}
+        <DatePicker
+          variant="fsel"
+          ariaLabel="From date"
+          placeholder="From"
+          value={state.from ?? ""}
+          max={state.to}
+          onChange={(v) => v && go({ period: "custom", from: v, to: state.to && state.to >= v ? state.to : v })}
         />
         <span aria-hidden="true">to</span>
-        <input
-          key={`to-${state.to ?? ""}`}
-          type="date"
-          className="fsel"
-          aria-label="To date"
-          defaultValue={state.to ?? ""}
-          onChange={(e) => e.target.value && go({ period: "custom", from: state.from && state.from <= e.target.value ? state.from : e.target.value, to: e.target.value })}
+        <DatePicker
+          variant="fsel"
+          ariaLabel="To date"
+          placeholder="To"
+          value={state.to ?? ""}
+          min={state.from}
+          onChange={(v) => v && go({ period: "custom", from: state.from && state.from <= v ? state.from : v, to: v })}
         />
       </span>
       {categorySwitch ? (
-        <select
-          className="fsel"
-          aria-label="Partner category"
+        <Dropdown
+          ariaLabel="Partner category"
           value={state.category ?? ""}
-          onChange={(e) => go({ category: (PARTNER_CATEGORIES as readonly string[]).includes(e.target.value) ? (e.target.value as PartnerCategory) : undefined })}
-        >
-          <option value="">All categories</option>
-          {PARTNER_CATEGORIES.map((c) => (
-            <option key={c} value={c}>
-              {PARTNER_CATEGORY_LABEL[c]}
-            </option>
-          ))}
-        </select>
+          options={[{ value: "", label: "All categories" }, ...PARTNER_CATEGORIES.map((c) => ({ value: c, label: PARTNER_CATEGORY_LABEL[c] }))]}
+          onChange={(v) => go({ category: (PARTNER_CATEGORIES as readonly string[]).includes(v) ? (v as PartnerCategory) : undefined })}
+        />
       ) : null}
       {regionSwitch ? (
-        <select
-          className="fsel"
-          aria-label="Region"
+        <Dropdown
+          ariaLabel="Region"
           value={state.region ?? ""}
-          onChange={(e) => go({ region: regions.some((r) => r.key === e.target.value) ? (e.target.value as DealRegion) : undefined })}
-        >
-          <option value="">All regions</option>
-          {regions.map((r) => (
-            <option key={r.key} value={r.key}>
-              {r.name}
-            </option>
-          ))}
-        </select>
+          options={[{ value: "", label: "All regions" }, ...regions.map((r) => ({ value: r.key, label: r.name }))]}
+          onChange={(v) => go({ region: regions.some((r) => r.key === v) ? (v as DealRegion) : undefined })}
+        />
       ) : null}
-      <select
-        className="fsel"
-        aria-label="Product"
+      <Dropdown
+        ariaLabel="Product"
         value={state.product ?? ""}
-        onChange={(e) => go({ product: (PRODUCTS as readonly string[]).includes(e.target.value) ? (e.target.value as Product) : undefined })}
-      >
-        <option value="">All products</option>
-        {PRODUCTS.map((p) => (
-          <option key={p} value={p}>
-            {PRODUCT_LABEL[p]}
-          </option>
-        ))}
-      </select>
+        options={[{ value: "", label: "All products" }, ...PRODUCTS.map((p) => ({ value: p, label: PRODUCT_LABEL[p] }))]}
+        onChange={(v) => go({ product: (PRODUCTS as readonly string[]).includes(v) ? (v as Product) : undefined })}
+      />
       {partners ? (
-        <select className="fsel" aria-label="Partner" value={state.partnerId ?? ""} onChange={(e) => go({ partnerId: e.target.value || undefined })}>
-          <option value="">All partners</option>
-          {partners.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.name}
-            </option>
-          ))}
-        </select>
+        <Dropdown
+          ariaLabel="Partner"
+          value={state.partnerId ?? ""}
+          options={[{ value: "", label: "All partners" }, ...partners.map((p) => ({ value: p.id, label: p.name }))]}
+          onChange={(v) => go({ partnerId: v || undefined })}
+        />
       ) : null}
       {state.period !== DEFAULT_DASHBOARD_PERIOD || state.region || state.product || state.category || state.partnerId ? (
         <Link href={pathname} className="btn btn-s" replace>

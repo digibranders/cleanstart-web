@@ -52,7 +52,7 @@ export function ProductMark({
   const mark = PRODUCT_MARK[product];
   const box = size ? { width: size, height: size, borderRadius: 4 } : undefined;
   return (
-    <span className={`pm${large ? " pm-lg" : ""} ${mark.cls}`} style={box} title={PRODUCT_LABEL[product]}>
+    <span className={`pm${large ? " pm-lg" : ""} ${mark.cls}`} style={box} data-hint={PRODUCT_LABEL[product]}>
       <svg
         className="ic"
         viewBox="0 0 256 256"

@@ -8,6 +8,7 @@ import { formatUsd } from '@/components/dashboard/overview-model';
 import { CHIP_PRODUCT } from '@/components/deals/derive';
 import { downloadCsv } from '@/components/partners/csv';
 import { ProductChip } from '@/components/ui/badge';
+import { DatePicker } from '@/components/ui/date-picker';
 import { ScrollRegion } from '@/components/ui/scroll-region';
 import { useToast } from '@/components/ui/toast';
 import { fmtLong, plural } from '@/lib/dates';
@@ -95,7 +96,7 @@ export function RangedReport({ report, today }: RangedReportProps): React.JSX.El
           </button>
         </nav>
         {showCustom ? (
-          <form
+          <form noValidate
             style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}
             onSubmit={(e) => {
               e.preventDefault();
@@ -103,10 +104,10 @@ export function RangedReport({ report, today }: RangedReportProps): React.JSX.El
             }}
           >
             <label className="sr" htmlFor="rg-from">From</label>
-            <input id="rg-from" type="date" className="fsel" value={from} max={to || undefined} onChange={(e) => setFrom(e.target.value)} />
+            <DatePicker id="rg-from" variant="fsel" placeholder="From" value={from} max={to || undefined} onChange={setFrom} />
             <span className="t-sec">to</span>
             <label className="sr" htmlFor="rg-to">To</label>
-            <input id="rg-to" type="date" className="fsel" value={to} min={from || undefined} onChange={(e) => setTo(e.target.value)} />
+            <DatePicker id="rg-to" variant="fsel" placeholder="To" value={to} min={from || undefined} onChange={setTo} />
             <button type="submit" className="btn btn-s" disabled={!customValid}>
               Apply
             </button>

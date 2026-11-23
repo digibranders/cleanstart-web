@@ -8,6 +8,7 @@ import { uploadFile } from '@/components/documents/upload-client';
 import { defaultTypeFor, MAX_FILES_PER_BATCH, sortBatch, titleFromFileName } from '@/components/documents/upload-rows';
 import { Icon } from '@/components/icon';
 import { Dropdown } from '@/components/ui/dropdown';
+import { FilePicker } from '@/components/ui/file-picker';
 import { useToast } from '@/components/ui/toast';
 import type { AudiencePartnerDto } from '@/lib/document-upload';
 import {
@@ -359,14 +360,13 @@ export function UploadDocumentForm({
                         <label htmlFor={`${row.id}-${kind}`} className="lbl">
                           {kind === 'poster' ? 'Poster image (optional)' : 'Captions file (optional)'}
                         </label>
-                        <input
+                        <FilePicker
                           id={`${row.id}-${kind}`}
-                          className={`field${problem ? ' field-err' : ''}`}
-                          type="file"
                           accept={MEDIA_ACCEPT[kind]}
+                          file={file}
                           disabled={locked}
-                          onChange={(e) => patch(row.id, { media: { ...row.media, [kind]: e.target.files?.[0] ?? null } })}
-                          aria-invalid={problem ? true : undefined}
+                          invalid={Boolean(problem)}
+                          onPick={(picked) => patch(row.id, { media: { ...row.media, [kind]: picked } })}
                         />
                         {problem ? <span className="err">{problem}</span> : null}
                       </div>

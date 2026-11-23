@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { once } from '@/components/documents/doc-view';
 import { Icon } from '@/components/icon';
 import { Drawer } from '@/components/ui/overlay';
+import { VideoPlayer } from '@/components/ui/video-player';
 import { fmtLong } from '@/lib/dates';
 import { DOC_PRODUCT_LABEL, DOCUMENT_TYPE_LABEL } from '@/lib/domain';
 import type { DocumentDto } from '@/lib/dto';
@@ -22,8 +23,8 @@ function useCountOnce(id: string): () => void {
 
 const frame: React.CSSProperties = { width: '100%', borderRadius: 8, background: '#120E20' };
 
-/** A private file played by the browser's own player; each range request is a new signed redirect from the stream route. */
-function VideoPlayer({ doc }: { doc: DocumentDto }): React.JSX.Element {
+/** A private file played by our own player; each range request is a new signed redirect from the stream route. */
+function PreviewVideo({ doc }: { doc: DocumentDto }): React.JSX.Element {
   const [failed, setFailed] = useState(false);
   const count = useCountOnce(doc.id);
   if (!doc.mime.startsWith('video/') || failed) {
@@ -35,20 +36,15 @@ function VideoPlayer({ doc }: { doc: DocumentDto }): React.JSX.Element {
     );
   }
   return (
-    // biome-ignore lint/a11y/useMediaCaption: the captions track is added below when staff uploaded a file; many videos have none
-    <video
-      controls
-      preload="metadata"
-      playsInline
-      aria-label={doc.title}
+    <VideoPlayer
+      label={doc.title}
       src={`/api/files/${doc.id}/stream`}
       poster={doc.hasPoster ? `/api/files/${doc.id}/poster` : undefined}
+      captionsSrc={doc.hasCaptions ? `/api/files/${doc.id}/captions` : undefined}
       style={{ ...frame, aspectRatio: '16 / 9' }}
       onPlay={count}
       onError={() => setFailed(true)}
-    >
-      {doc.hasCaptions ? <track kind="captions" src={`/api/files/${doc.id}/captions`} srcLang="en" label="Captions" /> : null}
-    </video>
+    />
   );
 }
 
@@ -98,7 +94,7 @@ export function DocumentPreview({
         </>
       }
     >
-      {doc.type === 'video' ? <VideoPlayer key={doc.id} doc={doc} /> : null}
+      {doc.type === 'video' ? <PreviewVideo key={doc.id} doc={doc} /> : null}
       {doc.type !== 'video' && doc.mime === 'application/pdf' ? <PdfPreview key={doc.id} doc={doc} /> : null}
       <p style={{ margin: 0, fontSize: 13, lineHeight: 1.55, color: '#4A4858' }}>
         {doc.summary ?? `${DOCUMENT_TYPE_LABEL[doc.type]}, ${format}`}

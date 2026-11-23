@@ -16,6 +16,7 @@ import {
 import { uploadFile } from '@/components/documents/upload-client';
 import { Icon } from '@/components/icon';
 import { Badge } from '@/components/ui/badge';
+import { DatePicker } from '@/components/ui/date-picker';
 import { Dropdown } from '@/components/ui/dropdown';
 import { Drawer } from '@/components/ui/overlay';
 import { useToast } from '@/components/ui/toast';
@@ -326,14 +327,7 @@ export function DocumentEditDrawer({
           <label htmlFor="ed-expires" className="lbl">
             Hide from partners on
           </label>
-          <input
-            id="ed-expires"
-            className="field"
-            type="date"
-            value={expiresOn}
-            disabled={busy}
-            onChange={(e) => setExpiresOn(e.target.value)}
-          />
+          <DatePicker id="ed-expires" value={expiresOn} disabled={busy} clearable onChange={setExpiresOn} />
           <span className="hint">{expiresOn === '' ? 'Optional. Leave empty for no expiry.' : 'From that day partners no longer see it. You still do, marked Expired.'}</span>
         </div>
       </div>

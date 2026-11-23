@@ -408,19 +408,13 @@ export function Team({ team, today }: { team: TeamDto; today: string }): React.J
             <label htmlFor="move-deals" className="lbl">
               Move their {removing.member.deals} {removing.member.deals === 1 ? "deal" : "deals"} to
             </label>
-            <select
+            <Dropdown
               id="move-deals"
-              className="field"
+              variant="field"
               value={removing.moveTo}
-              onChange={(e) => setRemoving((r) => (r ? { ...r, moveTo: e.target.value } : r))}
-            >
-              <option value={KEEP_WITH_COMPANY}>Leave with the company</option>
-              {heirs(removing.member).map((m) => (
-                <option key={m.id} value={m.id}>
-                  {m.name}, {PARTNER_ROLE_LABEL[m.role]}
-                </option>
-              ))}
-            </select>
+              options={[{ value: KEEP_WITH_COMPANY, label: "Leave with the company" }, ...heirs(removing.member).map((m) => ({ value: m.id, label: `${m.name}, ${PARTNER_ROLE_LABEL[m.role]}` }))]}
+              onChange={(v) => setRemoving((r) => (r ? { ...r, moveTo: v } : r))}
+            />
             <span className="hint">Only who owns the deals changes. Their status stays as it is.</span>
           </div>
         ) : null}

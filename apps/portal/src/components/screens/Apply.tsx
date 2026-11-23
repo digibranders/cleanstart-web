@@ -6,6 +6,7 @@ import { useState } from "react";
 import { NumberedSteps, PublicHeading, PublicSplit, useNarrow } from "@/components/partners/public-frame";
 import { Seg } from "@/components/partners/seg";
 import { TurnstileWidget } from "@/components/partners/turnstile-widget";
+import { Combobox } from "@/components/ui/combobox";
 import { Dropdown } from "@/components/ui/dropdown";
 import { useToast } from "@/components/ui/toast";
 import { COUNTRIES, findCountry } from "@/lib/deal-form";
@@ -425,26 +426,18 @@ export function Apply({ turnstileSiteKey, regions }: { turnstileSiteKey: string;
             <label htmlFor="ap-country" className="lbl">
               Country
             </label>
-            <input
+            <Combobox
               id="ap-country"
-              className={`field${countryErr ? " field-err" : ""}`}
-              type="text"
-              list="ap-countries"
-              autoComplete="off"
-              placeholder="Start typing to search"
               value={f.country}
-              onChange={(e) => set("country", e.target.value)}
+              options={COUNTRIES.map((c) => c.name)}
+              placeholder="Start typing to search"
+              onChange={(v) => set("country", v)}
               onBlur={() => {
                 if (country && country.name !== f.country) set("country", country.name);
               }}
-              aria-invalid={countryErr ? true : undefined}
-              aria-describedby="ap-country-err"
+              invalid={Boolean(countryErr)}
+              ariaDescribedBy="ap-country-err"
             />
-            <datalist id="ap-countries">
-              {COUNTRIES.map((c) => (
-                <option key={c.code} value={c.name} />
-              ))}
-            </datalist>
             {countryErr ? <ErrorText id="ap-country-err">Pick a country from the list.</ErrorText> : null}
           </div>
           <div className="fg">

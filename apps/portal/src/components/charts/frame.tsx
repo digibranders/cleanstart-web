@@ -1,4 +1,5 @@
 import { useId } from "react";
+import { TableToggle } from "./table-toggle";
 import { TipHost } from "./tooltip";
 
 export interface LegendItem {
@@ -13,7 +14,7 @@ export interface TableData {
 
 /**
  * Shared chrome for every chart: title, text description, legend (always for two or more series), the marks, and a
- * "View as table" toggle (native details, works without JavaScript) that shows the same data.
+ * "View as table" toggle that shows the same data.
  */
 export function ChartFrame({
   title,
@@ -53,8 +54,7 @@ export function ChartFrame({
       ) : null}
       {scaleKey}
       <TipHost>{children}</TipHost>
-      <details className="ch-table">
-        <summary>View as table</summary>
+      <TableToggle>
         <table>
           <caption className="sr">{title}</caption>
           <thead>
@@ -84,7 +84,7 @@ export function ChartFrame({
             ))}
           </tbody>
         </table>
-      </details>
+      </TableToggle>
     </figure>
   );
 }

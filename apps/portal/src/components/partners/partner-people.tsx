@@ -188,14 +188,13 @@ function RemovePersonDialog({
           <label htmlFor="pr-move" className="lbl">
             Move their {person.deals} {person.deals === 1 ? "deal" : "deals"} to
           </label>
-          <select id="pr-move" className="field" value={moveTo} onChange={(e) => setMoveTo(e.target.value)}>
-            <option value="">Leave with the company</option>
-            {heirs.map((m) => (
-              <option key={m.id} value={m.id}>
-                {m.name}, {PARTNER_ROLE_LABEL[m.role]}
-              </option>
-            ))}
-          </select>
+          <Dropdown
+            id="pr-move"
+            variant="field"
+            value={moveTo}
+            options={[{ value: "", label: "Leave with the company" }, ...heirs.map((m) => ({ value: m.id, label: `${m.name}, ${PARTNER_ROLE_LABEL[m.role]}` }))]}
+            onChange={setMoveTo}
+          />
           <span className="hint">Only who owns the deals changes. Their status stays as it is.</span>
         </div>
       ) : null}

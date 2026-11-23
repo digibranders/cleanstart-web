@@ -41,6 +41,8 @@ import { type PartnerChoice, PartnerPicker } from "../deals/PartnerPicker";
 import { ProductMark, StatusBadge } from "../deals/parts";
 import type { CustomerLookupResult } from "../deals/types";
 import { Icon } from "../icon";
+import { Combobox } from "../ui/combobox";
+import { DatePicker } from "../ui/date-picker";
 import { Dropdown } from "../ui/dropdown";
 import { ConfirmDialog } from "../ui/overlay";
 import { useToast } from "../ui/toast";
@@ -526,44 +528,37 @@ export function RegisterDeal({ mine, managers, partnerName: ownPartnerName, part
                         <label htmlFor="country" className="lbl">
                           Customer country <span className="hint">(optional, start typing to search)</span>
                         </label>
-                        <input
+                        <Combobox
                           id="country"
-                          className={cls("customerCountry")}
-                          type="text"
-                          list="countries"
-                          autoComplete="off"
                           value={form.country}
-                          onChange={(e) => patch({ country: e.target.value })}
+                          options={COUNTRIES.map((c) => c.name)}
                           placeholder="India"
-                          {...inputProps("customerCountry")}
+                          onChange={(v) => patch({ country: v })}
                           onBlur={() => {
                             touch("customerCountry");
                             const match = findCountry(form.country);
                             if (match && match.name !== form.country) patch({ country: match.name });
                           }}
+                          invalid={Boolean(fieldError("customerCountry"))}
+                          ariaDescribedBy={fieldError("customerCountry") ? errorId("customerCountry") : undefined}
                         />
-                        <datalist id="countries">
-                          {COUNTRIES.map((c) => (
-                            <option key={c.code} value={c.name} />
-                          ))}
-                        </datalist>
                         {errorLine("customerCountry")}
                       </div>
                       <div className="fg">
                         <label htmlFor="industry" className="lbl">
                           Industry <span className="hint">(optional)</span>
                         </label>
-                        <select id="industry" className="field" value={form.industry} onChange={(e) => patch({ industry: e.target.value })}>
-                          <option value="">Not sure or not listed</option>
-                          {form.industry && !(INDUSTRIES as readonly string[]).includes(form.industry) ? (
-                            <option value={form.industry}>{form.industry}</option>
-                          ) : null}
-                          {INDUSTRIES.map((name) => (
-                            <option key={name} value={name}>
-                              {name}
-                            </option>
-                          ))}
-                        </select>
+                        <Dropdown
+                          id="industry"
+                          variant="field"
+                          value={form.industry}
+                          options={[
+                            { value: "", label: "Not sure or not listed" },
+                            ...(form.industry && !(INDUSTRIES as readonly string[]).includes(form.industry) ? [{ value: form.industry, label: form.industry }] : []),
+                            ...INDUSTRIES.map((name) => ({ value: name, label: name })),
+                          ]}
+                          onChange={(v) => patch({ industry: v })}
+                        />
                       </div>
                     </div>
 
@@ -733,19 +728,9 @@ export function RegisterDeal({ mine, managers, partnerName: ownPartnerName, part
                           Deal value <span className="hint">(optional, your best estimate)</span>
                         </label>
                         <div style={{ display: "flex", gap: 6 }}>
-                          <select
-                            aria-label="Currency"
-                            className="field"
-                            style={{ width: 84, flex: "none" }}
-                            value={form.currency}
-                            onChange={(e) => patch({ currency: e.target.value as DealCurrency })}
-                          >
-                            {DEAL_CURRENCIES.map((code) => (
-                              <option key={code} value={code}>
-                                {code}
-                              </option>
-                            ))}
-                          </select>
+                          <div style={{ width: 84, flex: "none" }}>
+                            <Dropdown ariaLabel="Currency" variant="field" value={form.currency} options={DEAL_CURRENCIES} onChange={(v) => patch({ currency: v as DealCurrency })} />
+                          </div>
                           <input
                             id="value"
                             className={cls("dealValue", "tnum")}
@@ -764,14 +749,13 @@ export function RegisterDeal({ mine, managers, partnerName: ownPartnerName, part
                         <label htmlFor="stage" className="lbl">
                           Sales stage <span className="hint">(optional)</span>
                         </label>
-                        <select id="stage" className="field" value={form.salesStage} onChange={(e) => patch({ salesStage: e.target.value })}>
-                          <option value="">Not set</option>
-                          {SALES_STAGES.map((stage) => (
-                            <option key={stage} value={stage}>
-                              {stage}
-                            </option>
-                          ))}
-                        </select>
+                        <Dropdown
+                          id="stage"
+                          variant="field"
+                          value={form.salesStage}
+                          options={[{ value: "", label: "Not set" }, ...SALES_STAGES.map((stage) => ({ value: stage, label: stage }))]}
+                          onChange={(v) => patch({ salesStage: v })}
+                        />
                       </div>
                       <div className="fg">
                         <label htmlFor="seats" className="lbl">
@@ -796,14 +780,13 @@ export function RegisterDeal({ mine, managers, partnerName: ownPartnerName, part
                         <label htmlFor="close" className="lbl">
                           Expected close <span className="hint">(optional)</span>
                         </label>
-                        <input
+                        <DatePicker
                           id="close"
-                          className={cls("expectedClose", "tnum")}
-                          type="date"
                           min={today}
                           value={form.close}
-                          onChange={(e) => patch({ close: e.target.value })}
-                          {...inputProps("expectedClose")}
+                          onChange={(v) => patch({ close: v })}
+                          invalid={Boolean(fieldError("expectedClose"))}
+                          ariaDescribedBy={fieldError("expectedClose") ? errorId("expectedClose") : undefined}
                         />
                         {errorLine("expectedClose")}
                       </div>
@@ -811,13 +794,12 @@ export function RegisterDeal({ mine, managers, partnerName: ownPartnerName, part
                         <label htmlFor="decision" className="lbl">
                           Decision date <span className="hint">(optional, vendor decision)</span>
                         </label>
-                        <input
+                        <DatePicker
                           id="decision"
-                          className={cls("decisionDate", "tnum")}
-                          type="date"
                           value={form.decisionDate}
-                          onChange={(e) => patch({ decisionDate: e.target.value })}
-                          {...inputProps("decisionDate")}
+                          onChange={(v) => patch({ decisionDate: v })}
+                          invalid={Boolean(fieldError("decisionDate"))}
+                          ariaDescribedBy={fieldError("decisionDate") ? errorId("decisionDate") : undefined}
                         />
                         {errorLine("decisionDate")}
                       </div>

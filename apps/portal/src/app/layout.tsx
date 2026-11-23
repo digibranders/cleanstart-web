@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Manrope } from "next/font/google";
+import { HintHost } from "@/components/ui/hint";
 import { ToastProvider } from "@/components/ui/toast";
 import "@/styles/portal.css";
 
@@ -18,6 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }):
     <html lang="en" className={manrope.variable}>
       <body>
         <ToastProvider>{children}</ToastProvider>
+        <HintHost />
       </body>
     </html>
   );

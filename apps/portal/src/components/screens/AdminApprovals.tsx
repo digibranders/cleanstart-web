@@ -487,13 +487,13 @@ export function AdminApprovals({
                       <ProductChip product={CHIP_PRODUCT[deal.product]} />
                     </td>
                     <td className="t-sec hide-sm">{regionName(deal.region)}</td>
-                    <td className={`tnum hide-sm ${row.over ? "t-amber" : "t-sec"}`} title={`Submitted ${fmtLong(reviewSince(deal))}`}>
+                    <td className={`tnum hide-sm ${row.over ? "t-amber" : "t-sec"}`} data-hint={`Submitted ${fmtLong(reviewSince(deal))}`}>
                       {ageLabel(row.age)}
                       {row.over ? <span className="why why-amber">Over 2-day target</span> : null}
                     </td>
                     <td style={{ whiteSpace: "normal" }}>
                       {check.rival ? (
-                        <Link href={staffDealHref(check.rival.id)} className={`badge b-${check.tone}`} title="Open the other registration">
+                        <Link href={staffDealHref(check.rival.id)} className={`badge b-${check.tone}`} data-hint="Open the other registration">
                           {check.label}
                         </Link>
                       ) : (
@@ -515,7 +515,7 @@ export function AdminApprovals({
                             onClick={() => startReject(row)}
                             disabled={busyId === deal.id}
                             aria-label={`Reject ${deal.customer} from ${deal.partnerName}`}
-                            title="Reject with a reason"
+                            data-hint="Reject with a reason"
                           >
                             Reject
                           </button>
@@ -525,7 +525,7 @@ export function AdminApprovals({
                             onClick={() => accept(row)}
                             disabled={busyId === deal.id}
                             aria-label={`Accept ${deal.customer} from ${deal.partnerName}`}
-                            title="Accept and create the HubSpot deal"
+                            data-hint="Accept and create the HubSpot deal"
                           >
                             Accept
                           </button>

@@ -244,7 +244,7 @@ export function Shell({
                     <Icon name={item.icon} />
                     {item.label}
                     {count ? (
-                      <span className="nav-cnt" title={`${count} ${waiting === 1 ? "deal" : "deals"} waiting for review`}>
+                      <span className="nav-cnt" data-hint={`${count} ${waiting === 1 ? "deal" : "deals"} waiting for review`}>
                         {count}
                       </span>
                     ) : null}

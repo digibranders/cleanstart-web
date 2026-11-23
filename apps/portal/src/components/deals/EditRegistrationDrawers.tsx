@@ -20,6 +20,9 @@ import {
   removeRegistrationContactAction,
   updateRegistrationContactAction,
 } from "@/server/actions/registration-edit";
+import { Combobox } from "../ui/combobox";
+import { DatePicker } from "../ui/date-picker";
+import { Dropdown } from "../ui/dropdown";
 import { Dialog, Drawer } from "../ui/overlay";
 import { useToast } from "../ui/toast";
 
@@ -163,39 +166,35 @@ export function EditRegistrationDrawer({
           <label htmlFor="ed-country" className="lbl">
             Customer country
           </label>
-          <input
+          <Combobox
             id="ed-country"
-            type="text"
-            list="ed-countries"
-            autoComplete="off"
             value={f.country}
-            onChange={(e) => set({ country: e.target.value })}
+            options={COUNTRIES.map((c) => c.name)}
+            onChange={(v) => set({ country: v })}
             onBlur={() => {
               const match = findCountry(f.country);
               if (match && match.name !== f.country) set({ country: match.name });
             }}
-            {...bad("customerCountry")}
+            invalid={Boolean(errors.customerCountry)}
+            ariaDescribedBy={errors.customerCountry ? "ed-customerCountry-err" : undefined}
           />
-          <datalist id="ed-countries">
-            {COUNTRIES.map((c) => (
-              <option key={c.code} value={c.name} />
-            ))}
-          </datalist>
           {err("customerCountry")}
         </div>
         <div className="fg">
           <label htmlFor="ed-industry" className="lbl">
             Industry
           </label>
-          <select id="ed-industry" className="field" value={f.industry} onChange={(e) => set({ industry: e.target.value })}>
-            <option value="">Not sure or not listed</option>
-            {f.industry && !(INDUSTRIES as readonly string[]).includes(f.industry) ? <option value={f.industry}>{f.industry}</option> : null}
-            {INDUSTRIES.map((name) => (
-              <option key={name} value={name}>
-                {name}
-              </option>
-            ))}
-          </select>
+          <Dropdown
+            id="ed-industry"
+            variant="field"
+            value={f.industry}
+            options={[
+              { value: "", label: "Not sure or not listed" },
+              ...(f.industry && !(INDUSTRIES as readonly string[]).includes(f.industry) ? [{ value: f.industry, label: f.industry }] : []),
+              ...INDUSTRIES.map((name) => ({ value: name, label: name })),
+            ]}
+            onChange={(v) => set({ industry: v })}
+          />
         </div>
       </div>
       <div className="grid2" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))" }}>
@@ -204,13 +203,9 @@ export function EditRegistrationDrawer({
             Deal value
           </label>
           <div style={{ display: "flex", gap: 6 }}>
-            <select aria-label="Currency" className="field" style={{ width: 96, flex: "none" }} value={f.currency} onChange={(e) => set({ currency: e.target.value as DealCurrency })}>
-              {DEAL_CURRENCIES.map((code) => (
-                <option key={code} value={code}>
-                  {code}
-                </option>
-              ))}
-            </select>
+            <div style={{ width: 96, flex: "none" }}>
+              <Dropdown ariaLabel="Currency" variant="field" value={f.currency} options={DEAL_CURRENCIES} onChange={(v) => set({ currency: v as DealCurrency })} />
+            </div>
             <input id="ed-value" type="text" inputMode="decimal" autoComplete="off" value={f.dealValue} onChange={(e) => set({ dealValue: e.target.value })} {...bad("dealValue")} />
           </div>
           {err("dealValue")}
@@ -219,14 +214,13 @@ export function EditRegistrationDrawer({
           <label htmlFor="ed-stage" className="lbl">
             Sales stage
           </label>
-          <select id="ed-stage" className="field" value={f.salesStage} onChange={(e) => set({ salesStage: e.target.value })}>
-            <option value="">Not set</option>
-            {SALES_STAGES.map((stage) => (
-              <option key={stage} value={stage}>
-                {stage}
-              </option>
-            ))}
-          </select>
+          <Dropdown
+            id="ed-stage"
+            variant="field"
+            value={f.salesStage}
+            options={[{ value: "", label: "Not set" }, ...SALES_STAGES.map((stage) => ({ value: stage, label: stage }))]}
+            onChange={(v) => set({ salesStage: v })}
+          />
         </div>
         <div className="fg">
           <label htmlFor="ed-seats" className="lbl">
@@ -241,14 +235,27 @@ export function EditRegistrationDrawer({
           <label htmlFor="ed-close" className="lbl">
             Expected close
           </label>
-          <input id="ed-close" type="date" min={today} value={f.close} onChange={(e) => set({ close: e.target.value })} {...bad("expectedClose")} />
+          <DatePicker
+            id="ed-close"
+            min={today}
+            value={f.close}
+            onChange={(v) => set({ close: v })}
+            invalid={Boolean(errors.expectedClose)}
+            ariaDescribedBy={errors.expectedClose ? "ed-expectedClose-err" : undefined}
+          />
           {err("expectedClose")}
         </div>
         <div className="fg">
           <label htmlFor="ed-decision" className="lbl">
             Decision date
           </label>
-          <input id="ed-decision" type="date" value={f.decisionDate} onChange={(e) => set({ decisionDate: e.target.value })} {...bad("decisionDate")} />
+          <DatePicker
+            id="ed-decision"
+            value={f.decisionDate}
+            onChange={(v) => set({ decisionDate: v })}
+            invalid={Boolean(errors.decisionDate)}
+            ariaDescribedBy={errors.decisionDate ? "ed-decisionDate-err" : undefined}
+          />
           {err("decisionDate")}
         </div>
       </div>

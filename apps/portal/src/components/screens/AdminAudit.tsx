@@ -7,6 +7,7 @@ import { Icon } from '@/components/icon';
 import { AuditDrawer } from '@/components/people/AuditDrawer';
 import { downloadCsv } from '@/components/reports/download-csv';
 import { Dropdown, type DropdownOption } from '@/components/ui/dropdown';
+import { DatePicker } from '@/components/ui/date-picker';
 import { useToast } from '@/components/ui/toast';
 import { auditToCsv } from '@/lib/audit-csv';
 import {
@@ -178,26 +179,11 @@ export function AdminAudit({ page, view, partners, today, healthSlot }: AdminAud
                 <label className="sr" htmlFor="afrom">
                   From
                 </label>
-                <input
-                  id="afrom"
-                  className="finput"
-                  type="date"
-                  value={from}
-                  max={to || today}
-                  onChange={(e) => setFrom(e.target.value)}
-                />
+                <DatePicker id="afrom" variant="fsel" placeholder="From" value={from} max={to || today} onChange={setFrom} />
                 <label className="sr" htmlFor="ato">
                   To
                 </label>
-                <input
-                  id="ato"
-                  className="finput"
-                  type="date"
-                  value={to}
-                  min={from}
-                  max={today}
-                  onChange={(e) => setTo(e.target.value)}
-                />
+                <DatePicker id="ato" variant="fsel" placeholder="To" value={to} min={from || undefined} max={today} onChange={setTo} />
                 <button
                   type="button"
                   className="btn btn-s"
