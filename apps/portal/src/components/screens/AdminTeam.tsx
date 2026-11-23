@@ -7,15 +7,22 @@ import { RowAction } from "@/components/people/RowAction";
 import { StaffInviteDrawer } from "@/components/people/StaffInviteDrawer";
 import { Badge } from "@/components/ui/badge";
 import { Dropdown, type DropdownOption } from "@/components/ui/dropdown";
+import { ConfirmDialog } from "@/components/ui/overlay";
 import { useToast } from "@/components/ui/toast";
-import { isOneOf, STAFF_REGION_LABEL, STAFF_ROLE_LABEL, STAFF_ROLES, type StaffRole } from "@/lib/domain";
+import { isOneOf, STAFF_REGIONS, STAFF_REGION_LABEL, STAFF_ROLE_LABEL, STAFF_ROLES, type StaffRegion, type StaffRole } from "@/lib/domain";
 import type { StaffMemberDto } from "@/lib/dto";
 import { initialsOf, lastSeenLabel, rowKey } from "@/lib/people";
 import { ROUTES } from "@/lib/routes";
 import type { ActionResult } from "@/server/actions/result";
-import { changeStaffRoleAction, removeStaffAction } from "@/server/actions/staff";
+import {
+  changeStaffRegionAction,
+  changeStaffRoleAction,
+  removeStaffAction,
+  resendStaffInviteAction,
+} from "@/server/actions/staff";
 import { ScrollRegion } from "@/components/ui/scroll-region";
 
+const REGION_OPTIONS: readonly DropdownOption[] = STAFF_REGIONS.map((value) => ({ value, label: STAFF_REGION_LABEL[value] }));
 const ROLE_OPTIONS: readonly DropdownOption[] = STAFF_ROLES.map((value) => ({ value, label: STAFF_ROLE_LABEL[value] }));
 
 // [action, partner manager, sales, marketing]
@@ -38,7 +45,6 @@ export function AdminTeam({ people, today }: { people: StaffMemberDto[]; today: 
   const toast = useToast();
   const [confirming, setConfirming] = useState<string | null>(null);
   const [inviteOpen, setInviteOpen] = useState(false);
-  const [warnFor, setWarnFor] = useState<string | null>(null);
   const closeInvite = useCallback((): void => setInviteOpen(false), []);
 
   const report = async (pending: Promise<ActionResult<unknown>>): Promise<boolean> => {
@@ -47,9 +53,21 @@ export function AdminTeam({ people, today }: { people: StaffMemberDto[]; today: 
     return result.ok;
   };
 
+  const [pendingRole, setPendingRole] = useState<{ person: StaffMemberDto; role: StaffRole } | null>(null);
+
+  const changeRegion = async (person: StaffMemberDto, region: StaffRegion): Promise<void> => {
+    if (await report(changeStaffRegionAction({ userId: person.id, region }))) {
+      toast(`${person.name} now covers ${STAFF_REGION_LABEL[region]}`);
+    }
+  };
+
+  const resend = async (person: StaffMemberDto): Promise<void> => {
+    if (!person.inviteId) return;
+    if (await report(resendStaffInviteAction({ inviteId: person.inviteId }))) toast(`Invite resent to ${person.email}`);
+  };
+
   const changeRole = async (person: StaffMemberDto, role: StaffRole): Promise<void> => {
     if (!(await report(changeStaffRoleAction({ userId: person.id, role })))) return;
-    setWarnFor(person.partners.length > 0 && role !== "partner_manager" ? person.id : null);
     toast(roleToast(person.name, role));
   };
 
@@ -61,7 +79,8 @@ export function AdminTeam({ people, today }: { people: StaffMemberDto[]; today: 
   const lastActive = (p: StaffMemberDto): string =>
     p.isYou ? "Now" : p.status === "invited" ? "Invite pending" : lastSeenLabel(p.lastActiveAt, today);
 
-  const warned = people.find((p) => p.id === warnFor && p.role !== "partner_manager");
+  // Derived from the data so it survives a refresh: anyone no longer a partner manager who still has partners.
+  const warned = people.find((p) => p.role !== "partner_manager" && p.partners.length > 0);
 
   return (
     <div className="wrap">
@@ -145,12 +164,27 @@ export function AdminTeam({ people, today }: { people: StaffMemberDto[]; today: 
                         value={p.role}
                         options={ROLE_OPTIONS}
                         onChange={(v) => {
-                          if (isOneOf(STAFF_ROLES, v) && v !== p.role) void changeRole(p, v);
+                          if (isOneOf(STAFF_ROLES, v) && v !== p.role) setPendingRole({ person: p, role: v });
                         }}
                       />
                     )}
                   </td>
-                  <td className="t-sec hide-sm">{STAFF_REGION_LABEL[p.region]}</td>
+                  <td className="t-sec hide-sm">
+                    {p.isYou || p.status === "invited" ? (
+                      STAFF_REGION_LABEL[p.region]
+                    ) : (
+                      <Dropdown
+                        variant="rsel"
+                        id={`tregion-${rowKey(p.email)}`}
+                        ariaLabel={`Region for ${p.name}`}
+                        value={p.region}
+                        options={REGION_OPTIONS}
+                        onChange={(v) => {
+                          if (isOneOf(STAFF_REGIONS, v) && v !== p.region) void changeRegion(p, v);
+                        }}
+                      />
+                    )}
+                  </td>
                   <td className="t-sec hide-sm" title={p.partners.join(", ")}>
                     {p.partners.length ? `${p.partners.length} partners` : "None"}
                   </td>
@@ -182,13 +216,23 @@ export function AdminTeam({ people, today }: { people: StaffMemberDto[]; today: 
                         </button>
                       </span>
                     ) : (
-                      <RowAction
-                        label={`Remove access for ${p.name}`}
-                        tip="Remove access"
-                        icon="trash"
-                        tone="no"
-                        onClick={() => setConfirming(p.id)}
-                      />
+                      <span className="acts">
+                        {p.status === "invited" ? (
+                          <RowAction
+                            label={`Resend invite to ${p.name}`}
+                            tip="Resend invite"
+                            icon="send"
+                            onClick={() => void resend(p)}
+                          />
+                        ) : null}
+                        <RowAction
+                          label={`Remove access for ${p.name}`}
+                          tip="Remove access"
+                          icon="trash"
+                          tone="no"
+                          onClick={() => setConfirming(p.id)}
+                        />
+                      </span>
                     )}
                   </td>
                 </tr>
@@ -242,6 +286,15 @@ export function AdminTeam({ people, today }: { people: StaffMemberDto[]; today: 
           </tbody>
         </table>
       </section>
+
+      <ConfirmDialog
+        open={pendingRole !== null}
+        onClose={() => setPendingRole(null)}
+        onConfirm={() => pendingRole && void changeRole(pendingRole.person, pendingRole.role)}
+        title={pendingRole ? `Change ${pendingRole.person.name} to ${STAFF_ROLE_LABEL[pendingRole.role].toLowerCase()}?` : ""}
+        body="Their access to deals, partners and documents changes straight away."
+        confirmLabel="Change role"
+      />
 
       <StaffInviteDrawer open={inviteOpen} onClose={closeInvite} existingEmails={people.map((p) => p.email)} />
     </div>

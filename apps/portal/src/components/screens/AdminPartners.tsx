@@ -9,7 +9,7 @@ import { downloadCsv } from "@/components/partners/csv";
 import { PartnerDetail } from "@/components/partners/partner-detail";
 import { CategoryDialog, ManagerDialog } from "@/components/partners/partner-dialogs";
 import { type PartnerTab as Tab, partnerTabs } from "@/components/partners/partner-tabs";
-import { CATEGORY_FOR_FILTER, type CategoryFilter, PartnersTable } from "@/components/partners/partners-table";
+import { CATEGORY_FOR_FILTER, type CategoryFilter, type PartnerSort, PartnersTable } from "@/components/partners/partners-table";
 import { useToast } from "@/components/ui/toast";
 import { daysBetween, plural } from "@/lib/dates";
 import { PARTNER_CATEGORY_LABEL, PARTNER_REGION_LABEL, PARTNER_STATUS_LABEL } from "@/lib/domain";
@@ -70,18 +70,28 @@ export function AdminPartners({
   const [category, setCategory] = useState<CategoryFilter>("All");
   const [region, setRegion] = useState("All regions");
   const [status, setStatus] = useState("Any status");
+  const [query, setQuery] = useState("");
+  const [sort, setSort] = useState<PartnerSort>("name");
   const [dialog, setDialog] = useState<"add" | "category" | "manager" | null>(null);
   const [focusId, setFocusId] = useState<string | null>(null);
 
   const wantedCategory = CATEGORY_FOR_FILTER[category];
   const wantedRegion = region === "All regions" ? null : codeFromLabel(PARTNER_REGION_LABEL, region);
   const wantedStatus = status === "Any status" ? null : codeFromLabel(PARTNER_STATUS_LABEL, status);
-  const shown = partners.filter(
+  const needle = query.trim().toLowerCase();
+  const matching = partners.filter(
     (p) =>
+      (!needle || p.name.toLowerCase().includes(needle) || p.domain.toLowerCase().includes(needle)) &&
       (!wantedCategory || p.category === wantedCategory) &&
       (!wantedRegion || p.region === wantedRegion) &&
       (!wantedStatus || p.status === wantedStatus),
   );
+  const shown = [...matching].sort((a, b) => {
+    if (sort === "active") return (b.lastActiveAt ?? "").localeCompare(a.lastActiveAt ?? "");
+    if (sort === "pending") return b.pending - a.pending || a.name.localeCompare(b.name);
+    if (sort === "won") return b.won - a.won || a.name.localeCompare(b.name);
+    return a.name.localeCompare(b.name);
+  });
 
   // Picking a partner loads its detail below the list: bring it into view and hand it focus once it has rendered.
   useEffect(() => {
@@ -108,6 +118,15 @@ export function AdminPartners({
     (max, a) => Math.max(max, daysBetween(a.submittedAt.slice(0, 10), today)),
     0,
   );
+
+  const filterApplications = (next: { astatus?: string; aq?: string }): void => {
+    const params = new URLSearchParams(searchParams.toString());
+    for (const [key, value] of Object.entries(next)) {
+      if (value) params.set(key, value);
+      else params.delete(key);
+    }
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  };
 
   const select = (id: string): void => {
     setFocusId(id);
@@ -161,6 +180,7 @@ export function AdminPartners({
     setCategory("All");
     setRegion("All regions");
     setStatus("Any status");
+    setQuery("");
     select(result.data.id);
     toast(input.sendInvite ? `Invite sent to ${input.adminEmail.trim()}` : `${result.data.name} added, invite not sent yet`);
     return null;
@@ -244,6 +264,10 @@ export function AdminPartners({
               category={category}
               region={region}
               status={status}
+              query={query}
+              sort={sort}
+              onQuery={setQuery}
+              onSort={setSort}
               onCategory={setCategory}
               onRegion={setRegion}
               onStatus={setStatus}
@@ -252,6 +276,9 @@ export function AdminPartners({
           ) : (
             <ApplicationsTable
               applications={applications}
+              status={searchParams.get("astatus") ?? ""}
+              query={searchParams.get("aq") ?? ""}
+              onFilter={filterApplications}
               waiting={waiting}
               canDecide={canDecide}
               onApprove={(a, choice) =>

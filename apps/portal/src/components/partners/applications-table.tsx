@@ -1,6 +1,7 @@
 "use client";
 
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
+import { Dropdown } from "@/components/ui/dropdown";
 import { Badge } from "@/components/ui/badge";
 import { fmtLong } from "@/lib/dates";
 import {
@@ -21,9 +22,20 @@ const DEFAULT_REASON = "We already have a partner covering this region and segme
 const CATEGORY_OPTIONS: readonly string[] = PARTNER_CATEGORIES.map((c) => PARTNER_CATEGORY_LABEL[c]);
 const REGION_OPTIONS: readonly string[] = PARTNER_REGIONS.map((r) => PARTNER_REGION_LABEL[r]);
 
+const STATUS_OPTIONS = [
+  { value: "all", label: "Any status" },
+  { value: "new", label: "Waiting" },
+  { value: "approved", label: "Approved" },
+  { value: "declined", label: "Rejected" },
+];
+
 interface ApplicationsTableProps {
   applications: readonly ApplicationDto[];
   waiting: number;
+  /** Current filters, read from the URL by the page so the server does the matching. */
+  status: string;
+  query: string;
+  onFilter: (next: { astatus?: string; aq?: string }) => void;
   /** Only partner managers decide; other staff see the queue read-only. */
   canDecide: boolean;
   onApprove: (application: ApplicationDto, choice: { category: PartnerCategory; region: PartnerRegion }) => void;
@@ -34,6 +46,9 @@ interface ApplicationsTableProps {
 export function ApplicationsTable({
   applications,
   waiting,
+  status,
+  query,
+  onFilter,
   canDecide,
   onApprove,
   onDecline,
@@ -45,6 +60,14 @@ export function ApplicationsTable({
   const [reasonTried, setReasonTried] = useState(false);
   const [categoryLabel, setCategoryLabel] = useState<string>(PARTNER_CATEGORY_LABEL.channel);
   const [regionLabel, setRegionLabel] = useState<string>(PARTNER_REGION_LABEL.india);
+
+  const [text, setText] = useState(query);
+  // Wait for a pause in typing before asking the server to filter.
+  useEffect(() => {
+    if (text.trim() === query.trim()) return;
+    const timer = setTimeout(() => onFilter({ aq: text.trim() }), 300);
+    return () => clearTimeout(timer);
+  }, [text, query, onFilter]);
 
   const startReject = (id: string): void => {
     setApprovingId(null);
@@ -85,9 +108,25 @@ export function ApplicationsTable({
   return (
     <>
       <div className="toolbar">
-        <span className="card-meta">
-          From the Become a Partner form on cleanstart.com/partners and from /apply. New submissions first.
-        </span>
+        <div className="filters">
+          <label className="sr" htmlFor="application-q">
+            Search applications
+          </label>
+          <input
+            id="application-q"
+            className="finput"
+            type="search"
+            placeholder="Company, domain or applicant"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+          />
+          <Dropdown
+            ariaLabel="Application status"
+            value={status || "all"}
+            options={STATUS_OPTIONS}
+            onChange={(v) => onFilter({ astatus: v === "all" ? "" : v })}
+          />
+        </div>
         <span className="card-meta tnum">{waiting} waiting</span>
       </div>
       <ScrollRegion label="Applications">
@@ -291,7 +330,7 @@ export function ApplicationsTable({
             })}
           </tbody>
         </table>
-        {applications.length === 0 ? <div className="empty">No applications yet.</div> : null}
+        {applications.length === 0 ? <div className="empty">{status || query ? "No applications match these filters." : "No applications yet."}</div> : null}
       </ScrollRegion>
       <div style={{ padding: "10px 12px", borderTop: "1px solid #F0EFF4" }}>
         <span className="hint">

@@ -7,6 +7,7 @@ import { InviteCard } from "@/components/people/InviteCard";
 import { RowAction } from "@/components/people/RowAction";
 import { Badge, type BadgeTone } from "@/components/ui/badge";
 import { Dropdown, type DropdownOption } from "@/components/ui/dropdown";
+import { ConfirmDialog } from "@/components/ui/overlay";
 import { useToast } from "@/components/ui/toast";
 import { isOneOf, PARTNER_ROLE_LABEL, PARTNER_ROLES, type PartnerRole } from "@/lib/domain";
 import type { TeamDto, TeamMemberDto } from "@/lib/dto";
@@ -52,8 +53,19 @@ export function Team({ team, today }: { team: TeamDto; today: string }): React.J
     else if (success) toast(success);
   };
 
-  const changeRole = (member: TeamMemberDto, role: PartnerRole): void =>
-    void report(changeMemberRoleAction({ userId: member.id, role }));
+  const [pendingRole, setPendingRole] = useState<{ member: TeamMemberDto; role: PartnerRole } | null>(null);
+
+  const applyRole = (member: TeamMemberDto, role: PartnerRole): void =>
+    void report(
+      changeMemberRoleAction({ userId: member.id, role }),
+      `${member.name} is now ${PARTNER_ROLE_LABEL[role].toLowerCase()}`,
+    );
+
+  // Gaining or losing partner admin changes who can invite and remove people, so it is confirmed first.
+  const changeRole = (member: TeamMemberDto, role: PartnerRole): void => {
+    if (role === "partner_admin" || member.role === "partner_admin") setPendingRole({ member, role });
+    else applyRole(member, role);
+  };
 
   // Someone who only has an invite has no account to remove: removing them withdraws the invite.
   const isInviteOnly = (member: TeamMemberDto): boolean => member.inviteId !== null && member.inviteId === member.id;
@@ -259,6 +271,19 @@ export function Team({ team, today }: { team: TeamDto; today: string }): React.J
           </section>
         </aside>
       </div>
+
+      <ConfirmDialog
+        open={pendingRole !== null}
+        onClose={() => setPendingRole(null)}
+        onConfirm={() => pendingRole && applyRole(pendingRole.member, pendingRole.role)}
+        title={pendingRole ? `Make ${pendingRole.member.name} ${PARTNER_ROLE_LABEL[pendingRole.role].toLowerCase()}?` : ""}
+        body={
+          pendingRole?.role === "partner_admin"
+            ? "Partner admins can invite and remove people and edit the company profile."
+            : "They will no longer be able to invite or remove people or edit the company profile."
+        }
+        confirmLabel="Change role"
+      />
     </div>
   );
 }
