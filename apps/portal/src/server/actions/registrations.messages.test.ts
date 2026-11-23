@@ -69,7 +69,7 @@ describe('postMessageAction', () => {
     const result = await postMessageAction({ registrationId: reg.id, body: 'Can we get a reference call?' });
     expect(result.ok).toBe(true);
     const rows = await db.select().from(notifications).where(eq(notifications.userId, manager.id));
-    expect(rows[0]).toMatchObject({ kind: 'registration_message', link: '/admin/approvals' });
+    expect(rows[0]).toMatchObject({ kind: 'registration_message', link: `/admin/approvals/${reg.id}` });
     expect(mail.transport!.to(manager.email)).toHaveLength(1);
   });
 

@@ -149,6 +149,18 @@ export async function changeMemberRoleAction(raw: unknown): Promise<ActionResult
           partnerId: team.partnerId,
           subject: { type: before.inviteId === before.id ? 'invite' : 'user', id: after.id },
         });
+        // An invited person has no account yet, so there is nobody to tell.
+        if (before.inviteId !== before.id && after.id !== ctx.viewer.id) {
+          await notifyUsers(tx, [
+            {
+              userId: after.id,
+              kind: 'role_changed',
+              title: `Your role is now ${PARTNER_ROLE_LABEL[after.role]}`,
+              body: `Changed by ${ctx.viewer.name} at ${team.partnerName}`,
+              link: ROUTES.partner.account,
+            },
+          ]);
+        }
       }
       return after;
     });

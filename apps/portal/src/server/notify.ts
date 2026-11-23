@@ -31,7 +31,7 @@ export const NOTIFICATION_PREF_DEFAULTS: Record<NotificationCategory, boolean> =
   decision: true,
   stage: true,
   expiry: true,
-  docs: false,
+  docs: true,
   team: true,
 };
 

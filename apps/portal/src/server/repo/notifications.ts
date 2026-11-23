@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { and, desc, eq, isNull, sql } from 'drizzle-orm';
 import { notifications } from '@/db/schema';
 import { type Clock, fixedClock } from '@/lib/clock';
-import type { NotificationDto, NotificationsDto } from '@/lib/dto';
+import type { NotificationDto, NotificationsDto, NotificationsPageDto } from '@/lib/dto';
 import type { Viewer } from '@/server/auth/types';
 import { NotFoundError } from '@/server/errors';
 import { assertUuid } from '@/server/registrations/scope';
@@ -38,6 +38,33 @@ export async function listNotifications(tx: Tx, viewer: Viewer, input: { limit?:
   return { items: rows.map(toDto), unread: unread?.n ?? 0 };
 }
 
+export const NOTIFICATIONS_PAGE_SIZE = 25;
+
+/** One page of the viewer's own notifications for the full list, newest first. `unreadOnly` narrows it. */
+export async function listNotificationsPage(
+  tx: Tx,
+  viewer: Viewer,
+  input: { page: number; unreadOnly: boolean },
+): Promise<NotificationsPageDto> {
+  const page = Math.max(Math.floor(input.page), 1);
+  const where = input.unreadOnly
+    ? and(eq(notifications.userId, viewer.id), isNull(notifications.readAt))
+    : eq(notifications.userId, viewer.id);
+  const rows = await tx
+    .select()
+    .from(notifications)
+    .where(where)
+    .orderBy(desc(notifications.createdAt), desc(notifications.id))
+    .limit(NOTIFICATIONS_PAGE_SIZE)
+    .offset((page - 1) * NOTIFICATIONS_PAGE_SIZE);
+  const [total] = await tx.select({ n: sql<number>`count(*)::int` }).from(notifications).where(where);
+  const [unread] = await tx
+    .select({ n: sql<number>`count(*)::int` })
+    .from(notifications)
+    .where(and(eq(notifications.userId, viewer.id), isNull(notifications.readAt)));
+  return { items: rows.map(toDto), unread: unread?.n ?? 0, total: total?.n ?? 0, page, pageSize: NOTIFICATIONS_PAGE_SIZE };
+}
+
 export async function markAllRead(tx: Tx, viewer: Viewer, clock: Clock): Promise<void> {
   await tx
     .update(notifications)
@@ -66,13 +93,21 @@ const foreignNotification = async (tx: Tx, viewerId: string, ctx: IsolationConte
   return id;
 };
 
-export const isolation = defineIsolation<'listNotifications' | 'markAllRead' | 'markRead'>({
+export const isolation = defineIsolation<'listNotifications' | 'listNotificationsPage' | 'markAllRead' | 'markRead'>({
   listNotifications: {
     scope: 'own-user',
     expect: 'empty',
     probe: async (tx, viewer, ctx) => {
       await foreignNotification(tx, viewer.id, ctx);
       return (await listNotifications(tx, viewer, {})).items.filter((item) => item.title === 'isolation probe');
+    },
+  },
+  listNotificationsPage: {
+    scope: 'own-user',
+    expect: 'empty',
+    probe: async (tx, viewer, ctx) => {
+      await foreignNotification(tx, viewer.id, ctx);
+      return (await listNotificationsPage(tx, viewer, { page: 1, unreadOnly: false })).items.filter((item) => item.title === 'isolation probe');
     },
   },
   markAllRead: {

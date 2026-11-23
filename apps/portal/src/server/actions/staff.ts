@@ -10,6 +10,7 @@ import { revokeAllSessions } from '@/server/auth/sessions';
 import { sendEmail } from '@/server/email/send';
 import { buildTeamInvite } from '@/server/email/templates';
 import { NotFoundError } from '@/server/errors';
+import { notifyUsers } from '@/server/notify';
 import { withViewer } from '@/server/repo/context';
 import { createInvite, resendInvite } from '@/server/repo/invites';
 import { changeStaffRegion, changeStaffRole, listStaff, removeStaff } from '@/server/repo/staff';
@@ -96,6 +97,17 @@ export async function changeStaffRoleAction(raw: unknown): Promise<ActionResult<
           note: `${STAFF_ROLE_LABEL[before.role]} to ${STAFF_ROLE_LABEL[after.role]}.`,
           subject: { type: 'user', id: after.id },
         });
+        if (after.id !== ctx.viewer.id) {
+          await notifyUsers(tx, [
+            {
+              userId: after.id,
+              kind: 'role_changed',
+              title: `Your role is now ${STAFF_ROLE_LABEL[after.role]}`,
+              body: `Changed by ${ctx.viewer.name}`,
+              link: ROUTES.admin.account,
+            },
+          ]);
+        }
       }
       return after;
     });

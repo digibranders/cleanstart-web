@@ -1,4 +1,6 @@
+import { eq } from 'drizzle-orm';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { partners, users } from '@/db/schema';
 import { makePartner, makeUser, resetDb, testDb } from '@/db/test-helpers';
 import { PATH_HEADER } from '@/lib/next-path';
 import { UnauthenticatedError } from '@/server/errors';
@@ -106,6 +108,23 @@ describe('guards', () => {
       [PATH_HEADER]: '/admin/audit',
     });
     expect(await redirectOf(requireViewer)).toBe('/sign-in?next=%2Fadmin%2Faudit');
+  });
+
+  it('tells a signed in user whose company was suspended that the account is paused', async () => {
+    const partner = await makePartner(testDb(), {});
+    const user = await makeUser(testDb(), { partnerId: partner.id, password: PASSWORD });
+    await signInAs(user.email, '/partner/deals');
+    await testDb().update(partners).set({ status: 'suspended' }).where(eq(partners.id, partner.id));
+    expect(await redirectOf(requireViewer)).toBe('/sign-in?next=%2Fpartner%2Fdeals&reason=paused');
+  });
+
+  it('tells a disabled user the same, and never hints at a missing account', async () => {
+    const user = await makeUser(testDb(), { password: PASSWORD });
+    await signInAs(user.email);
+    await testDb().update(users).set({ status: 'disabled' }).where(eq(users.id, user.id));
+    expect(await redirectOf(requireViewer)).toBe('/sign-in?reason=paused');
+    mocks.requestHeaders = new Headers();
+    expect(await redirectOf(requireViewer)).toBe('/sign-in');
   });
 
   it('sends a partner who opens /admin to /partner/overview, and a technical user to Documents', async () => {

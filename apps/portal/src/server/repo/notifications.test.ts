@@ -5,7 +5,7 @@ import { asPartner, resetDb, testDb } from '@/db/test-helpers';
 import { fixedClock } from '@/lib/clock';
 import { NotFoundError } from '@/server/errors';
 import { withViewer } from './context';
-import { listNotifications, markAllRead, markRead } from './notifications';
+import { listNotifications, listNotificationsPage, markAllRead, markRead } from './notifications';
 
 const db = testDb();
 const clock = fixedClock('2026-11-06T14:02:00Z');
@@ -28,6 +28,26 @@ describe('listNotifications', () => {
     expect(out.items.map((i) => i.title)).toEqual(['newest', 'middle']);
     expect(out.unread).toBe(2);
     expect(out.items[0]).toMatchObject({ kind: 'registration_message', link: '/partner/deals', readAt: null, body: null });
+  });
+});
+
+describe('listNotificationsPage', () => {
+  it('pages 25 at a time, newest first, and narrows to unread', async () => {
+    const me = await asPartner(db, { role: 'partner_admin' });
+    const colleague = await asPartner(db, { partnerId: me.partnerId, role: 'sales' });
+    for (let i = 1; i <= 30; i += 1) {
+      await add(me.id, `n${String(i).padStart(2, '0')}`, `2026-10-${String(i).padStart(2, '0')}T10:00:00Z`, i <= 20 ? '2026-11-01T10:00:00Z' : null);
+    }
+    await add(colleague.id, 'not mine', '2026-11-04T10:00:00Z');
+    const first = await withViewer(me, (tx) => listNotificationsPage(tx, me, { page: 1, unreadOnly: false }));
+    expect(first).toMatchObject({ total: 30, unread: 10, page: 1, pageSize: 25 });
+    expect(first.items).toHaveLength(25);
+    expect(first.items[0]?.title).toBe('n30');
+    const second = await withViewer(me, (tx) => listNotificationsPage(tx, me, { page: 2, unreadOnly: false }));
+    expect(second.items.map((i) => i.title)).toEqual(['n05', 'n04', 'n03', 'n02', 'n01']);
+    const unread = await withViewer(me, (tx) => listNotificationsPage(tx, me, { page: 1, unreadOnly: true }));
+    expect(unread.total).toBe(10);
+    expect(unread.items.every((i) => i.readAt === null)).toBe(true);
   });
 });
 

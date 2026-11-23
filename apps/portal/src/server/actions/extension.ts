@@ -5,6 +5,7 @@ import { fmtLong } from '@/lib/dates';
 import { PRODUCT_LABEL } from '@/lib/domain';
 import type { RegistrationDetailDto } from '@/lib/dto';
 import { ROUTES } from '@/lib/routes';
+import { staffDealHref } from '@/lib/staff-deals-dto';
 import { recordAudit } from '@/server/audit/record';
 import { assertCan } from '@/server/auth/policies';
 import { sendEmail } from '@/server/email/send';
@@ -58,7 +59,7 @@ export async function requestExtensionAction(raw: unknown): Promise<ActionResult
               kind: 'extension_requested',
               title: `${result.partnerName} asked for more time on ${reg.customer}`,
               body: input.reason,
-              link: ROUTES.admin.approvals,
+              link: staffDealHref(reg.id),
             },
           ]
         : [];

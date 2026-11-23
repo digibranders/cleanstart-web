@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useState } from "react";
 import { MessageDrawer } from "@/components/partners/message-drawer";
 import { fmtShort } from "@/lib/dates";
-import type { ChecklistDto, CompanyDto } from "@/lib/dto";
+import { DOCUMENT_TYPE_LABEL } from "@/lib/domain";
+import type { ChecklistDto, CompanyDto, DocumentListItemDto } from "@/lib/dto";
 import { formatAgreement } from "@/lib/people";
 import { ROUTES } from "@/lib/routes";
 import { tickChecklistStepAction } from "@/server/actions/partners";
@@ -74,12 +75,6 @@ const buildSteps = (company: CompanyDto): readonly Step[] => [
   },
 ];
 
-const STARTERS: { title: string; meta: string; icon: IconName }[] = [
-  { title: "Partner sales playbook 2026", meta: "Enablement guide, PDF", icon: "docs" },
-  { title: "CleanSight product walkthrough", meta: "Video, 14 min", icon: "play" },
-  { title: "Competitive battlecard", meta: "Battlecard, PDF", icon: "file" },
-];
-
 // The row's `.li .btn` rule shrinks buttons to 18px, so the standard size is set here.
 const ACTION_STYLE = { marginLeft: "auto", height: 30, padding: "0 10px", fontSize: 13 } as const;
 
@@ -88,15 +83,17 @@ interface PartnerWelcomeProps {
   company: CompanyDto;
   checklist: ChecklistDto;
   viewerEmail: string;
+  /** The newest documents this partner can open. Empty until CleanStart publishes some. */
+  starters: DocumentListItemDto[];
 }
 
-export function PartnerWelcome({ firstName, company, checklist, viewerEmail }: PartnerWelcomeProps): React.JSX.Element {
+export function PartnerWelcome({ firstName, company, checklist, viewerEmail, starters }: PartnerWelcomeProps): React.JSX.Element {
   const STEPS = buildSteps(company);
   const done: Record<string, boolean> = Object.fromEntries(checklist.steps.map((s) => [s.step, s.done]));
   const [messaging, setMessaging] = useState(false);
   const doneCount = STEPS.filter((s) => done[s.key]).length;
   const percent = checklist.percent;
-  const tick = (step: "kickoff" | "playbook"): void => void tickChecklistStepAction({ step });
+  const tick = (step: "kickoff"): void => void tickChecklistStepAction({ step });
 
   return (
     <div className="wrap">
@@ -156,12 +153,7 @@ export function PartnerWelcome({ firstName, company, checklist, viewerEmail }: P
                 </span>
               </span>
               {!isDone && step.target && step.target !== "message" ? (
-                <Link
-                  href={step.target}
-                  className="btn btn-s"
-                  style={ACTION_STYLE}
-                  {...(step.key === "playbook" ? { onClick: () => tick("playbook") } : {})}
-                >
+                <Link href={step.target} className="btn btn-s" style={ACTION_STYLE}>
                   {step.action}
                 </Link>
               ) : null}
@@ -247,17 +239,32 @@ export function PartnerWelcome({ firstName, company, checklist, viewerEmail }: P
               All documents
             </Link>
           </div>
-          {STARTERS.map((d) => (
-            <Link href={ROUTES.partner.documents} className="li" key={d.title}>
+          {starters.length === 0 ? (
+            <Link href={ROUTES.partner.documents} className="li">
               <span className="li-ic">
-                <Icon name={d.icon} />
+                <Icon name="docs" />
               </span>
               <span className="li-t">
-                <span className="li-n">{d.title}</span>
-                <span className="li-s">{d.meta}</span>
+                <span className="li-n">Open the document library</span>
+                <span className="li-s">Datasheets, videos and playbooks for your products.</span>
               </span>
             </Link>
-          ))}
+          ) : (
+            starters.map((d) => (
+              <Link href={`${ROUTES.partner.documents}?doc=${d.id}`} className="li" key={d.id}>
+                <span className="li-ic">
+                  <Icon name={d.type === "video" ? "play" : "file"} />
+                </span>
+                <span className="li-t">
+                  <span className="li-n">{d.title}</span>
+                  <span className="li-s">
+                    {DOCUMENT_TYPE_LABEL[d.type]}
+                    {d.durationMinutes ? `, ${d.durationMinutes} min` : ""}
+                  </span>
+                </span>
+              </Link>
+            ))
+          )}
         </section>
       </div>
 

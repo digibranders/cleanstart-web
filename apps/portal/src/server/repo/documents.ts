@@ -18,6 +18,7 @@ import {
   documentOpens,
   documentVersions,
   documents,
+  partnerChecklist,
   partners,
   users,
 } from '@/db/schema';
@@ -453,6 +454,15 @@ export async function recordDocumentOpen(tx: Tx, viewer: Viewer, input: { id: st
     partnerId: viewer.partnerId,
     openedAt: clock.now(),
   });
+  // Opening an enablement guide is what ticks "Read the partner sales playbook" on the welcome page.
+  if (viewer.role !== 'partner_admin') return;
+  const [doc] = await tx.select({ type: documents.type }).from(documents).where(eq(documents.id, input.id)).limit(1);
+  if (doc?.type === 'enablement_guide') {
+    await tx
+      .insert(partnerChecklist)
+      .values({ partnerId: viewer.partnerId, step: 'playbook', doneAt: clock.now(), doneBy: viewer.id })
+      .onConflictDoNothing();
+  }
 }
 
 /**

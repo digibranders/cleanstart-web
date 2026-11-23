@@ -15,6 +15,7 @@ import {
 } from '@/lib/domain';
 import type { SearchHitDto } from '@/lib/dto';
 import { ROUTES } from '@/lib/routes';
+import { staffDealHref } from '@/lib/staff-deals-dto';
 import { SEARCH_MIN_CHARS } from '@/lib/search-pages';
 import type { Viewer } from '@/server/auth/types';
 import type { Tx } from './context';
@@ -90,7 +91,7 @@ async function searchRegistrations(tx: Tx, viewer: Viewer, q: string, pattern: s
     const status = REGISTRATION_STATUS_LABEL[r.status].toLowerCase();
     return viewer.kind === 'partner'
       ? { group: 'registrations', label: r.customer, hint: `${PRODUCT_LABEL[r.product]}, ${status}`, href: ROUTES.partner.deal(r.id), icon: 'deals' }
-      : { group: 'registrations', label: r.customer, hint: `${r.partnerName}, ${status}`, href: ROUTES.admin.approvals, icon: 'approve' };
+      : { group: 'registrations', label: r.customer, hint: `${r.partnerName}, ${status}`, href: staffDealHref(r.id), icon: 'approve' };
   });
 }
 
@@ -98,7 +99,7 @@ async function searchPartners(tx: Tx, viewer: Viewer, q: string, pattern: string
   const scope = partnerScope(viewer);
   if (scope === 'none') return [];
   const rows = await tx
-    .select({ name: partners.name, category: partners.category, region: partners.region })
+    .select({ id: partners.id, name: partners.name, category: partners.category, region: partners.region })
     .from(partners)
     .where(and(matches(partners.name, q, pattern), scope))
     .orderBy(desc(rank(partners.name, q)), asc(partners.name))
@@ -107,7 +108,7 @@ async function searchPartners(tx: Tx, viewer: Viewer, q: string, pattern: string
     group: 'partners',
     label: p.name,
     hint: `${PARTNER_CATEGORY_LABEL[p.category]}, ${PARTNER_REGION_LABEL[p.region]}`,
-    href: ROUTES.admin.partners,
+    href: `${ROUTES.admin.partners}?selected=${p.id}`,
     icon: 'bld',
   }));
 }
@@ -115,7 +116,7 @@ async function searchPartners(tx: Tx, viewer: Viewer, q: string, pattern: string
 /** The audience rule (and soft delete, for partners) is enforced by the documents_select policy; see rls.sql. */
 async function searchDocuments(tx: Tx, viewer: Viewer, q: string, pattern: string, limit: number): Promise<SearchHitDto[]> {
   const rows = await tx
-    .select({ title: documents.title, type: documents.type })
+    .select({ id: documents.id, title: documents.title, type: documents.type })
     .from(documents)
     .where(and(isNull(documents.deletedAt), matches(documents.title, q, pattern)))
     .orderBy(desc(rank(documents.title, q)), asc(documents.title))
@@ -124,7 +125,7 @@ async function searchDocuments(tx: Tx, viewer: Viewer, q: string, pattern: strin
     group: 'documents',
     label: d.title,
     hint: DOCUMENT_TYPE_LABEL[d.type],
-    href: viewer.kind === 'partner' ? ROUTES.partner.documents : ROUTES.admin.documents,
+    href: `${viewer.kind === 'partner' ? ROUTES.partner.documents : ROUTES.admin.documents}?doc=${d.id}`,
     icon: d.type === 'video' ? 'play' : 'file',
   }));
 }

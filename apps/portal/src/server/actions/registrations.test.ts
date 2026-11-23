@@ -63,7 +63,7 @@ describe('registerDealsAction', () => {
     expect(audit[0]).toMatchObject({ kind: 'deal_decisions', who: 'partner', subjectType: 'registration' });
     const notes = await db.select().from(notifications).where(eq(notifications.userId, manager.id));
     expect(notes).toHaveLength(1);
-    expect(notes[0]).toMatchObject({ kind: 'registration_submitted', link: '/admin/approvals' });
+    expect(notes[0]).toMatchObject({ kind: 'registration_submitted', link: `/admin/approvals/${result.data[0]?.id}` });
     const mails = mail.transport!.to(manager.email);
     expect(mails).toHaveLength(1);
     expect(mails[0]?.htmlContent).toContain('Vardhan Capital');

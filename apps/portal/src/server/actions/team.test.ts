@@ -127,6 +127,7 @@ describe('changeMemberRoleAction', () => {
     const [entry] = await db.select().from(auditLog);
     expect(entry).toMatchObject({ event: 'team.role_changed', note: 'Sales to Technical.' });
     expect(entry?.target).toBe('Karan Malhotra, at Kestrel Systems');
+    expect((await db.select().from(notifications)).map((n) => [n.userId, n.kind, n.title])).toEqual([[member.id, 'role_changed', 'Your role is now Technical']]);
     expect(await changeMemberRoleAction({ userId: admin.id, role: 'sales' })).toMatchObject({ ok: false, error: { code: 'conflict', message: 'Every company needs at least one partner admin.' } });
   });
 

@@ -28,7 +28,7 @@ const NOTIFICATIONS: ReadonlyArray<readonly [NotificationCategory, string, strin
   ["stage", "Deal stage changes", "When a deal moves stage in CleanStart's CRM."],
   ["expiry", "Protection ending", "Reminders 14 days and 3 days before a deal's protection ends."],
   ["docs", "New documents", "When CleanStart adds material for your products."],
-  ["team", "Team changes", "When a colleague accepts an invite or is removed."],
+  ["team", "Team changes", "When a colleague accepts an invite, is removed or has a role change."],
 ];
 
 export function Account({ profile, sessions, today }: AccountProps): React.JSX.Element {
@@ -175,7 +175,7 @@ export function Account({ profile, sessions, today }: AccountProps): React.JSX.E
             </div>
           </form>
 
-          <PasswordCard passwordChangedAt={profile.passwordChangedAt} />
+          <PasswordCard passwordChangedAt={profile.passwordChangedAt} email={profile.email} />
           <TwoStepCard enabled={profile.twoFactorEnabled} />
           <SessionsCard sessions={sessions} today={today} />
         </div>

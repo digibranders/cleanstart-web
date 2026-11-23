@@ -19,6 +19,7 @@ export const ROUTES = {
     team: "/partner/team",
     company: "/partner/company",
     account: "/partner/account",
+    notifications: "/partner/notifications",
   },
   admin: {
     overview: "/admin/overview",
@@ -30,6 +31,7 @@ export const ROUTES = {
     team: "/admin/team",
     audit: "/admin/audit",
     account: "/admin/account",
+    notifications: "/admin/notifications",
   },
 } as const;
 

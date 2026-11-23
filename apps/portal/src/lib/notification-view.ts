@@ -18,6 +18,7 @@ const ICON: Record<NotificationKind, IconName> = {
   application_new: 'bld',
   team_joined: 'team',
   team_removed: 'team',
+  role_changed: 'team',
 };
 
 export const notificationIcon = (kind: NotificationKind): IconName => ICON[kind];
