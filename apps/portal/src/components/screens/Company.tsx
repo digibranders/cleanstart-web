@@ -292,6 +292,9 @@ export function Company({ company, canEdit, viewerEmail }: CompanyProps): React.
                 <span className="li-t">
                   <span className="li-n">{manager.name}</span>
                   <span className="li-s">CleanStart{teamName ? `, ${teamName}` : ""}</span>
+                  <a href={`mailto:${manager.email}`} className="li-s">
+                    {manager.email}
+                  </a>
                 </span>
                 <button
                   type="button"

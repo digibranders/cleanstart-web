@@ -26,7 +26,7 @@ interface AccountProps {
 const NOTIFICATIONS: ReadonlyArray<readonly [NotificationCategory, string, string]> = [
   ["decision", "Deal accepted or rejected", "When CleanStart decides on a deal you registered."],
   ["stage", "Deal stage changes", "When a deal moves stage in CleanStart's CRM."],
-  ["expiry", "Protection ending", "14 days before a deal's protection ends."],
+  ["expiry", "Protection ending", "Reminders 14 days and 3 days before a deal's protection ends."],
   ["docs", "New documents", "When CleanStart adds material for your products."],
   ["team", "Team changes", "When a colleague accepts an invite or is removed."],
 ];
@@ -63,6 +63,7 @@ export function Account({ profile, sessions, today }: AccountProps): React.JSX.E
     }
     setSaved({ name: result.data.name, title: result.data.title ?? "", phone: result.data.phone ?? "" });
     setDraft({});
+    toast("Profile saved");
   };
 
   // Saved as you change them: the switch flips at once and flips back with a message if the save fails.
@@ -163,8 +164,10 @@ export function Account({ profile, sessions, today }: AccountProps): React.JSX.E
               }}
             >
               <span className="hint">
-                Role: <b style={{ color: "#2A2838" }}>{roleLabel}</b>. Another partner admin can change it on
-                the Team page.
+                Role: <b style={{ color: "#2A2838" }}>{roleLabel}</b>.{" "}
+                {profile.role === "partner_admin"
+                  ? "A partner admin can change roles on the Team page; if you are the only admin, ask your partner manager."
+                  : "A partner admin can change it on the Team page."}
               </span>
               <button type="submit" className="btn btn-p" disabled={!dirty}>
                 Save profile
