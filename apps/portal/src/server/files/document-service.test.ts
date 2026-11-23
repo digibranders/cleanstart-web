@@ -82,7 +82,10 @@ describe('handleCreateDocument', () => {
     const optedIn = await makeUser(db, { partnerId: channel.id, email: 'in@kestrel.test', name: 'Opt In' });
     const optedOut = await makeUser(db, { partnerId: channel.id, email: 'out@kestrel.test' });
     await makeUser(db, { partnerId: distributor.id });
-    await db.insert(notificationPrefs).values({ userId: optedIn.id, category: 'docs', email: true });
+    await db.insert(notificationPrefs).values([
+      { userId: optedIn.id, category: 'docs', email: true },
+      { userId: optedOut.id, category: 'docs', email: false },
+    ]);
 
     const { storage, transport, deps } = setup();
     const t = makeActionCtx(staff, clock);
