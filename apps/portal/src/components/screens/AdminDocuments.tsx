@@ -3,10 +3,13 @@
 import { useCallback, useState } from 'react';
 import { Icon } from '@/components/icon';
 import { DocumentEditDrawer } from '@/components/documents/DocumentEditDrawer';
+import { DocumentPreview } from '@/components/documents/DocumentPreview';
 import { UploadDocumentForm } from '@/components/documents/UploadDocumentForm';
 import { CHIP_PRODUCT, TYPE_ICON, TYPE_TONE } from '@/components/documents/doc-style';
 import { adminUpdatedLabel, audienceTone } from '@/components/documents/doc-view';
+import { ActionMenu } from '@/components/ui/action-menu';
 import { Badge, ProductChip } from '@/components/ui/badge';
+import { useToast } from '@/components/ui/toast';
 import type { AudiencePartnerDto } from '@/lib/document-upload';
 import { plural } from '@/lib/dates';
 import { DOCUMENT_TYPE_LABEL } from '@/lib/domain';
@@ -25,11 +28,30 @@ export function AdminDocuments({
 }): React.JSX.Element {
   const [uploadOpen, setUploadOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [viewingId, setViewingId] = useState<string | null>(null);
+  const toast = useToast();
   const closeUpload = useCallback((): void => setUploadOpen(false), []);
   const closeEdit = useCallback((): void => setEditingId(null), []);
+  const closeView = useCallback((): void => setViewingId(null), []);
 
   const opensTotal = docs.reduce((n, d) => n + (d.opens ?? 0), 0);
   const editing = editingId ? (docs.find((d) => d.id === editingId) ?? null) : null;
+  const viewing = viewingId ? (docs.find((d) => d.id === viewingId) ?? null) : null;
+
+  // The file route checks the audience and redirects to a 60 second signed URL. Staff opens are not counted.
+  const download = (d: DocumentDto): void => {
+    const link = document.createElement('a');
+    link.href = `/api/files/${d.id}`;
+    link.download = '';
+    document.body.append(link);
+    link.click();
+    link.remove();
+    toast(`Downloading ${d.title}, ${formatLabel(d)}`);
+  };
+  const openDocument = (d: DocumentDto): void => {
+    if (d.type === 'video') setViewingId(d.id);
+    else window.open(`/api/files/${d.id}`, '_blank', 'noopener');
+  };
 
   return (
     <div className="wrap">
@@ -85,6 +107,9 @@ export function AdminDocuments({
                   <th scope="col" className="r hide-sm">
                     Opened by
                   </th>
+                  <th scope="col" className="r">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -100,7 +125,7 @@ export function AdminDocuments({
                             type="button"
                             className="linkbtn li-n"
                             style={{ fontSize: 13 }}
-                            onClick={() => setEditingId(d.id)}
+                            onClick={() => openDocument(d)}
                           >
                             {d.title}
                           </button>
@@ -119,6 +144,17 @@ export function AdminDocuments({
                     <td className="tnum r t-sec hide-sm">{adminUpdatedLabel(d.updatedAt, today)}</td>
                     <td className="tnum r">{d.opens ?? 0}</td>
                     <td className="tnum r t-sec hide-sm">{plural(d.partnerCount ?? 0, 'partner')}</td>
+                    <td className="r">
+                      <ActionMenu
+                        label="Actions"
+                        ariaLabel={`Actions for ${d.title}`}
+                        items={[
+                          { label: d.type === 'video' ? 'Watch' : 'Open', onSelect: () => openDocument(d) },
+                          { label: 'Download', onSelect: () => download(d) },
+                          { label: 'Edit', onSelect: () => setEditingId(d.id) },
+                        ]}
+                      />
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -129,6 +165,8 @@ export function AdminDocuments({
           </ScrollRegion>
         </section>
       </div>
+
+      <DocumentPreview doc={viewing} onClose={closeView} onDownload={download} />
 
       {editing ? (
         <DocumentEditDrawer
