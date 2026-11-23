@@ -72,7 +72,7 @@ interface AdminApprovalsProps {
 export function AdminApprovals({ queue, extensions, viewerId, viewerRegion, managers, today }: AdminApprovalsProps): React.JSX.Element {
   const toast = useToast();
 
-  const [view, setView] = useState<"mine" | "all">("mine");
+  const [view, setView] = useState<"mine" | "all">("all");
   const [q, setQ] = useState("");
   const [product, setProduct] = useState(ALL_PRODUCTS);
   const [region, setRegion] = useState(ALL_REGIONS);
