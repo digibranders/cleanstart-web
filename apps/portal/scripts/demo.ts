@@ -91,6 +91,7 @@ async function truncateAll(ownerUrl: string): Promise<void> {
       await owner.query(`truncate table ${rows.map((row) => `"${row.tablename}"`).join(', ')} restart identity cascade`);
     }
     await owner.query('alter sequence if exists application_reference_seq restart');
+    await owner.query('alter sequence if exists registration_reference_seq restart');
     console.info(`truncated ${rows.length} tables`);
   } finally {
     await owner.end();

@@ -7,6 +7,7 @@ import type {
   AuditKind,
   AuditWho,
   ChecklistStep,
+  DealCurrency,
   DealRegion,
   DocProduct,
   DocumentType,
@@ -300,6 +301,8 @@ export interface RegistrationEventDto {
 
 export interface RegistrationListItem {
   id: string;
+  /** REG-YYMM-NNNN. */
+  reference: string;
   customer: string;
   website: string | null;
   partnerId: string;
@@ -327,10 +330,20 @@ export interface RegistrationListItem {
   extensionStatus: ExtensionStatus;
   /** Free text the partner typed; new registrations store YYYY-MM-DD. */
   expectedClose: string | null;
+  /** Optional on registration; null when the partner did not give one. */
+  dealValue: number | null;
+  currency: DealCurrency;
+  customerCountry: string | null;
 }
 
 export interface RegistrationDetailDto extends RegistrationListItem {
   notes: string | null;
+  customerIndustry: string | null;
+  useCase: string | null;
+  competitor: string | null;
+  seats: number | null;
+  salesStage: string | null;
+  decisionDate: IsoDate | null;
   extensionRequestedAt: IsoTimestamp | null;
   extensionReason: string | null;
   extensionGrantedAt: IsoTimestamp | null;

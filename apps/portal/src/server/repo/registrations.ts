@@ -24,6 +24,7 @@ import {
 } from '@/lib/deal-rules';
 import type { StageLabel } from '@/server/hubspot/types';
 import {
+  type DealCurrency,
   type DealRegion,
   PRODUCT_LABEL,
   type Product,
@@ -47,6 +48,7 @@ import type { SystemActor, Viewer } from '@/server/auth/types';
 import { ConflictError, ForbiddenError, NotFoundError, ValidationError } from '@/server/errors';
 import { computeChecks, loadDetails, selectRows, toListItem } from '@/server/registrations/mappers';
 import { isUniqueViolation } from '@/server/registrations/pg-errors';
+import { nextRegistrationReference } from '@/server/registrations/reference';
 import { decisionRecipients, threadRecipients } from '@/server/registrations/recipients';
 import { assertUuid, registrationScope } from '@/server/registrations/scope';
 import { assertStaff, type Tx } from './context';
@@ -77,6 +79,16 @@ export interface NewRegistrationsInput {
   contact: { name: string; role: string | null; email: string | null; phone: string | null } | null;
   expectedClose: string | null;
   notes: string | null;
+  /** The deal details below are all optional. A missing currency is stored as USD. */
+  dealValue?: number | null;
+  currency?: DealCurrency;
+  customerCountry?: string | null;
+  customerIndustry?: string | null;
+  useCase?: string | null;
+  competitor?: string | null;
+  seats?: number | null;
+  salesStage?: string | null;
+  decisionDate?: string | null;
 }
 
 const DEFAULT_LIMIT = 200;
@@ -217,11 +229,13 @@ export async function createRegistrations(
   }
 
   const now = clock.now();
-  const created = products.map((product) => ({ id: randomUUID(), product }));
+  const created: Array<{ id: string; product: Product; reference: string }> = [];
+  for (const product of products) created.push({ id: randomUUID(), product, reference: await nextRegistrationReference(tx, now) });
   try {
     await tx.insert(registrations).values(
-      created.map(({ id, product }) => ({
+      created.map(({ id, product, reference }) => ({
         id,
+        reference,
         partnerId,
         registeredBy: viewer.id,
         registeredByName: viewer.name,
@@ -232,6 +246,15 @@ export async function createRegistrations(
         managerId,
         expectedClose: input.expectedClose,
         notes: input.notes,
+        dealValue: input.dealValue ?? null,
+        ...(input.currency ? { currency: input.currency } : {}),
+        customerCountry: input.customerCountry ?? null,
+        customerIndustry: input.customerIndustry ?? null,
+        useCase: input.useCase ?? null,
+        competitor: input.competitor ?? null,
+        seats: input.seats ?? null,
+        salesStage: input.salesStage ?? null,
+        decisionDate: input.decisionDate ?? null,
         status: 'pending' as const,
         stage: STAGE_AWAITING_REVIEW,
         registeredOn: clock.today(),

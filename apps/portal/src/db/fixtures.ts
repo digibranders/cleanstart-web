@@ -23,6 +23,7 @@ import {
 import { addDays } from '@/lib/dates';
 import type { Clock } from '@/lib/clock';
 import {
+  DEAL_CURRENCIES,
   type DocumentType,
   type PartnerCategory,
   type PartnerRegion,
@@ -32,6 +33,7 @@ import {
   type UserStatus,
   NOTIFICATION_CATEGORIES,
 } from '@/lib/domain';
+import { nextRegistrationReference } from '@/server/registrations/reference';
 import { AUDIT_EVENTS, type AuditEvent } from '@/server/audit/events';
 import mockAccount from './mock-data/mock-account.json';
 import mockApplications from './mock-data/mock-applications.json';
@@ -79,6 +81,9 @@ const mockDealSchema = z.object({
   resubmittedOn: z.string().optional(), status: z.string(), stage: z.string(), protectionEnd: z.string().optional(),
   closedOn: z.string().optional(), decidedOn: z.string().optional(), decidedBy: z.string().optional(), rejectionReason: z.string().optional(),
   crmRef: z.string().optional(), crmSynced: z.string().optional(), extensionRequested: z.boolean().optional(), notes: z.string().optional(),
+  dealValue: z.number().optional(), currency: z.enum(DEAL_CURRENCIES).optional(), customerCountry: z.string().optional(),
+  customerIndustry: z.string().optional(), useCase: z.string().optional(), competitor: z.string().optional(), seats: z.number().optional(),
+  salesStage: z.string().optional(), decisionDate: z.string().optional(),
   contacts: z.array(mockContactSchema), thread: z.array(mockMessageSchema), history: z.array(mockEventSchema),
 });
 const mockApplicationSchema = z.object({
@@ -320,6 +325,7 @@ export async function seedMockData(db: Db, opts: SeedOptions): Promise<SeedSumma
     const status = deal.status.toLowerCase() as 'pending' | 'accepted' | 'rejected' | 'expired' | 'won' | 'lost';
     const row = first(
       await db.insert(registrations).values({
+        reference: await nextRegistrationReference(db, at(deal.registered, deal.registeredTime ?? '09:00')),
         partnerId,
         registeredBy: userIdByName.get(registeredByName) ?? null,
         registeredByName,
@@ -329,6 +335,15 @@ export async function seedMockData(db: Db, opts: SeedOptions): Promise<SeedSumma
         region: lookup({ India: 'india', 'Middle East': 'middle_east' } as const, deal.region, 'deal region'),
         managerId: staffIdByName.get(deal.manager) ?? null,
         notes: deal.notes ?? null,
+        dealValue: deal.dealValue ?? null,
+        ...(deal.currency ? { currency: deal.currency } : {}),
+        customerCountry: deal.customerCountry ?? null,
+        customerIndustry: deal.customerIndustry ?? null,
+        useCase: deal.useCase ?? null,
+        competitor: deal.competitor ?? null,
+        seats: deal.seats ?? null,
+        salesStage: deal.salesStage ?? null,
+        decisionDate: deal.decisionDate ?? null,
         status,
         stage: deal.stage,
         registeredOn: deal.registered,

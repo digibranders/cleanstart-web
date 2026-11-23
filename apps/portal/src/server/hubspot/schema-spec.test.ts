@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { dealProperties } from './mappers';
 import {
-  COMPANY_PROPERTIES, DEAL_PROPERTIES, EXTERNAL_DEAL_PROPERTIES, PIPELINE_SPEC,
+  COMPANY_PROPERTIES, DEAL_PROPERTIES, EXTERNAL_DEAL_PROPERTIES, PIPELINE_SPEC, STANDARD_DEAL_PROPERTIES,
 } from './schema-spec';
 import { STAGE_LABELS, type StageIds } from './types';
 
@@ -41,11 +41,15 @@ describe('schema spec', () => {
   it('names every deal property the mapper writes that this spec does not create', () => {
     const stageIds = Object.fromEntries(STAGE_LABELS.map((l) => [l, l])) as StageIds;
     const written = Object.keys(dealProperties(
-      { id: 'r', customerName: 'c', product: 'p', region: 'r', protectionEnd: '2027-01-01' },
+      {
+        id: 'r', customerName: 'c', product: 'p', region: 'r', protectionEnd: '2027-01-01',
+        reference: 'REG-2611-0001', dealValue: 1, currency: 'USD', customerCountry: 'IN', customerIndustry: 'Banking',
+        useCase: 'u', competitor: 'x', seats: 1, salesStage: 's', decisionDate: '2027-03-01',
+      },
       { name: 'n', hubspotCompanyId: '1' }, stageIds, 'pipe',
     ));
     const created = new Set(DEAL_PROPERTIES.map((p) => p.name));
-    const standard = new Set(['dealname', 'pipeline', 'dealstage']);
+    const standard = new Set(['dealname', 'pipeline', 'dealstage', ...STANDARD_DEAL_PROPERTIES]);
     const missing = written.filter((n) => !created.has(n) && !standard.has(n));
     expect(missing.sort()).toEqual([...EXTERNAL_DEAL_PROPERTIES].sort());
   });

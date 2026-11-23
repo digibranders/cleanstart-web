@@ -19,6 +19,7 @@ import {
   users,
 } from '@/db/schema';
 import type {
+  DealCurrency,
   DealRegion,
   PartnerCategory,
   PartnerRegion,
@@ -30,6 +31,7 @@ import type {
 } from '@/lib/domain';
 import type { PartnerViewer, StaffViewer, Viewer } from '@/server/auth/types';
 import { hashPassword } from '@/server/auth/passwords';
+import { nextRegistrationReference } from '@/server/registrations/reference';
 import type { IsolationContext, TenantFixture } from '@/server/repo/isolation.registry';
 
 /** System scope db for the worker's database (portal_app, app.kind = 'system'). Same object every call. */
@@ -40,7 +42,7 @@ export const testPool = (): Pool => pool;
 
 /**
  * TRUNCATE every table in public except the drizzle migration table, RESTART IDENTITY CASCADE, then restarts
- * application_reference_seq. Runs as portal_owner on its own connection (the app role has no TRUNCATE).
+ * application_reference_seq and registration_reference_seq. Runs as portal_owner on its own connection (the app role has no TRUNCATE).
  * The argument is accepted and ignored so the HubSpot plan's `resetDb(db)` call sites work unchanged.
  */
 export async function resetDb(_db?: Db): Promise<void> {
@@ -55,6 +57,7 @@ export async function resetDb(_db?: Db): Promise<void> {
     const names = rows.map((row) => `"${row.tablename}"`).join(', ');
     await client.query(`truncate ${names} restart identity cascade`);
     await client.query('alter sequence application_reference_seq restart with 1');
+    await client.query('alter sequence registration_reference_seq restart with 1');
   } finally {
     await client.end();
   }
@@ -180,6 +183,15 @@ export interface MakeRegistrationInput {
   hubspotDealId?: string | null;
   hubspotStageId?: string | null;
   contacts?: Array<{ name: string; role?: string; email?: string; phone?: string }>;
+  dealValue?: number | null;
+  currency?: DealCurrency;
+  customerCountry?: string | null;
+  customerIndustry?: string | null;
+  useCase?: string | null;
+  competitor?: string | null;
+  seats?: number | null;
+  salesStage?: string | null;
+  decisionDate?: string | null;
 }
 
 /**
@@ -199,6 +211,7 @@ export async function makeRegistration(database: Db, input: MakeRegistrationInpu
   const rows = await database
     .insert(registrations)
     .values({
+      reference: await nextRegistrationReference(database, new Date(`${input.registeredOn ?? '2026-11-06'}T09:00:00Z`)),
       partnerId,
       registeredBy: input.registeredBy ?? null,
       registeredByName: registrant?.name ?? 'Test User',
@@ -215,6 +228,15 @@ export async function makeRegistration(database: Db, input: MakeRegistrationInpu
       rejectionReason: status === 'rejected' ? 'Test rejection' : null,
       hubspotDealId: input.hubspotDealId ?? null,
       hubspotStageId: input.hubspotStageId ?? null,
+      dealValue: input.dealValue ?? null,
+      ...(input.currency ? { currency: input.currency } : {}),
+      customerCountry: input.customerCountry ?? null,
+      customerIndustry: input.customerIndustry ?? null,
+      useCase: input.useCase ?? null,
+      competitor: input.competitor ?? null,
+      seats: input.seats ?? null,
+      salesStage: input.salesStage ?? null,
+      decisionDate: input.decisionDate ?? null,
     })
     .returning();
   const registration = first(rows, 'registration');
