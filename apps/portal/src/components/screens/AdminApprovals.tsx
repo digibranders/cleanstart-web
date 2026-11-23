@@ -240,7 +240,7 @@ export function AdminApprovals({ queue, extensions, viewerId, viewerRegion, mana
     <div className="wrap">
       <div className="head">
         <div style={{ display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
-          <h1 className="h1">Deal approvals</h1>
+          <h1 className="h1">Deals</h1>
           <span className="h1-sub">
             Accepting creates the deal in HubSpot, starts 90 days of protection and emails the partner.
           </span>

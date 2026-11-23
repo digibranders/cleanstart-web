@@ -51,7 +51,7 @@ export const PARTNER_NAV: readonly NavItem[] = [
 ];
 
 export const ADMIN_NAV: readonly NavItem[] = [
-  { label: "Deal approvals", href: ROUTES.admin.approvals, icon: "approve", action: "registration.read_queue", count: "approvals" },
+  { label: "Deals", href: ROUTES.admin.approvals, icon: "approve", action: "registration.read_queue", count: "approvals" },
   { label: "Partners", href: ROUTES.admin.partners, icon: "bld", action: "partner.read" },
   { label: "Documents", href: ROUTES.admin.documents, icon: "docs", action: "document.upload" },
   { label: "Reports", href: ROUTES.admin.reports, icon: "chart", action: "report.read" },

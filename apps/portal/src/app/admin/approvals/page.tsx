@@ -7,7 +7,7 @@ import { withViewer } from "@/server/repo/context";
 import { listApprovalQueue, listExtensionRequests } from "@/server/repo/registrations";
 import { listManagerOptions } from "@/server/repo/staff";
 
-export const metadata: Metadata = { title: "Deal approvals" };
+export const metadata: Metadata = { title: "Deals" };
 
 export default async function Page(): Promise<React.JSX.Element> {
   const viewer = await requireCan("registration.read_queue");

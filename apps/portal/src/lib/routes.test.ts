@@ -39,11 +39,11 @@ describe("navFor", () => {
   });
 
   it("gives a partner manager every admin item", () => {
-    expect(labels(staff("partner_manager"))).toEqual(["Deal approvals", "Partners", "Documents", "Reports", "Team", "Audit log"]);
+    expect(labels(staff("partner_manager"))).toEqual(["Deals", "Partners", "Documents", "Reports", "Team", "Audit log"]);
   });
 
   it("gives staff sales approvals, partners and reports", () => {
-    expect(labels(staff("sales"))).toEqual(["Deal approvals", "Partners", "Reports"]);
+    expect(labels(staff("sales"))).toEqual(["Deals", "Partners", "Reports"]);
   });
 
   it("gives marketing Documents only", () => {
