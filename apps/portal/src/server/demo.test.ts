@@ -196,6 +196,17 @@ describe('the review password in a hosted demo', () => {
     expect(() => assertDemoModeAllowed({ ...hostedDemo, PORTAL_REVIEW_PASSWORD: 'x'.repeat(16) })).not.toThrow();
   });
 
+  it('may be left out only by the exact switch PORTAL_DEMO_OPEN=1', () => {
+    expect(() => assertDemoModeAllowed({ ...hostedDemo, PORTAL_REVIEW_PASSWORD: undefined, PORTAL_DEMO_OPEN: '1' })).not.toThrow();
+    for (const PORTAL_DEMO_OPEN of ['true', ' 1', '0', '']) {
+      expect(() => assertDemoModeAllowed({ ...hostedDemo, PORTAL_REVIEW_PASSWORD: undefined, PORTAL_DEMO_OPEN }), PORTAL_DEMO_OPEN).toThrow(/PORTAL_REVIEW_PASSWORD is required in demo mode/);
+    }
+  });
+
+  it('the open switch does nothing outside demo mode', () => {
+    expect(() => assertDemoModeAllowed({ NODE_ENV: 'production', PORTAL_DEMO_OPEN: '1', DATABASE_URL: 'postgresql://u:p@cleanstart.com/d' })).not.toThrow();
+  });
+
   it('is not required outside production', () => {
     expect(() => assertDemoModeAllowed({ PORTAL_DEMO_MODE: '1', NODE_ENV: 'development', DATABASE_URL: 'postgresql://u:p@localhost/d' })).not.toThrow();
   });

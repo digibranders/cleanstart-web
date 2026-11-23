@@ -104,7 +104,7 @@ const appHostOf = (value: string): string => {
  * and both database URLs must be on it (when set elsewhere it is enforced too). Then the deny rules: no host under
  * cleanstart.com or on PORTAL_DEMO_DENY_HOSTS, and in production no loopback or bare internal name (the droplet's
  * Postgres is "postgres" on the compose network). Both URLs must name the same host, port and database. Real service
- * credentials may not be set, a hosted demo needs a review password of 16 characters or more, and Turnstile keys must be
+ * credentials may not be set, a hosted demo needs a review password of 16 characters or more unless PORTAL_DEMO_OPEN=1 leaves it open on purpose, and Turnstile keys must be
  * Cloudflare's test keys. APP_URL may not be the production portal address. No password is ever put in a message.
  * Runs from the raw process environment (instrumentation.ts), so SKIP_ENV_VALIDATION does not skip it.
  */
@@ -118,8 +118,8 @@ export function assertDemoModeAllowed(source: Source): void {
   for (const name of REAL_CREDENTIALS) {
     if (source[name]) throw new DemoModeError(`Demo mode refused: ${name} is set. Real service credentials must not be set in demo mode.`);
   }
-  if (production && (source.PORTAL_REVIEW_PASSWORD ?? '').length < REVIEW_PASSWORD_MIN) {
-    throw new DemoModeError(`Demo mode refused: PORTAL_REVIEW_PASSWORD is required in demo mode in production and must be at least ${REVIEW_PASSWORD_MIN} characters, so a hosted demo is never open.`);
+  if (production && source.PORTAL_DEMO_OPEN !== '1' && (source.PORTAL_REVIEW_PASSWORD ?? '').length < REVIEW_PASSWORD_MIN) {
+    throw new DemoModeError(`Demo mode refused: PORTAL_REVIEW_PASSWORD is required in demo mode in production and must be at least ${REVIEW_PASSWORD_MIN} characters. To leave the demo open on purpose, set PORTAL_DEMO_OPEN=1.`);
   }
   if (source.TURNSTILE_SECRET_KEY !== undefined && source.TURNSTILE_SECRET_KEY !== TURNSTILE_TEST_SECRET_KEY) {
     throw new DemoModeError("Demo mode refused: TURNSTILE_SECRET_KEY must be Cloudflare's test key in demo mode.");
