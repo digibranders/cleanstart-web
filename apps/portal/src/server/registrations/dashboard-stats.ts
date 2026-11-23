@@ -168,7 +168,7 @@ export function topDeals(deals: readonly DealFact[], limit = 5): TopDealRow[] {
     .filter((d) => d.status !== 'rejected' && d.status !== 'lost' && d.status !== 'expired' && dollars(d) > 0)
     .sort((a, b) => dollars(b) - dollars(a) || a.id.localeCompare(b.id))
     .slice(0, limit)
-    .map((d) => ({ id: d.id, partnerId: d.partnerId, partnerName: d.partnerName, customer: d.customer, product: d.product, region: d.region, status: d.status, value: dollars(d) }));
+    .map((d) => ({ id: d.id, partnerId: d.partnerId, partnerName: d.partnerName, customer: d.customer, product: d.product, region: d.region, status: d.status, stage: d.stage, protectionEnd: d.protectionEnd, value: dollars(d) }));
 }
 
 /** Accepted deals whose protection ends from today to 14 days ahead, soonest first. */

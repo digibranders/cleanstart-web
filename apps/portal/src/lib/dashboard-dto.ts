@@ -104,6 +104,8 @@ export interface TopDealRow {
   product: Product;
   region: DealRegion;
   status: RegistrationStatus;
+  stage: string;
+  protectionEnd: string | null;
   value: number;
 }
 

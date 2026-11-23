@@ -185,6 +185,11 @@ describe('topDeals', () => {
     );
     expect(rows.map((r) => [r.id, r.value])).toEqual([['b', 90], ['a', 10]]);
   });
+
+  it('carries the stage and protection end the Overview table shows', () => {
+    const [row] = topDeals([deal({ value: 10, stage: 'Discovery', protectionEnd: '2027-01-31' })]);
+    expect([row?.stage, row?.protectionEnd]).toEqual(['Discovery', '2027-01-31']);
+  });
 });
 
 describe('expiring and protected', () => {
