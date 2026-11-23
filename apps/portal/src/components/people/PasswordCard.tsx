@@ -74,7 +74,7 @@ export function PasswordCard({ passwordChangedAt }: { passwordChangedAt: string 
         <div className="card-b" style={{ paddingBottom: 0 }}>
           <div className="note note-violet" role="status">
             <Icon name="check" />
-            <span>Password updated.</span>
+            <span>Password updated. Every other device was signed out.</span>
           </div>
         </div>
       ) : null}

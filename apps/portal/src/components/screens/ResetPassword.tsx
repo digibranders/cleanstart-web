@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BulletList, CHECK_D, PublicHeading, PublicSplit, StatusIcon } from "@/components/partners/public-frame";
 import { PasswordField, PasswordRules, passwordRules } from "@/components/ui/password-field";
 import { useToast } from "@/components/ui/toast";
@@ -11,6 +11,7 @@ import { NETWORK_FAILURE_STATUS, settleAuth } from "@/lib/auth-call";
 import { isValidEmail } from "@/lib/people";
 import { ROUTES } from "@/lib/routes";
 
+const RESEND_SECONDS = 60;
 const RULES = passwordRules("").map((rule) => rule.label);
 
 const NARROW_COLUMN: React.CSSProperties = {
@@ -23,16 +24,23 @@ const NARROW_COLUMN: React.CSSProperties = {
 };
 
 /** Shown when the page is opened without a token: the same request the sign-in page makes, with the same answer for every address. */
-function RequestResetLink(): React.JSX.Element {
+function RequestResetLink({ dead = false }: { dead?: boolean }): React.JSX.Element {
   const [email, setEmail] = useState("");
   const [tried, setTried] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [sent, setSent] = useState(false);
+  const [wait, setWait] = useState(0);
   const bad = !isValidEmail(email);
 
-  const send = async (event: React.FormEvent): Promise<void> => {
-    event.preventDefault();
+  useEffect(() => {
+    if (wait <= 0) return;
+    const timer = window.setTimeout(() => setWait((left) => left - 1), 1000);
+    return () => window.clearTimeout(timer);
+  }, [wait]);
+
+  const send = async (event?: React.FormEvent): Promise<void> => {
+    event?.preventDefault();
     if (bad) {
       setTried(true);
       return;
@@ -54,13 +62,30 @@ function RequestResetLink(): React.JSX.Element {
       return;
     }
     setSent(true);
+    setWait(RESEND_SECONDS);
   };
 
   if (sent) {
     return (
       <div role="status" style={NARROW_COLUMN}>
         <StatusIcon d={CHECK_D} tone="green" />
-        <PublicHeading title="Check your email">If {email} has a portal login, a reset link is on its way.</PublicHeading>
+        <PublicHeading title="Check your email">
+          If {email} has a portal login, a reset link is on its way. The link works for 60 minutes.
+        </PublicHeading>
+        {error ? (
+          <span className="err" role="alert">
+            {error}
+          </span>
+        ) : null}
+        <button
+          type="button"
+          className="btn btn-s"
+          style={{ alignSelf: "flex-start" }}
+          disabled={busy || wait > 0}
+          onClick={() => void send()}
+        >
+          {wait > 0 ? `Send again in ${wait}s` : "Send the link again"}
+        </button>
         <Link href={ROUTES.signIn} className="btn btn-s" style={{ alignSelf: "flex-start" }}>
           Back to sign in
         </Link>
@@ -70,7 +95,11 @@ function RequestResetLink(): React.JSX.Element {
 
   return (
     <form onSubmit={send} noValidate style={NARROW_COLUMN}>
-      <PublicHeading title="Reset your password">We will email you a link to set a new password.</PublicHeading>
+      <PublicHeading title={dead ? "This reset link no longer works" : "Reset your password"}>
+        {dead
+          ? "Reset links last 60 minutes and work once. Enter your email and we will send a new one."
+          : "We will email you a link to set a new password."}
+      </PublicHeading>
       <div className="fg">
         <label htmlFor="reset-email" className="lbl">
           Work email
@@ -106,7 +135,7 @@ function RequestResetLink(): React.JSX.Element {
   );
 }
 
-export function ResetPassword({ token }: { token: string }): React.JSX.Element {
+export function ResetPassword({ token, linkDead = false }: { token: string; linkDead?: boolean }): React.JSX.Element {
   const router = useRouter();
   const toast = useToast();
   const [pw, setPw] = useState("");
@@ -114,6 +143,7 @@ export function ResetPassword({ token }: { token: string }): React.JSX.Element {
   const [tried, setTried] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [expired, setExpired] = useState(false);
 
   const weak = passwordRules(pw).some((rule) => !rule.met);
   const mismatch = !weak && pw !== pw2;
@@ -129,14 +159,12 @@ export function ResetPassword({ token }: { token: string }): React.JSX.Element {
     const { error: failure } = await authClient.resetPassword({ newPassword: pw, token });
     setBusy(false);
     if (failure) {
-      setError(
-        failure.code === "PASSWORD_RULES_NOT_MET"
-          ? "Meet all four password rules."
-          : "This reset link is invalid or has expired. Request a new one on the sign-in page.",
-      );
+      if (failure.code === "PASSWORD_RULES_NOT_MET") setError("Meet all four password rules.");
+      else if (failure.code === "INVALID_TOKEN") setExpired(true);
+      else setError("We could not update your password. Try again in a moment.");
       return;
     }
-    toast("Password updated. Sign in with your new password.");
+    toast("Password updated and every other session signed out. Sign in with your new password.");
     router.push(ROUTES.signIn);
   };
 
@@ -155,7 +183,7 @@ export function ResetPassword({ token }: { token: string }): React.JSX.Element {
         </div>
       }
     >
-      {token ? (
+      {token && !linkDead && !expired ? (
         <form
           onSubmit={submit}
           noValidate
@@ -191,7 +219,7 @@ export function ResetPassword({ token }: { token: string }): React.JSX.Element {
           </button>
         </form>
       ) : (
-        <RequestResetLink />
+        <RequestResetLink dead={linkDead || expired} />
       )}
     </PublicSplit>
   );

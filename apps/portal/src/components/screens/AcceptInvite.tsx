@@ -65,7 +65,10 @@ function InviteProblem({ state }: { state: Exclude<InviteState, "ok"> }): React.
           <h2 style={{ margin: 0, fontSize: 22, fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1.25 }}>
             The CleanStart Partner Portal
           </h2>
-          <NumberedSteps items={ADMIN_STEPS} />
+          <p style={{ margin: 0, fontSize: 14, lineHeight: 1.55, color: "#6B687D" }}>
+            Partner teams manage deals, documents and colleagues here. CleanStart staff use it to review applications and
+            support partners. Ask whoever invited you for a fresh link.
+          </p>
         </div>
       }
     >
