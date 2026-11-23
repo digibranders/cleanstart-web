@@ -28,6 +28,7 @@ import { inviteUrl } from '@/server/urls';
 import type { ActionResult } from './result';
 import { runViewerAction } from './run';
 import { regionName, regionKeySchema } from '@/lib/regions';
+import { listRegions } from '@/server/repo/regions';
 
 const companySchema = z.object({
   partnerId: z.string().uuid().optional(),
@@ -141,7 +142,7 @@ export async function createPartnerAction(raw: unknown): Promise<ActionResult<Pa
       await recordAudit(tx, ctx.viewer, {
         event: 'partner.created',
         target: result.partner.name,
-        note: `${PARTNER_CATEGORY_LABEL[input.category]}, ${regionName(input.region)}. Partner admin ${input.adminName || input.adminEmail}${result.invite ? '. Invite sent.' : '. Invite not sent yet.'}`,
+        note: `${PARTNER_CATEGORY_LABEL[input.category]}, ${regionName(input.region, await listRegions(tx))}. Partner admin ${input.adminName || input.adminEmail}${result.invite ? '. Invite sent.' : '. Invite not sent yet.'}`,
         partnerId: result.partner.id,
         subject: { type: 'partner', id: result.partner.id },
       });

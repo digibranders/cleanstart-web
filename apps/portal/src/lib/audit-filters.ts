@@ -1,4 +1,5 @@
 import { AUDIT_KIND_LABEL, AUDIT_KINDS, AUDIT_WHO, type AuditKind, type AuditWho, isOneOf } from '@/lib/domain';
+import { isRealDay } from '@/lib/dates';
 import type { AuditPeriod } from '@/lib/dto';
 import { AUDIT_EVENTS } from '@/server/audit/events';
 
@@ -67,9 +68,7 @@ type Params = Record<string, string | string[] | undefined>;
 
 const first = (value: string | string[] | undefined): string | undefined => (Array.isArray(value) ? value[0] : value);
 
-const ISO_DAY = /^\d{4}-\d{2}-\d{2}$/;
-export const isRealDay = (value: string | undefined): value is string =>
-  value !== undefined && ISO_DAY.test(value) && new Date(`${value}T00:00:00Z`).toISOString().slice(0, 10) === value;
+export { isRealDay };
 
 /** Anything unknown falls back to the default, so a hand edited URL never throws. */
 export function parseAuditView(params: Params): AuditView {

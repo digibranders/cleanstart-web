@@ -16,7 +16,7 @@ import {
 } from '@/lib/dashboard-dto';
 import { addDays, daysBetween } from '@/lib/dates';
 import { waitingBusinessDays } from '@/lib/deal-rules';
-import type { StaffRegion } from '@/lib/domain';
+import type { StaffScope } from '@/lib/domain';
 import type { Viewer } from '@/server/auth/types';
 import { ForbiddenError } from '@/server/errors';
 import {
@@ -28,12 +28,13 @@ import {
   partnerTotals,
   protectedCount,
 } from '@/server/registrations/dashboard-stats';
-import { registrationScope } from '@/server/registrations/scope';
+import { aggregateRegistrationScope, registrationScope } from '@/server/registrations/scope';
 import { assertStaff, type Tx } from './context';
 import { listDocuments } from './documents';
 import { defineIsolation } from './isolation.registry';
 import { integrationHealth } from './integration-health';
 import { getPartnerOverview } from './overview';
+import { scopeCondition } from '@/server/staff-scope';
 
 const LIST_SIZE = 5;
 const DORMANT_DAYS = 30;
@@ -134,8 +135,12 @@ export async function partnerDashboard(tx: Tx, viewer: Viewer, filters: Dashboar
 const iso = (d: Date | null): string | null => (d ? d.toISOString() : null);
 const later = (a: Date | null, b: Date | null): Date | null => (a && b ? (a > b ? a : b) : (a ?? b));
 
-/** Staff sales see only the partners of their own region; partner managers see all (the rule listPartners uses). */
-const partnerRegionScope = (viewer: Viewer): StaffRegion | undefined => (viewer.kind === 'staff' && viewer.role === 'sales' ? viewer.region : undefined);
+/**
+ * The regions the staff Overview is limited to: staff sales and partner managers see the partners, deals and applications of
+ * the regions they cover ('all' is no limit). The Partners list is looser for managers (they see every partner there).
+ */
+const overviewRegionScope = (viewer: Viewer): StaffScope | undefined =>
+  viewer.kind === 'staff' && (viewer.role === 'sales' || viewer.role === 'partner_manager') ? viewer.regions : undefined;
 
 async function documentUse(tx: Tx, from: string): Promise<DocumentUseRow[]> {
   const opens = count(documentOpens.id);
@@ -149,7 +154,7 @@ async function documentUse(tx: Tx, from: string): Promise<DocumentUseRow[]> {
   return rows;
 }
 
-async function funnel(tx: Tx, region: DashboardFilters['region'] | StaffRegion | undefined, category: DashboardFilters['category'], window: { from: string; to: string }): Promise<FunnelDto> {
+async function funnel(tx: Tx, region: SQL | undefined, category: DashboardFilters['category'], window: { from: string; to: string }): Promise<FunnelDto> {
   const apps = await tx
     .select({ status: applications.status, partnerId: applications.partnerId })
     .from(applications)
@@ -158,7 +163,7 @@ async function funnel(tx: Tx, region: DashboardFilters['region'] | StaffRegion |
         gte(applications.createdAt, dayStart(window.from)),
         lt(applications.createdAt, dayStart(addDays(window.to, 1))),
         category ? eq(applications.category, category) : undefined,
-        region && region !== 'all' ? eq(applications.region, region) : undefined,
+        region,
       ),
     );
   const approved = apps.filter((a) => a.status === 'approved');
@@ -177,13 +182,13 @@ async function funnel(tx: Tx, region: DashboardFilters['region'] | StaffRegion |
 }
 
 /**
- * Staff (partner manager; staff sales for their region). Deals use the same scope as the approvals queue and the Deals table
- * (registrationScope: managers all, sales their region); partners follow listPartners (sales: partners in their region).
+ * Staff (partner manager; staff sales). Deals, partners and applications are limited to the regions the viewer covers
+ * (aggregateRegistrationScope, overviewRegionScope); 'all' sees everything.
  * Marketing has no deal access, so it is refused here as it is there.
  */
 export async function staffDashboard(tx: Tx, viewer: Viewer, filters: DashboardFilters, clock: Clock): Promise<StaffDashboardDto> {
   assertStaff(viewer);
-  const scope = registrationScope(viewer);
+  const scope = aggregateRegistrationScope(viewer);
   const today = clock.today();
   const window = range(filters, today);
   const all = await loadFacts(tx, scope, filters, filters.partnerId);
@@ -191,7 +196,7 @@ export async function staffDashboard(tx: Tx, viewer: Viewer, filters: DashboardF
   const pending = all.filter((d) => d.status === 'pending');
   const kpis = dealKpis(inRange);
 
-  const regionLimit = partnerRegionScope(viewer);
+  const regionLimit = overviewRegionScope(viewer);
   const partnerRows = await tx
     .select({ id: partners.id, name: partners.name, status: partners.status })
     .from(partners)
@@ -200,7 +205,7 @@ export async function staffDashboard(tx: Tx, viewer: Viewer, filters: DashboardF
         filters.partnerId ? eq(partners.id, filters.partnerId) : undefined,
         filters.region ? eq(partners.region, filters.region) : undefined,
         filters.category ? eq(partners.category, filters.category) : undefined,
-        regionLimit && regionLimit !== 'all' ? eq(partners.region, regionLimit) : undefined,
+        regionLimit ? scopeCondition(regionLimit, partners.region) : undefined,
       ),
     )
     .orderBy(asc(partners.name), asc(partners.id));
@@ -253,12 +258,12 @@ export async function staffDashboard(tx: Tx, viewer: Viewer, filters: DashboardF
   );
   const workload: ManagerWorkloadRow[] = counts.map((c) => ({ ...c, name: c.managerId ? (names.get(c.managerId) ?? 'Former staff member') : 'Unassigned' }));
 
-  // Staff sales see applications of their own region only, as they see partners and deals.
-  const appRegion = filters.region ?? regionLimit;
+  // Applications follow the same regions as partners and deals.
+  const appRegion = and(filters.region ? eq(applications.region, filters.region) : undefined, regionLimit ? scopeCondition(regionLimit, applications.region) : undefined);
   const [openApplications] = await tx
     .select({ n: count() })
     .from(applications)
-    .where(and(eq(applications.status, 'new'), filters.category ? eq(applications.category, filters.category) : undefined, appRegion && appRegion !== 'all' ? eq(applications.region, appRegion) : undefined));
+    .where(and(eq(applications.status, 'new'), filters.category ? eq(applications.category, filters.category) : undefined, appRegion));
   const docs = await documentUse(tx, window.from);
   const integrations = await integrationHealth(tx);
 

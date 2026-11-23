@@ -1,10 +1,10 @@
 import { eq } from 'drizzle-orm';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { invites, staffScopes, users } from '@/db/schema';
-import { asPartner, asStaff, makeInvite, makePartner, makeUser, resetDb, testDb } from '@/db/test-helpers';
+import { invites, staffRegions, staffScopes, users } from '@/db/schema';
+import { asPartner, asStaff, makeInvite, makePartner, makeUser, resetDb, testDb, viewerFor } from '@/db/test-helpers';
 import { fixedClock } from '@/lib/clock';
 import { withViewer } from './context';
-import { changeStaffRegion, changeStaffRole, listManagerOptions, listStaff, removeStaff } from './staff';
+import { changeStaffRegions, changeStaffRole, listManagerOptions, listStaff, removeStaff } from './staff';
 
 const db = testDb();
 const clock = fixedClock('2026-11-12T10:00:00Z');
@@ -23,10 +23,10 @@ describe('listStaff', () => {
     await makeUser(db, { kind: 'staff', role: 'sales', status: 'disabled', region: 'india' });
     const { invite } = await makeInvite(db, { kind: 'staff', partnerId: null, role: 'sales', staffRegion: 'india', email: 'kunal.shah@cleanstart.com', expiresAt: future });
     const list = await withViewer(gaurav, (tx) => listStaff(tx, gaurav));
-    expect(list.map((p) => [p.name, p.role, p.region, p.status, p.isYou])).toEqual([
-      [gaurav.name, 'partner_manager', 'india', 'active', true],
-      ['Rahul Menon', 'sales', 'india', 'active', false],
-      ['Kunal Shah', 'sales', 'india', 'invited', false],
+    expect(list.map((p) => [p.name, p.role, p.regions, p.status, p.isYou])).toEqual([
+      [gaurav.name, 'partner_manager', ['india'], 'active', true],
+      ['Rahul Menon', 'sales', ['india'], 'active', false],
+      ['Kunal Shah', 'sales', ['india'], 'invited', false],
     ]);
     expect(list[0]?.partners).toEqual(['Kestrel Systems', 'Saffron Secure']);
     expect(list[1]).toMatchObject({ id: rahul.id, partners: [], inviteId: null });
@@ -48,8 +48,8 @@ describe('listManagerOptions', () => {
     const partner = await asPartner(db, { role: 'sales' });
     const options = await withViewer(partner, (tx) => listManagerOptions(tx, partner));
     expect(options).toEqual([
-      { id: india.id, name: 'Gaurav Jadhav', region: 'india', team: 'CleanStart India' },
-      { id: gulf.id, name: 'Omar Nasser', region: 'middle_east', team: 'CleanStart Middle East' },
+      { id: india.id, name: 'Gaurav Jadhav', regions: ['india'], team: 'CleanStart India' },
+      { id: gulf.id, name: 'Omar Nasser', regions: ['middle_east'], team: 'CleanStart Middle East' },
     ]);
   });
 });
@@ -92,14 +92,35 @@ describe('changeStaffRole', () => {
   });
 });
 
-describe('changeStaffRegion', () => {
-  it('changes the scope row', async () => {
+describe('changeStaffRegions', () => {
+  it('changes the scope row and the region rows', async () => {
     const manager = await asStaff(db, 'partner_manager', 'india');
     const rahul = await makeUser(db, { kind: 'staff', role: 'sales', region: 'india' });
-    const changed = await withViewer(manager, (tx) => changeStaffRegion(tx, manager, { userId: rahul.id, region: 'middle_east' }));
-    expect(changed.region).toBe('middle_east');
+    const changed = await withViewer(manager, (tx) => changeStaffRegions(tx, manager, { userId: rahul.id, regions: ['middle_east'] }));
+    expect(changed.regions).toEqual(['middle_east']);
     const [scope] = await db.select().from(staffScopes).where(eq(staffScopes.userId, rahul.id));
     expect(scope?.region).toBe('middle_east');
+    expect((await db.select().from(staffRegions).where(eq(staffRegions.userId, rahul.id))).map((r) => r.regionKey)).toEqual(['middle_east']);
+  });
+
+  it('covers several regions in list order, then every region with no rows left', async () => {
+    const manager = await asStaff(db, 'partner_manager', 'all');
+    const omar = await makeUser(db, { kind: 'staff', role: 'partner_manager', region: 'middle_east' });
+    const two = await withViewer(manager, (tx) => changeStaffRegions(tx, manager, { userId: omar.id, regions: ['eu', 'middle_east'] }));
+    expect(two.regions).toEqual(['middle_east', 'eu']);
+    expect((await viewerFor(db, omar)).regions).toEqual(['middle_east', 'eu']);
+    const all = await withViewer(manager, (tx) => changeStaffRegions(tx, manager, { userId: omar.id, regions: 'all' }));
+    expect(all.regions).toBe('all');
+    expect(await db.select().from(staffRegions).where(eq(staffRegions.userId, omar.id))).toEqual([]);
+    const [scope] = await db.select().from(staffScopes).where(eq(staffScopes.userId, omar.id));
+    expect(scope?.region).toBe('all');
+  });
+
+  it('refuses a region that does not exist and an empty list', async () => {
+    const manager = await asStaff(db, 'partner_manager', 'all');
+    const rahul = await makeUser(db, { kind: 'staff', role: 'sales', region: 'india' });
+    await expect(withViewer(manager, (tx) => changeStaffRegions(tx, manager, { userId: rahul.id, regions: ['atlantis'] }))).rejects.toMatchObject({ code: 'validation' });
+    await expect(withViewer(manager, (tx) => changeStaffRegions(tx, manager, { userId: rahul.id, regions: [] }))).rejects.toMatchObject({ code: 'validation' });
   });
 });
 

@@ -63,7 +63,7 @@ DO $$
 DECLARE t text;
 BEGIN
   FOREACH t IN ARRAY ARRAY[
-    'regions', 'partners', 'users', 'staff_scopes', 'partner_checklist', 'applications', 'application_notes', 'application_tokens', 'invites', 'access_requests',
+    'regions', 'partners', 'users', 'staff_scopes', 'staff_regions', 'partner_checklist', 'applications', 'application_notes', 'application_tokens', 'invites', 'access_requests',
     'registrations', 'registration_contacts', 'registration_messages', 'registration_events', 'registration_reminders',
     'documents', 'document_audience', 'document_versions', 'document_opens', 'material_requests', 'email_change_requests',
     'notifications', 'notification_prefs', 'audit_log', 'hubspot_outbox', 'hubspot_sync_state',
@@ -215,6 +215,16 @@ CREATE POLICY staff_scopes_select ON staff_scopes FOR SELECT USING (
 );
 CREATE POLICY staff_scopes_write ON staff_scopes FOR ALL USING (app_is_staff()) WITH CHECK (app_is_staff());
 
+-- ---------------------------------------------------------------- staff_regions
+-- Same audience as staff_scopes: partners read the regions of active partner managers (the register form offers the manager for a region).
+DROP POLICY IF EXISTS staff_regions_select ON staff_regions;
+DROP POLICY IF EXISTS staff_regions_write ON staff_regions;
+CREATE POLICY staff_regions_select ON staff_regions FOR SELECT USING (
+  app_is_staff()
+  OR user_id IN (SELECT u.id FROM users u WHERE u.kind = 'staff' AND u.role = 'partner_manager' AND u.status = 'active')
+);
+CREATE POLICY staff_regions_write ON staff_regions FOR ALL USING (app_is_staff()) WITH CHECK (app_is_staff());
+
 -- ---------------------------------------------------------------- regions
 -- Any signed in user (and the system, which serves the public apply form) reads the list; only staff change it.
 DROP POLICY IF EXISTS regions_select ON regions;
@@ -268,5 +278,5 @@ GRANT SELECT, INSERT ON audit_log TO portal_app;
 -- DELETE is granted only where a flow needs it; the policies above further restrict who may use it.
 GRANT DELETE ON
   registrations, registration_contacts, registration_messages, registration_events, registration_reminders,
-  applications, document_versions, document_audience, auth_session, auth_account, auth_verification, auth_two_factor
+  applications, document_versions, document_audience, staff_regions, auth_session, auth_account, auth_verification, auth_two_factor
 TO portal_app;

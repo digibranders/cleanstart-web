@@ -112,7 +112,7 @@ describe('M0.7 auth spike', () => {
       kind: 'staff',
       role: 'partner_manager',
       partnerId: null,
-      region: 'india',
+      regions: ['india'],
     });
 
     expect(await viewerFromHeaders(new Headers())).toBeNull();

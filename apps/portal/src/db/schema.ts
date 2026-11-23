@@ -163,18 +163,33 @@ export const users = pgTable(
   ],
 );
 
-/** One row per staff user. Sales and marketing staff see only their region; partner managers use it for routing. */
+/** One row per staff user. Sales staff see only their regions, partner managers see their regions in Reports and Overview and are routed work by them. See staff_regions. */
 export const staffScopes = pgTable(
   'staff_scopes',
   {
     id: id(),
     userId: uuid('user_id').notNull().references(() => users.id),
-    /** 'all' or a regions.key. Validated by the staff actions, not a foreign key, because 'all' is not a region. */
+    /**
+     * 'all' (every region, no staff_regions rows), or for a limited person one of the keys they cover as a fallback.
+     * The staff_regions rows are the truth for a limited person. Not a foreign key, because 'all' is not a region.
+     */
     region: text('region').notNull(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
   (t) => [unique('staff_scopes_user_key').on(t.userId)],
+);
+
+/** The regions a limited staff member covers, one row each. A person who covers every region has none (staff_scopes.region = 'all'). */
+export const staffRegions = pgTable(
+  'staff_regions',
+  {
+    id: id(),
+    userId: uuid('user_id').notNull().references(() => users.id),
+    regionKey: text('region_key').notNull().references(() => regions.key),
+    createdAt: createdAt(),
+  },
+  (t) => [unique('staff_regions_user_region_key').on(t.userId, t.regionKey), index('staff_regions_region_idx').on(t.regionKey)],
 );
 
 /** Ticks the welcome checklist keeps. Derived steps are never stored (DERIVED_CHECKLIST_STEPS). */

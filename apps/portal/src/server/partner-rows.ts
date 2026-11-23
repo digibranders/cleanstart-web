@@ -1,11 +1,12 @@
 import { and, asc, eq, ilike, inArray, isNull, ne, or, sql, type SQL } from 'drizzle-orm';
 import { logoUrlOf } from '@/lib/company-profile';
 import { applications, invites, partners, registrations, users } from '@/db/schema';
-import type { PartnerCategory, PartnerRegion, PartnerStatus, StaffRegion } from '@/lib/domain';
+import type { PartnerCategory, PartnerRegion, PartnerStatus, StaffScope } from '@/lib/domain';
 import type { PartnerListRow } from '@/lib/dto';
 import { nameFromEmail } from '@/lib/people';
 import { iso, likePattern } from '@/server/people';
 import type { Tx } from '@/server/repo/context';
+import { scopeCondition } from '@/server/staff-scope';
 
 export interface PartnerRowFilter {
   ids?: readonly string[];
@@ -13,8 +14,8 @@ export interface PartnerRowFilter {
   status?: PartnerStatus;
   category?: PartnerCategory;
   region?: PartnerRegion;
-  /** Staff sales see only partners in their region. 'all' or undefined means no limit. */
-  scopeRegion?: StaffRegion;
+  /** Staff sales see only partners in their regions. 'all' or undefined means no limit. */
+  scope?: StaffScope;
 }
 
 const group = <T>(items: readonly T[], key: (item: T) => string | null): Map<string, T[]> => {
@@ -45,7 +46,8 @@ export async function partnerListRows(tx: Tx, filter: PartnerRowFilter): Promise
   if (filter.status) conditions.push(eq(partners.status, filter.status));
   if (filter.category) conditions.push(eq(partners.category, filter.category));
   if (filter.region) conditions.push(eq(partners.region, filter.region));
-  if (filter.scopeRegion && filter.scopeRegion !== 'all') conditions.push(eq(partners.region, filter.scopeRegion));
+  const limit = filter.scope ? scopeCondition(filter.scope, partners.region) : undefined;
+  if (limit) conditions.push(limit);
 
   const rows = await tx
     .select()

@@ -1,4 +1,4 @@
-import type { AuditWho, PartnerRole, StaffRegion, StaffRole } from '@/lib/domain';
+import type { AuditWho, PartnerRole, StaffRole, StaffScope } from '@/lib/domain';
 
 export interface PartnerViewer {
   id: string;
@@ -6,7 +6,7 @@ export interface PartnerViewer {
   role: PartnerRole;
   partnerId: string;
   partnerName: string;
-  region?: undefined;
+  regions?: undefined;
   email: string;
   name: string;
 }
@@ -17,8 +17,8 @@ export interface StaffViewer {
   role: StaffRole;
   partnerId: null;
   partnerName: null;
-  /** From staff_scopes. 'all' for marketing and for partner managers who cover both regions. */
-  region: StaffRegion;
+  /** From staff_scopes and staff_regions: 'all', or the keys of the regions this person covers. */
+  regions: StaffScope;
   email: string;
   name: string;
 }

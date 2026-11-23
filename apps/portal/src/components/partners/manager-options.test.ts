@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { managerChoices } from './manager-options';
 
-const manager = (id: string, name: string, team: string) => ({ id, name, region: 'india' as const, team });
+const manager = (id: string, name: string, team: string) => ({ id, name, regions: ['india'], team });
 
 describe('managerChoices', () => {
   it('uses the name as the label and keeps the id for each choice', () => {

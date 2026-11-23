@@ -7,9 +7,10 @@ import { RowAction } from "@/components/people/RowAction";
 import { StaffInviteDrawer } from "@/components/people/StaffInviteDrawer";
 import { Badge } from "@/components/ui/badge";
 import { Dropdown, type DropdownOption } from "@/components/ui/dropdown";
+import { MultiDropdown } from "@/components/ui/multi-dropdown";
 import { ConfirmDialog } from "@/components/ui/overlay";
 import { useToast } from "@/components/ui/toast";
-import { ALL_REGIONS, isOneOf, STAFF_ROLE_LABEL, STAFF_ROLES, type StaffRegion, type StaffRole } from "@/lib/domain";
+import { isOneOf, STAFF_ROLE_LABEL, STAFF_ROLES, type StaffRole, type StaffScope } from "@/lib/domain";
 import type { StaffMemberDto } from "@/lib/dto";
 import { initialsOf, lastSeenLabel, rowKey } from "@/lib/people";
 import { ROUTES } from "@/lib/routes";
@@ -22,13 +23,14 @@ import {
 } from "@/server/actions/staff";
 import { useRegions } from "@/components/regions-context";
 import { ScrollRegion } from "@/components/ui/scroll-region";
+import { scopeCovers, scopeLabel as labelOf } from "@/lib/regions";
 
 const ROLE_OPTIONS: readonly DropdownOption[] = STAFF_ROLES.map((value) => ({ value, label: STAFF_ROLE_LABEL[value] }));
 
 // [action, partner manager, sales, marketing]
 const PERMISSIONS: ReadonlyArray<readonly [string, string, string, string]> = [
-  ["Approve or reject a deal", "Yes", "Own region", "No"],
-  ["See deals", "All partners", "Own region", "No"],
+  ["Approve or reject a deal", "Yes", "Own regions", "No"],
+  ["See deals", "All partners", "Own regions", "No"],
   ["Register a deal for a partner", "Yes", "No", "No"],
   ["Approve applications and set tier", "Yes", "No", "No"],
   ["Invite or remove partner users", "Any partner", "No", "No"],
@@ -43,9 +45,11 @@ function roleToast(name: string, role: StaffRole): string {
 
 export function AdminTeam({ people, today }: { people: StaffMemberDto[]; today: string }): React.JSX.Element {
   const toast = useToast();
-  const { offer, name: regionName } = useRegions();
-  const scopeLabel = (key: string): string => (key === ALL_REGIONS ? "All regions" : regionName(key));
-  const scopeOptions = (current: string): DropdownOption[] => [{ value: ALL_REGIONS, label: "All regions" }, ...offer(current).map((r) => ({ value: r.key, label: r.name }))];
+  const { regions } = useRegions();
+  const scopeLabel = (scope: StaffScope): string => labelOf(scope, regions);
+  // The regions to offer: active ones, plus any inactive one the person already covers.
+  const scopeOptions = (current: StaffScope): { key: string; label: string }[] =>
+    regions.filter((r) => r.active || scopeCovers(current, r.key)).map((r) => ({ key: r.key, label: r.name }));
   const [confirming, setConfirming] = useState<string | null>(null);
   const [inviteOpen, setInviteOpen] = useState(false);
   const closeInvite = useCallback((): void => setInviteOpen(false), []);
@@ -58,9 +62,10 @@ export function AdminTeam({ people, today }: { people: StaffMemberDto[]; today: 
 
   const [pendingRole, setPendingRole] = useState<{ person: StaffMemberDto; role: StaffRole } | null>(null);
 
-  const changeRegion = async (person: StaffMemberDto, region: StaffRegion): Promise<void> => {
-    if (await report(changeStaffRegionAction({ userId: person.id, region }))) {
-      toast(`${person.name} now covers ${scopeLabel(region)}`);
+  const changeRegions = async (person: StaffMemberDto, scope: StaffScope): Promise<void> => {
+    const next = scope === "all" ? ["all"] : scope;
+    if (await report(changeStaffRegionAction({ userId: person.id, regions: next }))) {
+      toast(`${person.name} now covers ${scopeLabel(scope)}`);
     }
   };
 
@@ -174,17 +179,16 @@ export function AdminTeam({ people, today }: { people: StaffMemberDto[]; today: 
                   </td>
                   <td className="t-sec hide-sm">
                     {p.isYou || p.status === "invited" ? (
-                      scopeLabel(p.region)
+                      scopeLabel(p.regions)
                     ) : (
-                      <Dropdown
+                      <MultiDropdown
                         variant="rsel"
                         id={`tregion-${rowKey(p.email)}`}
-                        ariaLabel={`Region for ${p.name}`}
-                        value={p.region}
-                        options={scopeOptions(p.region)}
-                        onChange={(v) => {
-                          if (v !== p.region) void changeRegion(p, v);
-                        }}
+                        ariaLabel={`Regions for ${p.name}`}
+                        value={p.regions}
+                        summary={scopeLabel(p.regions)}
+                        options={scopeOptions(p.regions)}
+                        onCommit={(next) => void changeRegions(p, next)}
                       />
                     )}
                   </td>
@@ -248,7 +252,7 @@ export function AdminTeam({ people, today }: { people: StaffMemberDto[]; today: 
             <div className="note note-amber" role="status">
               <Icon name="warn" />
               <span>
-                {warned.name} still manages {warned.partners.length} partners in {scopeLabel(warned.region)}.
+                {warned.name} still manages {warned.partners.length} partners in {scopeLabel(warned.regions)}.
                 Those partners need a new partner manager.{" "}
                 <Link href={ROUTES.admin.partners} style={{ fontWeight: 600 }}>
                   Reassign on Partners

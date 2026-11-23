@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { publicActor, roleKey, SYSTEM_ACTORS, type Viewer } from './types';
 
 const partner: Viewer = { id: 'u1', kind: 'partner', role: 'sales', partnerId: 'p1', partnerName: 'Kestrel Systems', email: 'a@b.co', name: 'A' };
-const staff: Viewer = { id: 'u2', kind: 'staff', role: 'partner_manager', partnerId: null, partnerName: null, region: 'all', email: 'c@d.co', name: 'C' };
+const staff: Viewer = { id: 'u2', kind: 'staff', role: 'partner_manager', partnerId: null, partnerName: null, regions: 'all', email: 'c@d.co', name: 'C' };
 
 describe('auth types', () => {
   it('builds the role key from kind and role', () => {

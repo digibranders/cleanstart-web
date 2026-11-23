@@ -55,7 +55,9 @@ import { assertUuid, registrationScope } from '@/server/registrations/scope';
 import { assertStaff, type Tx } from './context';
 import { defineIsolation } from './isolation.registry';
 import { listManagerOptions } from './staff';
+import { isAllRegions, scopeCovers } from '@/lib/regions';
 import { assertRegionAssignable } from './regions';
+import { scopeCondition } from '@/server/staff-scope';
 
 export interface ListRegistrationsInput {
   status?: RegistrationStatus[];
@@ -176,10 +178,10 @@ async function resolveManager(
     }
     return requested;
   }
-  const covering = options.filter((o) => o.region === region || o.region === 'all');
+  const covering = options.filter((o) => scopeCovers(o.regions, region));
   const chosen =
     covering.find((o) => o.id === partnerManagerId) ??
-    covering.find((o) => o.region === region) ??
+    covering.find((o) => !isAllRegions(o.regions)) ??
     covering[0] ??
     options.find((o) => o.id === partnerManagerId) ??
     options[0];
@@ -567,9 +569,9 @@ export async function listApprovalQueue(
   const scope = registrationScope(viewer);
   const mine: SQL | undefined =
     input.scope === 'mine' && viewer.kind === 'staff'
-      ? viewer.region === 'all'
+      ? isAllRegions(viewer.regions)
         ? eq(registrations.managerId, viewer.id)
-        : eq(registrations.region, viewer.region)
+        : scopeCondition(viewer.regions, registrations.region)
       : undefined;
   const now = clock.now();
   const today = clock.today();

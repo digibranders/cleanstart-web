@@ -18,7 +18,7 @@ const staff = (role: StaffViewer["role"]): StaffViewer => ({
   role,
   partnerId: null,
   partnerName: null,
-  region: "india",
+  regions: ["india"],
   email: "gaurav@example.com",
   name: "Gaurav Jadhav",
 });

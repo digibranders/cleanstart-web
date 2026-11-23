@@ -13,7 +13,7 @@ import {
   renameRegion,
   setRegionActive,
 } from './regions';
-import { changeStaffRegion } from './staff';
+import { changeStaffRegions } from './staff';
 
 const db = testDb();
 
@@ -157,9 +157,9 @@ describe('staff scope', () => {
     const viewer = await asStaff(db, 'partner_manager', 'all');
     const target = await makeUser(db, { kind: 'staff', role: 'sales', region: 'india' });
     await withViewer(viewer, (tx) => addRegion(tx, viewer, { name: 'Africa' }));
-    await withViewer(viewer, (tx) => changeStaffRegion(tx, viewer, { userId: target.id, region: 'africa' }));
+    await withViewer(viewer, (tx) => changeStaffRegions(tx, viewer, { userId: target.id, regions: ['africa'] }));
     const [scope] = await db.select({ region: staffScopes.region }).from(staffScopes).where(eq(staffScopes.userId, target.id));
     expect(scope?.region).toBe('africa');
-    await expect(withViewer(viewer, (tx) => changeStaffRegion(tx, viewer, { userId: target.id, region: 'elsewhere' }))).rejects.toMatchObject({ code: 'validation' });
+    await expect(withViewer(viewer, (tx) => changeStaffRegions(tx, viewer, { userId: target.id, regions: ['elsewhere'] }))).rejects.toMatchObject({ code: 'validation' });
   });
 });

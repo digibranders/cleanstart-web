@@ -1,26 +1,28 @@
 import { and, asc, eq, inArray, isNull, ne } from 'drizzle-orm';
-import { invites, partners, staffScopes, users } from '@/db/schema';
+import { invites, partners, users } from '@/db/schema';
 import type { Clock } from '@/lib/clock';
 import { systemClock } from '@/lib/clock';
-import type { StaffRegion, StaffRole } from '@/lib/domain';
+import { ALL_REGIONS, type StaffRole, type StaffScope } from '@/lib/domain';
 import type { ManagerOptionDto, StaffMemberDto } from '@/lib/dto';
 import { nameFromEmail, staffTeamLabel } from '@/lib/people';
+import { decodeScope, sameScope } from '@/lib/regions';
 import type { Viewer } from '@/server/auth/types';
 import { ConflictError, NotFoundError } from '@/server/errors';
 import { iso } from '@/server/people';
 import { assertStaff, type Tx } from './context';
 import { defineIsolation } from './isolation.registry';
 import { assertStaffScopeAssignable, listRegions } from './regions';
+import { loadScope, loadScopes, setStaffScope } from '@/server/staff-scope';
 
 /** People of the CleanStart team: users with a login plus teammates who only have an open invite (id is then the invite id). */
 export async function listStaff(tx: Tx, viewer: Viewer): Promise<StaffMemberDto[]> {
   assertStaff(viewer);
   const rows = await tx
-    .select({ user: users, region: staffScopes.region })
+    .select({ user: users })
     .from(users)
-    .leftJoin(staffScopes, eq(staffScopes.userId, users.id))
     .where(and(eq(users.kind, 'staff'), ne(users.status, 'disabled')))
     .orderBy(asc(users.createdAt));
+  const scopes = await loadScopes(tx, rows.map((r) => r.user.id));
   const open = await tx
     .select()
     .from(invites)
@@ -33,12 +35,12 @@ export async function listStaff(tx: Tx, viewer: Viewer): Promise<StaffMemberDto[
       ? []
       : await tx.select({ managerId: partners.managerId, name: partners.name }).from(partners).where(inArray(partners.managerId, staffIds)).orderBy(asc(partners.name));
 
-  const members: StaffMemberDto[] = rows.map(({ user, region }) => ({
+  const members: StaffMemberDto[] = rows.map(({ user }) => ({
     id: user.id,
     name: user.name,
     email: user.email,
     role: user.role as StaffRole,
-    region: region ?? 'all',
+    regions: scopes.get(user.id) ?? ALL_REGIONS,
     partners: managed.filter((m) => m.managerId === user.id).map((m) => m.name),
     status: user.status === 'active' ? 'active' : 'invited',
     lastActiveAt: iso(user.lastLoginAt),
@@ -52,7 +54,7 @@ export async function listStaff(tx: Tx, viewer: Viewer): Promise<StaffMemberDto[
       name: nameFromEmail(invite.email),
       email: invite.email,
       role: invite.role as StaffRole,
-      region: invite.staffRegion ?? 'all',
+      regions: decodeScope(invite.staffRegion),
       partners: [],
       status: 'invited',
       lastActiveAt: null,
@@ -67,12 +69,15 @@ export async function listStaff(tx: Tx, viewer: Viewer): Promise<StaffMemberDto[
 export async function listManagerOptions(tx: Tx, _viewer: Viewer): Promise<ManagerOptionDto[]> {
   const regionList = await listRegions(tx);
   const rows = await tx
-    .select({ id: users.id, name: users.name, region: staffScopes.region })
+    .select({ id: users.id, name: users.name })
     .from(users)
-    .leftJoin(staffScopes, eq(staffScopes.userId, users.id))
     .where(and(eq(users.kind, 'staff'), eq(users.role, 'partner_manager'), eq(users.status, 'active')))
     .orderBy(asc(users.createdAt));
-  return rows.map((r) => ({ id: r.id, name: r.name, region: r.region ?? 'all', team: staffTeamLabel(r.region, regionList) }));
+  const scopes = await loadScopes(tx, rows.map((r) => r.id));
+  return rows.map((r) => {
+    const regions = scopes.get(r.id) ?? ALL_REGIONS;
+    return { id: r.id, name: r.name, regions, team: staffTeamLabel(regions, regionList) };
+  });
 }
 
 const loadTarget = async (tx: Tx, userId: string) => {
@@ -115,16 +120,16 @@ export async function changeStaffRole(tx: Tx, viewer: Viewer, input: { userId: s
   return memberAfter(tx, viewer, target.id);
 }
 
-export async function changeStaffRegion(tx: Tx, viewer: Viewer, input: { userId: string; region: StaffRegion }): Promise<StaffMemberDto> {
+/** Sets the regions a teammate covers: 'all' or a list of keys. Each key must be a region that exists; one the person already covers may be inactive. */
+export async function changeStaffRegions(tx: Tx, viewer: Viewer, input: { userId: string; regions: StaffScope }): Promise<StaffMemberDto> {
   assertStaff(viewer);
   const target = await loadTarget(tx, input.userId);
   if (!target) throw new NotFoundError('staff member');
-  const [scope] = await tx.select({ region: staffScopes.region }).from(staffScopes).where(eq(staffScopes.userId, target.id)).limit(1);
-  await assertStaffScopeAssignable(tx, input.region, scope?.region);
-  await tx
-    .insert(staffScopes)
-    .values({ userId: target.id, region: input.region })
-    .onConflictDoUpdate({ target: staffScopes.userId, set: { region: input.region } });
+  const current = await loadScope(tx, target.id);
+  for (const key of input.regions === ALL_REGIONS ? [ALL_REGIONS] : input.regions) {
+    await assertStaffScopeAssignable(tx, key, current !== ALL_REGIONS && current.includes(key) ? key : null);
+  }
+  if (!sameScope(current, input.regions)) await setStaffScope(tx, target.id, input.regions);
   return memberAfter(tx, viewer, target.id);
 }
 
@@ -163,10 +168,10 @@ export async function removeStaff(
   return { userId: invite.id, name: nameFromEmail(invite.email), email: invite.email };
 }
 
-export const isolation = defineIsolation<'listStaff' | 'listManagerOptions' | 'changeStaffRole' | 'changeStaffRegion' | 'removeStaff'>({
+export const isolation = defineIsolation<'listStaff' | 'listManagerOptions' | 'changeStaffRole' | 'changeStaffRegions' | 'removeStaff'>({
   listStaff: { scope: 'staff-only', probe: (tx, viewer) => listStaff(tx, viewer), expect: 'forbidden' },
   listManagerOptions: { scope: 'tenant', probe: (tx, viewer) => listManagerOptions(tx, viewer), expect: 'unchanged' },
   changeStaffRole: { scope: 'staff-only', probe: (tx, viewer, ctx) => changeStaffRole(tx, viewer, { userId: ctx.staffUserId, role: 'sales' }), expect: 'forbidden' },
-  changeStaffRegion: { scope: 'staff-only', probe: (tx, viewer, ctx) => changeStaffRegion(tx, viewer, { userId: ctx.staffUserId, region: 'all' }), expect: 'forbidden' },
+  changeStaffRegions: { scope: 'staff-only', probe: (tx, viewer, ctx) => changeStaffRegions(tx, viewer, { userId: ctx.staffUserId, regions: ALL_REGIONS }), expect: 'forbidden' },
   removeStaff: { scope: 'staff-only', probe: (tx, viewer, ctx) => removeStaff(tx, viewer, { userId: ctx.staffUserId }, systemClock), expect: 'forbidden' },
 });

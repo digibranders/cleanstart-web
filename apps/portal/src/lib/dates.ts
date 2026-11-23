@@ -7,6 +7,14 @@ const parse = (iso: string): number => {
   return Date.UTC(year, month - 1, day);
 };
 
+const ISO_DAY = /^\d{4}-\d{2}-\d{2}$/;
+/** True for a YYYY-MM-DD that is a real calendar day. "2026-13-01" and "2026-02-30" are false, and never throw. */
+export const isRealDay = (value: string | undefined): value is string => {
+  if (value === undefined || !ISO_DAY.test(value)) return false;
+  const at = new Date(`${value}T00:00:00Z`);
+  return !Number.isNaN(at.getTime()) && at.toISOString().slice(0, 10) === value;
+};
+
 export const daysBetween = (fromIso: string, toIso: string): number => Math.round((parse(toIso) - parse(fromIso)) / DAY_MS);
 export const addDays = (iso: string, days: number): string => new Date(parse(iso) + days * DAY_MS).toISOString().slice(0, 10);
 const dayMonth = (iso: string): string => `${new Date(parse(iso)).getUTCDate()} ${MONTHS[new Date(parse(iso)).getUTCMonth()] ?? ''}`;

@@ -28,7 +28,7 @@ const staff = (role: 'partner_manager' | 'marketing'): Viewer => ({
   role,
   partnerId: null,
   partnerName: null,
-  region: 'india',
+  regions: ['india'],
 });
 
 describe('not-found back link', () => {

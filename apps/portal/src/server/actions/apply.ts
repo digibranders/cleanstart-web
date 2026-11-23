@@ -29,6 +29,8 @@ import { absoluteUrl, applicationStatusUrl } from '@/server/urls';
 import type { ActionResult } from './result';
 import { runPublicAction } from './run';
 import { regionName, regionKeySchema } from '@/lib/regions';
+import { regionNameOf } from '@/server/region-names';
+import { listRegions } from '@/server/repo/regions';
 
 const text = (max: number) => z.string().trim().max(max);
 
@@ -110,10 +112,11 @@ export async function submitApplicationAction(raw: unknown): Promise<ActionResul
         },
         ctx.clock,
       );
+      const regionList = await listRegions(tx);
       await recordAudit(tx, actor, {
         event: 'application.submitted',
         target: application.company,
-        note: `${PARTNER_CATEGORY_LABEL[input.category]}, ${regionName(input.region)}${merged ? '. Updated an open application.' : ''}`,
+        note: `${PARTNER_CATEGORY_LABEL[input.category]}, ${regionName(input.region, regionList)}${merged ? '. Updated an open application.' : ''}`,
         subject: { type: 'application', id: application.id },
       });
       const managers = await listManagerRecipients(tx, actor);
@@ -121,7 +124,7 @@ export async function submitApplicationAction(raw: unknown): Promise<ActionResul
         userId: manager.userId,
         kind: 'application_new',
         title: `New application from ${application.company}`,
-        body: `${application.applicantName}, ${PARTNER_CATEGORY_LABEL[input.category]}, ${regionName(input.region)}`,
+        body: `${application.applicantName}, ${PARTNER_CATEGORY_LABEL[input.category]}, ${regionName(input.region, regionList)}`,
         link: `${ROUTES.admin.partners}?tab=applications`,
       }));
       await notifyUsers(tx, items);
@@ -155,7 +158,7 @@ export async function submitApplicationAction(raw: unknown): Promise<ActionResul
           applicantName: application.applicantName,
           applicantEmail: application.email,
           categoryLabel: PARTNER_CATEGORY_LABEL[input.category],
-          regionLabel: regionName(input.region),
+          regionLabel: await regionNameOf(input.region),
           source: 'portal',
           personalEmail: false,
           existingDomain: false,

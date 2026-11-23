@@ -11,6 +11,7 @@ import { getPartnerDetail } from '@/server/repo/partners';
 import type { ActionResult } from './result';
 import { runViewerAction } from './run';
 import { regionName, regionKeySchema } from '@/lib/regions';
+import { listRegions } from '@/server/repo/regions';
 
 const identitySchema = z.object({
   id: z.string().uuid(),
@@ -37,11 +38,12 @@ export async function updatePartnerIdentityAction(raw: unknown): Promise<ActionR
         await recordAudit(tx, ctx.viewer, { event: 'partner.domain_changed', target, before: change.before.domain, after: change.after.domain, partnerId: change.partnerId, subject });
       }
       if (change.before.region !== change.after.region) {
+        const regionList = await listRegions(tx);
         await recordAudit(tx, ctx.viewer, {
           event: 'partner.region_changed',
           target,
-          before: regionName(change.before.region),
-          after: regionName(change.after.region),
+          before: regionName(change.before.region, regionList),
+          after: regionName(change.after.region, regionList),
           note: 'Existing registrations keep their region.',
           partnerId: change.partnerId,
           subject,

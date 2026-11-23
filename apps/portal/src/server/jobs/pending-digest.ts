@@ -1,8 +1,8 @@
 import { and, asc, eq } from 'drizzle-orm';
-import { partners, registrations, staffScopes, users } from '@/db/schema';
+import { partners, registrations, users } from '@/db/schema';
 import { type Clock, systemClock } from '@/lib/clock';
 import { REVIEW_SLA_BUSINESS_DAYS, isOverSla, waitingBusinessDays } from '@/lib/deal-rules';
-import { type DealRegion, PRODUCT_LABEL, type Product, type StaffRegion, type StaffRole } from '@/lib/domain';
+import { type DealRegion, PRODUCT_LABEL, type Product, type StaffRole, type StaffScope } from '@/lib/domain';
 import { ROUTES } from '@/lib/routes';
 import { SYSTEM_ACTORS } from '@/server/auth/types';
 import { sendEmail } from '@/server/email/send';
@@ -11,14 +11,16 @@ import type { EmailTransport } from '@/server/email/transport';
 import { log } from '@/server/log';
 import { withSystem } from '@/server/repo/context';
 import { absoluteUrl } from '@/server/urls';
-import { regionName } from '@/lib/regions';
+import { isAllRegions, type RegionDto, regionName, scopeCovers } from '@/lib/regions';
+import { listRegions } from '@/server/repo/regions';
+import { loadScopes } from '@/server/staff-scope';
 
 export interface DigestReviewer {
   id: string;
   name: string;
   email: string;
   role: StaffRole;
-  region: StaffRegion;
+  regions: StaffScope;
 }
 
 export interface WaitingRegistration {
@@ -40,14 +42,14 @@ export interface ReviewerDigest {
 export const OVERDUE_BUSINESS_DAYS = REVIEW_SLA_BUSINESS_DAYS * 2;
 
 /**
- * The approvals queue "mine" scope: a partner manager with a region sees that region, one covering both sees the deals
- * routed to them (and the ones with no manager, which no one else would see); staff sales see their region, or all.
+ * The approvals queue "mine" scope: a partner manager with regions sees those regions, one covering all sees the deals
+ * routed to them (and the ones with no manager, which no one else would see); staff sales see their regions, or all.
  */
 const inScope = (reviewer: DigestReviewer, row: WaitingRegistration): boolean => {
   if (reviewer.role === 'partner_manager') {
-    return reviewer.region === 'all' ? row.managerId === reviewer.id || row.managerId === null : row.region === reviewer.region;
+    return isAllRegions(reviewer.regions) ? row.managerId === reviewer.id || row.managerId === null : scopeCovers(reviewer.regions, row.region);
   }
-  return reviewer.region === 'all' || row.region === reviewer.region;
+  return scopeCovers(reviewer.regions, row.region);
 };
 
 /**
@@ -58,6 +60,7 @@ export function buildDigests(
   reviewers: readonly DigestReviewer[],
   waitingRegistrations: readonly WaitingRegistration[],
   today: string,
+  regionList: readonly RegionDto[],
 ): ReviewerDigest[] {
   const digests: ReviewerDigest[] = [];
   for (const reviewer of reviewers) {
@@ -70,7 +73,7 @@ export function buildDigests(
           customer: row.customer,
           partnerName: row.partnerName,
           productLabel: PRODUCT_LABEL[row.product],
-          regionLabel: regionName(row.region),
+          regionLabel: regionName(row.region, regionList),
           waitingBusinessDays: days,
           pastTarget: isOverSla(row.since, today),
           overdue: days > OVERDUE_BUSINESS_DAYS,
@@ -89,11 +92,10 @@ export function buildDigests(
 export async function sendPendingDigests(deps: { clock: Clock; transport?: EmailTransport }): Promise<{ sent: number }> {
   const actor = SYSTEM_ACTORS.portal;
   const today = deps.clock.today();
-  const { reviewers, regs } = await withSystem(actor, async (tx) => {
+  const { reviewers, regs, regionList } = await withSystem(actor, async (tx) => {
     const staff = await tx
-      .select({ id: users.id, name: users.name, email: users.email, role: users.role, region: staffScopes.region })
+      .select({ id: users.id, name: users.name, email: users.email, role: users.role })
       .from(users)
-      .leftJoin(staffScopes, eq(staffScopes.userId, users.id))
       .where(and(eq(users.kind, 'staff'), eq(users.status, 'active')))
       .orderBy(asc(users.createdAt));
     const pending = await tx
@@ -109,13 +111,15 @@ export async function sendPendingDigests(deps: { clock: Clock; transport?: Email
       .from(registrations)
       .innerJoin(partners, eq(partners.id, registrations.partnerId))
       .where(eq(registrations.status, 'pending'));
+    const scopes = await loadScopes(tx, staff.map((s) => s.id));
     return {
-      reviewers: staff.map((s): DigestReviewer => ({ id: s.id, name: s.name, email: s.email, role: s.role as StaffRole, region: s.region ?? 'all' })),
+      regionList: await listRegions(tx),
+      reviewers: staff.map((s): DigestReviewer => ({ id: s.id, name: s.name, email: s.email, role: s.role as StaffRole, regions: scopes.get(s.id) ?? 'all' })),
       regs: pending.map((r): WaitingRegistration => ({ ...r, since: r.resubmittedOn ?? r.registeredOn })),
     };
   });
 
-  const digests = buildDigests(reviewers, regs, today);
+  const digests = buildDigests(reviewers, regs, today, regionList);
   let sent = 0;
   for (const digest of digests) {
     try {

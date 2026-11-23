@@ -4,7 +4,7 @@ import { sendEmail } from '@/server/email/send';
 import { buildRegistrationReceived } from '@/server/email/templates';
 import type { EmailAddress } from '@/server/email/transport';
 import { absoluteUrl } from '@/server/urls';
-import { regionName } from '@/lib/regions';
+import { regionNameOf } from '@/server/region-names';
 
 export interface PartnerReceipt {
   to: EmailAddress;
@@ -20,7 +20,7 @@ export async function sendPartnerReceipt(receipt: PartnerReceipt): Promise<void>
       to: receipt.to,
       customer: receipt.customer,
       productLabel: receipt.products.map((p) => PRODUCT_LABEL[p]).join(', '),
-      regionLabel: regionName(receipt.region),
+      regionLabel: await regionNameOf(receipt.region),
       dealsUrl: absoluteUrl(ROUTES.partner.deals),
     }),
   );

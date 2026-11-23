@@ -27,6 +27,7 @@ import type {
   Product,
   RegistrationStatus,
   StaffRegion,
+  StaffScope,
   StaffRole,
   UserKind,
 } from './domain';
@@ -137,7 +138,8 @@ export interface StaffMemberDto {
   name: string;
   email: string;
   role: StaffRole;
-  region: StaffRegion;
+  /** 'all', or the keys of the regions this person covers. */
+  regions: StaffScope;
   /** Names of the partners this person manages (partner managers only). */
   partners: string[];
   status: 'active' | 'invited';
@@ -149,8 +151,9 @@ export interface StaffMemberDto {
 export interface ManagerOptionDto {
   id: string;
   name: string;
-  region: StaffRegion;
-  /** "CleanStart India", "CleanStart Middle East". */
+  /** 'all', or the keys of the regions this manager covers. */
+  regions: StaffScope;
+  /** "CleanStart India", "CleanStart India and EU". */
   team: string;
 }
 

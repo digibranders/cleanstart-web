@@ -169,7 +169,7 @@ export const HELP_ARTICLES: readonly HelpArticle[] = [
     body: [
       { type: 'list', items: [
         'Partner manager: every page, including Partners, Reports, Team and the Audit log.',
-        'Sales: Overview, Deals, Partners and Reports, for deals in their own region.',
+        'Sales: Overview, Deals, Partners and Reports, for deals in the regions they cover.',
         'Marketing: Overview and Documents.',
       ] },
       { type: 'p', text: 'The sidebar only lists pages your role can open. If you follow a link to a page you cannot open, the portal sends you back to your Overview.' },
@@ -235,10 +235,10 @@ export const HELP_ARTICLES: readonly HelpArticle[] = [
     body: [
       { type: 'steps', items: [
         'Open Team and choose Invite teammate.',
-        'Pick a role: Partner manager, Sales or Marketing. Sales also has a region, or all regions.',
+        'Pick a role: Partner manager, Sales or Marketing. Choose the regions they cover: one or several, or All regions. You can change them later from the Region column.',
         'To end someone\'s access, choose Remove access from the Actions menu.',
       ] },
-      { type: 'p', text: 'Partner accounts never reach this admin portal. What each role can do is in the table on the Team page. Partner managers add, rename, reorder and turn off regions on the Regions page. A region that is turned off stays on the partners and deals that already have it.' },
+      { type: 'p', text: 'Partner accounts never reach this admin portal. What each role can do is in the table on the Team page. Partner managers add, rename, reorder and turn off regions on the Regions page. A region that is turned off stays on the partners and deals that already have it. A partner manager can cover several regions; new partners and deals in any of them are routed to that person.' },
     ],
   },
   {
@@ -249,7 +249,7 @@ export const HELP_ARTICLES: readonly HelpArticle[] = [
     summary: 'Registered, accepted, accept rate and pipeline by partner, for a date range.',
     body: [
       { type: 'p', text: 'Open Reports. Pick a preset range or a custom one. The figures cover deals registered, deals accepted, the accept rate and the pipeline by partner. Filters narrow the report by partner category and partner.' },
-      { type: 'p', text: 'Choose Export CSV to download the figures that are on screen. Partner managers and sales staff can open Reports; sales staff see deals in their own region.' },
+      { type: 'p', text: 'Choose Export CSV to download the figures that are on screen. Partner managers and sales staff can open Reports. Each person sees the partners and deals in the regions they cover, and someone who covers all regions sees everything.' },
     ],
   },
   {

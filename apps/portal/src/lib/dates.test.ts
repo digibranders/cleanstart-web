@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { addDays, businessDaysBetween, daysBetween, daysLeft, daysLeftLabel, fmtLong, fmtShort, fmtTimestamp, plural } from './dates';
+import { addDays, businessDaysBetween, daysBetween, daysLeft, daysLeftLabel, fmtLong, fmtShort, fmtTimestamp, isRealDay, plural } from './dates';
 
 describe('dates', () => {
   it('counts and adds calendar days across a month and a year end', () => {
@@ -46,3 +46,16 @@ describe('dates', () => {
     expect(fmtTimestamp('2025-10-29T10:12:00.000Z', '2026-11-06')).toBe('29 Oct 2025, 10:12');
   });
 });
+
+describe('isRealDay', () => {
+  it('accepts real calendar days, leap day included', () => {
+    expect(isRealDay('2026-11-06')).toBe(true);
+    expect(isRealDay('2028-02-29')).toBe(true);
+  });
+  it('refuses impossible days and other shapes without throwing', () => {
+    for (const bad of ['2026-13-01', '2026-00-10', '2026-02-30', '2027-02-29', '2026-11-31', '2026-1-1', '26-11-06', '', 'soon', undefined]) {
+      expect(isRealDay(bad)).toBe(false);
+    }
+  });
+});
+

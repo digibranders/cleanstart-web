@@ -5,7 +5,18 @@ import {
   type RegionDto,
   regionKeySchema,
   regionName,
+  decodeScope,
+  encodeScope,
+  isAllRegions,
+  normalizeScope,
   regionTeamLabel,
+  resolveScope,
+  sameScope,
+  scopeCovers,
+  scopeLabel,
+  scopeTeamLabel,
+  staffScopesSchema,
+  toggleScopeKey,
   slugRegionKey,
   staffScopeSchema,
 } from './regions';
@@ -51,6 +62,17 @@ describe('names and offers', () => {
     expect(regionName('middle_east')).toBe('Middle East');
     expect(regionName('asia_pacific')).toBe('Asia Pacific');
   });
+  it('shows a renamed or new region from the table, and a title cased key when the table lacks it', () => {
+    const table: RegionDto[] = [
+      { key: 'eu', name: 'European Union', sortOrder: 1, active: true },
+      { key: 'africa', name: 'Africa', sortOrder: 2, active: true },
+    ];
+    expect(regionName('eu', table)).toBe('European Union');
+    expect(regionName('africa', table)).toBe('Africa');
+    expect(regionName('india', table)).toBe('India');
+    expect(regionName('middle_east', table)).toBe('Middle East');
+    expect(regionName('all', table)).toBe('All regions');
+  });
   it('labels the team', () => {
     expect(regionTeamLabel('eu')).toBe('CleanStart EU');
     expect(regionTeamLabel('all')).toBe('CleanStart');
@@ -69,5 +91,61 @@ describe('input schemas', () => {
     expect(staffScopeSchema.safeParse('all').success).toBe(true);
     expect(staffScopeSchema.safeParse('eu').success).toBe(true);
     expect(staffScopeSchema.safeParse('EU!').success).toBe(false);
+  });
+});
+
+describe('staff scope', () => {
+  it('collapses to all when all is chosen and removes duplicates otherwise', () => {
+    expect(normalizeScope(['india', 'all'])).toBe('all');
+    expect(normalizeScope(['eu', 'india', 'eu'])).toEqual(['eu', 'india']);
+  });
+  it('knows what a scope covers and compares scopes regardless of order', () => {
+    expect(scopeCovers('all', 'eu')).toBe(true);
+    expect(scopeCovers(['india'], 'eu')).toBe(false);
+    expect(scopeCovers(['india', 'eu'], 'eu')).toBe(true);
+    expect(isAllRegions('all')).toBe(true);
+    expect(sameScope(['eu', 'india'], ['india', 'eu'])).toBe(true);
+    expect(sameScope('all', ['india'])).toBe(false);
+  });
+  it('round trips the stored text and reads blank as every region', () => {
+    expect(encodeScope(['middle_east', 'eu'])).toBe('middle_east,eu');
+    expect(encodeScope('all')).toBe('all');
+    expect(decodeScope('middle_east,eu')).toEqual(['middle_east', 'eu']);
+    expect(decodeScope('india')).toEqual(['india']);
+    expect(decodeScope('all')).toBe('all');
+    expect(decodeScope(null)).toBe('all');
+    expect(decodeScope('')).toBe('all');
+  });
+  it('resolves a stored row: all, the region rows, or the one fallback key before the backfill', () => {
+    expect(resolveScope('all', ['india'])).toBe('all');
+    expect(resolveScope(null, [])).toBe('all');
+    expect(resolveScope('india', ['india', 'eu'])).toEqual(['india', 'eu']);
+    expect(resolveScope('india', [])).toEqual(['india']);
+  });
+  it('labels a scope with names from the list', () => {
+    const table: RegionDto[] = [
+      { key: 'middle_east', name: 'Middle East', sortOrder: 1, active: true },
+      { key: 'eu', name: 'EU', sortOrder: 2, active: true },
+      { key: 'us', name: 'US', sortOrder: 3, active: true },
+    ];
+    expect(scopeLabel('all', table)).toBe('All regions');
+    expect(scopeLabel(['eu'], table)).toBe('EU');
+    expect(scopeLabel(['middle_east', 'eu'], table)).toBe('Middle East and EU');
+    expect(scopeLabel(['middle_east', 'eu', 'us'], table)).toBe('Middle East, EU and US');
+    expect(scopeTeamLabel(['middle_east', 'eu'], table)).toBe('CleanStart Middle East and EU');
+    expect(scopeTeamLabel('all', table)).toBe('CleanStart');
+  });
+  it('toggles choices in the multi select', () => {
+    expect(toggleScopeKey('all', 'india')).toEqual(['india']);
+    expect(toggleScopeKey(['india'], 'eu')).toEqual(['india', 'eu']);
+    expect(toggleScopeKey(['india', 'eu'], 'india')).toEqual(['eu']);
+    expect(toggleScopeKey(['india'], 'india')).toEqual(['india']);
+    expect(toggleScopeKey(['india', 'eu'], 'all')).toBe('all');
+  });
+  it('accepts a list from the form and refuses an empty one', () => {
+    expect(staffScopesSchema.parse(['india', 'eu'])).toEqual(['india', 'eu']);
+    expect(staffScopesSchema.parse(['all'])).toBe('all');
+    expect(staffScopesSchema.safeParse([]).success).toBe(false);
+    expect(staffScopesSchema.safeParse(['Not A Key']).success).toBe(false);
   });
 });

@@ -9,6 +9,8 @@ import { SEARCH_MIN_CHARS } from '@/lib/search-pages';
 import type { Viewer } from '@/server/auth/types';
 import type { Tx } from './context';
 import { defineIsolation } from './isolation.registry';
+import { listRegions } from './regions';
+import { scopeCondition } from '@/server/staff-scope';
 import { regionName } from '@/lib/regions';
 
 const MAX_PER_GROUP = 10;
@@ -35,15 +37,15 @@ function registrationScope(viewer: Viewer): Scope {
     return 'none';
   }
   if (viewer.role === 'partner_manager') return undefined;
-  if (viewer.role === 'sales') return viewer.region === 'all' ? undefined : eq(registrations.region, viewer.region);
+  if (viewer.role === 'sales') return scopeCondition(viewer.regions, registrations.region);
   return 'none';
 }
 
-/** Partners follow `partner.read`: partner manager all, staff sales their region. Partners search their own team instead. */
+/** Partners follow `partner.read`: partner manager all, staff sales their regions. Partners search their own team instead. */
 function partnerScope(viewer: Viewer): Scope {
   if (viewer.kind !== 'staff') return 'none';
   if (viewer.role === 'partner_manager') return undefined;
-  if (viewer.role === 'sales') return viewer.region === 'all' ? undefined : eq(partners.region, viewer.region);
+  if (viewer.role === 'sales') return scopeCondition(viewer.regions, partners.region);
   return 'none';
 }
 
@@ -94,10 +96,11 @@ async function searchPartners(tx: Tx, viewer: Viewer, q: string, pattern: string
     .where(and(matches(partners.name, q, pattern), scope))
     .orderBy(desc(rank(partners.name, q)), asc(partners.name))
     .limit(limit);
+  const regionList = await listRegions(tx);
   return rows.map((p) => ({
     group: 'partners',
     label: p.name,
-    hint: `${PARTNER_CATEGORY_LABEL[p.category]}, ${regionName(p.region)}`,
+    hint: `${PARTNER_CATEGORY_LABEL[p.category]}, ${regionName(p.region, regionList)}`,
     href: `${ROUTES.admin.partners}?selected=${p.id}`,
     icon: 'bld',
   }));

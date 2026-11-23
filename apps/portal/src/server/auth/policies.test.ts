@@ -98,7 +98,7 @@ const viewerOf = (key: RoleKey, region: StaffRegion = 'india'): Viewer => {
   if (kind === 'partner') {
     return { ...base, kind, role, partnerId: OWN_PARTNER, partnerName: 'Own Partner' } as PartnerViewer;
   }
-  return { ...base, kind, role, partnerId: null, partnerName: null, region } as StaffViewer;
+  return { ...base, kind, role, partnerId: null, partnerName: null, regions: region === 'all' ? 'all' : [region] } as StaffViewer;
 };
 
 const cellsOf = (action: Action): Cell[] => MATRIX[action].split(' ') as Cell[];
@@ -230,5 +230,15 @@ describe('partnerPermissionTable', () => {
 describe('role keys', () => {
   it('names a viewer by kind and role', () => {
     expect(roleKey(viewerOf('staff.marketing'))).toBe('staff.marketing');
+  });
+});
+
+describe('staff sales covering several regions', () => {
+  it('is in scope for every region they cover and for none other', () => {
+    const sales = { ...(viewerOf('staff.sales') as StaffViewer), regions: ['india', 'eu'] };
+    expect(can(sales, 'registration.decide', { region: 'india' })).toBe(true);
+    expect(can(sales, 'registration.decide', { region: 'eu' })).toBe(true);
+    expect(can(sales, 'registration.decide', { region: 'middle_east' })).toBe(false);
+    expect(can(sales, 'registration.decide', { region: null })).toBe(false);
   });
 });

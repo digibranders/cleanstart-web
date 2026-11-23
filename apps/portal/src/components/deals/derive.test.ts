@@ -114,13 +114,21 @@ describe('stageTrack', () => {
 
 describe('managerFor', () => {
   const managers = [
-    { id: 'm-in', name: 'Gaurav Jadhav', region: 'india' as const, team: 'CleanStart India' },
-    { id: 'm-me', name: 'Omar Nasser', region: 'middle_east' as const, team: 'CleanStart Middle East' },
+    { id: 'm-in', name: 'Gaurav Jadhav', regions: ['india'] as const, team: 'CleanStart India' },
+    { id: 'm-me', name: 'Omar Nasser', regions: ['middle_east'] as const, team: 'CleanStart Middle East' },
   ];
   it('picks the manager of the deal region, else the first, else nothing', () => {
     expect(managerFor(managers, 'middle_east')).toBe('m-me');
     expect(managerFor([managers[0]!], 'middle_east')).toBe('m-in');
     expect(managerFor([], 'india')).toBe('');
+  });
+  it('lets one manager cover several regions, and prefers a regional one over an all regions one', () => {
+    const several = [
+      { id: 'm-all', name: 'Priya', regions: 'all' as const, team: 'CleanStart' },
+      { id: 'm-two', name: 'Omar Nasser', regions: ['middle_east', 'eu'], team: 'CleanStart Middle East and EU' },
+    ];
+    expect(managerFor(several, 'eu')).toBe('m-two');
+    expect(managerFor(several, 'us')).toBe('m-all');
   });
 });
 
@@ -179,7 +187,7 @@ describe('defaultRejectReason', () => {
 });
 
 describe('routingText', () => {
-  const m = (name: string, region: 'india' | 'middle_east' | 'all') => ({ id: name, name, region, team: 'x' });
+  const m = (name: string, region: 'india' | 'middle_east' | 'all') => ({ id: name, name, regions: region === 'all' ? ('all' as const) : [region], team: 'x' });
   it('names the manager each region goes to', () => {
     expect(routingText([m('Gaurav Jadhav', 'india'), m('Omar Nasser', 'middle_east')])).toBe('India goes to Gaurav, Middle East to Omar.');
     expect(routingText([m('Gaurav Jadhav', 'india')])).toBe('India goes to Gaurav.');

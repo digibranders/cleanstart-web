@@ -8,6 +8,7 @@ import { isOneOf, PARTNER_ROLES, STAFF_ROLES, type UserKind } from '@/lib/domain
 import { PATH_HEADER, safeNext } from '@/lib/next-path';
 import { ROUTES } from '@/lib/routes';
 import { UnauthenticatedError } from '@/server/errors';
+import { loadScope } from '@/server/staff-scope';
 import { log } from '@/server/log';
 import { getAuth } from './auth';
 import { type Action, can, type PolicySubject } from './policies';
@@ -24,7 +25,7 @@ export async function loadViewer(userId: string): Promise<Viewer | null> {
       user: users,
       partnerName: partners.name,
       partnerStatus: partners.status,
-      staffRegion: staffScopes.region,
+      staffScopeId: staffScopes.id,
     })
     .from(users)
     .leftJoin(partners, eq(partners.id, users.partnerId))
@@ -43,11 +44,11 @@ export async function loadViewer(userId: string): Promise<Viewer | null> {
     if (row.partnerStatus === 'suspended') return null;
     return { ...base, kind: 'partner', role: user.role, partnerId: user.partnerId, partnerName: row.partnerName };
   }
-  if (!isOneOf(STAFF_ROLES, user.role) || row.staffRegion === null) {
+  if (!isOneOf(STAFF_ROLES, user.role) || row.staffScopeId === null) {
     log.error({ userId }, 'staff user row has no valid role or staff_scopes row');
     return null;
   }
-  return { ...base, kind: 'staff', role: user.role, partnerId: null, partnerName: null, region: row.staffRegion };
+  return { ...base, kind: 'staff', role: user.role, partnerId: null, partnerName: null, regions: await loadScope(db, user.id) };
 }
 
 /** The viewer for the session cookie in `requestHeaders`, or null. Testable without a Next request scope. */

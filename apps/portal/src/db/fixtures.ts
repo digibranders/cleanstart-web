@@ -17,10 +17,11 @@ import {
   registrationEvents,
   registrationMessages,
   registrations,
-  staffScopes,
   users,
 } from '@/db/schema';
 import { addDays } from '@/lib/dates';
+import { encodeScope, normalizeScope } from '@/lib/regions';
+import { setStaffScope } from '@/server/staff-scope';
 import type { Clock } from '@/lib/clock';
 import {
   DEAL_CURRENCIES,
@@ -29,6 +30,7 @@ import {
   type PartnerRegion,
   type PartnerRole,
   type StaffRegion,
+  type StaffScope,
   type StaffRole,
   type UserStatus,
   NOTIFICATION_CATEGORIES,
@@ -158,6 +160,8 @@ const PARTNER_CATEGORY: Record<string, PartnerCategory> = { Distributor: 'distri
 const AUDIENCE_CATEGORY: Record<string, PartnerCategory> = { Distributors: 'distributor', 'Channel partners': 'channel' };
 const REGION: Record<string, PartnerRegion> = { India: 'india', 'Middle East': 'middle_east', EU: 'eu', US: 'us', Elsewhere: 'elsewhere' };
 const STAFF_REGION: Record<string, StaffRegion> = { India: 'india', 'Middle East': 'middle_east', EU: 'eu', US: 'us', 'All regions': 'all' };
+/** "Middle East, EU" or "All regions" in the mock data, as a staff scope. */
+const staffScopeOf = (label: string): StaffScope => normalizeScope(label.split(',').map((part) => lookup(STAFF_REGION, part.trim(), 'staff region')));
 const PARTNER_ROLE: Record<string, PartnerRole> = { 'Partner admin': 'partner_admin', Sales: 'sales', Technical: 'technical' };
 const STAFF_ROLE: Record<string, StaffRole> = { 'Partner manager': 'partner_manager', Sales: 'sales', Marketing: 'marketing' };
 const PRODUCT = { 'CleanStart Images': 'images', 'Clean Libraries': 'libraries', CleanSight: 'cleansight' } as const;
@@ -213,10 +217,10 @@ export async function seedMockData(db: Db, opts: SeedOptions): Promise<SeedSumma
       'staff user',
     );
     staffIdByName.set(member.name, row.id);
-    await db.insert(staffScopes).values({ userId: row.id, region: lookup(STAFF_REGION, member.region, 'staff region') });
+    await setStaffScope(db, row.id, staffScopeOf(member.region));
     if (status === 'invited') {
       await db.insert(invites).values({
-        email: member.email, kind: 'staff', partnerId: null, role, staffRegion: lookup(STAFF_REGION, member.region, 'staff region'),
+        email: member.email, kind: 'staff', partnerId: null, role, staffRegion: encodeScope(staffScopeOf(member.region)),
         tokenHash: sha256Hex(`seed-staff-invite:${member.email}`), expiresAt: new Date((invitedAt ?? clock.now()).getTime() + 7 * 86_400_000),
         invitedBy: staffIdByName.get('Gaurav Jadhav') ?? null,
       });
