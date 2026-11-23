@@ -29,8 +29,12 @@ describe('mock scaffolding is gone (M5.4)', () => {
     expect(hits).toEqual([]);
   });
 
-  it('has no source file that uses browser storage', () => {
-    const hits = sources.filter((file) => /localStorage|sessionStorage/.test(readFileSync(join(root, file), 'utf8')));
+  // The deal form keeps an unsent draft per user in the browser (B2). It is the only file allowed to; the data is the
+  // partner's own unsent text and is cleared on submit. Everything else must keep state on the server.
+  const STORAGE_ALLOWED = ['src/components/screens/RegisterDeal.tsx'];
+
+  it('has no source file that uses browser storage, except the deal form draft', () => {
+    const hits = sources.filter((file) => !STORAGE_ALLOWED.includes(file) && /localStorage|sessionStorage/.test(readFileSync(join(root, file), 'utf8')));
     expect(hits).toEqual([]);
   });
 
