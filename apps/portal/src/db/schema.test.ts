@@ -22,7 +22,7 @@ const EXPECTED_TABLES = [
   'auth_verification', 'document_audience', 'document_opens', 'document_versions', 'documents', 'email_change_requests', 'hubspot_outbox',
   'hubspot_sync_state', 'invites', 'material_requests', 'notification_prefs', 'notifications', 'partner_checklist', 'partners',
   'regions', 'registration_contacts', 'registration_events', 'registration_messages', 'registration_reminders', 'registrations',
-  'staff_scopes', 'users',
+  'staff_regions', 'staff_scopes', 'users',
 ];
 
 describe('schema', () => {

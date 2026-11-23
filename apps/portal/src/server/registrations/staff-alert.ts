@@ -7,7 +7,7 @@ import type { EmailAddress } from '@/server/email/transport';
 import { log } from '@/server/log';
 import { type NewNotification, resolveEmailRecipients } from '@/server/notify';
 import { absoluteUrl } from '@/server/urls';
-import { regionName } from '@/lib/regions';
+import { regionNameOf } from '@/server/region-names';
 
 /** The deal manager's address from their notification, or PARTNERS_NOTIFY_EMAIL when the deal has no manager. May be empty. */
 export async function staffRecipients(items: readonly NewNotification[]): Promise<EmailAddress[]> {
@@ -41,7 +41,7 @@ export async function sendSubmissionAlert(alert: SubmissionAlert): Promise<void>
       partnerName: alert.partnerName,
       customer: alert.customer,
       productLabel: alert.products.map((p) => PRODUCT_LABEL[p]).join(', '),
-      regionLabel: regionName(alert.region),
+      regionLabel: await regionNameOf(alert.region),
       registeredByName: alert.registeredByName,
       resubmitted: alert.resubmitted,
       approvalsUrl: absoluteUrl(ROUTES.admin.approvals),

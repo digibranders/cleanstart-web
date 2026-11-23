@@ -96,9 +96,9 @@ describe('display helpers', () => {
 
 describe('staffTeamLabel', () => {
   it('names the CleanStart team for a region', () => {
-    expect(staffTeamLabel('india')).toBe('CleanStart India');
-    expect(staffTeamLabel('middle_east')).toBe('CleanStart Middle East');
+    expect(staffTeamLabel(['india'])).toBe('CleanStart India');
+    expect(staffTeamLabel(['middle_east'])).toBe('CleanStart Middle East');
+    expect(staffTeamLabel(['middle_east', 'eu'])).toBe('CleanStart Middle East and EU');
     expect(staffTeamLabel('all')).toBe('CleanStart');
-    expect(staffTeamLabel(null)).toBe('CleanStart');
   });
 });

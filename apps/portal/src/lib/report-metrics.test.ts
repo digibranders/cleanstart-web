@@ -113,6 +113,11 @@ describe('ranges', () => {
     expect(parseReportRange({ range: 'custom', from: '2026-02-30', to: '2026-03-01' }, today).preset).toBe('90d');
     expect(parseReportRange({ range: 'bogus' }, today).preset).toBe('90d');
   });
+  it('falls back instead of throwing on an impossible date such as month 13', () => {
+    expect(parseReportRange({ range: 'custom', from: '2026-13-01', to: '2026-12-01' }, today).preset).toBe('90d');
+    expect(parseReportRange({ range: 'custom', from: '2026-01-01', to: '2026-00-10' }, today).preset).toBe('90d');
+    expect(parseReportRange({ from: '2026-13-01', to: '2026-13-02' }, today).preset).toBe('90d');
+  });
   it('filters facts by registered date, both ends inclusive, and builds an empty report from none', () => {
     const facts = [fact({ registeredOn: '2026-01-01' }), fact({ registeredOn: '2026-02-01' }), fact({ registeredOn: '2026-02-02' })];
     expect(inRange(facts, { from: '2026-01-01', to: '2026-02-01' })).toHaveLength(2);

@@ -1,27 +1,31 @@
-import { and, asc, eq, sql } from 'drizzle-orm';
-import { partners, staffScopes, users } from '@/db/schema';
+import { and, asc, eq } from 'drizzle-orm';
+import { partners, users } from '@/db/schema';
 import type { PartnerCategory, PartnerRegion } from '@/lib/domain';
+import { isAllRegions, scopeCovers } from '@/lib/regions';
 import { ConflictError, ValidationError } from '@/server/errors';
 import type { Tx } from '@/server/repo/context';
+import { loadScopes } from '@/server/staff-scope';
 
 export type PartnerRow = typeof partners.$inferSelect;
 
 /**
- * The active partner manager a new partner is routed to: the one whose staff scope is `region`, then one whose scope
- * is 'all', then the oldest active partner manager. Null when there is none.
+ * The active partner manager a new partner is routed to: one who covers `region` (several regions allowed), then one who
+ * covers every region, then the oldest active partner manager. The oldest wins within each group. Null when there is none.
  */
 export async function pickManagerId(tx: Tx, region: PartnerRegion): Promise<string | null> {
-  const [row] = await tx
+  const managers = await tx
     .select({ id: users.id })
     .from(users)
-    .leftJoin(staffScopes, eq(staffScopes.userId, users.id))
     .where(and(eq(users.kind, 'staff'), eq(users.role, 'partner_manager'), eq(users.status, 'active')))
-    .orderBy(
-      sql`case when ${staffScopes.region} = ${region} then 0 when ${staffScopes.region} = 'all' then 1 else 2 end`,
-      asc(users.createdAt),
-    )
-    .limit(1);
-  return row?.id ?? null;
+    .orderBy(asc(users.createdAt), asc(users.id));
+  const scopes = await loadScopes(tx, managers.map((m) => m.id));
+  const rank = (id: string): number => {
+    const scope = scopes.get(id);
+    if (!scope) return 2;
+    return isAllRegions(scope) ? 1 : scopeCovers(scope, region) ? 0 : 2;
+  };
+  // Array.prototype.sort is stable, so the creation order from the query survives inside each rank.
+  return [...managers].sort((a, b) => rank(a.id) - rank(b.id))[0]?.id ?? null;
 }
 
 /** Throws ValidationError (path "managerId") unless the user is an active partner manager. */

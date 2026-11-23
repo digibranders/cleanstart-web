@@ -1,8 +1,8 @@
 import { logoUrlOf } from '@/lib/company-profile';
 import { and, count, eq, isNull, sql } from 'drizzle-orm';
-import { notificationPrefs, notifications, partners, registrations, staffScopes, users } from '@/db/schema';
+import { notificationPrefs, notifications, partners, registrations, users } from '@/db/schema';
 import { type Clock, systemClock } from '@/lib/clock';
-import { NOTIFICATION_CATEGORIES, type NotificationCategory, PARTNER_CATEGORY_LABEL, PARTNER_ROLE_LABEL, type PartnerRole, STAFF_ROLE_LABEL, type StaffRegion, type StaffRole } from '@/lib/domain';
+import { NOTIFICATION_CATEGORIES, type NotificationCategory, PARTNER_CATEGORY_LABEL, PARTNER_ROLE_LABEL, type PartnerRole, STAFF_ROLE_LABEL, type StaffRole } from '@/lib/domain';
 import type { ProfileDto, ShellDto } from '@/lib/dto';
 import type { Viewer } from '@/server/auth/types';
 import { NotFoundError, ValidationError } from '@/server/errors';
@@ -10,10 +10,10 @@ import { NOTIFICATION_PREF_DEFAULTS } from '@/server/notify';
 import { iso } from '@/server/people';
 import type { Tx } from './context';
 import { defineIsolation } from './isolation.registry';
-import { regionName } from '@/lib/regions';
-
-/** "CleanStart India", "CleanStart Middle East", or plain "CleanStart" for a manager who covers every region. */
-const teamLabel = (region: StaffRegion): string => (region === 'all' ? 'CleanStart' : `CleanStart ${regionName(region)}`);
+import { isAllRegions, regionName, scopeLabel } from '@/lib/regions';
+import { staffTeamLabel } from '@/lib/people';
+import { listRegions } from './regions';
+import { loadScope, scopeCondition } from '@/server/staff-scope';
 
 async function unreadCount(tx: Tx, userId: string): Promise<number> {
   const [row] = await tx
@@ -30,7 +30,7 @@ async function waitingCount(tx: Tx, viewer: Viewer): Promise<number> {
   const [row] = await tx
     .select({ value: count() })
     .from(registrations)
-    .where(viewer.region === 'all' ? pending : and(pending, eq(registrations.region, viewer.region)));
+    .where(and(pending, scopeCondition(viewer.regions, registrations.region)));
   return row?.value ?? 0;
 }
 
@@ -40,7 +40,7 @@ export async function getShell(tx: Tx, viewer: Viewer): Promise<ShellDto> {
   const unreadNotifications = await unreadCount(tx, viewer.id);
 
   if (viewer.kind === 'staff') {
-    const region = viewer.region === 'all' ? '' : `, ${regionName(viewer.region)}`;
+    const region = isAllRegions(viewer.regions) ? '' : `, ${scopeLabel(viewer.regions, await listRegions(tx))}`;
     return {
       ...base,
       roleLabel: `${STAFF_ROLE_LABEL[viewer.role]}${region}`,
@@ -59,11 +59,11 @@ export async function getShell(tx: Tx, viewer: Viewer): Promise<ShellDto> {
     .limit(1);
   if (!partner) throw new NotFoundError('partner');
 
+  const regionList = await listRegions(tx);
   const [manager] = partner.managerId
     ? await tx
-        .select({ id: users.id, name: users.name, email: users.email, region: staffScopes.region })
+        .select({ id: users.id, name: users.name, email: users.email })
         .from(users)
-        .leftJoin(staffScopes, eq(staffScopes.userId, users.id))
         .where(and(eq(users.id, partner.managerId), eq(users.status, 'active')))
         .limit(1)
     : [];
@@ -73,9 +73,9 @@ export async function getShell(tx: Tx, viewer: Viewer): Promise<ShellDto> {
     roleLabel: PARTNER_ROLE_LABEL[viewer.role],
     orgName: viewer.partnerName,
     orgLogoUrl: logoUrlOf(partner.id, partner.logoKey),
-    orgSub: `${PARTNER_CATEGORY_LABEL[partner.category]}, ${regionName(partner.region)}`,
+    orgSub: `${PARTNER_CATEGORY_LABEL[partner.category]}, ${regionName(partner.region, regionList)}`,
     partnerRegion: partner.region,
-    manager: manager ? { id: manager.id, name: manager.name, email: manager.email, team: teamLabel(manager.region ?? 'all') } : null,
+    manager: manager ? { id: manager.id, name: manager.name, email: manager.email, team: staffTeamLabel(await loadScope(tx, manager.id), regionList) } : null,
     waitingApprovals: 0,
     unreadNotifications,
   };

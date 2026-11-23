@@ -1,7 +1,8 @@
 import { and, desc, eq, isNull } from 'drizzle-orm';
-import { applications, authAccounts, authTwoFactors, invites, partners, staffScopes, users } from '@/db/schema';
+import { applications, authAccounts, authTwoFactors, invites, partners, users } from '@/db/schema';
 import { type Clock, systemClock } from '@/lib/clock';
-import type { PartnerRole, StaffRegion, StaffRole, UserKind } from '@/lib/domain';
+import { ALL_REGIONS, type PartnerRole, type StaffRole, type StaffScope, type UserKind } from '@/lib/domain';
+import { decodeScope, encodeScope } from '@/lib/regions';
 import type { CreatedInviteDto, InviteDto, InvitePreviewDto, InviteState } from '@/lib/dto';
 import { isValidEmail } from '@/lib/people';
 import type { SystemActor, Viewer } from '@/server/auth/types';
@@ -12,6 +13,7 @@ import { listManagerRecipients } from './applications';
 import { assertStaff, type Tx } from './context';
 import { defineIsolation } from './isolation.registry';
 import { assertStaffScopeAssignable } from './regions';
+import { setStaffScope } from '@/server/staff-scope';
 
 export interface AcceptInviteInput {
   token: string;
@@ -165,12 +167,7 @@ export async function acceptInvite(tx: Tx, _actor: SystemActor, input: AcceptInv
   }
 
   await tx.insert(authAccounts).values({ accountId: userId, providerId: 'credential', userId, password: input.passwordHash });
-  if (invite.kind === 'staff' && invite.staffRegion) {
-    await tx
-      .insert(staffScopes)
-      .values({ userId, region: invite.staffRegion })
-      .onConflictDoUpdate({ target: staffScopes.userId, set: { region: invite.staffRegion } });
-  }
+  if (invite.kind === 'staff' && invite.staffRegion) await setStaffScope(tx, userId, decodeScope(invite.staffRegion));
   if (needsAgreement && partner) {
     await tx.update(partners).set({ agreementVersion: input.agreementVersion, agreementAcceptedAt: now }).where(eq(partners.id, partner.id));
   }
@@ -189,15 +186,15 @@ export async function acceptInvite(tx: Tx, _actor: SystemActor, input: AcceptInv
 
 export type NewInviteInput =
   | { kind: 'partner'; partnerId: string; email: string; role: PartnerRole; name?: string | null | undefined }
-  | { kind: 'staff'; email: string; role: StaffRole; region: StaffRegion };
+  | { kind: 'staff'; email: string; role: StaffRole; regions: StaffScope };
 
 /** Partner admin on own company, partner manager on any, partner manager for staff invites (M1.6, M1.8). */
 export async function createInvite(tx: Tx, viewer: Viewer, input: NewInviteInput, clock: Clock): Promise<CreatedInviteDto> {
   if (!isValidEmail(input.email)) throw new ValidationError([{ path: 'email', message: 'Enter a valid work email.' }]);
   if (input.kind === 'staff') {
     assertStaff(viewer);
-    await assertStaffScopeAssignable(tx, input.region);
-    return issueInvite(tx, { kind: 'staff', partnerId: null, email: input.email, role: input.role, staffRegion: input.region, invitedBy: viewer.id }, clock);
+    for (const key of input.regions === ALL_REGIONS ? [ALL_REGIONS] : input.regions) await assertStaffScopeAssignable(tx, key);
+    return issueInvite(tx, { kind: 'staff', partnerId: null, email: input.email, role: input.role, staffRegion: encodeScope(input.regions), invitedBy: viewer.id }, clock);
   }
   if (viewer.kind === 'partner' && input.partnerId !== viewer.partnerId) throw new NotFoundError('partner');
   const [partner] = await tx.select({ id: partners.id }).from(partners).where(eq(partners.id, input.partnerId)).limit(1);

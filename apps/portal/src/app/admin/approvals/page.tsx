@@ -37,7 +37,7 @@ export default async function Page({
       queue={data.queue}
       extensions={data.extensions}
       viewerId={viewer.id}
-      viewerRegion={viewer.region}
+      viewerRegions={viewer.regions}
       managers={data.managers}
       today={systemClock.today()}
       facet={facet}

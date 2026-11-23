@@ -13,21 +13,22 @@ import { NotFoundError } from '@/server/errors';
 import { notifyUsers } from '@/server/notify';
 import { withViewer } from '@/server/repo/context';
 import { createInvite, resendInvite } from '@/server/repo/invites';
-import { changeStaffRegion, changeStaffRole, listStaff, removeStaff } from '@/server/repo/staff';
+import { changeStaffRegions, changeStaffRole, listStaff, removeStaff } from '@/server/repo/staff';
 import { inviteUrl } from '@/server/urls';
 import type { ActionResult } from './result';
 import { runViewerAction } from './run';
-import { regionName, staffScopeSchema } from '@/lib/regions';
+import { scopeLabel, sameScope, staffScopesSchema } from '@/lib/regions';
+import { listRegions } from '@/server/repo/regions';
 
 const inviteSchema = z.object({
   name: z.string().trim().min(1, 'Enter their name.').max(120),
   email: z.string().trim().max(254),
   role: z.enum(STAFF_ROLES),
-  region: staffScopeSchema,
+  regions: staffScopesSchema,
 });
 const inviteIdSchema = z.object({ inviteId: z.string().uuid() });
 const roleSchema = z.object({ userId: z.string().uuid(), role: z.enum(STAFF_ROLES) });
-const regionSchema = z.object({ userId: z.string().uuid(), region: staffScopeSchema });
+const regionSchema = z.object({ userId: z.string().uuid(), regions: staffScopesSchema });
 const removeSchema = z.object({ id: z.string().uuid() });
 
 const staffMail = (args: { invite: InviteDto; token: string; inviteeName: string; inviterName: string }) =>
@@ -46,10 +47,10 @@ export async function inviteStaffAction(raw: unknown): Promise<ActionResult<Invi
   return runViewerAction({ name: 'staff.invite', schema: inviteSchema }, raw, async (ctx, input): Promise<InviteDto> => {
     assertCan(ctx.viewer, 'staff.invite');
     const created = await withViewer(ctx.viewer, async (tx) => {
-      const result = await createInvite(tx, ctx.viewer, { kind: 'staff', email: input.email, role: input.role, region: input.region }, ctx.clock);
+      const result = await createInvite(tx, ctx.viewer, { kind: 'staff', email: input.email, role: input.role, regions: input.regions }, ctx.clock);
       await recordAudit(tx, ctx.viewer, {
         event: 'staff.invited',
-        target: `${input.name}, ${STAFF_ROLE_LABEL[input.role].toLowerCase()}, ${regionName(input.region)}`,
+        target: `${input.name}, ${STAFF_ROLE_LABEL[input.role].toLowerCase()}, ${scopeLabel(input.regions, await listRegions(tx))}`,
         subject: { type: 'invite', id: result.invite.id },
       });
       return result;
@@ -71,7 +72,7 @@ export async function resendStaffInviteAction(raw: unknown): Promise<ActionResul
       const resent = await resendInvite(tx, ctx.viewer, { inviteId: input.inviteId }, ctx.clock);
       await recordAudit(tx, ctx.viewer, {
         event: 'staff.invite_resent',
-        target: `${member.name}, ${STAFF_ROLE_LABEL[member.role].toLowerCase()}, ${regionName(member.region)}`,
+        target: `${member.name}, ${STAFF_ROLE_LABEL[member.role].toLowerCase()}, ${scopeLabel(member.regions, await listRegions(tx))}`,
         subject: { type: 'invite', id: resent.invite.id },
       });
       return { resent, member };
@@ -123,12 +124,13 @@ export async function changeStaffRegionAction(raw: unknown): Promise<ActionResul
     const changed = await withViewer(ctx.viewer, async (tx) => {
       const before = (await listStaff(tx, ctx.viewer)).find((m) => m.id === input.userId && m.inviteId !== m.id);
       if (!before) throw new NotFoundError('staff member');
-      const after = await changeStaffRegion(tx, ctx.viewer, { userId: input.userId, region: input.region });
-      if (before.region !== after.region) {
+      const after = await changeStaffRegions(tx, ctx.viewer, { userId: input.userId, regions: input.regions });
+      if (!sameScope(before.regions, after.regions)) {
+        const list = await listRegions(tx);
         await recordAudit(tx, ctx.viewer, {
           event: 'staff.region_changed',
           target: `${after.name}, CleanStart team`,
-          note: `${regionName(before.region)} to ${regionName(after.region)}.`,
+          note: `${scopeLabel(before.regions, list)} to ${scopeLabel(after.regions, list)}.`,
           subject: { type: 'user', id: after.id },
         });
       }
@@ -148,7 +150,7 @@ export async function removeStaffAction(raw: unknown): Promise<ActionResult<{ id
       const removed = await removeStaff(tx, ctx.viewer, { userId: input.id }, ctx.clock);
       await recordAudit(tx, ctx.viewer, {
         event: 'staff.removed',
-        target: `${removed.name}, ${STAFF_ROLE_LABEL[member.role].toLowerCase()}, ${regionName(member.region)}`,
+        target: `${removed.name}, ${STAFF_ROLE_LABEL[member.role].toLowerCase()}, ${scopeLabel(member.regions, await listRegions(tx))}`,
         subject: { type: 'user', id: removed.userId },
       });
       return { removed, hadLogin: member.inviteId !== member.id };

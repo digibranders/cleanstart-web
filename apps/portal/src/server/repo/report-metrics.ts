@@ -4,13 +4,13 @@ import { fixedClock } from '@/lib/clock';
 import { buildRangedReport, type RangedReportDto, type ReportRange } from '@/lib/report-metrics';
 import type { Viewer } from '@/server/auth/types';
 import { ForbiddenError } from '@/server/errors';
-import { registrationScope } from '@/server/registrations/scope';
+import { aggregateRegistrationScope } from '@/server/registrations/scope';
 import { assertStaff, type Tx } from './context';
 import { defineIsolation } from './isolation.registry';
 
 /**
  * Value, win rate, funnel, leaderboard and product figures for the deals registered inside `range`. Partner managers
- * and staff sales only; the rows read are the ones `registrationScope` allows (a sales viewer sees their region).
+ * and staff sales only; the rows read are the ones `aggregateRegistrationScope` allows (the regions the viewer covers).
  */
 export async function getRangedReport(tx: Tx, viewer: Viewer, range: ReportRange): Promise<RangedReportDto> {
   assertStaff(viewer);
@@ -29,7 +29,7 @@ export async function getRangedReport(tx: Tx, viewer: Viewer, range: ReportRange
     })
     .from(registrations)
     .innerJoin(partners, eq(partners.id, registrations.partnerId))
-    .where(and(registrationScope(viewer), gte(registrations.registeredOn, range.from), lte(registrations.registeredOn, range.to)))
+    .where(and(aggregateRegistrationScope(viewer), gte(registrations.registeredOn, range.from), lte(registrations.registeredOn, range.to)))
     .orderBy(asc(registrations.registeredOn), asc(registrations.id));
   return buildRangedReport(rows, range);
 }

@@ -20,7 +20,7 @@ const staff: Viewer = {
   role: 'partner_manager',
   partnerId: null,
   partnerName: null,
-  region: 'all',
+  regions: 'all',
   email: 'gaurav@cleanstart.com',
   name: 'Gaurav Jadhav',
 };

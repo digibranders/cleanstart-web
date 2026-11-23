@@ -1,13 +1,14 @@
 import { and, asc, desc, eq, isNull, ne, sql } from 'drizzle-orm';
-import { auditLog, invites, partnerChecklist, partners, registrations, staffScopes, users } from '@/db/schema';
+import { auditLog, invites, partnerChecklist, partners, registrations, users } from '@/db/schema';
 import { type Clock, systemClock } from '@/lib/clock';
 import { type CompanyDetailsInput, logoUrlOf } from '@/lib/company-profile';
-import { CHECKLIST_STEPS, type ChecklistStep, type PartnerCategory, type PartnerRegion, type PartnerStatus, type StaffRegion } from '@/lib/domain';
+import { CHECKLIST_STEPS, type ChecklistStep, type PartnerCategory, type PartnerRegion, type PartnerStatus, type StaffScope } from '@/lib/domain';
 import type { ChecklistDto, CompanyDetailsDto, CompanyDto, CreatedInviteDto, IsoTimestamp, PartnerDetailDto, PartnerListRow } from '@/lib/dto';
 import { emailDomain, isPlausibleDomain, isValidEmail, nameFromEmail, normaliseDomain, staffTeamLabel } from '@/lib/people';
 import type { Viewer } from '@/server/auth/types';
 import { ConflictError, ForbiddenError, NotFoundError, ValidationError } from '@/server/errors';
 import { issueInvite, rotateInviteToken } from '@/server/invite-core';
+import { scopeCovers } from '@/lib/regions';
 import { loadPartnerPeople } from '@/server/partner-people';
 import { assertActiveManager, insertOnboardingPartner, pickManagerId } from '@/server/partner-routing';
 import { partnerListRows } from '@/server/partner-rows';
@@ -16,6 +17,7 @@ import { resolvePartnerScope } from '@/server/partner-scope';
 import { assertStaff, type Tx } from './context';
 import { defineIsolation } from './isolation.registry';
 import { assertRegionAssignable, listRegions } from './regions';
+import { loadScope } from '@/server/staff-scope';
 
 type PartnerRow = typeof partners.$inferSelect;
 
@@ -34,9 +36,8 @@ const toDetails = (p: PartnerRow): CompanyDetailsDto => ({
 const toCompany = async (tx: Tx, p: PartnerRow): Promise<CompanyDto> => {
   const [manager] = p.managerId
     ? await tx
-        .select({ id: users.id, name: users.name, email: users.email, region: staffScopes.region })
+        .select({ id: users.id, name: users.name, email: users.email })
         .from(users)
-        .leftJoin(staffScopes, eq(staffScopes.userId, users.id))
         .where(eq(users.id, p.managerId))
         .limit(1)
     : [];
@@ -54,18 +55,18 @@ const toCompany = async (tx: Tx, p: PartnerRow): Promise<CompanyDto> => {
     ...toDetails(p),
     tier: null,
     since: p.createdAt.toISOString().slice(0, 10),
-    manager: manager ? { id: manager.id, name: manager.name, email: manager.email, team: staffTeamLabel(manager.region, await listRegions(tx)) } : null,
+    manager: manager ? { id: manager.id, name: manager.name, email: manager.email, team: staffTeamLabel(await loadScope(tx, manager.id), await listRegions(tx)) } : null,
     agreementVersion: p.agreementVersion,
     agreementAcceptedAt: iso(p.agreementAcceptedAt),
   };
 };
 
-/** Partner viewers: their own company. Staff: pass partnerId. Staff sales only see partners in their region. (M1.5, M1.7) */
+/** Partner viewers: their own company. Staff: pass partnerId. Staff sales only see partners in their regions. (M1.5, M1.7) */
 export async function getCompany(tx: Tx, viewer: Viewer, input: { partnerId?: string }): Promise<CompanyDto> {
   const partnerId = resolvePartnerScope(viewer, input.partnerId);
   const [partner] = await tx.select().from(partners).where(eq(partners.id, partnerId)).limit(1);
   if (!partner) throw new NotFoundError('partner');
-  if (viewer.kind === 'staff' && viewer.role === 'sales' && viewer.region !== 'all' && partner.region !== viewer.region) {
+  if (viewer.kind === 'staff' && viewer.role === 'sales' && !scopeCovers(viewer.regions, partner.region)) {
     throw new NotFoundError('partner');
   }
   return toCompany(tx, partner);
@@ -132,7 +133,7 @@ export async function setPartnerLogo(
   return { company: await toCompany(tx, row), previousKey: before.logoKey };
 }
 
-/** The stored logo key of a partner the viewer may see: a partner viewer's own, any for staff (sales staff only in their region). Null when there is no logo. */
+/** The stored logo key of a partner the viewer may see: a partner viewer's own, any for staff (sales staff only in their regions). Null when there is no logo. */
 export async function getPartnerLogoKey(tx: Tx, viewer: Viewer, partnerId: string): Promise<string | null> {
   const company = await getCompany(tx, viewer, { partnerId });
   const [row] = await tx.select({ logoKey: partners.logoKey }).from(partners).where(eq(partners.id, company.partnerId)).limit(1);
@@ -225,9 +226,9 @@ export interface NewPartnerInput {
   sendInvite: boolean;
 }
 
-/** Staff sales only see partners in their own region; partner managers see all. */
-const regionScope = (viewer: Viewer): StaffRegion | undefined =>
-  viewer.kind === 'staff' && viewer.role === 'sales' ? viewer.region : undefined;
+/** Staff sales only see partners in their own regions; partner managers see all. */
+const regionScope = (viewer: Viewer): StaffScope | undefined =>
+  viewer.kind === 'staff' && viewer.role === 'sales' ? viewer.regions : undefined;
 
 const rowFor = async (tx: Tx, id: string): Promise<PartnerListRow> => {
   const [row] = await partnerListRows(tx, { ids: [id] });
@@ -241,7 +242,7 @@ const lockPartner = async (tx: Tx, id: string) => {
   return row;
 };
 
-/** Staff. Staff sales: only partners in their region. */
+/** Staff. Staff sales: only partners in their regions. */
 export async function listPartners(tx: Tx, viewer: Viewer, input: ListPartnersInput): Promise<PartnerListRow[]> {
   assertStaff(viewer);
   const scope = regionScope(viewer);
@@ -250,14 +251,14 @@ export async function listPartners(tx: Tx, viewer: Viewer, input: ListPartnersIn
     ...(input.status ? { status: input.status } : {}),
     ...(input.category ? { category: input.category } : {}),
     ...(input.region ? { region: input.region } : {}),
-    ...(scope ? { scopeRegion: scope } : {}),
+    ...(scope ? { scope } : {}),
   });
 }
 
 export async function getPartnerDetail(tx: Tx, viewer: Viewer, id: string): Promise<PartnerDetailDto> {
   assertStaff(viewer);
   const scope = regionScope(viewer);
-  const [row] = await partnerListRows(tx, { ids: [id], ...(scope ? { scopeRegion: scope } : {}) });
+  const [row] = await partnerListRows(tx, { ids: [id], ...(scope ? { scope } : {}) });
   const [partner] = await tx.select().from(partners).where(eq(partners.id, id)).limit(1);
   if (!row || !partner) throw new NotFoundError('partner');
   const people = await loadPartnerPeople(tx, partner.id);

@@ -1,4 +1,4 @@
-import { addDays } from './dates';
+import { addDays, isRealDay } from './dates';
 import { type DealRegion, isOneOf, PARTNER_CATEGORIES, type PartnerCategory, PRODUCTS, type Product, type RegistrationStatus } from './domain';
 import { REGION_KEY_PATTERN } from './regions';
 import type { AttentionItemDto, DocumentListItemDto, IntegrationHealthDto, IsoTimestamp } from './dto';
@@ -40,12 +40,6 @@ const pick = (params: Params, key: string): string | undefined => {
   return value === null || value === undefined ? undefined : value.trim();
 };
 
-const ISO_DAY = /^\d{4}-\d{2}-\d{2}$/;
-const isRealDay = (v: string | undefined): v is string => {
-  if (v === undefined || !ISO_DAY.test(v)) return false;
-  const at = new Date(`${v}T00:00:00Z`);
-  return !Number.isNaN(at.getTime()) && at.toISOString().slice(0, 10) === v;
-};
 
 /** Parses `?period=&from=&to=&region=&product=&category=&partnerId=`. Any bad or missing value falls back to the default (no filter). */
 export function parseDashboardFilters(params: Params, opts: { staff: boolean }): DashboardFilters {

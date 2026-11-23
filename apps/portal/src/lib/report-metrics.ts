@@ -1,4 +1,4 @@
-import { addDays } from './dates';
+import { addDays, isRealDay } from './dates';
 import { isOneOf, PRODUCTS, type Product, type RegistrationStatus } from './domain';
 
 /* ---------------------------------------------------------------- date range (URL state) */
@@ -24,9 +24,6 @@ export interface ReportRange {
 
 type Params = URLSearchParams | Record<string, string | string[] | undefined>;
 
-const ISO_DAY = /^\d{4}-\d{2}-\d{2}$/;
-const isRealDay = (value: string | undefined): value is string =>
-  value !== undefined && ISO_DAY.test(value) && new Date(`${value}T00:00:00Z`).toISOString().slice(0, 10) === value;
 
 const pick = (params: Params, key: string): string | undefined => {
   const raw = params instanceof URLSearchParams ? params.get(key) : params[key];

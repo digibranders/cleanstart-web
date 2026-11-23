@@ -4,7 +4,7 @@ import { countryName, formatDealValue } from '@/lib/deal-format';
 import { EXTENSION_DAYS, PROTECTION_DAYS, REVIEW_SLA_BUSINESS_DAYS } from '@/lib/deal-rules';
 import { PRODUCT_LABEL } from '@/lib/domain';
 import type { RegistrationDetailDto } from '@/lib/dto';
-import { regionName } from '@/lib/regions';
+import { type RegionDto, regionName } from '@/lib/regions';
 
 /** Everything the page prints, already resolved: dates are ISO, labels are display text. */
 export interface RegistrationConfirmationDto {
@@ -26,7 +26,7 @@ export interface RegistrationConfirmationDto {
 }
 
 /** Null when the registration is not accepted or lacks the dates the page needs. */
-export function toConfirmationDto(deal: RegistrationDetailDto, today: string): RegistrationConfirmationDto | null {
+export function toConfirmationDto(deal: RegistrationDetailDto, today: string, regions: readonly RegionDto[]): RegistrationConfirmationDto | null {
   if (deal.status !== 'accepted' || !deal.decidedOn || !deal.protectionEnd) return null;
   const extended = deal.extensionStatus === 'granted' && deal.extensionDays;
   return {
@@ -35,7 +35,7 @@ export function toConfirmationDto(deal: RegistrationDetailDto, today: string): R
     website: deal.website,
     country: countryName(deal.customerCountry),
     product: PRODUCT_LABEL[deal.product],
-    region: regionName(deal.region),
+    region: regionName(deal.region, regions),
     partnerName: deal.partnerName,
     registeredOn: deal.registeredOn,
     acceptedOn: deal.decidedOn,

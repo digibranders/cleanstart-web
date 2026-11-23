@@ -9,8 +9,8 @@ import { assertStaff, type Tx } from './context';
 import { defineIsolation } from './isolation.registry';
 import { getRegistration, lockRegistration } from './registrations';
 import { listManagerOptions } from './staff';
-import { regionName } from '@/lib/regions';
-import { assertRegionAssignable } from './regions';
+import { type RegionDto, regionName } from '@/lib/regions';
+import { assertRegionAssignable, listRegions } from './regions';
 
 export interface RoutingSnapshot {
   managerId: string | null;
@@ -33,8 +33,8 @@ const snapshot = (reg: Pick<RegistrationDetailDto, 'managerId' | 'managerName' |
 });
 
 /** "Gaurav Jadhav, India": how the audit entry and the history line read one side of the change. */
-export const routingLabel = (routing: RoutingSnapshot): string =>
-  `${routing.managerName ?? 'No manager'}, ${regionName(routing.region)}`;
+export const routingLabel = (routing: RoutingSnapshot, regions: readonly RegionDto[]): string =>
+  `${routing.managerName ?? 'No manager'}, ${regionName(routing.region, regions)}`;
 
 /**
  * Staff. Changes the partner manager and the region of a pending registration. The manager must be one of
@@ -62,6 +62,7 @@ export async function reassignRegistration(
     return { registration: current, before, after, changed: false };
   }
 
+  const regionList = await listRegions(tx);
   await tx
     .update(registrations)
     .set({ managerId: manager.id, region: input.region })
@@ -69,7 +70,7 @@ export async function reassignRegistration(
   await tx.insert(registrationEvents).values({
     registrationId: current.id,
     at: clock.now(),
-    text: `Reassigned from ${routingLabel(before)} to ${routingLabel(after)}`,
+    text: `Reassigned from ${routingLabel(before, regionList)} to ${routingLabel(after, regionList)}`,
     byLabel: viewer.name,
     source: 'portal',
   });

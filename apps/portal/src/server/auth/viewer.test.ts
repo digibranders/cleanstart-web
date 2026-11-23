@@ -70,7 +70,7 @@ describe('homeFor', () => {
     role,
     partnerId: null,
     partnerName: null,
-    region: 'india',
+    regions: ['india'],
     email: 'e@x.co',
     name: 'N',
   });

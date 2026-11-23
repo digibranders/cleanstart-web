@@ -15,7 +15,6 @@ import {
   registrationContacts,
   registrationMessages,
   registrations,
-  staffScopes,
   users,
 } from '@/db/schema';
 import type {
@@ -27,10 +26,13 @@ import type {
   Product,
   RegistrationStatus,
   StaffRegion,
+  StaffScope,
   StaffRole,
 } from '@/lib/domain';
 import type { PartnerViewer, StaffViewer, Viewer } from '@/server/auth/types';
+import { decodeScope, normalizeScope } from '@/lib/regions';
 import { hashPassword } from '@/server/auth/passwords';
+import { loadScope, setStaffScope } from '@/server/staff-scope';
 import { nextRegistrationReference } from '@/server/registrations/reference';
 import type { IsolationContext, TenantFixture } from '@/server/repo/isolation.registry';
 
@@ -133,7 +135,8 @@ export interface MakeUserInput {
   email?: string;
   name?: string;
   status?: 'invited' | 'active' | 'disabled';
-  region?: StaffRegion;
+  /** A staff scope: 'all', one region key, or several keys. Default 'all'. */
+  region?: StaffRegion | readonly string[];
   /** Inserts a Better Auth credential account hashed with hashPassword (added by M0.7). */
   password?: string;
   hubspotContactId?: string | null;
@@ -161,7 +164,7 @@ export async function makeUser(database: Db, input: MakeUserInput): Promise<User
     })
     .returning();
   const user = first(rows, 'user');
-  if (kind === 'staff') await database.insert(staffScopes).values({ userId: user.id, region: input.region ?? 'all' });
+  if (kind === 'staff') await setStaffScope(database, user.id, scopeOf(input.region ?? 'all'));
   if (input.password !== undefined) {
     await database
       .insert(authAccounts)
@@ -304,6 +307,9 @@ export async function makeApplication(database: Db, input: Partial<typeof applic
   return first(rows, 'application');
 }
 
+/** 'all', one key, or a list of keys, as a StaffScope. */
+const scopeOf = (value: StaffRegion | readonly string[]): StaffScope => (typeof value === 'string' ? decodeScope(value) : normalizeScope(value));
+
 /** Returns the row and the clear token (the row holds only the SHA-256 hex digest, as hashToken() produces). */
 export async function makeInvite(
   database: Db,
@@ -387,14 +393,13 @@ export async function viewerFor(database: Db, user: UserRow): Promise<Viewer> {
       name: user.name,
     };
   }
-  const scope = (await database.select({ region: staffScopes.region }).from(staffScopes).where(eq(staffScopes.userId, user.id)))[0];
   return {
     id: user.id,
     kind: 'staff',
     role: user.role as StaffRole,
     partnerId: null,
     partnerName: null,
-    region: scope?.region ?? 'all',
+    regions: await loadScope(database, user.id),
     email: user.email,
     name: user.name,
   };
@@ -403,7 +408,7 @@ export async function viewerFor(database: Db, user: UserRow): Promise<Viewer> {
 export async function asStaff(
   database: Db,
   role: 'partner_manager' | 'sales' | 'marketing' = 'partner_manager',
-  region: StaffRegion = 'all',
+  region: StaffRegion | readonly string[] = 'all',
 ): Promise<StaffViewer> {
   const viewer = await viewerFor(database, await makeUser(database, { kind: 'staff', role, region }));
   if (viewer.kind !== 'staff') throw new Error('test helper: asStaff produced a partner viewer');

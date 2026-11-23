@@ -237,10 +237,10 @@ describe('createInvite', () => {
     const manager = await asStaff(db, 'partner_manager', 'india');
     const forPartner = await withViewer(manager, (tx) => createInvite(tx, manager, { kind: 'partner', partnerId: partner.id, email: 'x@p.example', role: 'technical' }, clock));
     expect(forPartner.invite.partnerId).toBe(partner.id);
-    const staff = await withViewer(manager, (tx) => createInvite(tx, manager, { kind: 'staff', email: 'kunal@cleanstart.com', role: 'sales', region: 'india' }, clock));
+    const staff = await withViewer(manager, (tx) => createInvite(tx, manager, { kind: 'staff', email: 'kunal@cleanstart.com', role: 'sales', regions: ['india'] }, clock));
     expect(staff.invite).toMatchObject({ kind: 'staff', partnerId: null, staffRegion: 'india', role: 'sales' });
     const admin = await asPartner(db, { partnerId: partner.id, role: 'partner_admin' });
-    await expect(withViewer(admin, (tx) => createInvite(tx, admin, { kind: 'staff', email: 'y@cleanstart.com', role: 'sales', region: 'india' }, clock))).rejects.toMatchObject({ code: 'forbidden' });
+    await expect(withViewer(admin, (tx) => createInvite(tx, admin, { kind: 'staff', email: 'y@cleanstart.com', role: 'sales', regions: ['india'] }, clock))).rejects.toMatchObject({ code: 'forbidden' });
   });
 });
 

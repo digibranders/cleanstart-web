@@ -3,23 +3,19 @@
 import { useState } from "react";
 import { Drawer } from "@/components/ui/overlay";
 import { useToast } from "@/components/ui/toast";
-import {
-  ALL_REGIONS,
-  STAFF_ROLE_LABEL,
-  STAFF_ROLES,
-  type StaffRegion,
-  type StaffRole,
-} from "@/lib/domain";
+import { ALL_REGIONS, STAFF_ROLE_LABEL, STAFF_ROLES, type StaffRole, type StaffScope } from "@/lib/domain";
+import { scopeLabel } from "@/lib/regions";
 import { codeFromLabel, isValidEmail } from "@/lib/people";
 import { inviteStaffAction } from "@/server/actions/staff";
 import { issuesToErrors } from "@/server/actions/result";
+import { MultiDropdown } from "@/components/ui/multi-dropdown";
 import { Seg } from "./Seg";
 import { useRegions } from "@/components/regions-context";
 
 const ROLES: readonly string[] = STAFF_ROLES.map((r) => STAFF_ROLE_LABEL[r]);
 const ROLE_HINT: Record<StaffRole, string> = {
   partner_manager: "Approves deals and applications, and manages partners.",
-  sales: "Sees and approves deals in their own region.",
+  sales: "Sees and approves deals in the regions they cover.",
   marketing: "Publishes documents for partners.",
 };
 
@@ -33,13 +29,13 @@ export function StaffInviteDrawer({
   existingEmails: readonly string[];
 }): React.JSX.Element | null {
   const toast = useToast();
-  const { offer } = useRegions();
-  const scopes = [{ key: ALL_REGIONS, name: "All regions" }, ...offer()];
-  const defaultScope = scopes[1]?.name ?? scopes[0]?.name ?? "";
+  const { regions, offer } = useRegions();
+  const choices = offer().map((r) => ({ key: r.key, label: r.name }));
+  const defaultScope: StaffScope = choices[0] ? [choices[0].key] : ALL_REGIONS;
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [roleLabel, setRoleLabel] = useState<string>(STAFF_ROLE_LABEL.sales);
-  const [regionLabel, setRegionLabel] = useState<string>(defaultScope);
+  const [scope, setScope] = useState<StaffScope>(defaultScope);
   const [tried, setTried] = useState(false);
   const [busy, setBusy] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
@@ -50,7 +46,6 @@ export function StaffInviteDrawer({
   const nameErr = tried && name.trim() === "";
   const emailErr = (tried && (!emailOk || duplicate)) || serverError !== null;
   const role: StaffRole = codeFromLabel(STAFF_ROLE_LABEL, roleLabel) ?? "sales";
-  const region: StaffRegion = scopes.find((s) => s.name === regionLabel)?.key ?? ALL_REGIONS;
 
   const submit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
@@ -60,7 +55,7 @@ export function StaffInviteDrawer({
       return;
     }
     setBusy(true);
-    const result = await inviteStaffAction({ name, email: address, role, region });
+    const result = await inviteStaffAction({ name, email: address, role, regions: scope === ALL_REGIONS ? [ALL_REGIONS] : scope });
     setBusy(false);
     if (!result.ok) {
       setServerError(issuesToErrors(result.error).email ?? result.error.message);
@@ -69,7 +64,7 @@ export function StaffInviteDrawer({
     setName("");
     setEmail("");
     setRoleLabel(STAFF_ROLE_LABEL.sales);
-    setRegionLabel(defaultScope);
+    setScope(defaultScope);
     setTried(false);
     onClose();
     toast(`Invite sent to ${address}`);
@@ -142,11 +137,18 @@ export function StaffInviteDrawer({
       </div>
       <div className="fg">
         <span id="inv-reg" className="lbl">
-          Region
+          Regions
         </span>
-        <div style={{ alignSelf: "flex-start" }}>
-          <Seg options={scopes.map((s) => s.name)} value={regionLabel} onChange={setRegionLabel} labelledBy="inv-reg" />
-        </div>
+        <MultiDropdown
+          variant="field"
+          id="inv-reg-dd"
+          ariaLabel="Regions they cover"
+          value={scope}
+          summary={scopeLabel(scope, regions)}
+          options={choices}
+          onCommit={setScope}
+        />
+        <span className="hint">Choose one or more regions, or All regions.</span>
       </div>
     </Drawer>
   );

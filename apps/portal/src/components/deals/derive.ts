@@ -3,7 +3,7 @@ import { sameCustomer } from "@/lib/customer";
 import { acceptedOnFor, EXPIRING_SOON_DAYS, isOverSla, PROTECTION_DAYS, REVIEW_SLA_BUSINESS_DAYS, waitingBusinessDays } from "@/lib/deal-rules";
 import { type DealRegion, PRODUCT_LABEL, type Product, type RegistrationStatus } from "@/lib/domain";
 import type { ManagerOptionDto, RegistrationCheckDto, RegistrationDetailDto, RegistrationListItem } from "@/lib/dto";
-import { type RegionDto, regionName } from "@/lib/regions";
+import { isAllRegions, type RegionDto, regionName, scopeCovers, scopeKeys } from "@/lib/regions";
 import { addDays, daysBetween, daysLeft, daysLeftLabel, fmtLong, fmtShort, plural } from "./dates";
 import type { HubspotHintDto } from "./types";
 
@@ -134,7 +134,7 @@ export function stageTrack(deal: Pick<RegistrationListItem, "status" | "stage">)
 
 /** The manager the Register form preselects: the one covering the deal region, else the first. */
 export function managerFor(managers: readonly ManagerOptionDto[], region: DealRegion): string {
-  return (managers.find((m) => m.region === region) ?? managers.find((m) => m.region === "all") ?? managers[0])?.id ?? "";
+  return (managers.find((m) => !isAllRegions(m.regions) && scopeCovers(m.regions, region)) ?? managers.find((m) => isAllRegions(m.regions)) ?? managers[0])?.id ?? "";
 }
 
 export interface Check {
@@ -202,9 +202,9 @@ export function defaultRejectReason(deal: CheckedDeal, check: Check): string {
 
 /** "India goes to Gaurav, Middle East to Omar." from the managers partners can pick. */
 export function routingText(managers: readonly ManagerOptionDto[], regions?: readonly RegionDto[]): string {
-  const keys = regions ? regions.filter((r) => r.active).map((r) => r.key) : [...new Set(managers.map((m) => m.region))].filter((k) => k !== "all");
+  const keys = regions ? regions.filter((r) => r.active).map((r) => r.key) : [...new Set(managers.flatMap((m) => scopeKeys(m.regions)))];
   const parts = keys.flatMap((region) => {
-    const manager = managers.find((m) => m.region === region);
+    const manager = managers.find((m) => !isAllRegions(m.regions) && scopeCovers(m.regions, region));
     return manager ? [{ region, first: firstWord(manager.name) }] : [];
   }).map((p, index) => `${regionName(p.region, regions)} ${index === 0 ? "goes to" : "to"} ${p.first}`);
   return parts.length ? `${parts.join(", ")}.` : "";

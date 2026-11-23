@@ -1,6 +1,6 @@
 import { sql } from 'drizzle-orm';
 import { appDb, type Db, systemDb } from '@/db/client';
-import type { SystemActor, Viewer } from '@/server/auth/types';
+import type { StaffViewer, SystemActor, Viewer } from '@/server/auth/types';
 import { ForbiddenError } from '@/server/errors';
 import { log } from '@/server/log';
 
@@ -38,6 +38,6 @@ export const withSystem = <T>(actor: SystemActor, fn: (tx: Tx) => Promise<T>): P
   });
 
 /** Throws ForbiddenError unless the viewer is CleanStart staff. Cheap guard for staff only repo functions. */
-export const assertStaff = (viewer: Viewer): void => {
+export function assertStaff(viewer: Viewer): asserts viewer is StaffViewer {
   if (viewer.kind !== 'staff') throw new ForbiddenError('staff only');
-};
+}

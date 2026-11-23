@@ -60,7 +60,7 @@ const events = async () => (await db.select().from(auditLog)).map((a) => a.event
 
 describe('inviteStaffAction', () => {
   it('invites a teammate: staff invite row, audit and an email with a link', async () => {
-    const result = await inviteStaffAction({ name: 'Kunal Shah', email: 'Kunal.Shah@cleanstart.com', role: 'sales', region: 'india' });
+    const result = await inviteStaffAction({ name: 'Kunal Shah', email: 'Kunal.Shah@cleanstart.com', role: 'sales', regions: ['india'] });
     expect(result).toMatchObject({ ok: true, data: { email: 'kunal.shah@cleanstart.com', kind: 'staff', role: 'sales', staffRegion: 'india' } });
     expect(JSON.stringify(result)).not.toContain('token');
     expect(await events()).toEqual(['staff.invited']);
@@ -70,10 +70,20 @@ describe('inviteStaffAction', () => {
     expect(await db.select().from(invites)).toHaveLength(1);
   });
 
+  it('invites a teammate for several regions or for all of them', async () => {
+    const two = await inviteStaffAction({ name: 'Omar Nasser', email: 'omar@cleanstart.com', role: 'partner_manager', regions: ['middle_east', 'eu'] });
+    expect(two).toMatchObject({ ok: true, data: { staffRegion: 'middle_east,eu' } });
+    const everywhere = await inviteStaffAction({ name: 'Priya', email: 'priya@cleanstart.com', role: 'marketing', regions: ['india', 'all'] });
+    expect(everywhere).toMatchObject({ ok: true, data: { staffRegion: 'all' } });
+    expect((await db.select().from(auditLog)).map((e) => e.target).sort()).toEqual(['Omar Nasser, partner manager, Middle East and EU', 'Priya, marketing, All regions']);
+    expect(await inviteStaffAction({ name: 'X', email: 'x@cleanstart.com', role: 'sales', regions: [] })).toMatchObject({ ok: false, error: { code: 'validation' } });
+    expect(await inviteStaffAction({ name: 'X', email: 'x@cleanstart.com', role: 'sales', regions: ['atlantis'] })).toMatchObject({ ok: false, error: { code: 'validation' } });
+  });
+
   it('is only for partner managers: staff sales, marketing and partner viewers are refused', async () => {
     for (const viewer of [await asStaff(db, 'sales', 'india'), await asStaff(db, 'marketing', 'all'), await asPartner(db, { role: 'partner_admin' })]) {
       harness.viewer = viewer;
-      expect(await inviteStaffAction({ name: 'X', email: 'x@cleanstart.com', role: 'sales', region: 'india' })).toMatchObject({ ok: false, error: { code: 'forbidden' } });
+      expect(await inviteStaffAction({ name: 'X', email: 'x@cleanstart.com', role: 'sales', regions: ['india'] })).toMatchObject({ ok: false, error: { code: 'forbidden' } });
     }
     expect(await db.select().from(invites)).toHaveLength(0);
     expect(fake.sent).toHaveLength(0);
@@ -81,10 +91,10 @@ describe('inviteStaffAction', () => {
 
   it('reports an existing login and validates the input', async () => {
     const teammate = await makeUser(db, { kind: 'staff', role: 'sales', region: 'india', email: 'rahul@cleanstart.com' });
-    expect(await inviteStaffAction({ name: 'Rahul', email: teammate.email, role: 'sales', region: 'india' })).toMatchObject({ ok: false, error: { code: 'conflict' } });
-    expect(await inviteStaffAction({ name: '  ', email: 'a@cleanstart.com', role: 'sales', region: 'india' })).toMatchObject({ ok: false, error: { code: 'validation' } });
-    expect(await inviteStaffAction({ name: 'A', email: 'nope', role: 'sales', region: 'india' })).toMatchObject({ ok: false, error: { code: 'validation' } });
-    expect(await inviteStaffAction({ name: 'A', email: 'a@cleanstart.com', role: 'partner_admin', region: 'india' })).toMatchObject({ ok: false, error: { code: 'validation' } });
+    expect(await inviteStaffAction({ name: 'Rahul', email: teammate.email, role: 'sales', regions: ['india'] })).toMatchObject({ ok: false, error: { code: 'conflict' } });
+    expect(await inviteStaffAction({ name: '  ', email: 'a@cleanstart.com', role: 'sales', regions: ['india'] })).toMatchObject({ ok: false, error: { code: 'validation' } });
+    expect(await inviteStaffAction({ name: 'A', email: 'nope', role: 'sales', regions: ['india'] })).toMatchObject({ ok: false, error: { code: 'validation' } });
+    expect(await inviteStaffAction({ name: 'A', email: 'a@cleanstart.com', role: 'partner_admin', regions: ['india'] })).toMatchObject({ ok: false, error: { code: 'validation' } });
   });
 });
 
@@ -98,10 +108,17 @@ describe('resendStaffInviteAction', () => {
 });
 
 describe('changeStaffRoleAction and changeStaffRegionAction', () => {
+  it('moves a manager to several regions and writes one audit note', async () => {
+    const omar = await makeUser(db, { kind: 'staff', role: 'partner_manager', region: 'middle_east', name: 'Omar Nasser' });
+    expect(await changeStaffRegionAction({ userId: omar.id, regions: ['middle_east', 'eu'] })).toMatchObject({ ok: true, data: { regions: ['middle_east', 'eu'] } });
+    expect(await changeStaffRegionAction({ userId: omar.id, regions: ['eu', 'middle_east'] })).toMatchObject({ ok: true });
+    expect((await db.select().from(auditLog)).map((e) => e.note)).toEqual(['Middle East to Middle East and EU.']);
+  });
+
   it('changes a role and a region with audit notes', async () => {
     const rahul = await makeUser(db, { kind: 'staff', role: 'sales', region: 'india', name: 'Rahul Menon' });
     expect(await changeStaffRoleAction({ userId: rahul.id, role: 'marketing' })).toMatchObject({ ok: true, data: { role: 'marketing' } });
-    expect(await changeStaffRegionAction({ userId: rahul.id, region: 'middle_east' })).toMatchObject({ ok: true, data: { region: 'middle_east' } });
+    expect(await changeStaffRegionAction({ userId: rahul.id, regions: ['middle_east'] })).toMatchObject({ ok: true, data: { regions: ['middle_east'] } });
     const notes = Object.fromEntries((await db.select().from(auditLog)).map((e) => [e.event, e.note]));
     expect(notes).toEqual({ 'staff.role_changed': 'Sales to Marketing.', 'staff.region_changed': 'India to Middle East.' });
     const sent = await db.select().from(notifications);
@@ -117,7 +134,7 @@ describe('changeStaffRoleAction and changeStaffRegionAction', () => {
     const rahul = await makeUser(db, { kind: 'staff', role: 'sales', region: 'india' });
     harness.viewer = await asStaff(db, 'marketing', 'all');
     expect(await changeStaffRoleAction({ userId: rahul.id, role: 'marketing' })).toMatchObject({ ok: false, error: { code: 'forbidden' } });
-    expect(await changeStaffRegionAction({ userId: rahul.id, region: 'all' })).toMatchObject({ ok: false, error: { code: 'forbidden' } });
+    expect(await changeStaffRegionAction({ userId: rahul.id, regions: ['all'] })).toMatchObject({ ok: false, error: { code: 'forbidden' } });
   });
 });
 

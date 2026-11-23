@@ -14,6 +14,7 @@ import { lockRegistration } from '@/server/repo/registrations';
 import type { ActionResult } from './result';
 import { runViewerAction } from './run';
 import { regionKeySchema } from '@/lib/regions';
+import { listRegions } from '@/server/repo/regions';
 
 const reassignSchema = z.object({
   id: z.string().uuid(),
@@ -30,12 +31,13 @@ export async function reassignRegistrationAction(raw: unknown): Promise<ActionRe
       const result = await reassignRegistration(tx, ctx.viewer, input, ctx.clock);
       if (!result.changed) return result;
       const reg = result.registration;
+      const regionList = await listRegions(tx);
       await recordAudit(tx, ctx.viewer, {
         event: 'registration.reassigned',
         target: `${reg.customer}, ${PRODUCT_LABEL[reg.product]}, from ${reg.partnerName}`,
         note: 'Manager and region changed while the registration was waiting.',
-        before: routingLabel(result.before),
-        after: routingLabel(result.after),
+        before: routingLabel(result.before, regionList),
+        after: routingLabel(result.after, regionList),
         partnerId: reg.partnerId,
         subject: { type: 'registration', id: reg.id },
       });

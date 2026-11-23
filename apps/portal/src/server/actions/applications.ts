@@ -25,6 +25,7 @@ import { applicationReplyUrl, inviteUrl } from '@/server/urls';
 import type { ActionResult } from './result';
 import { runViewerAction } from './run';
 import { regionName, regionKeySchema } from '@/lib/regions';
+import { listRegions } from '@/server/repo/regions';
 
 const idSchema = z.object({ id: z.string().uuid() });
 const approveSchema = z.object({
@@ -54,7 +55,7 @@ export async function approveApplicationAction(raw: unknown): Promise<ActionResu
       await recordAudit(tx, ctx.viewer, {
         event: 'application.approved',
         target: before.company,
-        note: `Created ${result.partner.name} as ${PARTNER_CATEGORY_LABEL[input.category]}, ${regionName(input.region)}. Invite sent to ${before.applicantName}.`,
+        note: `Created ${result.partner.name} as ${PARTNER_CATEGORY_LABEL[input.category]}, ${regionName(input.region, await listRegions(tx))}. Invite sent to ${before.applicantName}.`,
         partnerId: result.partner.id,
         subject: { type: 'application', id: before.id },
       });

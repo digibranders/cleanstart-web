@@ -6,7 +6,7 @@ import { BulletList, CHECK_D, PublicHeading, PublicSplit, StatusIcon } from "@/c
 import { fmtLong } from "@/lib/dates";
 import { ROUTES } from "@/lib/routes";
 import { PARTNER_CATEGORY_LABEL } from "@/lib/domain";
-import { regionName } from "@/lib/regions";
+import { type RegionDto, regionName } from "@/lib/regions";
 import type { ApplyReceipt } from "@/server/apply-receipt";
 
 const DOT_D =
@@ -21,7 +21,7 @@ const DOT_STYLE: Record<StepState, React.CSSProperties> = {
   next: { background: "#F1F0F4", color: "#8D87A8" },
 };
 
-export function ApplyDone({ receipt }: { receipt: ApplyReceipt }): React.JSX.Element {
+export function ApplyDone({ receipt, regions }: { receipt: ApplyReceipt; regions: readonly RegionDto[] }): React.JSX.Element {
   const firstName = receipt.firstName;
   const steps: { title: string; text: string; state: StepState }[] = [
     { title: "Application received", text: fmtLong(receipt.submittedOn), state: "done" },
@@ -113,7 +113,7 @@ export function ApplyDone({ receipt }: { receipt: ApplyReceipt }): React.JSX.Ele
           <dt>Category</dt>
           <dd>{PARTNER_CATEGORY_LABEL[receipt.category]}</dd>
           <dt>Region</dt>
-          <dd>{regionName(receipt.region)}</dd>
+          <dd>{regionName(receipt.region, regions)}</dd>
         </dl>
         {receipt.statusToken ? (
           <Link

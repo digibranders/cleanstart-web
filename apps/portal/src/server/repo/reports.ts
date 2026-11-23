@@ -8,22 +8,23 @@ import type { AdminReportsDto, FollowUpDto, PartnerReportRow, ProductReportRow }
 import type { Viewer } from '@/server/auth/types';
 import { ForbiddenError } from '@/server/errors';
 import { assertStaff, type Tx } from './context';
+import { aggregateRegistrationScope } from '@/server/registrations/scope';
+import { scopeCondition } from '@/server/staff-scope';
 import { defineIsolation } from './isolation.registry';
 
 const toDate = (value: Date | string | null): Date | null => (value === null ? null : new Date(value));
 const dateOf = (value: Date): string => value.toISOString().slice(0, 10);
 
 /**
- * Partner manager (all) and staff sales (own region). Aggregates only; `accepted` counts status accepted, won, lost
+ * Partner manager and staff sales, each limited to the regions they cover ('all' sees everything). Aggregates only; `accepted` counts status accepted, won, lost
  * and expired. Filtering by region, category and sort, and the CSV, are client side (src/lib/report-view.ts).
- * Staff sales see the partners of their region and the registrations of their region.
+ * The partners listed are those whose region the viewer covers. Staff sales count the deals registered in their regions; a partner manager counts every deal of the partners listed.
  */
 export async function getAdminReports(tx: Tx, viewer: Viewer, clock: Clock): Promise<AdminReportsDto> {
   assertStaff(viewer);
   if (viewer.role !== 'partner_manager' && viewer.role !== 'sales') {
     throw new ForbiddenError('reports are for partner managers and staff sales');
   }
-  const region = viewer.role === 'sales' && viewer.region !== 'all' ? viewer.region : null;
   const today = clock.today();
 
   const partnerRows = await tx
@@ -37,10 +38,10 @@ export async function getAdminReports(tx: Tx, viewer: Viewer, clock: Clock): Pro
       createdAt: partners.createdAt,
     })
     .from(partners)
-    .where(region ? eq(partners.region, region) : undefined)
+    .where(scopeCondition(viewer.regions, partners.region))
     .orderBy(asc(partners.name), asc(partners.id));
 
-  const regionFilter = region ? eq(registrations.region, region) : undefined;
+  const regionFilter = aggregateRegistrationScope(viewer);
   const perPartner = await tx
     .select({
       partnerId: registrations.partnerId,

@@ -57,9 +57,11 @@ export const STAFF_ROLE_LABEL: Record<StaffRole, string> = {
   marketing: 'Marketing',
 };
 
-/** A staff scope: a region key, or ALL_REGIONS for the person who covers every region. */
+/** One stored staff scope value: a region key, or ALL_REGIONS for the person who covers every region. */
 export type StaffRegion = string;
 export const ALL_REGIONS = 'all';
+/** The regions a staff member covers: ALL_REGIONS, or the list of region keys they cover (never empty for a real person). */
+export type StaffScope = typeof ALL_REGIONS | readonly string[];
 
 /** Currencies a deal value can be entered in. USD is the default. */
 export const DEAL_CURRENCIES = ['USD', 'EUR', 'GBP', 'INR', 'AED', 'SAR'] as const;

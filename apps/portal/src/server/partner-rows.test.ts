@@ -66,8 +66,10 @@ describe('partnerListRows', () => {
     expect((await rows({ region: 'india' })).map((r) => r.id)).toEqual([b.id]);
     expect((await rows({ ids: [a.id] })).map((r) => r.id)).toEqual([a.id]);
     expect(await rows({ ids: [] })).toEqual([]);
-    expect((await rows({ scopeRegion: 'middle_east' })).map((r) => r.id)).toEqual([a.id]);
-    expect(await rows({ scopeRegion: 'all' })).toHaveLength(2);
+    expect((await rows({ scope: ['middle_east'] })).map((r) => r.id)).toEqual([a.id]);
+    expect(await rows({ scope: 'all' })).toHaveLength(2);
+    expect(await rows({ scope: ['india', 'middle_east'] })).toHaveLength(2);
+    expect(await rows({ scope: [] })).toEqual([]);
   });
 
   it('treats LIKE wildcards in the search term literally', async () => {

@@ -64,6 +64,13 @@
       "when": 1795400000000,
       "tag": "0008_regions",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1795500000000,
+      "tag": "0009_staff_regions",
+      "breakpoints": true
     }
   ]
 }

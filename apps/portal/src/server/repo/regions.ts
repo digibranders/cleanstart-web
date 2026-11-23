@@ -1,18 +1,19 @@
 import { and, asc, count, eq, sql } from 'drizzle-orm';
-import { partners, regions, staffScopes, users } from '@/db/schema';
+import { partners, regions, users } from '@/db/schema';
 import { ALL_REGIONS } from '@/lib/domain';
-import { checkRegionName, type RegionAdminDto, type RegionDto } from '@/lib/regions';
+import { checkRegionName, isAllRegions, type RegionAdminDto, type RegionDto, scopeCovers } from '@/lib/regions';
 import type { Viewer } from '@/server/auth/types';
 import { ConflictError, NotFoundError, ValidationError } from '@/server/errors';
-import { assertStaff, type Tx } from './context';
+import { assertStaff, type Queryable, type Tx } from './context';
 import { defineIsolation } from './isolation.registry';
+import { loadScopes } from '@/server/staff-scope';
 
 const toDto = (row: typeof regions.$inferSelect): RegionDto => ({ key: row.key, name: row.name, sortOrder: row.sortOrder, active: row.active });
 
 const ordered = [asc(regions.sortOrder), asc(regions.name)] as const;
 
 /** Every region, inactive ones included, in display order. Any signed in user (and the system, for the public apply form). */
-export async function listRegions(tx: Tx, _viewer?: Viewer): Promise<RegionDto[]> {
+export async function listRegions(tx: Queryable, _viewer?: Viewer): Promise<RegionDto[]> {
   return (await tx.select().from(regions).orderBy(...ordered)).map(toDto);
 }
 
@@ -21,19 +22,23 @@ export async function listRegionsAdmin(tx: Tx, viewer: Viewer): Promise<RegionAd
   assertStaff(viewer);
   const rows = await listRegions(tx);
   const partnerCounts = await tx.select({ region: partners.region, n: count() }).from(partners).groupBy(partners.region);
-  const scopes = await tx
-    .select({ id: users.id, name: users.name, role: users.role, region: staffScopes.region })
-    .from(staffScopes)
-    .innerJoin(users, eq(users.id, staffScopes.userId))
+  const staff = await tx
+    .select({ id: users.id, name: users.name, role: users.role })
+    .from(users)
     .where(and(eq(users.kind, 'staff'), eq(users.status, 'active')))
     .orderBy(asc(users.name));
+  const scopes = await loadScopes(tx, staff.map((s) => s.id));
+  const people = staff.flatMap((s) => {
+    const scope = scopes.get(s.id);
+    return scope ? [{ ...s, scope }] : [];
+  });
   return rows.map((r) => ({
     ...r,
     partnerCount: partnerCounts.find((p) => p.region === r.key)?.n ?? 0,
-    managers: scopes
-      .filter((s) => s.role === 'partner_manager' && (s.region === r.key || s.region === ALL_REGIONS))
-      .map((s) => ({ id: s.id, name: s.name, allRegions: s.region === ALL_REGIONS })),
-    staffCount: scopes.filter((s) => s.region === r.key).length,
+    managers: people
+      .filter((s) => s.role === 'partner_manager' && scopeCovers(s.scope, r.key))
+      .map((s) => ({ id: s.id, name: s.name, allRegions: isAllRegions(s.scope) })),
+    staffCount: people.filter((s) => !isAllRegions(s.scope) && scopeCovers(s.scope, r.key)).length,
   }));
 }
 

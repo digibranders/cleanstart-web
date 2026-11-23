@@ -1,4 +1,5 @@
-import { ALL_REGIONS, type DealRegion, PARTNER_ROLES, type PartnerRegion, type PartnerRole } from '@/lib/domain';
+import { type DealRegion, PARTNER_ROLES, type PartnerRegion, type PartnerRole } from '@/lib/domain';
+import { isAllRegions, scopeCovers } from '@/lib/regions';
 import { ForbiddenError } from '@/server/errors';
 import type { Viewer } from './types';
 import { roleKey } from './types';
@@ -112,7 +113,7 @@ const mine = (v: Viewer, s: PolicySubject | undefined): boolean =>
   v.kind === 'partner' && (s?.ownerUserId === undefined || s.ownerUserId === v.id);
 
 const inScope = (v: Viewer, s: PolicySubject | undefined): boolean =>
-  v.kind === 'staff' && (s?.region === undefined || v.region === ALL_REGIONS || s.region === v.region);
+  v.kind === 'staff' && (s?.region === undefined || isAllRegions(v.regions) || (s.region !== null && scopeCovers(v.regions, s.region)));
 
 const self = (v: Viewer, s: PolicySubject | undefined): boolean =>
   s?.targetUserId === undefined || s.targetUserId === v.id;

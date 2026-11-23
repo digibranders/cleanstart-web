@@ -3,7 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { fmtTimestamp } from "@/lib/dates";
-import { PARTNER_CATEGORY_LABEL, PRODUCT_LABEL, type StaffRegion } from "@/lib/domain";
+import { PARTNER_CATEGORY_LABEL, PRODUCT_LABEL, type StaffScope } from "@/lib/domain";
 import type { ApprovalQueueDto, ManagerOptionDto, RegistrationDetailDto } from "@/lib/dto";
 import { BULK_DECIDE_MAX } from "@/lib/deal-rules";
 import { type BulkItemResult, bulkDecideAction } from "@/server/actions/bulk-decide";
@@ -42,6 +42,7 @@ import { Drawer } from "../ui/overlay";
 import { useToast } from "../ui/toast";
 import { ScrollRegion } from "@/components/ui/scroll-region";
 import { useRegions } from "@/components/regions-context";
+import { isAllRegions, scopeCovers } from "@/lib/regions";
 
 const ALL_PRODUCTS = "All products";
 const ALL_REGIONS = "All regions";
@@ -72,7 +73,7 @@ interface AdminApprovalsProps {
   queue: ApprovalQueueDto;
   extensions: RegistrationDetailDto[];
   viewerId: string;
-  viewerRegion: StaffRegion;
+  viewerRegions: StaffScope;
   managers: ManagerOptionDto[];
   today: string;
   facet: StaffDealFacet;
@@ -99,7 +100,7 @@ export function AdminApprovals({
   queue,
   extensions,
   viewerId,
-  viewerRegion,
+  viewerRegions,
   managers,
   today,
   facet,
@@ -163,7 +164,7 @@ export function AdminApprovals({
   );
 
   const inMyQueue = (deal: RegistrationDetailDto): boolean =>
-    viewerRegion === "all" ? deal.managerId === viewerId : deal.region === viewerRegion;
+    isAllRegions(viewerRegions) ? deal.managerId === viewerId : scopeCovers(viewerRegions, deal.region);
 
   const needle = q.trim().toLowerCase();
   const visible = rows.filter(
