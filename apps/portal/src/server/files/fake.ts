@@ -13,7 +13,7 @@ export class FakeFileStorage implements FileStorage {
   heads = new Map<string, number[]>();
   deleted: string[] = [];
   /** Every presigned URL handed out. `filename` is set for 'get'. */
-  presigned: Array<{ kind: 'put' | 'get'; key: string; expiresAt: Date; filename?: string }> = [];
+  presigned: Array<{ kind: 'put' | 'get'; key: string; expiresAt: Date; filename?: string; inline?: boolean }> = [];
   private readonly clock: Clock;
 
   constructor(clock: Clock = systemClock) {
@@ -35,9 +35,9 @@ export class FakeFileStorage implements FileStorage {
     };
   }
 
-  async presignGet(input: { key: string; filename: string; expiresInSeconds?: number }): Promise<{ url: string; expiresAt: Date }> {
+  async presignGet(input: { key: string; filename: string; inline?: boolean; expiresInSeconds?: number }): Promise<{ url: string; expiresAt: Date }> {
     const expiresAt = new Date(this.clock.now().getTime() + (input.expiresInSeconds ?? GET_SECONDS) * 1000);
-    this.presigned.push({ kind: 'get', key: input.key, expiresAt, filename: input.filename });
+    this.presigned.push({ kind: 'get', key: input.key, expiresAt, filename: input.filename, inline: input.inline === true });
     return { url: `https://${FAKE_HOST}/get/${encodeURIComponent(input.key)}`, expiresAt };
   }
 

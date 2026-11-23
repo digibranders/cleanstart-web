@@ -1,12 +1,117 @@
 import { daysBetween, fmtShort } from '@/lib/dates';
 import type { AudienceInput, AudiencePartnerDto } from '@/lib/document-upload';
-import type { AudienceKind, PartnerCategory } from '@/lib/domain';
-import type { DocumentAudienceDto } from '@/lib/dto';
+import { DOC_PRODUCTS, DOCUMENT_TYPES, type AudienceKind, type DocProduct, type DocumentType, type PartnerCategory } from '@/lib/domain';
+import type { DocumentAudienceDto, DocumentDto } from '@/lib/dto';
 
-/** A document counts as new for this many days after it was added or replaced. */
-export const FRESH_DAYS = 7;
+/** A document is new for a partner for this many days after it was added or replaced, until their company opens it. */
+export const NEW_DAYS = 14;
 
-export const isFresh = (updatedAt: string, today: string): boolean => daysBetween(updatedAt.slice(0, 10), today) <= FRESH_DAYS;
+export const isNewDocument = (doc: Pick<DocumentDto, 'updatedAt' | 'ownOpens'>, today: string): boolean =>
+  (doc.ownOpens ?? 0) === 0 && daysBetween(doc.updatedAt.slice(0, 10), today) <= NEW_DAYS;
+
+/** Calls `fn` on the first call only: the player counts one open per viewing, however often it fires "play". */
+export function once(fn: () => void): () => void {
+  let called = false;
+  return () => {
+    if (called) return;
+    called = true;
+    fn();
+  };
+}
+
+/* ---------------------------------------------------------------- library grouping and URL filters */
+
+export const DOC_GROUPS = ['sales', 'technical', 'marketing', 'videos', 'other'] as const;
+export type DocGroup = (typeof DOC_GROUPS)[number];
+export const DOC_GROUP_LABEL: Record<DocGroup, string> = {
+  sales: 'Sales enablement',
+  technical: 'Technical',
+  marketing: 'Marketing',
+  videos: 'Training and videos',
+  other: 'Other',
+};
+/** The tab labels: shorter than the section headings. */
+export const DOC_GROUP_TAB: Record<DocGroup, string> = {
+  sales: 'Sales',
+  technical: 'Technical',
+  marketing: 'Marketing',
+  videos: 'Videos',
+  other: 'Other',
+};
+
+const GROUP_OF_TYPE: Record<DocumentType, DocGroup> = {
+  battlecard: 'sales',
+  price_list: 'sales',
+  enablement_guide: 'sales',
+  datasheet: 'technical',
+  solution_sheet: 'marketing',
+  video: 'videos',
+};
+
+export const groupOf = (type: DocumentType): DocGroup => GROUP_OF_TYPE[type] ?? 'other';
+
+/** Documents bucketed by purpose in the fixed group order, empty groups left out. Order inside a group is kept. */
+export function groupDocuments<T extends { type: DocumentType }>(docs: readonly T[]): Array<{ group: DocGroup; docs: T[] }> {
+  return DOC_GROUPS.map((group) => ({ group, docs: docs.filter((d) => groupOf(d.type) === group) })).filter((g) => g.docs.length > 0);
+}
+
+export const DOC_SORTS = ['new', 'opened', 'name'] as const;
+export type DocSort = (typeof DOC_SORTS)[number];
+export const DOC_SORT_LABEL: Record<DocSort, string> = { new: 'Newest first', opened: 'Most opened', name: 'Name' };
+export const DOC_VIEWS = ['list', 'cards'] as const;
+export type DocLibraryLayout = (typeof DOC_VIEWS)[number];
+
+/** The library filters as they live in the URL. */
+export interface DocumentsView {
+  q: string;
+  type: DocumentType | null;
+  product: DocProduct | null;
+  group: DocGroup | null;
+  sort: DocSort;
+  layout: DocLibraryLayout;
+}
+
+export const DOCUMENTS_Q_MAX = 100;
+type Params = Record<string, string | string[] | undefined>;
+const first = (value: string | string[] | undefined): string | undefined => (Array.isArray(value) ? value[0] : value);
+const pick = <T extends string>(allowed: readonly T[], value: string | undefined): T | null =>
+  allowed.find((candidate) => candidate === value) ?? null;
+
+/** Anything unknown falls back to the default, so a hand edited URL never throws. */
+export function parseDocumentsView(params: Params): DocumentsView {
+  return {
+    q: (first(params.q) ?? '').trim().slice(0, DOCUMENTS_Q_MAX),
+    type: pick(DOCUMENT_TYPES, first(params.type)),
+    product: pick(DOC_PRODUCTS, first(params.product)),
+    group: pick(DOC_GROUPS, first(params.group)),
+    sort: pick(DOC_SORTS, first(params.sort)) ?? 'new',
+    layout: pick(DOC_VIEWS, first(params.view)) ?? 'list',
+  };
+}
+
+/** "?q=..." with defaults left out, or "" when nothing is set. */
+export function documentsViewToQuery(view: DocumentsView): string {
+  const query = new URLSearchParams();
+  if (view.q) query.set('q', view.q);
+  if (view.type) query.set('type', view.type);
+  if (view.product) query.set('product', view.product);
+  if (view.group) query.set('group', view.group);
+  if (view.sort !== 'new') query.set('sort', view.sort);
+  if (view.layout !== 'list') query.set('view', view.layout);
+  const text = query.toString();
+  return text ? `?${text}` : '';
+}
+
+/** True when a filter (not the sort or the layout) narrows the list. */
+export const hasDocumentFilters = (view: DocumentsView): boolean =>
+  view.q !== '' || view.type !== null || view.product !== null || view.group !== null;
+
+/** The list arrives newest first from the server; only the other two orders need work. */
+export function sortDocuments<T extends Pick<DocumentDto, 'title' | 'ownOpens'>>(docs: readonly T[], sort: DocSort): T[] {
+  if (sort === 'opened') return [...docs].sort((a, b) => (b.ownOpens ?? 0) - (a.ownOpens ?? 0));
+  if (sort === 'name') return [...docs].sort((a, b) => a.title.localeCompare(b.title));
+  return [...docs];
+}
 
 /** "Today" for a document updated today, otherwise "4 Nov". Replaces the mock's "Just now". */
 export const adminUpdatedLabel = (updatedAt: string, today: string): string =>

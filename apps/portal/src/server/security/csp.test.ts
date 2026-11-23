@@ -30,7 +30,8 @@ describe('buildCsp', () => {
 
   it('lists Turnstile for scripts, frames and connections, and the document bucket for connections', () => {
     expect(directive(prod, 'script-src')).toContain('https://challenges.cloudflare.com');
-    expect(directive(prod, 'frame-src')).toEqual(['https://challenges.cloudflare.com']);
+    expect(directive(prod, 'frame-src')).toEqual(['https://challenges.cloudflare.com', "'self'", 'https://acct.r2.cloudflarestorage.com']);
+    expect(directive(prod, 'media-src')).toEqual(["'self'", 'https://acct.r2.cloudflarestorage.com']);
     expect(directive(prod, 'connect-src')).toEqual(["'self'", 'https://challenges.cloudflare.com', 'https://acct.r2.cloudflarestorage.com']);
   });
 

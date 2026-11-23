@@ -13,7 +13,7 @@ describe('FakeFileStorage', () => {
     expect(got.url).toBe('https://fake-r2.test/get/k1');
     expect(storage.presigned).toEqual([
       { kind: 'put', key: 'k1', expiresAt: put.expiresAt },
-      { kind: 'get', key: 'k1', expiresAt: got.expiresAt, filename: 'a.pdf' },
+      { kind: 'get', key: 'k1', expiresAt: got.expiresAt, filename: 'a.pdf', inline: false },
     ]);
   });
 

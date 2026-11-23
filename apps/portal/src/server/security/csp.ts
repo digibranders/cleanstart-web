@@ -30,7 +30,9 @@ export function buildCsp({ nonce, isDev, connectOrigins }: CspInput): string {
     'img-src': ["'self'", 'data:', 'blob:'],
     'font-src': ["'self'"],
     'connect-src': ["'self'", TURNSTILE, ...connectOrigins, ...(isDev ? ['ws://localhost:*'] : [])],
-    'frame-src': [TURNSTILE],
+    // The video player and the PDF preview load our stream route, which redirects to the document bucket.
+    'media-src': ["'self'", ...connectOrigins],
+    'frame-src': [TURNSTILE, "'self'", ...connectOrigins],
     'object-src': ["'none'"],
     'base-uri': ["'self'"],
     'form-action': ["'self'"],

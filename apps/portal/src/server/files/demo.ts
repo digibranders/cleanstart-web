@@ -27,7 +27,7 @@ export interface DemoFileStore {
 }
 
 const putClaims = z.object({ m: z.literal('put'), k: z.string(), c: z.string(), l: z.number().int().min(0).max(DOCUMENT_MAX_BYTES), e: z.number() });
-const getClaims = z.object({ m: z.literal('get'), k: z.string(), f: z.string(), e: z.number() });
+const getClaims = z.object({ m: z.literal('get'), k: z.string(), f: z.string(), i: z.boolean().optional(), e: z.number() });
 type PutClaims = z.infer<typeof putClaims>;
 type GetClaims = z.infer<typeof getClaims>;
 
@@ -68,9 +68,9 @@ export class DemoFileStorage implements FileStorage {
     return { url: this.url('put', token), headers: { 'Content-Type': input.contentType }, expiresAt };
   }
 
-  async presignGet(input: { key: string; filename: string; expiresInSeconds?: number }): Promise<{ url: string; expiresAt: Date }> {
+  async presignGet(input: { key: string; filename: string; inline?: boolean; expiresInSeconds?: number }): Promise<{ url: string; expiresAt: Date }> {
     const expiresAt = new Date(this.clock.now().getTime() + (input.expiresInSeconds ?? GET_SECONDS) * 1000);
-    return { url: this.url('get', seal(this.deps.secret, { m: 'get', k: input.key, f: input.filename, e: expiresAt.getTime() })), expiresAt };
+    return { url: this.url('get', seal(this.deps.secret, { m: 'get', k: input.key, f: input.filename, ...(input.inline ? { i: true } : {}), e: expiresAt.getTime() })), expiresAt };
   }
 
   /** The file for a key: an upload from the store, or the placeholder of a seeded document. */
@@ -122,12 +122,12 @@ export class DemoFileStorage implements FileStorage {
     await this.deps.store.put(claims.k, { contentType: claims.c, bytes });
   }
 
-  /** The GET route: the file and the name to download it as. */
-  async serveDownload(token: string): Promise<{ contentType: string; bytes: Uint8Array; filename: string }> {
+  /** The GET route: the file, the name to download it as, and whether the ticket asked to show it in the browser. */
+  async serveDownload(token: string): Promise<{ contentType: string; bytes: Uint8Array; filename: string; inline: boolean }> {
     const claims: GetClaims | undefined = getClaims.safeParse(unseal(this.deps.secret, token, this.clock.now())).data;
     if (!claims) throw new NotFoundError('demo file');
     const file = await this.read(claims.k);
     if (!file) throw new NotFoundError('demo file');
-    return { ...file, filename: claims.f };
+    return { ...file, filename: claims.f, inline: claims.i === true };
   }
 }
