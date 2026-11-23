@@ -15,7 +15,10 @@ import { EXTENSION_DAYS } from "@/lib/deal-rules";
 import { decideExtensionAction } from "@/server/actions/extension";
 import { postMessageAction } from "@/server/actions/registrations";
 import { issuesToErrors } from "@/server/actions/result";
+import { type StaffDealFacet, type StaffDealFilters, type StaffDealsPageDto, staffDealHref } from "@/lib/staff-deals-dto";
+import Link from "next/link";
 import { downloadCsv } from "../deals/csv";
+import { StaffDealFacetBar, StaffDealsTable } from "./StaffDealsTable";
 import { fmtLong, fmtShort, plural } from "../deals/dates";
 import {
   avOf,
@@ -68,9 +71,24 @@ interface AdminApprovalsProps {
   viewerRegion: StaffRegion;
   managers: ManagerOptionDto[];
   today: string;
+  facet: StaffDealFacet;
+  deals: StaffDealsPageDto;
+  filters: StaffDealFilters;
+  partners: { id: string; name: string }[];
 }
 
-export function AdminApprovals({ queue, extensions, viewerId, viewerRegion, managers, today }: AdminApprovalsProps): React.JSX.Element {
+export function AdminApprovals({
+  queue,
+  extensions,
+  viewerId,
+  viewerRegion,
+  managers,
+  today,
+  facet,
+  deals,
+  filters,
+  partners,
+}: AdminApprovalsProps): React.JSX.Element {
   const toast = useToast();
 
   const [view, setView] = useState<"mine" | "all">("all");
@@ -240,6 +258,18 @@ export function AdminApprovals({ queue, extensions, viewerId, viewerRegion, mana
     { key: "all", label: "All regions", count: waiting.length },
   ];
 
+  if (facet !== "waiting") {
+    return (
+      <div className="wrap">
+        <div className="head">
+          <h1 className="h1">Deals</h1>
+        </div>
+        <StaffDealFacetBar facet={facet} counts={deals.counts} filters={filters} />
+        <StaffDealsTable facet={facet} deals={deals} filters={filters} partners={partners} managers={managers} />
+      </div>
+    );
+  }
+
   return (
     <div className="wrap">
       <div className="head">
@@ -256,6 +286,8 @@ export function AdminApprovals({ queue, extensions, viewerId, viewerRegion, mana
           </button>
         </div>
       </div>
+
+      <StaffDealFacetBar facet={facet} counts={deals.counts} filters={filters} />
 
       <section aria-label="Queue summary" className="card kpis">
         <div className="kpi">
@@ -590,7 +622,11 @@ export function AdminApprovals({ queue, extensions, viewerId, viewerRegion, mana
                 <tr key={d.id}>
                   <td className="tnum t-sec hide-sm">{fmtShort(d.decidedOn ?? today)}</td>
                   <td>{d.partnerName}</td>
-                  <td style={{ fontWeight: 600 }}>{d.customer}</td>
+                  <td style={{ fontWeight: 600 }}>
+                    <Link href={staffDealHref(d.id)} className="linkbtn">
+                      {d.customer}
+                    </Link>
+                  </td>
                   <td className="hide-sm">
                     <ProductChip product={CHIP_PRODUCT[d.product]} />
                   </td>
@@ -616,6 +652,9 @@ export function AdminApprovals({ queue, extensions, viewerId, viewerRegion, mana
           footer={
             viewing.state === "open" ? (
               <>
+                <Link href={staffDealHref(viewing.deal.id)} className="btn btn-s">
+                  Open deal page
+                </Link>
                 <button
                   type="button"
                   className="btn btn-d"
