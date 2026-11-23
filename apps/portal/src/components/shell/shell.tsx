@@ -292,36 +292,34 @@ export function Shell({
                         </span>
                       </span>
                     </div>
-                    {kind === "partner" ? (
-                      <>
-                        <Link href={ROUTES.partner.account} role="menuitem" className="li">
-                          <span className="li-ic">
-                            <Icon name="team" />
-                          </span>
-                          <span className="li-t">
-                            <span className="li-n">Your account</span>
-                            <span className="li-s">Profile, password, two-step</span>
-                          </span>
-                        </Link>
-                        <button
-                          type="button"
-                          role="menuitem"
-                          className="li linkbtn"
-                          style={{ width: "100%" }}
-                          onClick={() => {
-                            setProfileOpen(false);
-                            setMsg({ subject: "Question about the portal", body: "", tried: false });
-                          }}
-                        >
-                          <span className="li-ic">
-                            <Icon name="send" />
-                          </span>
-                          <span className="li-t">
-                            <span className="li-n">Message {me.manager?.name}</span>
-                            <span className="li-s">Your partner manager</span>
-                          </span>
-                        </button>
-                      </>
+                    <Link href={kind === "partner" ? ROUTES.partner.account : ROUTES.admin.account} role="menuitem" className="li">
+                      <span className="li-ic">
+                        <Icon name="team" />
+                      </span>
+                      <span className="li-t">
+                        <span className="li-n">Your account</span>
+                        <span className="li-s">Profile, password, two-step</span>
+                      </span>
+                    </Link>
+                    {kind === "partner" && me.manager ? (
+                      <button
+                        type="button"
+                        role="menuitem"
+                        className="li linkbtn"
+                        style={{ width: "100%" }}
+                        onClick={() => {
+                          setProfileOpen(false);
+                          setMsg({ subject: "Question about the portal", body: "", tried: false });
+                        }}
+                      >
+                        <span className="li-ic">
+                          <Icon name="send" />
+                        </span>
+                        <span className="li-t">
+                          <span className="li-n">Message {me.manager.name}</span>
+                          <span className="li-s">Your partner manager</span>
+                        </span>
+                      </button>
                     ) : null}
                     <button type="button" role="menuitem" className="li linkbtn" style={{ width: "100%" }} onClick={signOut}>
                       <span className="li-ic">
@@ -417,25 +415,27 @@ export function Shell({
                               </span>
                             </Link>
                           ) : null}
-                          <button
-                            type="button"
-                            className="li linkbtn"
-                            style={{ width: "100%" }}
-                            onClick={() => {
-                              setPop(null);
-                              setMsg({ subject: "Question about the portal", body: "", tried: false });
-                            }}
-                          >
-                            <span className="li-ic">
-                              <Icon name="send" />
-                            </span>
-                            <span className="li-t">
-                              <span className="li-n">Message your partner manager</span>
-                              <span className="li-s">
-                                {me.manager?.name}, {me.manager?.team}
+                          {me.manager ? (
+                            <button
+                              type="button"
+                              className="li linkbtn"
+                              style={{ width: "100%" }}
+                              onClick={() => {
+                                setPop(null);
+                                setMsg({ subject: "Question about the portal", body: "", tried: false });
+                              }}
+                            >
+                              <span className="li-ic">
+                                <Icon name="send" />
                               </span>
-                            </span>
-                          </button>
+                              <span className="li-t">
+                                <span className="li-n">Message your partner manager</span>
+                                <span className="li-s">
+                                  {me.manager.name}, {me.manager.team}
+                                </span>
+                              </span>
+                            </button>
+                          ) : null}
                         </>
                       ) : (
                         <div className="li">
