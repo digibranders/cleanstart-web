@@ -15,6 +15,7 @@ export const ROUTES = {
     newDeal: "/partner/deals/new",
     deal: (id: string): string => `/partner/deals/${id}`,
     documents: "/partner/documents",
+    program: "/partner/program",
     team: "/partner/team",
     company: "/partner/company",
     account: "/partner/account",
@@ -47,6 +48,7 @@ export const PARTNER_NAV: readonly NavItem[] = [
   { label: "Deals", href: ROUTES.partner.deals, icon: "deals", action: "registration.read" },
   { label: "Register deal", href: ROUTES.partner.newDeal, icon: "reg", action: "registration.create" },
   { label: "Documents", href: ROUTES.partner.documents, icon: "docs", action: "document.read" },
+  { label: "Program", href: ROUTES.partner.program, icon: "info", action: "partner.read" },
   { label: "Team", href: ROUTES.partner.team, icon: "team", action: "team.read" },
   { label: "Company", href: ROUTES.partner.company, icon: "bld", action: "partner.read" },
 ];
