@@ -15,35 +15,21 @@ export interface DigestRegistrationRow {
   overdue: boolean;
 }
 
-export interface DigestApplicationRow {
-  company: string;
-  applicantName: string;
-  waitingBusinessDays: number;
-  pastTarget: boolean;
-}
-
-/** To one staff reviewer, once a day, only when something waits. Rows arrive in the order they are shown. */
+/** To one staff reviewer, once a day, only when a registration waits (applications have their own digest). Rows arrive in the order they are shown. */
 export interface PendingDigestInput {
   to: EmailAddress;
   recipientName: string;
   registrations: DigestRegistrationRow[];
-  applications: DigestApplicationRow[];
   targetBusinessDays: number;
   approvalsUrl: string;
-  partnersUrl: string;
 }
 
-const flag = (row: { pastTarget: boolean; overdue?: boolean }): string => (row.overdue ? ', OVERDUE' : row.pastTarget ? ', past the target' : '');
+const flag = (row: { pastTarget: boolean; overdue: boolean }): string => (row.overdue ? ', OVERDUE' : row.pastTarget ? ', past the target' : '');
 
 export function buildPendingDigest(input: PendingDigestInput): EmailMessage {
   const overdue = input.registrations.filter((r) => r.overdue).length;
-  const total = input.registrations.length + input.applications.length;
-  const summary = [
-    input.registrations.length > 0 ? plural(input.registrations.length, 'registration') : '',
-    input.applications.length > 0 ? plural(input.applications.length, 'application') : '',
-  ]
-    .filter(Boolean)
-    .join(' and ');
+  const total = input.registrations.length;
+  const summary = plural(total, 'registration');
   const blocks: EmailBlock[] = [
     { type: 'paragraph', text: hello(input.recipientName) },
     {
@@ -67,17 +53,6 @@ export function buildPendingDigest(input: PendingDigestInput): EmailMessage {
       })),
     });
     blocks.push({ type: 'button', label: 'Open the approvals queue', url: input.approvalsUrl });
-  }
-  if (input.applications.length > 0) {
-    blocks.push({ type: 'paragraph', text: 'Partner applications' });
-    blocks.push({
-      type: 'facts',
-      rows: input.applications.map((a) => ({
-        label: oneLine(a.company),
-        value: `${oneLine(a.applicantName)}. Waiting ${plural(a.waitingBusinessDays, 'business day')}${flag(a)}`,
-      })),
-    });
-    blocks.push({ type: 'button', label: 'Open the applications', url: input.partnersUrl });
   }
   return {
     to: [input.to],

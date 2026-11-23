@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, gte, inArray, max, ne, sql, type SQL } from 'drizzle-orm';
+import { and, asc, count, desc, eq, gte, inArray, lt, max, ne, sql, type SQL } from 'drizzle-orm';
 import { applications, documentOpens, documents, invites, partners, registrations, users } from '@/db/schema';
 import { type Clock, fixedClock } from '@/lib/clock';
 import {
@@ -10,11 +10,11 @@ import {
   type PartnerDashboardDto,
   type PartnerHealthDto,
   type PartnerPerformanceRow,
-  periodStart,
+  periodRange,
   type StaffDashboardDto,
   type TeamMemberCount,
 } from '@/lib/dashboard-dto';
-import { daysBetween } from '@/lib/dates';
+import { addDays, daysBetween } from '@/lib/dates';
 import { waitingBusinessDays } from '@/lib/deal-rules';
 import type { StaffRegion } from '@/lib/domain';
 import type { Viewer } from '@/server/auth/types';
@@ -72,6 +72,7 @@ async function loadFacts(tx: Tx, scope: SQL | undefined, filters: DashboardFilte
         scope,
         filters.region ? eq(registrations.region, filters.region) : undefined,
         filters.product ? eq(registrations.product, filters.product) : undefined,
+        filters.category ? eq(partners.category, filters.category) : undefined,
         partnerId ? eq(registrations.partnerId, partnerId) : undefined,
       ),
     )
@@ -79,7 +80,7 @@ async function loadFacts(tx: Tx, scope: SQL | undefined, filters: DashboardFilte
   return rows.map(({ decidedAt, ...row }) => ({ ...row, decidedOn: decidedAt ? decidedAt.toISOString().slice(0, 10) : null }));
 }
 
-const range = (filters: DashboardFilters, today: string): { from: string; to: string } => ({ from: periodStart(filters.period, today), to: today });
+const range = periodRange;
 
 /**
  * Partner admin and partner sales: the viewer's company only (partnerId in the filters is ignored); sales see only the deals
@@ -90,7 +91,7 @@ export async function partnerDashboard(tx: Tx, viewer: Viewer, filters: Dashboar
   const today = clock.today();
   const window = range(filters, today);
   const all = await loadFacts(tx, registrationScope(viewer), filters, viewer.partnerId);
-  const inRange = all.filter((d) => d.registeredOn >= window.from);
+  const inRange = all.filter((d) => d.registeredOn >= window.from && d.registeredOn <= window.to);
   const waiting = all.filter((d) => d.status === 'pending');
 
   let team: TeamMemberCount[] = [];
@@ -148,13 +149,15 @@ async function documentUse(tx: Tx, from: string): Promise<DocumentUseRow[]> {
   return rows;
 }
 
-async function funnel(tx: Tx, region: DashboardFilters['region'] | StaffRegion | undefined, from: string): Promise<FunnelDto> {
+async function funnel(tx: Tx, region: DashboardFilters['region'] | StaffRegion | undefined, category: DashboardFilters['category'], window: { from: string; to: string }): Promise<FunnelDto> {
   const apps = await tx
     .select({ status: applications.status, partnerId: applications.partnerId })
     .from(applications)
     .where(
       and(
-        gte(applications.createdAt, dayStart(from)),
+        gte(applications.createdAt, dayStart(window.from)),
+        lt(applications.createdAt, dayStart(addDays(window.to, 1))),
+        category ? eq(applications.category, category) : undefined,
         region && region !== 'all' ? eq(applications.region, region) : undefined,
       ),
     );
@@ -184,7 +187,7 @@ export async function staffDashboard(tx: Tx, viewer: Viewer, filters: DashboardF
   const today = clock.today();
   const window = range(filters, today);
   const all = await loadFacts(tx, scope, filters, filters.partnerId);
-  const inRange = all.filter((d) => d.registeredOn >= window.from);
+  const inRange = all.filter((d) => d.registeredOn >= window.from && d.registeredOn <= window.to);
   const pending = all.filter((d) => d.status === 'pending');
   const kpis = dealKpis(inRange);
 
@@ -196,6 +199,7 @@ export async function staffDashboard(tx: Tx, viewer: Viewer, filters: DashboardF
       and(
         filters.partnerId ? eq(partners.id, filters.partnerId) : undefined,
         filters.region ? eq(partners.region, filters.region) : undefined,
+        filters.category ? eq(partners.category, filters.category) : undefined,
         regionLimit && regionLimit !== 'all' ? eq(partners.region, regionLimit) : undefined,
       ),
     )
@@ -254,7 +258,7 @@ export async function staffDashboard(tx: Tx, viewer: Viewer, filters: DashboardF
   const [openApplications] = await tx
     .select({ n: count() })
     .from(applications)
-    .where(and(eq(applications.status, 'new'), appRegion && appRegion !== 'all' ? eq(applications.region, appRegion) : undefined));
+    .where(and(eq(applications.status, 'new'), filters.category ? eq(applications.category, filters.category) : undefined, appRegion && appRegion !== 'all' ? eq(applications.region, appRegion) : undefined));
   const docs = await documentUse(tx, window.from);
   const integrations = await integrationHealth(tx);
 
@@ -267,7 +271,7 @@ export async function staffDashboard(tx: Tx, viewer: Viewer, filters: DashboardF
     activePartners: health.active,
     protectedNow: protectedCount(all, today),
     openApplications: openApplications?.n ?? 0,
-    funnel: await funnel(tx, appRegion, window.from),
+    funnel: await funnel(tx, appRegion, filters.category, window),
     partnerHealth: health,
     topByPipeline: rank('pipelineValue'),
     topByWon: rank('wonValue'),

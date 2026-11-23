@@ -4,6 +4,7 @@ import {
   type DealKpis,
   type DealSeries,
   type ExpiringRow,
+  type HeatWeekPoint,
   type MonthPoint,
   REPORTING_CURRENCY,
   type ReasonRow,
@@ -101,6 +102,20 @@ export function weeklySubmittedVsDecided(deals: readonly DealFact[], from: strin
     if (decided) decided.decided += 1;
   }
   return weeks;
+}
+
+export const HEAT_WEEKS = 12;
+
+/** Registrations per day for the HEAT_WEEKS Monday-start weeks ending with the week of `today`. Days after today are null. */
+export function activityHeat(deals: readonly DealFact[], today: string, weeks = HEAT_WEEKS): HeatWeekPoint[] {
+  const last = mondayOf(today);
+  const first = addDays(last, -(weeks - 1) * 7);
+  const perDay = new Map<string, number>();
+  for (const d of deals) perDay.set(d.registeredOn, (perDay.get(d.registeredOn) ?? 0) + 1);
+  return Array.from({ length: weeks }, (_, w) => {
+    const weekStart = addDays(first, w * 7);
+    return { weekStart, days: Array.from({ length: 7 }, (_, d) => { const day = addDays(weekStart, d); return day > today ? null : (perDay.get(day) ?? 0); }) };
+  });
 }
 
 /** Won over won plus lost, 0 to 1. Null when no deal has been won or lost. */
@@ -212,6 +227,7 @@ export function dealSeries(inRange: readonly DealFact[], all: readonly DealFact[
     byStage: pipelineBy(inRange, (d) => d.stage),
     monthly: monthlyRegistrations(all, range.to),
     weekly: weeklySubmittedVsDecided(inRange, range.from, range.to),
+    heat: activityHeat(all, range.to),
     approvalTime: approvalTimeBuckets(decisionDays(inRange)),
     rejectionReasons: rejectionReasons(inRange),
     topDeals: topDeals(inRange),

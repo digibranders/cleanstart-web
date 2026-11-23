@@ -2,7 +2,7 @@
 
 import { downloadCsv } from "@/components/partners/csv";
 
-/** Downloads the KPI table the page already shows; nothing is fetched. */
+/** Downloads the KPI table the page already shows, filters and all; nothing is fetched. */
 export function ExportKpisButton({
   filename,
   header,
@@ -14,7 +14,7 @@ export function ExportKpisButton({
 }): React.JSX.Element {
   return (
     <button type="button" className="btn btn-s" onClick={() => downloadCsv(filename, header, rows.map((r) => [...r]))}>
-      Export CSV
+      Download KPIs
     </button>
   );
 }

@@ -1,15 +1,18 @@
 import Link from "next/link";
-import { BarList, CATEGORICAL, Columns, Donut, Funnel, Line, PRODUCT_COLOR, STATUS_COLOR, StatTile } from "@/components/charts";
+import { BarList, CATEGORICAL, Columns, Donut, Funnel, Heatmap, Line, PRODUCT_COLOR, STATUS_COLOR, StatTile } from "@/components/charts";
 import { ExportKpisButton } from "@/components/dashboard/ExportKpisButton";
 import { OverviewFilters } from "@/components/dashboard/OverviewFilters";
 import {
   buildStaffTiles,
   formatUsd,
+  heatIsEmpty,
+  heatWeeks,
+  kpiCsvRows,
+  kpiFilename,
   productBars,
   reasonBars,
   regionBars,
   TILES_CSV_HEADER,
-  tilesCsv,
   weekLabel,
   workloadBars,
 } from "@/components/dashboard/overview-model";
@@ -135,6 +138,7 @@ export function StaffOverview({ data, today, asOf, scope }: StaffOverviewProps):
   const decided = series.approvalTime.reduce((n, b) => n + b.count, 0);
   const partnersTable = topPartners(d);
   const f = d.filters;
+  const dealsWaiting = `${ROUTES.admin.approvals}?status=waiting`;
 
   return (
     <div className="wrap">
@@ -145,13 +149,17 @@ export function StaffOverview({ data, today, asOf, scope }: StaffOverviewProps):
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
             <OverviewFilters
               period={f.period}
+              from={f.from}
+              to={f.to}
+              category={f.category}
+              categorySwitch
               product={f.product}
               region={f.region}
               partnerId={f.partnerId}
               regionSwitch={data.regionSwitch}
               partners={data.partners}
             />
-            <ExportKpisButton filename="overview-kpis.csv" header={TILES_CSV_HEADER} rows={tilesCsv(tiles)} />
+            <ExportKpisButton filename={kpiFilename(d.range)} header={TILES_CSV_HEADER} rows={kpiCsvRows(f, d.range, tiles, new Map(data.partners.map((p) => [p.id, p.name])))} />
           </div>
         }
       />
@@ -170,7 +178,12 @@ export function StaffOverview({ data, today, asOf, scope }: StaffOverviewProps):
 
       {noDeals ? (
         <section className="card">
-          <Empty>No deals in this view yet. Choose a longer period or clear a filter.</Empty>
+          <Empty>
+            No deals in this view yet. Choose a longer period or clear a filter.{" "}
+            <Link href={ROUTES.admin.overview} className="link-sm">
+              Reset filters
+            </Link>
+          </Empty>
         </section>
       ) : null}
 
@@ -179,7 +192,7 @@ export function StaffOverview({ data, today, asOf, scope }: StaffOverviewProps):
           {statusSlices.some((s) => s.value > 0) ? (
             <Donut title="Registrations by status" description="Deals registered in the period by status." totalLabel="deals" data={statusSlices} />
           ) : (
-            <ChartEmpty title="Registrations by status">No deals registered in this period.</ChartEmpty>
+            <ChartEmpty title="Registrations by status" action={{ href: ROUTES.admin.approvals, label: "Open the deals queue" }}>No deals registered in this period.</ChartEmpty>
           )}
         </Cell>
         <Cell span={8} wide className="">
@@ -195,7 +208,7 @@ export function StaffOverview({ data, today, asOf, scope }: StaffOverviewProps):
               format={(n) => String(Math.round(n))}
             />
           ) : (
-            <ChartEmpty title="Submitted and decided per week">No deals were submitted or decided in this period.</ChartEmpty>
+            <ChartEmpty title="Submitted and decided per week" action={{ href: `${ROUTES.admin.approvals}?status=all`, label: "See all deals" }}>No deals were submitted or decided in this period.</ChartEmpty>
           )}
         </Cell>
 
@@ -203,21 +216,21 @@ export function StaffOverview({ data, today, asOf, scope }: StaffOverviewProps):
           {regionRows.length > 0 ? (
             <BarList title="Pipeline value by region" description="Open deals (pending and accepted), USD." data={regionRows} format={formatUsd} />
           ) : (
-            <ChartEmpty title="Pipeline value by region">No open pipeline value for this period.</ChartEmpty>
+            <ChartEmpty title="Pipeline value by region" action={{ href: `${ROUTES.admin.approvals}?status=all`, label: "See all deals" }}>No open pipeline value for this period.</ChartEmpty>
           )}
         </Cell>
         <Cell span={4} className="">
           {productSlices.length > 0 ? (
             <Donut title="Pipeline value by product" description="Open deals (pending and accepted), USD." totalLabel="pipeline" data={productSlices} format={formatUsd} />
           ) : (
-            <ChartEmpty title="Pipeline value by product">No open pipeline value for this period.</ChartEmpty>
+            <ChartEmpty title="Pipeline value by product" action={{ href: `${ROUTES.admin.approvals}?status=all`, label: "See all deals" }}>No open pipeline value for this period.</ChartEmpty>
           )}
         </Cell>
         <Cell span={4} className="">
           {d.funnel.applied > 0 ? (
             <Funnel title="Application funnel" description="Applications received in the period and how far they got." stages={funnel} />
           ) : (
-            <ChartEmpty title="Application funnel">No partner applications in this period.</ChartEmpty>
+            <ChartEmpty title="Application funnel" action={{ href: ROUTES.admin.partners, label: "Open partners" }}>No partner applications in this period.</ChartEmpty>
           )}
         </Cell>
 
@@ -225,7 +238,7 @@ export function StaffOverview({ data, today, asOf, scope }: StaffOverviewProps):
           {health.some((h) => h.value > 0) ? (
             <Donut title="Partner health" description="Partners by status." totalLabel="partners" data={health} />
           ) : (
-            <ChartEmpty title="Partner health">No partners in this view.</ChartEmpty>
+            <ChartEmpty title="Partner health" action={{ href: ROUTES.admin.partners, label: "Open partners" }}>No partners in this view.</ChartEmpty>
           )}
         </Cell>
         <Cell span={4} className="">
@@ -237,14 +250,14 @@ export function StaffOverview({ data, today, asOf, scope }: StaffOverviewProps):
               rows={series.approvalTime.map((b) => ({ label: b.label, values: [b.count] }))}
             />
           ) : (
-            <ChartEmpty title="Time to decision">No deals were decided in this period.</ChartEmpty>
+            <ChartEmpty title="Time to decision" action={{ href: dealsWaiting, label: "Review waiting deals" }}>No deals were decided in this period.</ChartEmpty>
           )}
         </Cell>
         <Cell span={4} className="">
           {reasons.length > 0 ? (
             <BarList title="Rejection reasons" description="Why deals were rejected in the period." data={reasons} format={(n) => String(n)} />
           ) : (
-            <ChartEmpty title="Rejection reasons">No deals were rejected in this period.</ChartEmpty>
+            <ChartEmpty title="Rejection reasons" action={{ href: `${ROUTES.admin.approvals}?status=rejected`, label: "See rejected deals" }}>No deals were rejected in this period.</ChartEmpty>
           )}
         </Cell>
 
@@ -252,7 +265,17 @@ export function StaffOverview({ data, today, asOf, scope }: StaffOverviewProps):
           {workload.length > 0 ? (
             <BarList title="Manager workload" description="Deals waiting for approval, per manager." data={workload} format={(n) => String(n)} />
           ) : (
-            <ChartEmpty title="Manager workload">Nothing is waiting for approval.</ChartEmpty>
+            <ChartEmpty title="Manager workload" action={{ href: `${ROUTES.admin.approvals}?status=all`, label: "See all deals" }}>Nothing is waiting for approval.</ChartEmpty>
+          )}
+        </Cell>
+
+        <Cell span={8} wide className="">
+          {heatIsEmpty(series.heat) ? (
+            <ChartEmpty title="Registration activity" action={{ href: ROUTES.admin.approvals, label: "Open the deals queue" }}>
+              No deals were registered in the last 12 weeks.
+            </ChartEmpty>
+          ) : (
+            <Heatmap title="Registration activity" description="Deals registered each day over the last 12 weeks." weeks={heatWeeks(series.heat)} unit="deals" />
           )}
         </Cell>
 

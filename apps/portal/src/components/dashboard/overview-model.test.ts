@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { BreakdownRow, PartnerDashboardDto, StaffDashboardDto } from '@/lib/dashboard-dto';
-import { buildDashboardTiles, buildStaffTiles, formatUsd, protectionBars, stageFunnel, tilesCsv, valueBars, workloadBars } from './overview-model';
+import { buildDashboardTiles, buildStaffTiles, formatUsd, heatIsEmpty, heatWeeks, kpiCsvRows, kpiFilename, protectionBars, stageFunnel, tilesCsv, valueBars, workloadBars } from './overview-model';
 
 const row = (key: string, count: number, value = 0): BreakdownRow => ({ key, count, value });
 
@@ -92,6 +92,25 @@ describe('buildStaffTiles', () => {
 
   it('exports the tiles as CSV rows', () => {
     expect(tilesCsv(buildStaffTiles(staffDto, true))[0]).toEqual(['Waiting for approval', '3', '1 past the 2 day target']);
+  });
+
+  it('puts the filters ahead of the tiles in the KPI download and names the file after the days covered', () => {
+    const range = { from: '2026-09-01', to: '2026-10-15' };
+    const rows = kpiCsvRows({ period: 'custom', from: range.from, to: range.to, category: 'channel', region: 'india' }, range, [{ label: 'Open pipeline', value: '$1K', foot: '1 open deal' }]);
+    expect(rows).toEqual([
+      ['Period', 'Custom dates', '2026-09-01 to 2026-10-15'],
+      ['Region', 'India', ''],
+      ['Partner category', 'Channel partner', ''],
+      ['Open pipeline', '$1K', '1 open deal'],
+    ]);
+    expect(kpiFilename(range)).toBe('overview-kpis-2026-09-01-to-2026-10-15.csv');
+  });
+
+  it('labels heat map weeks and spots an empty map', () => {
+    const points = [{ weekStart: '2026-11-16', days: [0, 1, 0, 0, 0, 0, 0] }, { weekStart: '2026-11-23', days: [0, null, null, null, null, null, null] }];
+    expect(heatWeeks(points).map((w) => w.label)).toEqual(['16 Nov', '23 Nov']);
+    expect(heatIsEmpty(points)).toBe(false);
+    expect(heatIsEmpty([points[1] ?? { weekStart: '', days: [] }])).toBe(true);
   });
 
   it('ranks the workload and leaves out managers with nothing waiting', () => {

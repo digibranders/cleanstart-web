@@ -1,13 +1,19 @@
 import Link from "next/link";
-import { BarList, Columns, Donut, Funnel, PRODUCT_COLOR, STATUS_COLOR, StatTile, Timeline } from "@/components/charts";
+import { BarList, Columns, Donut, Funnel, Heatmap, PRODUCT_COLOR, STATUS_COLOR, StatTile, Timeline } from "@/components/charts";
+import { ExportKpisButton } from "@/components/dashboard/ExportKpisButton";
 import { OverviewFilters } from "@/components/dashboard/OverviewFilters";
 import {
   buildDashboardTiles,
   dayMs,
   formatUsd,
+  heatIsEmpty,
+  heatWeeks,
+  kpiCsvRows,
+  kpiFilename,
   productBars,
   protectionBars,
   stageFunnel,
+  TILES_CSV_HEADER,
   valueBars,
 } from "@/components/dashboard/overview-model";
 import { ScrollRegion } from "@/components/ui/scroll-region";
@@ -67,13 +73,23 @@ export function Empty({ children }: { children: React.ReactNode }): React.JSX.El
 }
 
 /** The empty state of a chart: its own card, with the chart title so the grid does not lose a slot. */
-export function ChartEmpty({ title, children }: { title: string; children: React.ReactNode }): React.JSX.Element {
+export function ChartEmpty({ title, children, action }: { title: string; children: React.ReactNode; action?: { href: string; label: string } }): React.JSX.Element {
   return (
     <div className="card" style={{ minHeight: 120 }}>
       <div className="card-h">
         <h2 className="card-t">{title}</h2>
       </div>
-      <Empty>{children}</Empty>
+      <Empty>
+        {children}
+        {action ? (
+          <>
+            {" "}
+            <Link href={action.href} className="link-sm">
+              {action.label}
+            </Link>
+          </>
+        ) : null}
+      </Empty>
     </div>
   );
 }
@@ -133,7 +149,7 @@ function DocumentLists({ newDocuments, mostOpened }: { newDocuments: DocumentLis
   );
 }
 
-function Header({ filters, today, asOf, deals }: { filters: DashboardFilters; today: string; asOf: string; deals: boolean }): React.JSX.Element {
+function Header({ filters, today, asOf, deals, exportKpis }: { filters: DashboardFilters; today: string; asOf: string; deals: boolean; exportKpis?: React.ReactNode }): React.JSX.Element {
   return (
     <div className="head">
       <div style={{ display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
@@ -144,7 +160,8 @@ function Header({ filters, today, asOf, deals }: { filters: DashboardFilters; to
       </div>
       {deals ? (
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-          <OverviewFilters period={filters.period} product={filters.product} />
+          <OverviewFilters period={filters.period} from={filters.from} to={filters.to} product={filters.product} />
+          {exportKpis}
           <Link href={ROUTES.partner.newDeal} className="btn btn-p">
             <Icon d={PLUS_PATH} />
             Register deal
@@ -187,7 +204,13 @@ export function PartnerOverview({ data, today, asOf }: PartnerOverviewProps): Re
 
   return (
     <div className="wrap">
-      <Header filters={d.filters} today={today} asOf={asOf} deals />
+      <Header
+        filters={d.filters}
+        today={today}
+        asOf={asOf}
+        deals
+        exportKpis={<ExportKpisButton filename={kpiFilename(d.range)} header={TILES_CSV_HEADER} rows={kpiCsvRows(d.filters, d.range, tiles)} />}
+      />
       {d.ownDealsOnly ? (
         <p className="card-meta" style={{ margin: 0 }}>
           You see only the deals you registered.
@@ -219,21 +242,21 @@ export function PartnerOverview({ data, today, asOf }: PartnerOverviewProps): Re
           {statusSlices.some((s) => s.value > 0) ? (
             <Donut title="Deals by status" description="Registered deals in the period by status." totalLabel="deals" data={statusSlices} />
           ) : (
-            <ChartEmpty title="Deals by status">No deals registered in this period. Choose a longer period or register a deal.</ChartEmpty>
+            <ChartEmpty title="Deals by status" action={{ href: ROUTES.partner.newDeal, label: "Register a deal" }}>No deals registered in this period. Choose a longer period or register a deal.</ChartEmpty>
           )}
         </Cell>
         <Cell span={4} className="">
           {productRows.length > 0 ? (
             <BarList title="Pipeline value by product" description="Open deals (pending and accepted), USD." data={productRows} format={formatUsd} />
           ) : (
-            <ChartEmpty title="Pipeline value by product">No open pipeline value for this period. Add a deal value when you register a deal.</ChartEmpty>
+            <ChartEmpty title="Pipeline value by product" action={{ href: ROUTES.partner.newDeal, label: "Register a deal" }}>No open pipeline value for this period. Add a deal value when you register a deal.</ChartEmpty>
           )}
         </Cell>
         <Cell span={4} className="">
           {stageRows.length > 0 ? (
             <Funnel title="Pipeline by sales stage" description="Open deals that reached each stage, with the share of the stage before." stages={stageRows} />
           ) : (
-            <ChartEmpty title="Pipeline by sales stage">No open deals at any stage yet.</ChartEmpty>
+            <ChartEmpty title="Pipeline by sales stage" action={{ href: ROUTES.partner.newDeal, label: "Register a deal" }}>No open deals at any stage yet.</ChartEmpty>
           )}
         </Cell>
         <Cell span={8} wide className="">
@@ -245,14 +268,14 @@ export function PartnerOverview({ data, today, asOf }: PartnerOverviewProps): Re
               rows={series.monthly.map((m) => ({ label: monthLabel(m.month), values: [m.count] }))}
             />
           ) : (
-            <ChartEmpty title="Registrations per month">No registrations in the last 12 months. Register a deal to see the trend.</ChartEmpty>
+            <ChartEmpty title="Registrations per month" action={{ href: ROUTES.partner.newDeal, label: "Register a deal" }}>No registrations in the last 12 months. Register a deal to see the trend.</ChartEmpty>
           )}
         </Cell>
         <Cell span={4} className="">
           {windows.length > 0 ? (
             <Timeline title="Protection windows" description="The next deals to lose protection; the line marks today." bars={windows} today={dayMs(today)} />
           ) : (
-            <ChartEmpty title="Protection windows">No protection ends in the next 14 days.</ChartEmpty>
+            <ChartEmpty title="Protection windows" action={{ href: `${ROUTES.partner.deals}?status=accepted`, label: "View protected deals" }}>No protection ends in the next 14 days.</ChartEmpty>
           )}
         </Cell>
         {countryBars.length > 0 ? (
@@ -275,6 +298,16 @@ export function PartnerOverview({ data, today, asOf }: PartnerOverviewProps): Re
             />
           </Cell>
         ) : null}
+
+        <Cell span={8} wide className="">
+          {heatIsEmpty(series.heat) ? (
+            <ChartEmpty title="Registration activity" action={{ href: ROUTES.partner.newDeal, label: "Register a deal" }}>
+              No deals registered in the last 12 weeks.
+            </ChartEmpty>
+          ) : (
+            <Heatmap title="Registration activity" description="Deals registered each day over the last 12 weeks." weeks={heatWeeks(series.heat)} unit="deals" />
+          )}
+        </Cell>
 
         <Cell span={8} wide label="Top deals by value" className="card clip">
           <CardHead id="top" title="Top deals by value" href={ROUTES.partner.deals} />

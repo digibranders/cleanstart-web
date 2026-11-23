@@ -1,9 +1,9 @@
-import type { Bar, FunnelStage, ProtectionBar } from "@/components/charts";
+import type { Bar, FunnelStage, HeatWeek, ProtectionBar } from "@/components/charts";
 import { PRODUCT_COLOR } from "@/components/charts";
-import type { BreakdownRow, DealKpis, ExpiringRow, ManagerWorkloadRow, PartnerDashboardDto, ReasonRow, StaffDashboardDto } from "@/lib/dashboard-dto";
+import { type BreakdownRow, type DashboardFilters, type DealKpis, type ExpiringRow, type HeatWeekPoint, type ManagerWorkloadRow, type PartnerDashboardDto, type ReasonRow, type StaffDashboardDto, DASHBOARD_PERIOD_LABEL } from "@/lib/dashboard-dto";
 import { plural } from "@/lib/dates";
 import { PROTECTION_DAYS } from "@/lib/deal-rules";
-import { PARTNER_REGION_LABEL, PRODUCT_LABEL, type Product } from "@/lib/domain";
+import { PARTNER_CATEGORY_LABEL, PARTNER_REGION_LABEL, PRODUCT_LABEL, type Product } from "@/lib/domain";
 import { ROUTES } from "@/lib/routes";
 import { STAGE_LABELS } from "@/server/hubspot/types";
 
@@ -230,3 +230,25 @@ export const TILES_CSV_HEADER = ["Measure", "Value", "Note"] as const;
 
 /** The KPI table as CSV rows, one per tile. */
 export const tilesCsv = (tiles: readonly StaffTile[]): string[][] => tiles.map((t) => [t.label, t.value, t.foot]);
+
+/** The heat map weeks, labelled with the Monday of each week. Days after today stay null so they draw nothing. */
+export const heatWeeks = (points: readonly HeatWeekPoint[]): HeatWeek[] => points.map((w) => ({ label: weekLabel(w.weekStart), days: w.days }));
+
+/** True when the heat map has no registration in any of its weeks. */
+export const heatIsEmpty = (points: readonly HeatWeekPoint[]): boolean => points.every((w) => w.days.every((d) => !d));
+
+/** The file name for the KPI download: it carries the exact days covered, so two exports never share a name. */
+export const kpiFilename = (range: { from: string; to: string }): string => `overview-kpis-${range.from}-to-${range.to}.csv`;
+
+/**
+ * The KPI download: the filters that produced the figures first, so a saved file says what it covers, then one row per tile.
+ * `names` turns a partner id into a name (staff only).
+ */
+export function kpiCsvRows(filters: DashboardFilters, range: { from: string; to: string }, tiles: readonly { label: string; value: string; foot: string }[], names: ReadonlyMap<string, string> = new Map()): string[][] {
+  const applied: string[][] = [["Period", filters.period === "custom" ? "Custom dates" : DASHBOARD_PERIOD_LABEL[filters.period], `${range.from} to ${range.to}`]];
+  if (filters.region) applied.push(["Region", PARTNER_REGION_LABEL[filters.region], ""]);
+  if (filters.product) applied.push(["Product", PRODUCT_LABEL[filters.product], ""]);
+  if (filters.category) applied.push(["Partner category", PARTNER_CATEGORY_LABEL[filters.category], ""]);
+  if (filters.partnerId) applied.push(["Partner", names.get(filters.partnerId) ?? filters.partnerId, ""]);
+  return [...applied, ...tiles.map((t) => [t.label, t.value, t.foot])];
+}

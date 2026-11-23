@@ -1,23 +1,30 @@
 import { addDays } from './dates';
-import { DEAL_REGIONS, type DealRegion, isOneOf, PRODUCTS, type Product, type RegistrationStatus } from './domain';
+import { DEAL_REGIONS, type DealRegion, isOneOf, PARTNER_CATEGORIES, type PartnerCategory, PRODUCTS, type Product, type RegistrationStatus } from './domain';
 import type { AttentionItemDto, DocumentListItemDto, IntegrationHealthDto, IsoTimestamp } from './dto';
 
 /* ---------------------------------------------------------------- filters (URL state) */
 
 export const DASHBOARD_PERIODS = ['30d', '90d', '12m', 'ytd'] as const;
-export type DashboardPeriod = (typeof DASHBOARD_PERIODS)[number];
-export const DEFAULT_DASHBOARD_PERIOD: DashboardPeriod = '90d';
+/** The presets, plus `custom`, which carries its own `from` and `to` in the filters. */
+export type DashboardPeriod = (typeof DASHBOARD_PERIODS)[number] | 'custom';
+export const DEFAULT_DASHBOARD_PERIOD = '90d' as const;
 export const DASHBOARD_PERIOD_LABEL: Record<DashboardPeriod, string> = {
   '30d': 'Last 30 days',
   '90d': 'Last 90 days',
   '12m': 'Last 12 months',
   ytd: 'Year to date',
+  custom: 'Custom dates',
 };
 
 export interface DashboardFilters {
   period: DashboardPeriod;
+  /** Only with `period: 'custom'`: first and last day, inclusive, YYYY-MM-DD. */
+  from?: string;
+  to?: string;
   region?: DealRegion;
   product?: Product;
+  /** Staff only: the partner category (distributor or channel). */
+  category?: PartnerCategory;
   /** Staff only. A partner viewer's own company is the only scope, whatever this holds. */
   partnerId?: string;
 }
@@ -32,22 +39,35 @@ const pick = (params: Params, key: string): string | undefined => {
   return value === null || value === undefined ? undefined : value.trim();
 };
 
-/** Parses `?period=&region=&product=&partnerId=`. Any bad or missing value falls back to the default (no filter). */
+const ISO_DAY = /^\d{4}-\d{2}-\d{2}$/;
+const isRealDay = (v: string | undefined): v is string => {
+  if (v === undefined || !ISO_DAY.test(v)) return false;
+  const at = new Date(`${v}T00:00:00Z`);
+  return !Number.isNaN(at.getTime()) && at.toISOString().slice(0, 10) === v;
+};
+
+/** Parses `?period=&from=&to=&region=&product=&category=&partnerId=`. Any bad or missing value falls back to the default (no filter). */
 export function parseDashboardFilters(params: Params, opts: { staff: boolean }): DashboardFilters {
   const period = pick(params, 'period');
   const region = pick(params, 'region');
   const product = pick(params, 'product');
   const partnerId = pick(params, 'partnerId');
+  const category = pick(params, 'category');
+  const from = pick(params, 'from');
+  const to = pick(params, 'to');
+  const custom = (period === 'custom' || period === undefined) && isRealDay(from) && isRealDay(to) && from <= to;
   return {
-    period: isOneOf(DASHBOARD_PERIODS, period) ? period : DEFAULT_DASHBOARD_PERIOD,
+    period: custom ? 'custom' : isOneOf(DASHBOARD_PERIODS, period) ? period : DEFAULT_DASHBOARD_PERIOD,
+    ...(custom ? { from, to } : {}),
     ...(isOneOf(DEAL_REGIONS, region) ? { region } : {}),
     ...(isOneOf(PRODUCTS, product) ? { product } : {}),
+    ...(opts.staff && isOneOf(PARTNER_CATEGORIES, category) ? { category } : {}),
     ...(opts.staff && partnerId !== undefined && UUID.test(partnerId) ? { partnerId } : {}),
   };
 }
 
 /** The first day of the period, inclusive. `today` is a YYYY-MM-DD date. */
-export function periodStart(period: DashboardPeriod, today: string): string {
+export function periodStart(period: Exclude<DashboardPeriod, 'custom'>, today: string): string {
   switch (period) {
     case '30d':
       return addDays(today, -29);
@@ -59,6 +79,19 @@ export function periodStart(period: DashboardPeriod, today: string): string {
       return `${today.slice(0, 4)}-01-01`;
   }
 }
+
+/** The days a filter set covers. A custom range is cut off at today, and a start after today moves back to it. */
+export function periodRange(filters: DashboardFilters, today: string): { from: string; to: string } {
+  const { period } = filters;
+  if (period !== 'custom') return { from: periodStart(period, today), to: today };
+  if (!filters.from || !filters.to) return { from: periodStart(DEFAULT_DASHBOARD_PERIOD, today), to: today };
+  const to = filters.to < today ? filters.to : today;
+  return { from: filters.from < to ? filters.from : to, to };
+}
+
+/** True when any filter differs from the plain Overview. */
+export const hasActiveFilters = (f: DashboardFilters): boolean =>
+  f.period !== DEFAULT_DASHBOARD_PERIOD || Boolean(f.region || f.product || f.category || f.partnerId);
 
 /* ---------------------------------------------------------------- shared building blocks */
 
@@ -84,6 +117,13 @@ export interface WeekPoint {
   weekStart: string;
   submitted: number;
   decided: number;
+}
+
+export interface HeatWeekPoint {
+  /** The Monday of the week, YYYY-MM-DD. */
+  weekStart: string;
+  /** Deals registered on Monday to Sunday; null for days after today. */
+  days: (number | null)[];
 }
 
 export interface BucketPoint {
@@ -144,6 +184,8 @@ export interface DealSeries {
   byStage: BreakdownRow[];
   monthly: MonthPoint[];
   weekly: WeekPoint[];
+  /** Deals registered per day over the last 12 weeks, whatever the period. */
+  heat: HeatWeekPoint[];
   approvalTime: BucketPoint[];
   rejectionReasons: ReasonRow[];
   topDeals: TopDealRow[];
