@@ -415,6 +415,15 @@ export function Shell({
                               </span>
                             </Link>
                           ) : null}
+                          <Link href={ROUTES.partner.program} className="li" onClick={() => setPop(null)}>
+                            <span className="li-ic">
+                              <Icon name="info" />
+                            </span>
+                            <span className="li-t">
+                              <span className="li-n">Program guide</span>
+                              <span className="li-s">Deal protection, roles and support</span>
+                            </span>
+                          </Link>
                           {me.manager ? (
                             <button
                               type="button"

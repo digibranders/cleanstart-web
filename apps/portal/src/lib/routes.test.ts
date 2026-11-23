@@ -27,15 +27,15 @@ const labels = (viewer: PartnerViewer | StaffViewer): string[] => navFor(viewer)
 
 describe("navFor", () => {
   it("gives a partner admin every partner item", () => {
-    expect(labels(partner("partner_admin"))).toEqual(["Overview", "Deals", "Register deal", "Documents", "Team", "Company"]);
+    expect(labels(partner("partner_admin"))).toEqual(["Overview", "Deals", "Register deal", "Documents", "Program", "Team", "Company"]);
   });
 
   it("gives partner sales everything except Team", () => {
-    expect(labels(partner("sales"))).toEqual(["Overview", "Deals", "Register deal", "Documents", "Company"]);
+    expect(labels(partner("sales"))).toEqual(["Overview", "Deals", "Register deal", "Documents", "Program", "Company"]);
   });
 
-  it("gives a technical partner user Documents and Company only", () => {
-    expect(labels(partner("technical"))).toEqual(["Documents", "Company"]);
+  it("gives a technical partner user Documents, Program and Company only", () => {
+    expect(labels(partner("technical"))).toEqual(["Documents", "Program", "Company"]);
   });
 
   it("gives a partner manager every admin item", () => {
