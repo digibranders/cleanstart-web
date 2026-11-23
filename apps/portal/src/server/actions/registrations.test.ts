@@ -90,11 +90,13 @@ describe('registerDealsAction', () => {
     expect(await db.select().from(registrations)).toHaveLength(1);
   });
 
-  it('still registers when no manager exists and no fallback address is configured, and sends no email', async () => {
-    session.viewer = await asPartner(db, { role: 'partner_admin' });
+  it('still registers when no manager exists and no fallback address is configured, and only the partner gets a receipt', async () => {
+    const viewer = await asPartner(db, { role: 'partner_admin' });
+    session.viewer = viewer;
     const result = await registerDealsAction(form({ products: ['images'] }));
     expect(result.ok).toBe(true);
-    expect(mail.transport!.sent).toHaveLength(0);
+    expect(mail.transport!.sent).toHaveLength(1);
+    expect(mail.transport!.to(viewer.email)).toHaveLength(1);
   });
 });
 

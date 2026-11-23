@@ -1,10 +1,11 @@
 import { and, eq } from 'drizzle-orm';
 import { registrationEvents, registrations } from '@/db/schema';
-import type { Clock } from '@/lib/clock';
+import { type Clock, fixedClock } from '@/lib/clock';
 import type { RegistrationDetailDto } from '@/lib/dto';
 import type { Viewer } from '@/server/auth/types';
 import { ConflictError } from '@/server/errors';
 import type { Tx } from './context';
+import { defineIsolation } from './isolation.registry';
 import { getRegistration, lockRegistration } from './registrations';
 
 export const STAGE_WITHDRAWN = 'Withdrawn by partner';
@@ -28,3 +29,9 @@ export async function withdrawRegistration(tx: Tx, viewer: Viewer, id: string, c
   });
   return getRegistration(tx, viewer, current.id);
 }
+
+const probeClock = fixedClock('2026-11-06T14:02:00Z');
+
+export const isolation = defineIsolation<'withdrawRegistration'>({
+  withdrawRegistration: { scope: 'tenant', expect: 'not_found', probe: (tx, viewer, ctx) => withdrawRegistration(tx, viewer, ctx.b.registrationId, probeClock) },
+});
