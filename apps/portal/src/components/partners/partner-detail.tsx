@@ -90,6 +90,30 @@ export function PartnerDetail({
           <dd>{p.adminName ?? "Not invited yet"}</dd>
           <dt>HubSpot company</dt>
           <dd className="tnum">{p.hubspotCompanyId ?? "Not created yet"}</dd>
+          {p.website ? (
+            <>
+              <dt>Website</dt>
+              <dd>{p.website}</dd>
+            </>
+          ) : null}
+          {p.phone ? (
+            <>
+              <dt>Phone</dt>
+              <dd className="tnum">{p.phone}</dd>
+            </>
+          ) : null}
+          {p.address ? (
+            <>
+              <dt>Address</dt>
+              <dd>{p.address}</dd>
+            </>
+          ) : null}
+          {p.about ? (
+            <>
+              <dt>About</dt>
+              <dd>{p.about}</dd>
+            </>
+          ) : null}
         </dl>
         <div className="kpis" style={{ borderTop: "1px solid #F0EFF4", gridTemplateColumns: "repeat(4, minmax(0, 1fr))" }}>
           {(
