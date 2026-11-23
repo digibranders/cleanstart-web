@@ -13,6 +13,7 @@ import type { RegistrationDetailDto, RegistrationListItem } from "@/lib/dto";
 import { ROUTES } from "@/lib/routes";
 import { requestExtensionAction } from "@/server/actions/extension";
 import { postMessageAction } from "@/server/actions/registrations";
+import { withdrawRegistrationAction } from "@/server/actions/withdraw";
 import { daysLeft, fmtLong, fmtShort, plural, PROTECTION_DAYS } from "../deals/dates";
 import { acceptedOn, firstWord, initialsOf, protectionLength, stageTrack, waitDays } from "../deals/derive";
 import { ManagerMessageDrawer } from "../deals/ManagerMessageDrawer";
@@ -130,9 +131,12 @@ export function DealDetail({ deal, siblings, today, partnerManager, senderEmail 
   const [extTried, setExtTried] = useState(false);
   const [extBusy, setExtBusy] = useState(false);
   const [fixing, setFixing] = useState(false);
+  const [withdrawOpen, setWithdrawOpen] = useState(false);
+  const [withdrawBusy, setWithdrawBusy] = useState(false);
   const [messageSubject, setMessageSubject] = useState<string | null>(null);
   // stable, because the overlay re-focuses its first field whenever onClose changes
   const closeExt = useCallback(() => setExtOpen(false), []);
+  const closeWithdraw = useCallback(() => setWithdrawOpen(false), []);
 
   if (!deal) return <NotFound />;
 
@@ -181,6 +185,22 @@ export function DealDetail({ deal, siblings, today, partnerManager, senderEmail 
     }
   };
 
+  const withdraw = async (event: React.FormEvent): Promise<void> => {
+    event.preventDefault();
+    setWithdrawBusy(true);
+    try {
+      const result = await withdrawRegistrationAction({ id: deal.id });
+      if (!result.ok) {
+        toast(result.error.message);
+        return;
+      }
+      setWithdrawOpen(false);
+      toast("Registration withdrawn.");
+    } finally {
+      setWithdrawBusy(false);
+    }
+  };
+
   return (
     <div className="wrap">
       <div className="head">
@@ -218,6 +238,11 @@ export function DealDetail({ deal, siblings, today, partnerManager, senderEmail 
           {deal.status === "rejected" ? (
             <button type="button" className="btn btn-p" onClick={() => setFixing(true)}>
               Fix and resubmit
+            </button>
+          ) : null}
+          {deal.status === "pending" ? (
+            <button type="button" className="btn btn-s" onClick={() => setWithdrawOpen(true)}>
+              Withdraw registration
             </button>
           ) : null}
           <button
@@ -556,6 +581,26 @@ export function DealDetail({ deal, siblings, today, partnerManager, senderEmail 
           ) : null}
         </div>
         <span className="hint">Your partner manager decides and replies by email.</span>
+      </Dialog>
+
+      <Dialog
+        open={withdrawOpen}
+        onClose={closeWithdraw}
+        title="Withdraw this registration?"
+        subtitle={`${deal.customer}, ${PRODUCT_LABEL[deal.product]}. CleanStart will no longer review it.`}
+        onSubmit={withdraw}
+        footer={
+          <>
+            <button type="button" className="btn btn-s" onClick={closeWithdraw}>
+              Keep registration
+            </button>
+            <button type="submit" className="btn btn-p" disabled={withdrawBusy}>
+              Withdraw registration
+            </button>
+          </>
+        }
+      >
+        <span className="hint">You can register this customer again later.</span>
       </Dialog>
 
       {fixing && deal.status === "rejected" ? (
