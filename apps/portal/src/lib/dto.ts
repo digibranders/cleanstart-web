@@ -238,6 +238,13 @@ export interface PartnerPersonDto {
   status: 'active' | 'invited';
   lastActiveAt: IsoTimestamp | null;
   invitedAt: IsoTimestamp | null;
+  title: string | null;
+  phone: string | null;
+  /** Registrations this person registered. */
+  deals: number;
+  /** The open invite, for resend and withdraw. For an invite-only person it equals `id`. */
+  inviteId: string | null;
+  twoFactorEnabled: boolean;
 }
 
 export interface PartnerDealRow {
@@ -254,6 +261,8 @@ export interface PartnerDetailDto extends PartnerListRow {
   address: string | null;
   about: string | null;
   people: PartnerPersonDto[];
+  /** Why staff suspended the partner, from the audit entry. Null unless suspended. */
+  suspendReason: string | null;
   openInvites: number;
   recentDeals: PartnerDealRow[];
 }

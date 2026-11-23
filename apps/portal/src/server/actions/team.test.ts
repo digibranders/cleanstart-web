@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm';
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import { accessRequests, auditLog, invites, notifications, users } from '@/db/schema';
+import { accessRequests, auditLog, invites, notifications, registrations, users } from '@/db/schema';
 import { asPartner, asStaff, makeAccessRequest, makeInvite, makePartner, makeRegistration, makeUser, resetDb, testDb } from '@/db/test-helpers';
 import type { Viewer } from '@/server/auth/types';
 import type { FakeEmailTransport } from '@/server/email/fake';
@@ -189,5 +189,35 @@ describe('decideAccessRequestAction', () => {
     expect(fake.to('rohit@kestrelsystems.in')).toHaveLength(1);
     expect(await events()).toEqual(['team.access_request_declined']);
     expect((await db.select().from(accessRequests))[0]?.status).toBe('declined');
+  });
+});
+
+describe('staff managing a partner from its drawer', () => {
+  it('a partner manager removes a person with the deal move; a staff sales user may not', async () => {
+    const partner = await makePartner(db, { name: 'Kestrel Systems', domain: 'kestrelsystems.in' });
+    await makeUser(db, { partnerId: partner.id, role: 'partner_admin' });
+    const leaver = await makeUser(db, { partnerId: partner.id, role: 'sales', name: 'Karan Malhotra' });
+    const heir = await makeUser(db, { partnerId: partner.id, role: 'sales', name: 'Meera Pillai' });
+    const deal = await makeRegistration(db, { partnerId: partner.id, registeredBy: leaver.id });
+    harness.viewer = await asStaff(db, 'sales', 'all');
+    expect(await removeMemberAction({ partnerId: partner.id, userId: leaver.id, moveDealsTo: heir.id })).toMatchObject({ ok: false, error: { code: 'forbidden' } });
+    expect(await inviteMemberAction({ partnerId: partner.id, email: 'x@kestrelsystems.in', role: 'sales' })).toMatchObject({ ok: false, error: { code: 'forbidden' } });
+    harness.viewer = await asStaff(db, 'partner_manager', 'all');
+    expect(await removeMemberAction({ partnerId: partner.id, userId: leaver.id, moveDealsTo: heir.id })).toMatchObject({ ok: true });
+    const [moved] = await db.select().from(registrations).where(eq(registrations.id, deal.id));
+    expect(moved?.registeredBy).toBe(heir.id);
+    expect(await events()).toEqual(['team.deals_moved', 'team.removed']);
+  });
+
+  it('keeps one admin path: the last active admin cannot be removed, and a company with no admin can be given one', async () => {
+    const partner = await makePartner(db, { name: 'Kestrel Systems', domain: 'kestrelsystems.in' });
+    const onlyAdmin = await makeUser(db, { partnerId: partner.id, role: 'partner_admin' });
+    harness.viewer = await asStaff(db, 'partner_manager', 'all');
+    expect(await removeMemberAction({ partnerId: partner.id, userId: onlyAdmin.id })).toMatchObject({ ok: false, error: { code: 'conflict', message: 'Every company needs at least one partner admin.' } });
+    expect(await changeMemberRoleAction({ partnerId: partner.id, userId: onlyAdmin.id, role: 'sales' })).toMatchObject({ ok: false, error: { code: 'conflict' } });
+    const bare = await makePartner(db, { name: 'Bare Co', domain: 'bare.example' });
+    const invited = await inviteMemberAction({ partnerId: bare.id, email: 'owner@bare.example', role: 'partner_admin', name: 'Owner' });
+    expect(invited).toMatchObject({ ok: true, data: { partnerId: bare.id, role: 'partner_admin' } });
+    expect(fake.only('owner@bare.example').htmlContent).toMatch(/accept-invite\?token=/u);
   });
 });

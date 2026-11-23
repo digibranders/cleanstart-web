@@ -33,6 +33,8 @@ vi.mock('@/server/email/send', async () => {
 });
 
 import { revokeAllSessions } from '@/server/auth/sessions';
+import { withViewer } from '@/server/repo/context';
+import { getPartnerDetail } from '@/server/repo/partners';
 import {
   createPartnerAction,
   resendPartnerInvitesAction,
@@ -236,12 +238,21 @@ describe('partner management actions', () => {
     const partner = await makePartner(db, { name: 'Ironleaf', status: 'active' });
     const admin = await makeUser(db, { partnerId: partner.id, role: 'partner_admin' });
     const sales = await makeUser(db, { partnerId: partner.id, role: 'sales' });
-    expect(await suspendPartnerAction({ id: partner.id })).toMatchObject({ ok: true, data: { status: 'suspended' } });
+    expect(await suspendPartnerAction({ id: partner.id })).toMatchObject({ ok: false });
+    expect(await suspendPartnerAction({ id: partner.id, reason: '   ' })).toMatchObject({ ok: false });
+    expect(await db.select().from(auditLog)).toHaveLength(0);
+    expect(await suspendPartnerAction({ id: partner.id, reason: 'Unpaid invoice, pending review' })).toMatchObject({ ok: true, data: { status: 'suspended' } });
     expect(vi.mocked(revokeAllSessions).mock.calls.map((c) => c[0]).sort()).toEqual([admin.id, sales.id].sort());
-    await suspendPartnerAction({ id: partner.id });
+    const [entry] = await db.select().from(auditLog);
+    expect(entry).toMatchObject({ event: 'partner.suspended', note: 'Unpaid invoice, pending review' });
+    const detail = await withViewer(harness.viewer, (tx) => getPartnerDetail(tx, harness.viewer as Viewer, partner.id));
+    expect(detail.suspendReason).toBe('Unpaid invoice, pending review');
+    await suspendPartnerAction({ id: partner.id, reason: 'Second call is a no-op' });
     expect(await restorePartnerAction({ id: partner.id })).toMatchObject({ ok: true, data: { status: 'active' } });
     expect((await db.select().from(auditLog)).map((a) => a.event).sort()).toEqual(['partner.restored', 'partner.suspended']);
     expect(await db.select().from(hubspotOutbox)).toHaveLength(2);
+    const restored = await withViewer(harness.viewer, (tx) => getPartnerDetail(tx, harness.viewer as Viewer, partner.id));
+    expect(restored.suspendReason).toBeNull();
   });
 
   it('resends every open invite, emails each, audits once, and says when nobody is left', async () => {

@@ -7,7 +7,7 @@ import { AddPartnerDrawer, type NewPartnerValues } from "@/components/partners/a
 import { ApplicationsTable } from "@/components/partners/applications-table";
 import { downloadCsv } from "@/components/partners/csv";
 import { PartnerDetail } from "@/components/partners/partner-detail";
-import { CategoryDialog, ManagerDialog } from "@/components/partners/partner-dialogs";
+import { CategoryDialog, IdentityDialog, ManagerDialog, ProfileDialog, SuspendDialog } from "@/components/partners/partner-dialogs";
 import { type PartnerTab as Tab, partnerTabs } from "@/components/partners/partner-tabs";
 import { CATEGORY_FOR_FILTER, type CategoryFilter, type PartnerSort, PartnersTable } from "@/components/partners/partners-table";
 import { useToast } from "@/components/ui/toast";
@@ -72,7 +72,7 @@ export function AdminPartners({
   const [status, setStatus] = useState("Any status");
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<PartnerSort>("name");
-  const [dialog, setDialog] = useState<"add" | "category" | "manager" | null>(null);
+  const [dialog, setDialog] = useState<"add" | "category" | "manager" | "identity" | "profile" | "suspend" | null>(null);
 
   const selectedParam = searchParams.get("selected");
   const open = selectedParam !== null && detail?.id === selectedParam ? detail : null;
@@ -305,6 +305,8 @@ export function AdminPartners({
             canManage={canManage}
             onChangeManager={() => setDialog("manager")}
             onChangeCategory={() => setDialog("category")}
+            onEditIdentity={() => setDialog("identity")}
+            onEditProfile={() => setDialog("profile")}
             onResendInvites={() => {
               void (async () => {
                 const result = await resendPartnerInvitesAction({ id: open.id });
@@ -320,7 +322,7 @@ export function AdminPartners({
                 );
               })();
             }}
-            onSuspend={() => void report(suspendPartnerAction({ id: open.id }), `${open.name} is suspended`)}
+            onSuspend={() => setDialog("suspend")}
             onRestore={() => void report(restorePartnerAction({ id: open.id }), `Access restored for ${open.name}`)}
           />
         ) : null}
@@ -338,6 +340,18 @@ export function AdminPartners({
               setPartnerCategoryAction({ id: detail.id, category: value }),
               `${detail.name} is now listed as ${PARTNER_CATEGORY_LABEL[value].toLowerCase()}`,
             );
+          }}
+        />
+      ) : null}
+      {dialog === "identity" && detail ? <IdentityDialog key={detail.id} partner={detail} onClose={() => setDialog(null)} /> : null}
+      {dialog === "profile" && detail ? <ProfileDialog key={detail.id} partner={detail} onClose={() => setDialog(null)} /> : null}
+      {dialog === "suspend" && detail ? (
+        <SuspendDialog
+          partner={detail}
+          onClose={() => setDialog(null)}
+          onSave={(reason) => {
+            setDialog(null);
+            void report(suspendPartnerAction({ id: detail.id, reason }), `${detail.name} is suspended`);
           }}
         />
       ) : null}

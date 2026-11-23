@@ -15,7 +15,19 @@ const ROLE_ORDER: readonly PartnerRole[] = ["sales", "technical", "partner_admin
 const ROLE_OPTIONS: readonly DropdownOption[] = ROLE_ORDER.map((value) => ({ value, label: PARTNER_ROLE_LABEL[value] }));
 
 /** One drawer for a colleague's name, title, phone, role and sign-in email. Render it with key={member.id} so it starts fresh for each person. */
-export function EditMemberDrawer({ member, onClose }: { member: TeamMemberDto; onClose: () => void }): React.JSX.Element {
+export function EditMemberDrawer({
+  member,
+  partnerId,
+  onClose,
+  onSaved,
+}: {
+  member: TeamMemberDto;
+  /** Staff only: the company the person belongs to. Partner admins act on their own company. */
+  partnerId?: string;
+  onClose: () => void;
+  onSaved?: () => void;
+}): React.JSX.Element {
+  const scope = partnerId ? { partnerId } : {};
   const toast = useToast();
   const [name, setName] = useState(member.name);
   const [title, setTitle] = useState(member.title ?? "");
@@ -45,21 +57,22 @@ export function EditMemberDrawer({ member, onClose }: { member: TeamMemberDto; o
       setBusy(false);
     };
     if (detailsChanged) {
-      const result = await updateMemberDetailsAction({ userId: member.id, name: name.trim(), title: title.trim(), phone: phone.trim() });
+      const result = await updateMemberDetailsAction({ ...scope, userId: member.id, name: name.trim(), title: title.trim(), phone: phone.trim() });
       if (!result.ok) return fail(result);
       done.push("details saved");
     }
     if (role !== member.role) {
-      const result = await changeMemberRoleAction({ userId: member.id, role });
+      const result = await changeMemberRoleAction({ ...scope, userId: member.id, role });
       if (!result.ok) return fail(result);
       done.push(`now ${PARTNER_ROLE_LABEL[role].toLowerCase()}`);
     }
     if (emailChanged) {
-      const result = await requestMemberEmailChangeAction({ userId: member.id, email: address });
+      const result = await requestMemberEmailChangeAction({ ...scope, userId: member.id, email: address });
       if (!result.ok) return fail(result);
       done.push(`confirmation link sent to ${address}`);
     }
     setBusy(false);
+    onSaved?.();
     onClose();
     toast(`${member.name}: ${done.join(", ")}`);
   };

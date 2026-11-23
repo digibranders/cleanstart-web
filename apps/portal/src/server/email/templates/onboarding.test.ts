@@ -10,6 +10,7 @@ import {
   buildPasswordReset,
   buildTeamChangeNotice,
   buildTeamInvite,
+  buildTwoStepResetNotice,
 } from './index';
 
 const PERSON = { email: 'person@example.com', name: 'Person' };
@@ -187,6 +188,14 @@ const CASES: TemplateCase[] = [
     build: (f) => buildPasswordChanged({ to: PERSON, name: f('name', 'Aditi Rao'), changedAt: '2026-11-12T14:02:00.000Z' }),
     subject: 'Your CleanStart Partner Portal password was changed',
     contains: ['Password changed', 'was changed on 12 Nov 2026, 14:02 UTC', 'Forgot password'],
+    to: ['person@example.com'],
+  },
+  {
+    name: 'buildTwoStepResetNotice',
+    build: (f) =>
+      buildTwoStepResetNotice({ to: PERSON, name: f('name', 'Aditi Rao'), companyName: 'Kestrel Systems', resetBy: 'Gaurav Jadhav', reason: f('reason', 'Lost phone and backup codes') }),
+    subject: 'Two-step sign-in was reset on your CleanStart Partner Portal login',
+    contains: ['Two-step sign-in reset', 'Gaurav Jadhav at CleanStart', 'Kestrel Systems', 'Lost phone and backup codes', 'turn two-step sign-in back on'],
     to: ['person@example.com'],
   },
   {
