@@ -8,6 +8,8 @@ export const ROUTES = {
   confirmEmail: "/confirm-email",
   apply: "/apply",
   applyDone: "/apply/done",
+  applyStatus: "/apply/status",
+  applyReply: "/apply/reply",
   acceptInvite: "/accept-invite",
   partner: {
     welcome: "/partner/welcome",

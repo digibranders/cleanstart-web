@@ -1,8 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { Icon } from "@/components/icon";
 import { BulletList, CHECK_D, PublicHeading, PublicSplit, StatusIcon } from "@/components/partners/public-frame";
 import { fmtLong } from "@/lib/dates";
+import { ROUTES } from "@/lib/routes";
 import { PARTNER_CATEGORY_LABEL, PARTNER_REGION_LABEL } from "@/lib/domain";
 import type { ApplyReceipt } from "@/server/apply-receipt";
 
@@ -112,6 +114,15 @@ export function ApplyDone({ receipt }: { receipt: ApplyReceipt }): React.JSX.Ele
           <dt>Region</dt>
           <dd>{PARTNER_REGION_LABEL[receipt.region]}</dd>
         </dl>
+        {receipt.statusToken ? (
+          <Link
+            href={`${ROUTES.applyStatus}?token=${encodeURIComponent(receipt.statusToken)}`}
+            className="btn btn-s"
+            style={{ alignSelf: "flex-start" }}
+          >
+            Check your application status
+          </Link>
+        ) : null}
         <p style={{ margin: 0, fontSize: 12.5, color: "#6B687D" }}>
           Questions? Reply to the confirmation email and it reaches the partner team.
         </p>

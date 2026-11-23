@@ -12,6 +12,7 @@ import { describe, expect, it } from 'vitest';
  */
 const ACTIONS_DIR = join(process.cwd(), 'src/server/actions');
 const INVITE_PREVIEW = join(process.cwd(), 'src/server/invite-preview.ts');
+const APPLICATION_STATUS = join(process.cwd(), 'src/server/application-status.ts');
 
 /** shortcut: line and block comment stripping by regex (a `//` inside a string literal is cut too), and a `:ip:` or `-ip` inside a string or path is skipped, fine for these files. */
 const stripComments = (source: string): string => source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:\\])\/\/.*$/gm, '$1');
@@ -51,7 +52,7 @@ describe('public server actions are rate limited', () => {
 
   it('finds the public actions the contracts name', () => {
     expect(actions.map((a) => a.name).sort()).toEqual(
-      ['acceptInviteAction', 'confirmEmailChangeAction', 'previewInviteAction', 'requestAccessAction', 'submitApplicationAction'].sort(),
+      ['acceptInviteAction', 'confirmEmailChangeAction', 'previewInviteAction', 'replyToApplicationAction', 'requestAccessAction', 'requestNewInviteAction', 'submitApplicationAction'].sort(),
     );
   });
 
@@ -62,9 +63,11 @@ describe('public server actions are rate limited', () => {
     expect(addressMisuses(action.body, 'ctx\\.ip'), `${action.file}: ${action.name}`).toEqual([]);
   });
 
-  it('invite-preview.ts rate limits and never skips the limit for an unknown address', () => {
-    const source = readFileSync(INVITE_PREVIEW, 'utf8');
-    expect(stripComments(source)).toMatch(/rateLimit\(/);
+  it.each([INVITE_PREVIEW, APPLICATION_STATUS])('%s rate limits and never skips the limit for an unknown address', (file) => {
+    const source = readFileSync(file, 'utf8');
+    const loaders = source.split(/^export async function /m).slice(1);
+    expect(loaders.length).toBeGreaterThan(0);
+    for (const loader of loaders) expect(stripComments(loader)).toMatch(/rateLimit\(/);
     expect(addressMisuses(source, 'ip')).toEqual([]);
   });
 });

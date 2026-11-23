@@ -3,9 +3,9 @@ import { describe, expect, it } from 'vitest';
 import { JOBS } from './index';
 
 describe('JOBS', () => {
-  it('lists the nine jobs of the registry with unique names', () => {
+  it('lists the ten jobs of the registry with unique names', () => {
     expect(JOBS.map((job) => job.name)).toEqual([
-      'hubspot-outbox', 'hubspot-poll', 'hubspot-reconcile', 'expiry', 'expiry-reminders', 'pending-digest', 'website-intake', 'document-purge', 'retention',
+      'hubspot-outbox', 'hubspot-poll', 'hubspot-reconcile', 'expiry', 'expiry-reminders', 'invite-reminders', 'pending-digest', 'website-intake', 'document-purge', 'retention',
     ]);
     expect(new Set(JOBS.map((job) => job.name)).size).toBe(JOBS.length);
   });

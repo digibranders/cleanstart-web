@@ -2,14 +2,18 @@ import { describe, expect, it } from 'vitest';
 import * as templates from './index';
 
 describe('template index', () => {
-  it('exports all 26 builders', () => {
+  it('exports all 30 builders', () => {
     const builders = Object.keys(templates).filter((key) => key.startsWith('build'));
     expect(builders.sort()).toEqual(
       [
         'buildAccessRequest',
         'buildAccessRequestDeclined',
         'buildApplicationApproved',
+        'buildAccessRequestCopy',
         'buildApplicationDeclined',
+        'buildApplicationInfoRequest',
+        'buildApplicationInviteReminder',
+        'buildInviteAgainRequest',
         'buildApplicationReceived',
         'buildApplicationStaffAlert',
         'buildDealAccepted',

@@ -2,22 +2,26 @@
 
 import { z } from 'zod';
 import { PARTNER_CATEGORIES, PARTNER_CATEGORY_LABEL, PARTNER_REGION_LABEL, PARTNER_REGIONS } from '@/lib/domain';
-import type { ApplicationDto } from '@/lib/dto';
+import { APPLICATION_LINK_TTL_DAYS } from '@/lib/apply';
+import type { ApplicationDto, ApplicationNoteDto } from '@/lib/dto';
 import type { ApplicationApprovalDto } from '@/lib/apply';
 import { ROUTES } from '@/lib/routes';
 import { recordAudit } from '@/server/audit/record';
 import { assertCan } from '@/server/auth/policies';
 import { sendEmail } from '@/server/email/send';
-import { buildApplicationApproved, buildApplicationDeclined } from '@/server/email/templates';
+import { buildApplicationApproved, buildApplicationDeclined, buildApplicationInfoRequest } from '@/server/email/templates';
 import { enqueue } from '@/server/hubspot/outbox';
 import { withViewer } from '@/server/repo/context';
 import {
+  addApplicationNote,
   approveApplication,
   declineApplication,
   getApplication,
+  listApplicationNotes,
   reopenApplication,
+  requestApplicationInfo,
 } from '@/server/repo/applications';
-import { inviteUrl } from '@/server/urls';
+import { applicationReplyUrl, inviteUrl } from '@/server/urls';
 import type { ActionResult } from './result';
 import { runViewerAction } from './run';
 
@@ -28,6 +32,8 @@ const approveSchema = z.object({
   region: z.enum(PARTNER_REGIONS),
   managerId: z.string().uuid().optional(),
 });
+const noteSchema = z.object({ id: z.string().uuid(), note: z.string().trim().min(1, 'Write the note first.').max(2000) });
+const infoSchema = z.object({ id: z.string().uuid(), message: z.string().trim().min(1, 'Write what you need to know.').max(1000) });
 const declineSchema = z.object({
   id: z.string().uuid(),
   reason: z.string().trim().min(1, 'Add a reason the applicant will see.').max(500),
@@ -125,5 +131,60 @@ export async function reopenApplicationAction(raw: unknown): Promise<ActionResul
     });
     ctx.revalidate(ROUTES.admin.partners);
     return reopened;
+  });
+}
+
+export async function listApplicationNotesAction(raw: unknown): Promise<ActionResult<ApplicationNoteDto[]>> {
+  return runViewerAction({ name: 'application.notes', schema: idSchema }, raw, async (ctx, input): Promise<ApplicationNoteDto[]> => {
+    assertCan(ctx.viewer, 'application.read');
+    return withViewer(ctx.viewer, (tx) => listApplicationNotes(tx, ctx.viewer, { id: input.id }));
+  });
+}
+
+export async function addApplicationNoteAction(raw: unknown): Promise<ActionResult<ApplicationNoteDto>> {
+  return runViewerAction({ name: 'application.add_note', schema: noteSchema }, raw, async (ctx, input): Promise<ApplicationNoteDto> => {
+    assertCan(ctx.viewer, 'application.read');
+    return withViewer(ctx.viewer, async (tx) => {
+      const note = await addApplicationNote(tx, ctx.viewer, { id: input.id, note: input.note });
+      const application = await getApplication(tx, ctx.viewer, input.id);
+      await recordAudit(tx, ctx.viewer, {
+        event: 'application.note_added',
+        target: application.company,
+        subject: { type: 'application', id: application.id },
+      });
+      return note;
+    });
+  });
+}
+
+/** Emails the applicant a private reply link and moves the application to "info requested". The reviewer can still decide meanwhile. */
+export async function requestApplicationInfoAction(raw: unknown): Promise<ActionResult<ApplicationDto>> {
+  return runViewerAction({ name: 'application.request_info', schema: infoSchema }, raw, async (ctx, input): Promise<ApplicationDto> => {
+    assertCan(ctx.viewer, 'application.decline');
+    const done = await withViewer(ctx.viewer, async (tx) => {
+      const result = await requestApplicationInfo(tx, ctx.viewer, { id: input.id, message: input.message }, ctx.clock);
+      await recordAudit(tx, ctx.viewer, {
+        event: 'application.info_requested',
+        target: result.application.company,
+        note: input.message,
+        subject: { type: 'application', id: result.application.id },
+      });
+      return result;
+    });
+    ctx.revalidate(ROUTES.admin.partners);
+    ctx.afterCommit(async () => {
+      await sendEmail(
+        buildApplicationInfoRequest({
+          to: { email: done.application.email, name: done.application.applicantName },
+          applicantName: done.application.applicantName,
+          company: done.application.company,
+          reference: done.application.reference,
+          question: input.message,
+          replyUrl: applicationReplyUrl(done.replyToken),
+          validDays: APPLICATION_LINK_TTL_DAYS,
+        }),
+      );
+    });
+    return done.application;
   });
 }

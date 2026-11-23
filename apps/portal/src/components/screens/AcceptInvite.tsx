@@ -11,7 +11,7 @@ import { PARTNER_ROLE_LABEL, STAFF_ROLE_LABEL } from "@/lib/domain";
 import type { InvitePreviewDto, InviteState } from "@/lib/dto";
 import { nameFromEmail } from "@/lib/people";
 import { ROUTES } from "@/lib/routes";
-import { acceptInviteAction } from "@/server/actions/invites";
+import { acceptInviteAction, requestNewInviteAction } from "@/server/actions/invites";
 import { issuesToErrors } from "@/server/actions/result";
 
 const AGREEMENT_TEXT =
@@ -52,8 +52,20 @@ const FILE_D =
   "M212.24,83.76l-56-56A6,6,0,0,0,152,26H56A14,14,0,0,0,42,40V216a14,14,0,0,0,14,14H200a14,14,0,0,0,14-14V88A6,6,0,0,0,212.24,83.76ZM158,46.48,193.52,82H158ZM200,218H56a2,2,0,0,1-2-2V40a2,2,0,0,1,2-2h90V88a6,6,0,0,0,6,6h50V216A2,2,0,0,1,200,218Zm-34-82a6,6,0,0,1-6,6H96a6,6,0,0,1,0-12h64A6,6,0,0,1,166,136Zm0,32a6,6,0,0,1-6,6H96a6,6,0,0,1,0-12h64A6,6,0,0,1,166,168Z";
 
 /** The page shown when the link cannot be used: one message per reason, so nobody has to guess. */
-function InviteProblem({ state }: { state: Exclude<InviteState, "ok"> }): React.JSX.Element {
+function InviteProblem({ state, token }: { state: Exclude<InviteState, "ok">; token: string }): React.JSX.Element {
   const problem = PROBLEMS[state];
+  const [asked, setAsked] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [askError, setAskError] = useState<string | null>(null);
+  const canAsk = state === "expired" || state === "used" || state === "revoked";
+  const ask = async (): Promise<void> => {
+    setBusy(true);
+    setAskError(null);
+    const result = await requestNewInviteAction({ token });
+    setBusy(false);
+    if (result.ok) setAsked(true);
+    else setAskError(result.error.message);
+  };
   return (
     <PublicSplit
       label="Accept invite"
@@ -74,9 +86,26 @@ function InviteProblem({ state }: { state: Exclude<InviteState, "ok"> }): React.
     >
       <div role="status" style={{ width: "100%", maxWidth: 400, margin: "0 auto", display: "flex", flexDirection: "column", gap: 14 }}>
         <PublicHeading title={problem.title}>{problem.text}</PublicHeading>
-        <a href={ROUTES.signIn} className="btn btn-s" style={{ alignSelf: "flex-start" }}>
-          Go to sign in
-        </a>
+        {asked ? (
+          <p style={{ margin: 0, fontSize: 13, lineHeight: 1.55, color: "#17663A" }}>
+            Request sent. If this invite was yours, the person who sent it has been told and can send you a new one.
+          </p>
+        ) : null}
+        {askError ? (
+          <span className="err" role="alert">
+            {askError}
+          </span>
+        ) : null}
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+          {canAsk && !asked ? (
+            <button type="button" className="btn btn-p" onClick={ask} disabled={busy}>
+              Send me a new invite
+            </button>
+          ) : null}
+          <a href={ROUTES.signIn} className="btn btn-s">
+            Go to sign in
+          </a>
+        </div>
       </div>
     </PublicSplit>
   );
@@ -94,7 +123,7 @@ export function AcceptInvite({ token, preview }: { token: string; preview: Invit
   const [busy, setBusy] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
-  if (preview.state !== "ok") return <InviteProblem state={preview.state} />;
+  if (preview.state !== "ok") return <InviteProblem state={preview.state} token={token} />;
 
   const needsAgreement = preview.needsAgreement === true;
   const email = preview.email ?? "";

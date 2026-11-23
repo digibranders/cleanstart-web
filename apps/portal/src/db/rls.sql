@@ -63,7 +63,7 @@ DO $$
 DECLARE t text;
 BEGIN
   FOREACH t IN ARRAY ARRAY[
-    'partners', 'users', 'staff_scopes', 'partner_checklist', 'applications', 'invites', 'access_requests',
+    'partners', 'users', 'staff_scopes', 'partner_checklist', 'applications', 'application_notes', 'application_tokens', 'invites', 'access_requests',
     'registrations', 'registration_contacts', 'registration_messages', 'registration_events', 'registration_reminders',
     'documents', 'document_audience', 'document_versions', 'document_opens', 'email_change_requests',
     'notifications', 'notification_prefs', 'audit_log', 'hubspot_outbox', 'hubspot_sync_state',
@@ -190,7 +190,7 @@ CREATE POLICY notification_prefs_all ON notification_prefs FOR ALL
 DO $$
 DECLARE t text;
 BEGIN
-  FOREACH t IN ARRAY ARRAY['applications', 'document_versions', 'registration_reminders', 'hubspot_sync_state'] LOOP
+  FOREACH t IN ARRAY ARRAY['applications', 'application_notes', 'application_tokens', 'document_versions', 'registration_reminders', 'hubspot_sync_state'] LOOP
     EXECUTE format('DROP POLICY IF EXISTS %I ON %I', t || '_staff', t);
     EXECUTE format('CREATE POLICY %I ON %I FOR ALL USING (app_is_staff()) WITH CHECK (app_is_staff())', t || '_staff', t);
   END LOOP;

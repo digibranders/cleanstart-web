@@ -2,6 +2,7 @@ export * from './application-received';
 export * from './application-staff-alert';
 export * from './application-approved';
 export * from './application-declined';
+export * from './application-followups';
 export * from './team-invite';
 export * from './access-request';
 export * from './access-request-declined';

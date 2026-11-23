@@ -1,6 +1,7 @@
 import { type EmailBlock, renderEmail } from '../layout';
 import type { EmailAddress, EmailMessage } from '../transport';
-import { asList, FOOTNOTES, hello, oneLine } from './shared';
+import { REVIEW_TARGET_TEXT } from '@/lib/application-status';
+import { asList, FOOTNOTES, hello, oneLine, requireSafeLink } from './shared';
 
 /** To the applicant right after /apply, and for website entries never (the CMS sends its own). */
 export interface ApplicationReceivedInput {
@@ -8,6 +9,8 @@ export interface ApplicationReceivedInput {
   applicantName: string;
   company: string;
   reference: string;
+  /** Private link to the status page. Absent for entries without one. */
+  statusUrl?: string;
 }
 
 export function buildApplicationReceived(input: ApplicationReceivedInput): EmailMessage {
@@ -24,8 +27,14 @@ export function buildApplicationReceived(input: ApplicationReceivedInput): Email
         { label: 'Company', value: input.company },
       ],
     },
-    { type: 'note', text: 'Quote the reference if you write to us about this application.' },
   ];
+  if (input.statusUrl) {
+    blocks.push(
+      { type: 'paragraph', text: `${REVIEW_TARGET_TEXT} You can see where your application stands at any time.` },
+      { type: 'button', label: 'Check your application status', url: requireSafeLink('application-received', input.statusUrl) },
+    );
+  }
+  blocks.push({ type: 'note', text: 'Quote the reference if you write to us about this application. The status link is private to you.' });
   return {
     to: asList(input.to),
     subject: 'We received your partner application',

@@ -21,8 +21,10 @@ import {
 import {
   ACCESS_REQUEST_ROLES,
   ACCESS_REQUEST_STATUSES,
+  APPLICATION_NOTE_KINDS,
   APPLICATION_SOURCES,
   APPLICATION_STATUSES,
+  APPLICATION_TOKEN_KINDS,
   AUDIENCE_KINDS,
   AUDIT_KINDS,
   AUDIT_WHO,
@@ -190,6 +192,16 @@ export const applications = pgTable(
     decidedAt: ts('decided_at'),
     declineReason: text('decline_reason'),
     partnerId: uuid('partner_id').references(() => partners.id),
+    vendors: text('vendors').array(),
+    products: text('products').array(),
+    companySize: text('company_size'),
+    yearsInBusiness: text('years_in_business'),
+    verticals: text('verticals').array(),
+    country: text('country'),
+    referralSource: text('referral_source'),
+    consentAt: ts('consent_at'),
+    /** Set once, before the "invite not used" reminder email goes out. */
+    inviteReminderSentAt: ts('invite_reminder_sent_at'),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
@@ -198,7 +210,7 @@ export const applications = pgTable(
     uniqueIndex('applications_source_ref_key').on(t.source, t.sourceRef),
     uniqueIndex('applications_open_portal_email_key')
       .on(sql`lower(${t.email})`)
-      .where(sql`${t.status} = 'new' and ${t.source} = 'portal'`),
+      .where(sql`${t.status} in ('new', 'info_requested') and ${t.source} = 'portal'`),
     index('applications_status_idx').on(t.status, t.createdAt),
     index('applications_domain_idx').on(t.domain),
     check('applications_email_lower', sql`${t.email} = lower(${t.email})`),
@@ -206,6 +218,42 @@ export const applications = pgTable(
     check('applications_source_chk', inList(t.source, APPLICATION_SOURCES)),
     check('applications_status_chk', inList(t.status, APPLICATION_STATUSES)),
     check('applications_web_ref_chk', sql`${t.source} = 'portal' or ${t.sourceRef} is not null`),
+  ],
+);
+
+/** Internal reviewer notes, the question sent to an applicant and their reply. author_id is null for the applicant. Staff only. */
+export const applicationNotes = pgTable(
+  'application_notes',
+  {
+    id: id(),
+    applicationId: uuid('application_id').notNull().references(() => applications.id, { onDelete: 'cascade' }),
+    authorId: uuid('author_id').references(() => users.id),
+    kind: text('kind', { enum: APPLICATION_NOTE_KINDS }).notNull().default('internal'),
+    note: text('note').notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    index('application_notes_application_idx').on(t.applicationId, t.createdAt),
+    check('application_notes_kind_chk', inList(t.kind, APPLICATION_NOTE_KINDS)),
+  ],
+);
+
+/** Private links for an applicant: kind status (the status page) and kind reply (answer a request for information, single use). Only the hash is stored. */
+export const applicationTokens = pgTable(
+  'application_tokens',
+  {
+    id: id(),
+    applicationId: uuid('application_id').notNull().references(() => applications.id, { onDelete: 'cascade' }),
+    kind: text('kind', { enum: APPLICATION_TOKEN_KINDS }).notNull(),
+    tokenHash: text('token_hash').notNull(),
+    expiresAt: ts('expires_at').notNull(),
+    usedAt: ts('used_at'),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    uniqueIndex('application_tokens_token_hash_key').on(t.tokenHash),
+    index('application_tokens_application_idx').on(t.applicationId, t.kind),
+    check('application_tokens_kind_chk', inList(t.kind, APPLICATION_TOKEN_KINDS)),
   ],
 );
 

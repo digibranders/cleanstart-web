@@ -53,8 +53,8 @@ export function RequestAccessForm({ onBack }: { onBack: () => void }): React.JSX
       <div role="status" style={FORM_STYLE}>
         <StatusIcon d={CHECK_D} tone="green" />
         <PublicHeading title="Request sent">
-          If your company is a CleanStart partner, its partner admin has been told and will review your request. You
-          get an email with a link to set your password once they approve.
+          If your company is a CleanStart partner, its partner admin has been notified and will review your request, and
+          you get an invite by email once they approve. We also emailed {rq.email} a copy of this request.
         </PublicHeading>
         <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.55, color: "#5E5B6E" }}>
           Not a partner company yet?{" "}

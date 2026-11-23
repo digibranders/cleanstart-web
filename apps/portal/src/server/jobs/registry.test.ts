@@ -24,6 +24,7 @@ describe('job registry', () => {
       'hubspot-reconcile': '30 2 * * *',
       expiry: '10 0 * * *',
       'expiry-reminders': '0 5 * * *',
+      'invite-reminders': '30 5 * * *',
       'pending-digest': '30 4 * * *',
       'website-intake': '*/5 * * * *',
       'document-purge': '20 3 * * *',
@@ -31,9 +32,9 @@ describe('job registry', () => {
     });
   });
 
-  it('names the nine jobs of contracts H.17 plus the digest', () => {
+  it('names the nine jobs of contracts H.17 plus the digest and the invite reminder', () => {
     expect(JOBS.map((j) => j.name).sort()).toEqual(
-      ['document-purge', 'expiry', 'expiry-reminders', 'hubspot-outbox', 'hubspot-poll', 'hubspot-reconcile', 'pending-digest', 'retention', 'website-intake'],
+      ['document-purge', 'expiry', 'expiry-reminders', 'hubspot-outbox', 'hubspot-poll', 'hubspot-reconcile', 'invite-reminders', 'pending-digest', 'retention', 'website-intake'],
     );
   });
 });
