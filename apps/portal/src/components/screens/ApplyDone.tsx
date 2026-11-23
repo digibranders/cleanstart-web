@@ -24,7 +24,7 @@ export function ApplyDone({ receipt }: { receipt: ApplyReceipt }): React.JSX.Ele
     { title: "Application received", text: fmtLong(receipt.submittedOn), state: "done" },
     {
       title: "Review by a partner manager",
-      text: "They check your company and may call you to learn how you sell.",
+      text: "They check your company and may call you to learn how you sell. Expect a decision within 2 business days.",
       state: "now",
     },
     { title: "Decision by email", text: "If approved, you get an invite to set up your portal login.", state: "next" },

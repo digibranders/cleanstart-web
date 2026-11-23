@@ -90,7 +90,12 @@ export function SignIn(): React.JSX.Element {
     );
     setBusy(false);
     if (error) {
-      setSigninError(failMessage(error, "That email and password do not match."));
+      setSigninError(
+        failMessage(
+          error,
+          "That email and password do not match, or the account is paused. If your password is right, ask your partner admin or CleanStart partner manager whether your login or company is active.",
+        ),
+      );
       return;
     }
     if ((data as { twoFactorRedirect?: boolean } | null)?.twoFactorRedirect) {
@@ -187,7 +192,8 @@ export function SignIn(): React.JSX.Element {
             <PublicHeading title="Sign in">Use the work email your partner admin invited.</PublicHeading>
             {urlError ? (
               <span className="err" role="alert">
-                That sign-in did not work. Use the email your partner admin invited and your password.
+                That sign-in did not work. Use the email your partner admin invited and your password. If you were signed
+                out unexpectedly, your login or company may be paused: ask your partner manager.
               </span>
             ) : null}
             <div className="fg">
