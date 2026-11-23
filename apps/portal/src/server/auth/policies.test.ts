@@ -62,6 +62,8 @@ const MATRIX: Record<Action, string> = {
   'manager.message': 'Y Y Y - - -',
   'overview.read': 'Y Y - - - -',
   'report.read': '- - - Y Y -',
+  'overview.read_staff': '- - - Y Y Y',
+  'dashboard.read_staff': '- - - Y Y -',
   'document.read': 'Y Y Y Y Y Y',
   'document.open': 'Y Y Y Y Y Y',
   'document.upload': '- - - Y - Y',

@@ -21,6 +21,7 @@ export const ROUTES = {
     account: "/partner/account",
   },
   admin: {
+    overview: "/admin/overview",
     approvals: "/admin/approvals",
     partners: "/admin/partners",
     documents: "/admin/documents",
@@ -54,6 +55,7 @@ export const PARTNER_NAV: readonly NavItem[] = [
 ];
 
 export const ADMIN_NAV: readonly NavItem[] = [
+  { label: "Overview", href: ROUTES.admin.overview, icon: "dash", action: "overview.read_staff" },
   { label: "Deals", href: ROUTES.admin.approvals, icon: "approve", action: "registration.read_queue", count: "approvals" },
   { label: "Partners", href: ROUTES.admin.partners, icon: "bld", action: "partner.read" },
   { label: "Documents", href: ROUTES.admin.documents, icon: "docs", action: "document.upload" },

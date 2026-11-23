@@ -110,13 +110,14 @@ describe('staffDashboard', () => {
     const d = await withViewer(viewer, (tx) => staffDashboard(tx, viewer, filters, clock));
     expect(d.waiting).toEqual({ count: 2, overdue: 1 }); // Own Waiting (16 Nov) is past 2 business days, Sales Deal (20 Nov) is not
     expect(d.kpis.statusCounts.accepted).toBe(1);
+    expect(d.protectedNow).toBe(1);
     expect(d.series.byRegion.map((r) => r.key).sort()).toEqual(['india', 'middle_east']);
     expect(d.expiring14.map((e) => e.customer)).toEqual(['Beta Secret']);
     expect(d.managerWorkload).toEqual([{ managerId: expect.any(String), name: 'Mira Manager', waiting: 2, overdue: 1, decided: 2 }]);
     expect(d.partnerHealth).toEqual({ active: 2, onboarding: 0, inactive: 0 });
     expect(d.topByPipeline[0]?.name).toBe('Beta');
     expect(d.topByWon.map((p) => p.name)).toEqual(['Alpha']);
-    expect(d.integrations).toEqual({ pending: 0, failed: 0, lastPollAt: null });
+    expect(d.integrations).toEqual({ pending: 0, failed: 0, lastPollAt: null, lastError: null });
   });
 
   it('limits staff sales to deals of their region and partners of their region', async () => {
@@ -166,6 +167,18 @@ describe('staffDashboard', () => {
     const d = await withViewer(staff, (tx) => staffDashboard(tx, staff, filters, clock));
     expect(d.funnel).toEqual({ applied: 4, approved: 2, invited: 1, active: 1 });
     expect(d.openApplications).toBe(1);
+  });
+
+  it('limits staff sales to the applications of their region', async () => {
+    await makeApplication(db, { status: 'new', region: 'india', createdAt: new Date('2026-11-01T08:00:00Z') });
+    await makeApplication(db, { status: 'new', region: 'middle_east', createdAt: new Date('2026-11-02T08:00:00Z') });
+    const india = await asStaff(db, 'sales', 'india');
+    const d = await withViewer(india, (tx) => staffDashboard(tx, india, filters, clock));
+    expect(d.openApplications).toBe(1);
+    expect(d.funnel.applied).toBe(1);
+    const manager = await asStaff(db);
+    const all = await withViewer(manager, (tx) => staffDashboard(tx, manager, filters, clock));
+    expect(all.openApplications).toBe(2);
   });
 
   it('ranks documents by opens in the period, zero opens included', async () => {

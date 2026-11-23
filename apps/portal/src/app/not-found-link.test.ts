@@ -45,9 +45,9 @@ describe('not-found back link', () => {
     getViewer.mockResolvedValue(partner('technical'));
     expect(await backLink()).toEqual({ href: '/partner/documents', label: 'Back to documents' });
     getViewer.mockResolvedValue(staff('partner_manager'));
-    expect(await backLink()).toEqual({ href: '/admin/approvals', label: 'Back to deal approvals' });
+    expect(await backLink()).toEqual({ href: '/admin/overview', label: 'Back to overview' });
     getViewer.mockResolvedValue(staff('marketing'));
-    expect(await backLink()).toEqual({ href: '/admin/documents', label: 'Back to documents' });
+    expect(await backLink()).toEqual({ href: '/admin/overview', label: 'Back to overview' });
   });
 });
 

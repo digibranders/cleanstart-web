@@ -69,7 +69,7 @@ export const getViewer = cache(async (): Promise<Viewer | null> => {
 /** Where a viewer lands after sign in and when bounced. Every home is a page that viewer's role may open. */
 export function homeFor(viewer: Viewer): string {
   if (viewer.kind === 'partner') return viewer.role === 'technical' ? ROUTES.partner.documents : ROUTES.partner.overview;
-  return viewer.role === 'marketing' ? ROUTES.admin.documents : ROUTES.admin.approvals;
+  return ROUTES.admin.overview;
 }
 
 async function signInUrl(): Promise<string> {

@@ -7,13 +7,16 @@ import type { IntegrationHealthDto } from '@/lib/dto';
 import { retryFailedOutboxAction } from '@/server/actions/audit';
 import { useToast } from '../ui/toast';
 
-/** HubSpot sync health for the partner manager: what is queued, what failed, when HubSpot was last read. */
+/** CRM sync health for the partner manager: what is queued, what failed, when HubSpot was last read. */
 export function IntegrationHealthCard({
   health,
   today,
+  name = 'HubSpot',
 }: {
   health: IntegrationHealthDto;
   today: string;
+  /** What the sync is called on screen; the Overview says "CRM" so it stays neutral about the system behind it. */
+  name?: string;
 }): React.JSX.Element {
   const toast = useToast();
   const router = useRouter();
@@ -37,7 +40,7 @@ export function IntegrationHealthCard({
   };
 
   return (
-    <section aria-label="HubSpot sync" className="card kpis">
+    <section aria-label={`${name} sync`} className="card kpis">
       <div className="kpi">
         <span className="kpi-l">Sync queue</span>
         <span className="kpi-v">{health.pending}</span>
@@ -54,7 +57,7 @@ export function IntegrationHealthCard({
         )}
       </div>
       <div className="kpi">
-        <span className="kpi-l">Last HubSpot check</span>
+        <span className="kpi-l">Last {name} check</span>
         <span className="kpi-v" style={{ fontSize: 14 }}>
           {health.lastPollAt ? fmtTimestamp(health.lastPollAt.toISOString(), today) : 'Never'}
         </span>

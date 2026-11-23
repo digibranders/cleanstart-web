@@ -89,8 +89,8 @@ describe('display helpers', () => {
     expect(landingPathFor('partner', 'partner_admin')).toBe('/partner/welcome');
     expect(landingPathFor('partner', 'sales')).toBe('/partner/overview');
     expect(landingPathFor('partner', 'technical')).toBe('/partner/documents');
-    expect(landingPathFor('staff', 'partner_manager')).toBe('/admin/approvals');
-    expect(landingPathFor('staff', 'marketing')).toBe('/admin/documents');
+    expect(landingPathFor('staff', 'partner_manager')).toBe('/admin/overview');
+    expect(landingPathFor('staff', 'marketing')).toBe('/admin/overview');
   });
 });
 
