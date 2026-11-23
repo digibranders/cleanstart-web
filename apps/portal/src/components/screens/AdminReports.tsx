@@ -5,6 +5,7 @@ import { useMemo, useState } from 'react';
 import { Icon } from '@/components/icon';
 import { FollowUpList } from '@/components/reports/FollowUpList';
 import { RangedReport } from '@/components/reports/RangedReport';
+import { ReportInsights } from '@/components/reports/ReportInsights';
 import { downloadCsv } from '@/components/reports/download-csv';
 import { avatarClass, CATEGORY_BADGE, initialsOf } from '@/components/reports/partner-ui';
 import { Dropdown } from '@/components/ui/dropdown';
@@ -23,16 +24,18 @@ import {
   type ReportSort,
 } from '@/lib/report-view';
 import type { RangedReportDto } from '@/lib/report-metrics';
+import type { ReportInsightsDto } from '@/lib/report-insights';
 import { ROUTES } from '@/lib/routes';
 import { ScrollRegion } from "@/components/ui/scroll-region";
 
 interface AdminReportsProps {
   report: AdminReportsDto;
   ranged: RangedReportDto;
+  insights: ReportInsightsDto;
   today: string;
 }
 
-export function AdminReports({ report, ranged, today }: AdminReportsProps): React.JSX.Element {
+export function AdminReports({ report, ranged, insights, today }: AdminReportsProps): React.JSX.Element {
   const toast = useToast();
   const { regions, name: regionName } = useRegions();
   const [region, setRegion] = useState<string>('all');
@@ -70,6 +73,7 @@ export function AdminReports({ report, ranged, today }: AdminReportsProps): Reac
       </div>
 
       <RangedReport report={ranged} today={today} />
+      <ReportInsights insights={insights} />
 
       <h2 className="h1-sub" style={{ margin: '8px 0 0' }}>All time</h2>
       <section aria-label="All time summary" className="card kpis">

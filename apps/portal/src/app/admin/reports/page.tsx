@@ -4,6 +4,7 @@ import { systemClock } from "@/lib/clock";
 import { parseReportRange } from "@/lib/report-metrics";
 import { requireCan } from "@/server/auth/viewer";
 import { withViewer } from "@/server/repo/context";
+import { getReportInsights } from "@/server/repo/report-insights";
 import { getRangedReport } from "@/server/repo/report-metrics";
 import { getAdminReports } from "@/server/repo/reports";
 
@@ -17,9 +18,10 @@ export default async function Page({
   const viewer = await requireCan("report.read");
   const today = systemClock.today();
   const range = parseReportRange(await searchParams, today);
-  const [report, ranged] = await withViewer(viewer, async (tx) => [
+  const [report, ranged, insights] = await withViewer(viewer, async (tx) => [
     await getAdminReports(tx, viewer, systemClock),
     await getRangedReport(tx, viewer, range),
+    await getReportInsights(tx, viewer, range),
   ] as const);
-  return <AdminReports report={report} ranged={ranged} today={today} />;
+  return <AdminReports report={report} ranged={ranged} insights={insights} today={today} />;
 }
