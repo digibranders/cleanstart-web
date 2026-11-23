@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { Icon } from '@/components/icon';
 import { FollowUpList } from '@/components/reports/FollowUpList';
-import { ProductBreakdown } from '@/components/reports/ProductBreakdown';
+import { RangedReport } from '@/components/reports/RangedReport';
 import { downloadCsv } from '@/components/reports/download-csv';
 import { avatarClass, CATEGORY_BADGE, initialsOf } from '@/components/reports/partner-ui';
 import { Dropdown } from '@/components/ui/dropdown';
@@ -21,15 +21,17 @@ import {
   SORTS,
   type ReportSort,
 } from '@/lib/report-view';
+import type { RangedReportDto } from '@/lib/report-metrics';
 import { ROUTES } from '@/lib/routes';
 import { ScrollRegion } from "@/components/ui/scroll-region";
 
 interface AdminReportsProps {
   report: AdminReportsDto;
+  ranged: RangedReportDto;
   today: string;
 }
 
-export function AdminReports({ report, today }: AdminReportsProps): React.JSX.Element {
+export function AdminReports({ report, ranged, today }: AdminReportsProps): React.JSX.Element {
   const toast = useToast();
   const [region, setRegion] = useState<string>('all');
   const [category, setCategory] = useState<string>('all');
@@ -55,7 +57,7 @@ export function AdminReports({ report, today }: AdminReportsProps): React.JSX.El
       <div className="head">
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
           <h1 className="h1">Reports</h1>
-          <span className="h1-sub">All time, up to {fmtLong(today)}.</span>
+          <span className="h1-sub">Date range figures first, then all time up to {fmtLong(today)}.</span>
         </div>
         <div style={{ display: 'flex', gap: 6 }}>
           <button type="button" className="btn btn-s" onClick={exportCsv}>
@@ -65,6 +67,9 @@ export function AdminReports({ report, today }: AdminReportsProps): React.JSX.El
         </div>
       </div>
 
+      <RangedReport report={ranged} today={today} />
+
+      <h2 className="h1-sub" style={{ margin: '8px 0 0' }}>All time</h2>
       <section aria-label="All time summary" className="card kpis">
         <div className="kpi">
           <span className="kpi-l">Registered</span>
@@ -192,7 +197,6 @@ export function AdminReports({ report, today }: AdminReportsProps): React.JSX.El
       </section>
 
       <div className="row">
-        <ProductBreakdown rows={report.products} total={report.totalRegistered} />
         <FollowUpList items={report.followUps} />
       </div>
     </div>
