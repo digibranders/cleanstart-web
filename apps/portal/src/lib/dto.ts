@@ -50,6 +50,8 @@ export interface ShellDto {
   orgSub: string;
   /** The viewer's partner manager (partner viewers only). */
   manager: { id: string; name: string; email: string; team: string } | null;
+  /** Partner viewers only: the partner's own region, the default on the deal form. */
+  partnerRegion?: PartnerRegion;
   /** Staff only: pending registrations in the viewer's scope. Drives the nav count. */
   waitingApprovals: number;
   unreadNotifications: number;
@@ -323,10 +325,11 @@ export interface RegistrationListItem {
   crmRef: string | null;
   crmSyncedAt: IsoTimestamp | null;
   extensionStatus: ExtensionStatus;
+  /** Free text the partner typed; new registrations store YYYY-MM-DD. */
+  expectedClose: string | null;
 }
 
 export interface RegistrationDetailDto extends RegistrationListItem {
-  expectedClose: string | null;
   notes: string | null;
   extensionRequestedAt: IsoTimestamp | null;
   extensionReason: string | null;
