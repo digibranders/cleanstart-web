@@ -295,7 +295,7 @@ export function DocumentEditDrawer({
       </div>
       {confirming ? (
         <div className="note note-amber" role="alert">
-          <span>Delete {doc.title}? Partners lose access at once. This cannot be undone.</span>
+          <span>Delete {doc.title}? Partners lose access at once. The file is kept for 30 days, then removed.</span>
         </div>
       ) : null}
       {error ? (
