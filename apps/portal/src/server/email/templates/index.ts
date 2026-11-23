@@ -20,3 +20,4 @@ export * from './manager-message';
 export * from './team-change-notice';
 export * from './password-changed';
 export * from './password-reset';
+export * from './pending-digest';
