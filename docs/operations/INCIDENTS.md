@@ -178,3 +178,12 @@ Copy this for a new entry, newest first:
 - **Root cause:** New access helpers (`isAdminEditorOrHr`/`isAdminEditorOrEvents`) were untested. The 95% function-coverage gate on `access/**` is enforced only by CI's `test:coverage`, **not** by plain `test`.
 - **Fix:** Added unit tests for the new helpers; re-ran `test:coverage` locally before pushing.
 - **Reusable lesson:** For `apps/cms`, run `pnpm --filter @cleanstart/cms test:coverage` (not just `test`) when touching `src/payload/access/**` — plain `test` won't catch the coverage-gate failure.
+
+## 2026-11-23 - A Vercel CLI deploy from the repo root went to production www.cleanstart.com
+
+- **Area:** Vercel project `cleanstart` (apps/web, production), operated from an agent session.
+- **Symptom:** while redeploying the separate portal demo, a `vercel deploy --prod` ran in the repo root instead of the demo folder, and `www.cleanstart.com` served a build of the local `development` working tree (including other sessions' uncommitted work) for about 6 minutes. A stray environment variable `PORTAL_DEMO_OPEN` was also added to the `cleanstart` project.
+- **Root cause:** a shell chain `cmd1 && cd $DIR && vercel ...; vercel ...`. The first command failed, so `cd` was skipped, and the later commands after `;` still ran in the repo root, which has `.vercel/project.json` linked to the production project. The scratch folder had been cleared since the last session, which made the first command fail.
+- **Fix:** rolled production back to the previous deployment (`vercel rollback`), re-enabled "auto assign custom domains" (a rollback switches it off, so the next push to main would not have gone live), removed the stray variable and deleted the erroneous deployment. Verified `www.cleanstart.com` serves the previous deployment again.
+- **Status:** Fixed and verified. No customer data involved.
+- **Reusable lesson:** never run `vercel` from the repo root for another project. Use `set -e`, `cd` on its own line, and check `.vercel/project.json` for the expected project id before any `vercel env`, `deploy` or `rm` command. After any `vercel rollback`, check that `autoAssignCustomDomains` is true again.
