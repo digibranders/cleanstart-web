@@ -469,6 +469,7 @@ export function Shell({
                 open={pop === "notes"}
                 onToggle={() => setPop(pop === "notes" ? null : "notes")}
                 onClose={() => setPop(null)}
+                allHref={kind === "partner" ? ROUTES.partner.notifications : ROUTES.admin.notifications}
               />
             </div>
           </header>

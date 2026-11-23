@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm';
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import { auditLog, invites, users } from '@/db/schema';
+import { auditLog, invites, notifications, users } from '@/db/schema';
 import { asPartner, asStaff, makeInvite, makeUser, resetDb, testDb } from '@/db/test-helpers';
 import type { Viewer } from '@/server/auth/types';
 import type { FakeEmailTransport } from '@/server/email/fake';
@@ -104,6 +104,8 @@ describe('changeStaffRoleAction and changeStaffRegionAction', () => {
     expect(await changeStaffRegionAction({ userId: rahul.id, region: 'middle_east' })).toMatchObject({ ok: true, data: { region: 'middle_east' } });
     const notes = Object.fromEntries((await db.select().from(auditLog)).map((e) => [e.event, e.note]));
     expect(notes).toEqual({ 'staff.role_changed': 'Sales to Marketing.', 'staff.region_changed': 'India to Middle East.' });
+    const sent = await db.select().from(notifications);
+    expect(sent.map((n) => [n.userId, n.kind, n.title, n.link])).toEqual([[rahul.id, 'role_changed', 'Your role is now Marketing', '/admin/account']]);
   });
 
   it('refuses to change your own role', async () => {

@@ -6,7 +6,7 @@ import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import type { IconName } from '@/components/icon-paths';
 import type { SearchHitDto } from '@/lib/dto';
 import { buildPageHits, SEARCH_MIN_CHARS } from '@/lib/search-pages';
-import { joinWords, type NavItem, type PortalKind, searchNouns } from '@/lib/routes';
+import { joinWords, type NavItem, type PortalKind, ROUTES, searchNouns } from '@/lib/routes';
 import { searchAction } from '@/server/actions/search';
 import { Icon } from '../icon';
 
@@ -14,12 +14,22 @@ import { Icon } from '../icon';
 export const OPEN_SEARCH_EVENT = 'portal:open-search';
 
 const DEBOUNCE_MS = 150;
+/** Rows shown per group. The query asks for one more, so a sixth hit means "see all" is worth showing. */
+const GROUP_ROWS = 5;
 const GROUP_LABEL: Record<SearchHitDto['group'], string> = {
   registrations: 'Deals',
   partners: 'Partners',
   documents: 'Documents',
   people: 'People',
 };
+
+/** The list page for a group. Only the staff deals list can take the query; the others open the plain list. */
+function seeAllHref(kind: PortalKind, group: SearchHitDto['group'], q: string): string {
+  if (group === 'registrations') return kind === 'partner' ? ROUTES.partner.deals : `${ROUTES.admin.approvals}?status=all&q=${encodeURIComponent(q)}`;
+  if (group === 'partners') return ROUTES.admin.partners;
+  if (group === 'documents') return kind === 'partner' ? ROUTES.partner.documents : ROUTES.admin.documents;
+  return kind === 'partner' ? ROUTES.partner.team : ROUTES.admin.team;
+}
 
 interface Row {
   key: string;
@@ -86,7 +96,7 @@ export function SearchPalette({ kind, nav }: { kind: PortalKind; nav: readonly N
     const mine = requestId.current + 1;
     requestId.current = mine;
     const timer = setTimeout(async () => {
-      const result = await searchAction({ q, limit: 5 });
+      const result = await searchAction({ q, limit: GROUP_ROWS + 1 });
       if (requestId.current !== mine) return;
       setFailed(!result.ok);
       setHits(result.ok ? result.data : []);
@@ -109,12 +119,16 @@ export function SearchPalette({ kind, nav }: { kind: PortalKind; nav: readonly N
       name: 'Pages',
       rows: buildPageHits(nav, kind, q).map((p) => ({ key: `page-${p.href}`, label: p.label, hint: '', href: p.href, icon: p.icon })),
     },
-    ...(['registrations', 'partners', 'documents', 'people'] as const).map((group) => ({
-      name: GROUP_LABEL[group],
-      rows: hits
-        .filter((h) => h.group === group)
-        .map((h, i) => ({ key: `${group}-${i}-${h.href}`, label: h.label, hint: h.hint, href: h.href, icon: h.icon })),
-    })),
+    ...(['registrations', 'partners', 'documents', 'people'] as const).map((group) => {
+      const found = hits.filter((h) => h.group === group);
+      const rows: Row[] = found
+        .slice(0, GROUP_ROWS)
+        .map((h, i) => ({ key: `${group}-${i}-${h.href}`, label: h.label, hint: h.hint, href: h.href, icon: h.icon }));
+      if (found.length > GROUP_ROWS) {
+        rows.push({ key: `${group}-all`, label: `See all ${GROUP_LABEL[group].toLowerCase()}`, hint: '', href: seeAllHref(kind, group, q), icon: 'search' });
+      }
+      return { name: GROUP_LABEL[group], rows };
+    }),
   ].filter((g) => g.rows.length > 0);
 
   const onDialogKey = (event: React.KeyboardEvent): void => {

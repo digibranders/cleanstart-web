@@ -594,6 +594,13 @@ export interface NotificationsDto {
   unread: number;
 }
 
+export interface NotificationsPageDto extends NotificationsDto {
+  /** Rows matching the filter, for the pager. */
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
 /** Exception to the string-dates rule: the HubSpot plan returns a Date, and a Date crosses the server to client boundary. */
 export interface IntegrationHealthDto {
   pending: number;

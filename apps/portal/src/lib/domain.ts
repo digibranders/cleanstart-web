@@ -178,6 +178,7 @@ export const NOTIFICATION_KINDS = [
   'application_new',
   'team_joined',
   'team_removed',
+  'role_changed',
 ] as const;
 export type NotificationKind = (typeof NOTIFICATION_KINDS)[number];
 
@@ -201,6 +202,7 @@ export const NOTIFICATION_CATEGORY_OF: Record<NotificationKind, NotificationCate
   application_new: null,
   team_joined: 'team',
   team_removed: 'team',
+  role_changed: 'team',
 };
 
 export const CHECKLIST_STEPS = ['agreement', 'company', 'team', 'kickoff', 'playbook', 'deal'] as const;

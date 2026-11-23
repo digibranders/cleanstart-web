@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { Icon } from "@/components/icon";
+import { authClient } from "@/lib/auth-client";
+import { settleAuth } from "@/lib/auth-call";
+import { ROUTES } from "@/lib/routes";
 import { PasswordField, passwordRules } from "@/components/ui/password-field";
 import { fmtLong } from "@/lib/dates";
 import { changePasswordAction } from "@/server/actions/account";
@@ -10,7 +13,7 @@ import { issuesToErrors } from "@/server/actions/result";
 const CIRCLE =
   "M128,26A102,102,0,1,0,230,128,102.12,102.12,0,0,0,128,26Zm0,192a90,90,0,1,1,90-90A90.1,90.1,0,0,1,128,218Z";
 
-export function PasswordCard({ passwordChangedAt }: { passwordChangedAt: string | null }): React.JSX.Element {
+export function PasswordCard({ passwordChangedAt, email }: { passwordChangedAt: string | null; email: string }): React.JSX.Element {
   const [current, setCurrent] = useState("");
   const [next, setNext] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -20,6 +23,13 @@ export function PasswordCard({ passwordChangedAt }: { passwordChangedAt: string 
   const [busy, setBusy] = useState(false);
   const [serverErrors, setServerErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
+  const [resetState, setResetState] = useState<"idle" | "sending" | "sent" | "failed">("idle");
+
+  const sendReset = async (): Promise<void> => {
+    setResetState("sending");
+    const { error } = await settleAuth(() => authClient.requestPasswordReset({ email, redirectTo: ROUTES.resetPassword }));
+    setResetState(error ? "failed" : "sent");
+  };
 
   const rules = passwordRules(next);
   const weak = rules.some((r) => !r.met);
@@ -150,6 +160,15 @@ export function PasswordCard({ passwordChangedAt }: { passwordChangedAt: string 
             {formError}
           </span>
         ) : null}
+        <span style={{ marginRight: formError ? 12 : "auto", alignSelf: "center", fontSize: 12.5 }} role="status">
+          {resetState === "sent" ? (
+            `A reset link is on its way to ${email}.`
+          ) : (
+            <button type="button" className="linkbtn" onClick={sendReset} disabled={resetState === "sending"} style={{ color: "#4B23C8" }}>
+              {resetState === "failed" ? "Could not send. Try again" : "Forgot your current password?"}
+            </button>
+          )}
+        </span>
         <button type="submit" className="btn btn-s" disabled={busy}>
           Update password
         </button>

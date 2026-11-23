@@ -26,7 +26,7 @@ describe('getProfile', () => {
       partnerName: viewer.partnerName,
       twoFactorEnabled: false,
       passwordChangedAt: null,
-      notifications: { decision: true, stage: true, expiry: true, docs: false, team: true },
+      notifications: { decision: true, stage: true, expiry: true, docs: true, team: true },
     });
   });
 
@@ -41,7 +41,7 @@ describe('getProfile', () => {
     const theirs = await asPartner(db, { partnerId: mine.partnerId, role: 'sales' });
     await withViewer(theirs, (tx) => setNotificationPrefs(tx, theirs, { decision: false, stage: false, expiry: false, docs: true, team: false }));
     const profile = await withViewer(mine, (tx) => getProfile(tx, mine));
-    expect(profile.notifications).toEqual({ decision: true, stage: true, expiry: true, docs: false, team: true });
+    expect(profile.notifications).toEqual({ decision: true, stage: true, expiry: true, docs: true, team: true });
   });
 });
 

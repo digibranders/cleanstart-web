@@ -72,9 +72,20 @@ export function homeFor(viewer: Viewer): string {
   return ROUTES.admin.overview;
 }
 
+/**
+ * A live session with no viewer means the account or its company was paused after sign in. The sign in page says so
+ * (reason=paused); a visitor with no session, or a wrong password, gets no such hint.
+ */
 async function signInUrl(): Promise<string> {
-  const next = safeNext((await headers()).get(PATH_HEADER));
-  return next ? `${ROUTES.signIn}?next=${encodeURIComponent(next)}` : ROUTES.signIn;
+  const requestHeaders = new Headers(await headers());
+  requestHeaders.set('cookie', (await cookies()).toString());
+  const paused = (await getAuth().api.getSession({ headers: requestHeaders })) !== null;
+  const params = new URLSearchParams();
+  const next = safeNext(requestHeaders.get(PATH_HEADER));
+  if (next) params.set('next', next);
+  if (paused) params.set('reason', 'paused');
+  const query = params.toString();
+  return query ? `${ROUTES.signIn}?${query}` : ROUTES.signIn;
 }
 
 /** Pages. No session: redirect to /sign-in?next=<path>. */

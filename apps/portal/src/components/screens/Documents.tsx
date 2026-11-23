@@ -1,5 +1,6 @@
 'use client';
 
+import { useSearchParams } from 'next/navigation';
 import { useCallback, useMemo, useState } from 'react';
 import { Icon } from '@/components/icon';
 import { DocumentPreview } from '@/components/documents/DocumentPreview';
@@ -48,7 +49,8 @@ export function Documents({
   const [q, setQ] = useState('');
   const [product, setProduct] = useState<string>(ANY_PRODUCT);
   const [sort, setSort] = useState<Sort>('Newest first');
-  const [viewingId, setViewingId] = useState<string | null>(null);
+  // Search hits and notifications link here with ?doc=<id> to open that document's preview.
+  const [viewingId, setViewingId] = useState<string | null>(useSearchParams().get('doc'));
   const [requestOpen, setRequestOpen] = useState(false);
 
   const tabTypes: DocumentType[] = [

@@ -50,6 +50,8 @@ export function SignIn(): React.JSX.Element {
   const [busy, setBusy] = useState(false);
   const [signinError, setSigninError] = useState("");
   const [urlError, setUrlError] = useState(false);
+  const [paused, setPaused] = useState(false);
+  const [afterReset, setAfterReset] = useState(false);
   const [codeError, setCodeError] = useState("");
   const [resetError, setResetError] = useState("");
   const [signinTried, setSigninTried] = useState(false);
@@ -64,6 +66,8 @@ export function SignIn(): React.JSX.Element {
     const params = new URLSearchParams(window.location.search);
     if (params.get("request") === "1") setView("request");
     if (params.get("error")) setUrlError(true);
+    if (params.get("reason") === "paused") setPaused(true);
+    if (params.get("reset") === "1") setAfterReset(true);
   }, []);
 
   // A full navigation: the session cookie was just set, and "/" sends each role to its own home.
@@ -190,6 +194,18 @@ export function SignIn(): React.JSX.Element {
         {view === "signin" ? (
           <form onSubmit={submitSignin} noValidate style={FORM_STYLE}>
             <PublicHeading title="Sign in">Use the work email your partner admin invited.</PublicHeading>
+            {paused ? (
+              <div className="note note-violet" role="status">
+                <span>Your account or your company is paused. Ask your partner manager.</span>
+              </div>
+            ) : null}
+            {afterReset ? (
+              <div className="note note-violet" role="status">
+                <span>
+                  Password updated. Once you are in, turn on two-step sign in under Account to keep it safe.
+                </span>
+              </div>
+            ) : null}
             {urlError ? (
               <span className="err" role="alert">
                 That sign-in did not work. Use the email your partner admin invited and your password. If you were signed

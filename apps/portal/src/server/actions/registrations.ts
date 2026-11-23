@@ -6,6 +6,7 @@ import { normalizeDomain, sameCustomer } from '@/lib/customer';
 import { DEAL_CURRENCIES, DEAL_REGIONS, PRODUCT_LABEL, PRODUCTS } from '@/lib/domain';
 import type { RegistrationListItem, RegistrationMessageDto } from '@/lib/dto';
 import { ROUTES } from '@/lib/routes';
+import { staffDealHref } from '@/lib/staff-deals-dto';
 import { recordAudit } from '@/server/audit/record';
 import { assertCan } from '@/server/auth/policies';
 import { sendEmail } from '@/server/email/send';
@@ -133,7 +134,7 @@ export async function registerDealsAction(raw: unknown): Promise<ActionResult<Re
                 kind: 'registration_submitted',
                 title: `${first.partnerName} registered ${first.customer}`,
                 body: created.map((r) => PRODUCT_LABEL[r.product]).join(', '),
-                link: ROUTES.admin.approvals,
+                link: staffDealHref(first.id),
               },
             ]
           : [];
@@ -201,7 +202,7 @@ export async function resubmitRegistrationAction(raw: unknown): Promise<ActionRe
               kind: 'registration_resubmitted',
               title: `${updated.partnerName} resubmitted ${updated.customer}`,
               body: PRODUCT_LABEL[updated.product],
-              link: ROUTES.admin.approvals,
+              link: staffDealHref(updated.id),
             },
           ]
         : [];
@@ -262,7 +263,7 @@ export async function postMessageAction(raw: unknown): Promise<ActionResult<Regi
         kind: 'registration_message',
         title: `${posted.message.authorName} wrote about ${posted.registration.customer}`,
         body: posted.message.body.slice(0, EXCERPT_CHARS),
-        link: toPartner ? ROUTES.partner.deal(posted.registration.id) : ROUTES.admin.approvals,
+        link: toPartner ? ROUTES.partner.deal(posted.registration.id) : staffDealHref(posted.registration.id),
       }));
       await notifyUsers(tx, items);
       return { posted, items, toPartner };
@@ -280,7 +281,7 @@ export async function postMessageAction(raw: unknown): Promise<ActionResult<Regi
             authorOrg: outcome.posted.message.authorOrg,
             customer: outcome.posted.registration.customer,
             excerpt: outcome.posted.message.body.slice(0, EXCERPT_CHARS),
-            dealUrl: absoluteUrl(outcome.toPartner ? ROUTES.partner.deal(outcome.posted.registration.id) : ROUTES.admin.approvals),
+            dealUrl: absoluteUrl(outcome.toPartner ? ROUTES.partner.deal(outcome.posted.registration.id) : staffDealHref(outcome.posted.registration.id)),
           }),
         );
       }

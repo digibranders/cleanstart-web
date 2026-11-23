@@ -41,7 +41,7 @@ describe('notifications', () => {
       item(on.id, 'document_new'),
       item(staff.id, 'registration_submitted'),
     ]);
-    expect(recipients.map((r) => `${r.userId}:${r.kind}`).sort()).toEqual([`${on.id}:registration_accepted`, `${staff.id}:registration_submitted`].sort());
-    expect(NOTIFICATION_PREF_DEFAULTS.docs).toBe(false);
+    expect(recipients.map((r) => `${r.userId}:${r.kind}`).sort()).toEqual([`${on.id}:registration_accepted`, `${on.id}:document_new`, `${staff.id}:registration_submitted`].sort());
+    expect(NOTIFICATION_PREF_DEFAULTS.docs).toBe(true);
   });
 });

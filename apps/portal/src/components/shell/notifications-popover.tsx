@@ -36,10 +36,12 @@ interface NotificationsPopoverProps {
   open: boolean;
   onToggle: () => void;
   onClose: () => void;
+  /** The full list for this side of the portal. */
+  allHref: string;
 }
 
 /** The bell in the top bar and its popover. Reads the viewer's own notifications; the layout supplies and refreshes them. */
-export function NotificationsPopover({ notifications, today, open, onToggle, onClose }: NotificationsPopoverProps): React.JSX.Element {
+export function NotificationsPopover({ notifications, today, open, onToggle, onClose, allHref }: NotificationsPopoverProps): React.JSX.Element {
   const router = useRouter();
   const [readHere, setReadHere] = useState<ReadonlySet<string>>(new Set());
   const [allRead, setAllRead] = useState(false);
@@ -126,6 +128,11 @@ export function NotificationsPopover({ notifications, today, open, onToggle, onC
                 </div>
               ),
             )}
+            <div style={{ padding: "8px 12px", borderTop: "1px solid #F0EFF4", textAlign: "center" }}>
+              <Link href={allHref} className="linkbtn" onClick={onClose}>
+                See all
+              </Link>
+            </div>
           </div>
         </>
       ) : null}

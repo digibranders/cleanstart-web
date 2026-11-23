@@ -45,7 +45,7 @@ beforeEach(() => resetDb(db));
 describe('searchAll as staff', () => {
   it('finds deals, partners, documents and people, one group after the other', async () => {
     const w = await seed();
-    await makeDocument(db, { title: 'Kestrel partner playbook' });
+    const playbook = await makeDocument(db, { title: 'Kestrel partner playbook' });
     const staff = await asStaff(db, 'partner_manager', 'all');
     await makeUser(db, { partnerId: w.a.id, role: 'sales', name: 'Kestrel Vikram', email: 'vikram@kestrel.example.com' });
 
@@ -54,14 +54,16 @@ describe('searchAll as staff', () => {
     expect(hits.find((h) => h.label === 'Kestrel Systems')).toMatchObject({
       group: 'partners',
       hint: 'Channel partner, India',
-      href: ROUTES.admin.partners,
+      href: `${ROUTES.admin.partners}?selected=${w.a.id}`,
       icon: 'bld',
     });
+    expect(hits.find((h) => h.group === 'documents')?.href).toBe(`${ROUTES.admin.documents}?doc=${playbook.id}`);
     expect(hits.find((h) => h.group === 'people')).toMatchObject({ hint: 'Kestrel Systems, Sales', href: ROUTES.admin.partners });
 
     const deals = await search(staff, 'vardhan');
     expect(deals.map((h) => h.label).sort()).toEqual(['Vardhan Capital', 'Vardhan Holdings']);
-    expect(deals[0]).toMatchObject({ group: 'registrations', href: ROUTES.admin.approvals, icon: 'approve' });
+    expect(deals[0]).toMatchObject({ group: 'registrations', icon: 'approve' });
+    expect(deals[0]?.href).toMatch(/^\/admin\/approvals\/[0-9a-f-]{36}$/);
     expect(deals.find((h) => h.label === 'Vardhan Holdings')?.hint).toBe('Kestrel Gulf Networks, pending');
   });
 

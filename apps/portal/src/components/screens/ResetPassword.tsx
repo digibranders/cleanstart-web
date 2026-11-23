@@ -165,7 +165,7 @@ export function ResetPassword({ token, linkDead = false }: { token: string; link
       return;
     }
     toast("Password updated and every other session signed out. Sign in with your new password.");
-    router.push(ROUTES.signIn);
+    router.push(`${ROUTES.signIn}?reset=1`);
   };
 
   return (

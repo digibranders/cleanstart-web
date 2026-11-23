@@ -49,7 +49,7 @@ describe('requestExtensionAction', () => {
     const result = await requestExtensionAction({ id: reg.id, reason: 'Procurement is slow' });
     expect(result).toMatchObject({ ok: true, data: { extensionStatus: 'requested' } });
     expect((await db.select().from(auditLog).where(eq(auditLog.event, 'registration.extension_requested')))[0]).toMatchObject({ note: 'Procurement is slow', kind: 'deal_decisions' });
-    expect((await db.select().from(notifications).where(eq(notifications.userId, gaurav.id)))[0]).toMatchObject({ kind: 'extension_requested', link: '/admin/approvals' });
+    expect((await db.select().from(notifications).where(eq(notifications.userId, gaurav.id)))[0]).toMatchObject({ kind: 'extension_requested', link: `/admin/approvals/${reg.id}` });
     expect(mail.transport!.to(gaurav.email)).toHaveLength(1);
     expect(await db.select().from(hubspotOutbox)).toHaveLength(0);
   });

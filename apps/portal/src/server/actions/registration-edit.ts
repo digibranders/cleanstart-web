@@ -5,6 +5,7 @@ import { normalizeDomain } from '@/lib/customer';
 import { DEAL_CURRENCIES, PRODUCT_LABEL } from '@/lib/domain';
 import type { RegistrationDetailDto } from '@/lib/dto';
 import { ROUTES } from '@/lib/routes';
+import { staffDealHref } from '@/lib/staff-deals-dto';
 import { recordAudit } from '@/server/audit/record';
 import { assertCan } from '@/server/auth/policies';
 import type { Viewer } from '@/server/auth/types';
@@ -109,7 +110,7 @@ export async function editRegistrationAction(raw: unknown): Promise<ActionResult
             kind: 'registration_resubmitted',
             title: `${reg.partnerName} edited ${reg.customer}`,
             body: `${PRODUCT_LABEL[reg.product]}: ${outcome.changes.map((c) => c.label.toLowerCase()).join(', ')}`,
-            link: ROUTES.admin.approvals,
+            link: staffDealHref(reg.id),
           },
         ]);
       }
@@ -141,7 +142,7 @@ async function contactChanged(
         kind: 'registration_resubmitted',
         title: `${reg.partnerName} changed the contacts on ${reg.customer}`,
         body: `${PRODUCT_LABEL[reg.product]}. ${note}`,
-        link: ROUTES.admin.approvals,
+        link: staffDealHref(reg.id),
       },
     ]);
   }

@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { documentOpens, documents } from '@/db/schema';
+import { documentOpens, documents, partnerChecklist } from '@/db/schema';
 import { asStaff, makeDocument, makePartner, makeUser, resetDb, testDb, viewerFor } from '@/db/test-helpers';
 import { fixedClock } from '@/lib/clock';
 import type { PartnerCategory } from '@/lib/domain';
@@ -73,6 +73,18 @@ describe('recordDocumentOpen', () => {
     expect(rows).toHaveLength(1);
     expect(rows[0]).toMatchObject({ documentId: doc.id, userId: viewer.id, partnerId: partner.id });
     expect(rows[0]?.openedAt.toISOString()).toBe('2026-11-06T14:02:00.000Z');
+  });
+
+  it('ticks the playbook step when a partner admin opens an enablement guide, and for nothing else', async () => {
+    const partner = await makePartner(db, {});
+    const admin = await viewerFor(db, await makeUser(db, { partnerId: partner.id, role: 'partner_admin' }));
+    const sheet = await makeDocument(db, { type: 'datasheet' });
+    await withViewer(admin, (tx) => recordDocumentOpen(tx, admin, { id: sheet.id }, clock));
+    expect(await db.select().from(partnerChecklist)).toHaveLength(0);
+    const guide = await makeDocument(db, { type: 'enablement_guide' });
+    await withViewer(admin, (tx) => recordDocumentOpen(tx, admin, { id: guide.id }, clock));
+    await withViewer(admin, (tx) => recordDocumentOpen(tx, admin, { id: guide.id }, clock));
+    expect((await db.select().from(partnerChecklist)).map((r) => [r.partnerId, r.step])).toEqual([[partner.id, 'playbook']]);
   });
 
   it('records nothing for staff', async () => {
