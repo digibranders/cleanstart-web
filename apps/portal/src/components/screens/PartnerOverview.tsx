@@ -19,6 +19,14 @@ interface PartnerOverviewProps {
   asOf: string;
 }
 
+/** Where a KPI tile leads: the Deals tab that holds its deals. Expiring deals are a subset of Accepted. */
+const KPI_STATUS: Record<string, string> = {
+  Pending: "pending",
+  Protected: "accepted",
+  "Expiring in 14 days": "accepted",
+  "Won this year": "won",
+};
+
 export function PartnerOverview({ overview, today, asOf }: PartnerOverviewProps): React.JSX.Element {
   const kpis = buildOverviewKpis(overview);
   const recent = overview.recent;
@@ -46,11 +54,11 @@ export function PartnerOverview({ overview, today, asOf }: PartnerOverviewProps)
 
       <section aria-label="Key figures" className="card kpis">
         {kpis.map((k) => (
-          <div className="kpi" key={k.label}>
+          <Link className="kpi" key={k.label} href={`${ROUTES.partner.deals}?status=${KPI_STATUS[k.label] ?? "all"}`}>
             <span className="kpi-l">{k.label}</span>
             <span className={`kpi-v ${k.cls}`}>{k.value}</span>
             <span className="kpi-f">{k.foot}</span>
-          </div>
+          </Link>
         ))}
       </section>
 
