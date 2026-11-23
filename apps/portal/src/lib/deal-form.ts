@@ -107,6 +107,17 @@ export const isBlankContact = (c: ContactRow): boolean => !c.name.trim() && !c.r
 
 const isRealDate = (value: string): boolean => ISO_DATE.test(value) && new Date(value).toISOString().slice(0, 10) === value;
 
+/** One contact on its own (the edit drawers); validateDealForm applies the same rules row by row. */
+export function contactErrors(c: Pick<ContactRow, 'name' | 'email' | 'phone'>): Partial<Record<'name' | 'email' | 'phone', string>> {
+  const errors: Partial<Record<'name' | 'email' | 'phone', string>> = {};
+  const email = c.email.trim();
+  const phone = c.phone.trim();
+  if (!c.name.trim()) errors.name = 'Enter the contact name.';
+  if (email && !EMAIL.test(email)) errors.email = 'Enter a valid email.';
+  if (phone && (!PHONE_CHARS.test(phone) || phone.replace(/\D/g, '').length < 6)) errors.phone = 'Enter a valid phone number.';
+  return errors;
+}
+
 /** "1,25,000.50" and "125000" both read as numbers; anything else is NaN. */
 export const parseAmount = (text: string): number => {
   const clean = text.trim().replace(/[,\s]/g, '');
