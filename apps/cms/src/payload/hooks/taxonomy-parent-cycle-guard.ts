@@ -36,7 +36,6 @@ export const taxonomyParentCycleGuardHook = (
     | 'knowledgeCategories'
     | 'industries'
     | 'resourceTypes'
-    | 'departments'
     | 'regions'
     | 'pressTypes'
     | 'webinarTypes',

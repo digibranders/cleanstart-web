@@ -21,6 +21,7 @@ export type Job = {
   source: "cms" | "ats";
   atsUrl?: string | null;
   department?: JobDepartment | null;
+  departmentRef?: { id: number; name?: string | null; slug?: string | null } | number | null;
   employmentType?: JobEmploymentType | null;
   experienceLevel?: JobExperienceLevel | null;
   experienceRange?: string | null;
@@ -63,7 +64,6 @@ type PayloadListResponse<T> = {
 interface GetJobsArgs {
   page?: number;
   limit?: number;
-  department?: string;
   location?: string;
   search?: string;
   /**
@@ -79,7 +79,6 @@ interface GetJobsArgs {
 export async function getJobs({
   page = 1,
   limit = 50,
-  department,
   location,
   search,
   status = "open",
@@ -99,6 +98,7 @@ export async function getJobs({
     "title",
     "slug",
     "department",
+    "departmentRef",
     "employmentType",
     "hiringStatus",
     "experienceRange",
@@ -118,7 +118,6 @@ export async function getJobs({
     // "all" — surface open + closed, but never paused (admin-only).
     params.set("where[hiringStatus][in]", "open,closed");
   }
-  if (department) params.set("where[department][equals]", department);
   if (location) params.set("where[locations.slug][equals]", location);
   if (search) params.set("where[title][contains]", search);
   return fetchCMS<PayloadListResponse<Job>>(
@@ -177,6 +176,7 @@ export async function getJobSlugs(): Promise<string[]> {
 // server-side imports from `@/lib/jobs` keep resolving.
 export type {
   JobDepartment,
+  JobDepartmentOption,
   JobEmploymentType,
   JobExperienceLevel,
   JobLocation,
@@ -185,6 +185,7 @@ export type {
 } from "./jobs-utils";
 export {
   DEPARTMENT_LABEL,
+  jobDepartment,
   EMPLOYMENT_TYPE_LABEL,
   EXPERIENCE_LABEL,
   JOB_STATUS_LABEL,

@@ -19,9 +19,8 @@ describe('DEPARTMENTS_SEED', () => {
     expect(new Set(slugs).size).toBe(slugs.length);
   });
 
-  it('matches the Jobs department enum exactly (no drift)', () => {
-    const seedSlugs = [...DEPARTMENTS_SEED.map((t) => t.slug)].sort();
-    const enumSlugs = [...enumValues()].sort();
-    expect(seedSlugs).toEqual(enumSlugs);
+  it('covers every frozen Jobs department enum value', () => {
+    const seedSlugs = new Set(DEPARTMENTS_SEED.map((t) => t.slug));
+    for (const value of enumValues()) expect(seedSlugs.has(value)).toBe(true);
   });
 });

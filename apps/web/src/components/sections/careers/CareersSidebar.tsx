@@ -4,8 +4,7 @@ import {
   MobileTabStrip,
 } from "@/components/sections/_shared/SidebarFilters";
 import {
-  DEPARTMENT_LABEL,
-  type JobDepartment,
+  type JobDepartmentOption,
   type JobLocation,
 } from "@/lib/jobs-utils";
 
@@ -13,8 +12,8 @@ interface CareersSidebarProps {
   activeDepartment: string;
   activeLocation: string;
   searchQuery: string;
-  /** Department slugs that have at least one open role — others are hidden. */
-  availableDepartments: JobDepartment[];
+  /** Departments that have at least one open role — others are hidden. */
+  availableDepartments: JobDepartmentOption[];
   /** Location records that have at least one open role attached. */
   availableLocations: JobLocation[];
 }
@@ -51,9 +50,9 @@ export function CareersSidebar({
           items={[
             { value: "", label: "All Departments", active: !activeDepartment },
             ...availableDepartments.map((d) => ({
-              value: d,
-              label: DEPARTMENT_LABEL[d],
-              active: activeDepartment === d,
+              value: d.slug,
+              label: d.name,
+              active: activeDepartment === d.slug,
             })),
           ]}
           buildHref={(value) =>
@@ -95,13 +94,13 @@ export function CareersSidebar({
               active: !activeDepartment,
             },
             ...availableDepartments.map((d) => ({
-              key: d,
-              label: DEPARTMENT_LABEL[d],
+              key: d.slug,
+              label: d.name,
               href: hrefFor({
-                department: d,
+                department: d.slug,
                 location: activeLocation,
               }),
-              active: activeDepartment === d,
+              active: activeDepartment === d.slug,
             })),
           ]}
         />

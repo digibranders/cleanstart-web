@@ -6,8 +6,9 @@ import type { TaxonomySeedTerm } from './industries-seed';
  * `?department=<value>` filter URLs keep resolving after the enum →
  * relationship promotion.
  *
- * A parity test (departments-seed.test.ts) asserts these slugs exactly match
- * the Jobs `department` enum options, so the two can never drift.
+ * A test (departments-seed.test.ts) asserts every frozen Jobs `department` enum
+ * value has a seed row, so legacy jobs always resolve to a department. Rows
+ * beyond the enum (IT) exist only as departments.
  */
 export const DEPARTMENTS_SEED: readonly TaxonomySeedTerm[] = [
   { name: 'Engineering', slug: 'engineering' },
@@ -18,4 +19,5 @@ export const DEPARTMENTS_SEED: readonly TaxonomySeedTerm[] = [
   { name: 'Finance', slug: 'finance' },
   { name: 'Legal', slug: 'legal' },
   { name: 'People', slug: 'people' },
+  { name: 'IT', slug: 'it' },
 ] as const;

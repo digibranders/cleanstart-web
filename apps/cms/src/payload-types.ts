@@ -701,7 +701,6 @@ export interface Media {
    * Photographer / source attribution.
    */
   credit?: string | null;
-  prefix?: string | null;
   /**
    * Smart-crop focal point as percentages (0–100). Drives OG-image and 1:1 thumbnail crops.
    */
@@ -709,6 +708,7 @@ export interface Media {
     x?: number | null;
     y?: number | null;
   };
+  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -6116,15 +6116,12 @@ export interface Job {
    */
   atsUrl?: string | null;
   /**
-   * Legacy enum — superseded by the Department relationship below. Kept during the taxonomy transition; removed once apps/web reads the relationship.
+   * Pick a department, or use + New to add one.
    */
+  departmentRef?: (number | null) | Department;
   department?:
     | ('engineering' | 'sales' | 'marketing' | 'customer-success' | 'operations' | 'finance' | 'legal' | 'people')
     | null;
-  /**
-   * Department taxonomy reference. Seeded/backfilled from the legacy `department` enum; editors manage the list under Taxonomies → Departments.
-   */
-  departmentRef?: (number | null) | Department;
   employmentType?: ('full-time' | 'part-time' | 'contract' | 'internship') | null;
   experienceLevel?: ('entry' | 'mid' | 'senior' | 'staff' | 'principal') | null;
   /**
@@ -6503,169 +6500,8 @@ export interface Department {
    * URL-safe slug. Auto-generated from "name" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
    */
   slug: string;
-  description?: string | null;
-  icon?: (number | null) | Media;
-  /**
-   * Optional parent category for hierarchical taxonomies.
-   */
-  parent?: (number | null) | Department;
-  /**
-   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
-   */
-  seo?: {
-    /**
-     * SEO title. Falls back to the document title + site default. Aim for ≤ 60 characters.
-     */
-    title?: string | null;
-    /**
-     * SEO description. Falls back to the document abstract / first paragraph. Aim for ≤ 160 characters.
-     */
-    description?: string | null;
-    /**
-     * When set to no-index, the page is excluded from /sitemap.xml and Google won't show it.
-     */
-    indexable?: ('index' | 'noindex' | 'noindex,nofollow') | null;
-    /**
-     * Falls back to the hero image, then the site default OG image. Derivatives served at 1200×630 (OGP) and 1200×675 (Discover).
-     */
-    ogImage?: (number | null) | Media;
-    /**
-     * Override for the og:image alt text. Falls back to the alt text on the linked media asset.
-     */
-    ogImageAlt?: string | null;
-    /**
-     * Show fields to override the og:title / og:description independently of the SEO title / description.
-     */
-    useAdvancedOg?: boolean | null;
-    /**
-     * Defaults to the SEO title. Most editors never need to override this.
-     */
-    ogTitle?: string | null;
-    /**
-     * Defaults to the SEO description.
-     */
-    ogDescription?: string | null;
-    /**
-     * Show fields to override the X (Twitter) card independently of the OG card. Most editors don't need this — by default the OG fields drive the X card too.
-     */
-    useAdvancedTwitter?: boolean | null;
-    /**
-     * `summary_large_image` is the right choice for almost every page; only switch to `summary` for thin content like author / category index pages.
-     */
-    twitterCard?: ('summary' | 'summary_large_image') | null;
-    /**
-     * Defaults to ogTitle, then SEO title.
-     */
-    twitterTitle?: string | null;
-    /**
-     * Defaults to ogDescription, then SEO description.
-     */
-    twitterDescription?: string | null;
-    /**
-     * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
-     */
-    twitterImage?: (number | null) | Media;
-    useCustomCanonical?: boolean | null;
-    canonicalOverride?: string | null;
-    robotsAdvanced?: {
-      /**
-       * Don't show a cached version in SERP.
-       */
-      noarchive?: boolean | null;
-      /**
-       * Suppress the textual snippet entirely (overrides max-snippet).
-       */
-      nosnippet?: boolean | null;
-      /**
-       * Don't index images on this page.
-       */
-      noimageindex?: boolean | null;
-      /**
-       * Don't show the 'Translate' link on this page.
-       */
-      notranslate?: boolean | null;
-      /**
-       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
-       */
-      maxSnippet?: number | null;
-      /**
-       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
-       */
-      maxImagePreview?: ('standard' | 'large' | 'none') | null;
-      /**
-       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
-       */
-      maxVideoPreview?: number | null;
-      /**
-       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
-       */
-      unavailableAfter?: string | null;
-    };
-    alternates?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    customTags?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    /**
-     * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
-     */
-    keywordTarget?: string | null;
-    keywords?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    /**
-     * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
-     */
-    speakablePath?:
-      | {
-          selector: string;
-          id?: string | null;
-        }[]
-      | null;
-    /**
-     * Escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
-     */
-    additionalSchema?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    schemaHistory?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-  };
   updatedAt: string;
   createdAt: string;
-  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -6791,6 +6627,7 @@ export interface CareerApplication {
  */
 export interface Resume {
   id: number;
+  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -9197,6 +9034,7 @@ export interface EmailAsset {
    * Where this asset is used, e.g. "Signature logo (rendered at 140px wide)".
    */
   usage?: string | null;
+  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -11898,8 +11736,8 @@ export interface JobsSelect<T extends boolean = true> {
   slug?: T;
   source?: T;
   atsUrl?: T;
-  department?: T;
   departmentRef?: T;
+  department?: T;
   employmentType?: T;
   experienceLevel?: T;
   experienceRange?: T;
@@ -12065,13 +11903,13 @@ export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   caption?: T;
   credit?: T;
-  prefix?: T;
   focalPoint?:
     | T
     | {
         x?: T;
         y?: T;
       };
+  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -13446,55 +13284,8 @@ export interface ResourceTypesSelect<T extends boolean = true> {
 export interface DepartmentsSelect<T extends boolean = true> {
   name?: T;
   slug?: T;
-  description?: T;
-  icon?: T;
-  parent?: T;
-  seo?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-        indexable?: T;
-        ogImage?: T;
-        ogImageAlt?: T;
-        useAdvancedOg?: T;
-        ogTitle?: T;
-        ogDescription?: T;
-        useAdvancedTwitter?: T;
-        twitterCard?: T;
-        twitterTitle?: T;
-        twitterDescription?: T;
-        twitterImage?: T;
-        useCustomCanonical?: T;
-        canonicalOverride?: T;
-        robotsAdvanced?:
-          | T
-          | {
-              noarchive?: T;
-              nosnippet?: T;
-              noimageindex?: T;
-              notranslate?: T;
-              maxSnippet?: T;
-              maxImagePreview?: T;
-              maxVideoPreview?: T;
-              unavailableAfter?: T;
-            };
-        alternates?: T;
-        customTags?: T;
-        keywordTarget?: T;
-        keywords?: T;
-        speakablePath?:
-          | T
-          | {
-              selector?: T;
-              id?: T;
-            };
-        additionalSchema?: T;
-        schemaHistory?: T;
-      };
   updatedAt?: T;
   createdAt?: T;
-  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -13993,6 +13784,7 @@ export interface SignatureTemplatesSelect<T extends boolean = true> {
 export interface EmailAssetsSelect<T extends boolean = true> {
   alt?: T;
   usage?: T;
+  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -14130,6 +13922,7 @@ export interface CareerApplicationsSelect<T extends boolean = true> {
  * via the `definition` "resumes_select".
  */
 export interface ResumesSelect<T extends boolean = true> {
+  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
