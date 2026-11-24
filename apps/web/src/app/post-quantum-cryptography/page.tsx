@@ -16,11 +16,12 @@ import { getPageGraph } from '@/lib/seo/compose-page';
 /*
  * /post-quantum-cryptography
  *
- * Landing page built from the client's "PQC LP" brief. DRAFT: noindex, absent
- * from the sitemap and from the nav, until the copy and the claims in the
- * capability cards are signed off. Title and description are ours, pending SEO
- * review. To launch: drop `noindex`, add the route to the sitemap's
- * STATIC_ROUTES, link it from the nav, and seed its pageRegistry row in prod.
+ * Landing page built from the client's "PQC LP" brief. DRAFT: noindex and
+ * nofollow, absent from the sitemap and from the nav, and linked from nowhere,
+ * until the copy and the claims in the capability cards are signed off. Title
+ * and description are ours, pending SEO review. To launch: drop `noindex` and
+ * `nofollow`, add the route to the sitemap's STATIC_ROUTES, link it from the
+ * nav, and seed its pageRegistry row in prod.
  *
  * Band rhythm: dark hero, white, tinted, white, DARK, so only one dark run
  * reaches the footer's CTA card (the same shape as the telecom page).
@@ -33,6 +34,7 @@ export const metadata = buildPageMetadata({
   path: '/post-quantum-cryptography',
   eyebrow: 'Solutions',
   noindex: true,
+  nofollow: true,
 });
 
 export const revalidate = 21600; // 6h ISR fallback; on-demand publish revalidation keeps this fresh
