@@ -19,7 +19,7 @@ const expectDatabaseError = async (promise: Promise<unknown>, pattern: RegExp): 
 
 const EXPECTED_TABLES = [
   'access_requests', 'application_notes', 'application_tokens', 'applications', 'audit_log', 'auth_account', 'auth_session', 'auth_two_factor',
-  'auth_verification', 'dashboard_layouts', 'document_audience', 'document_opens', 'document_versions', 'documents', 'email_change_requests', 'hubspot_outbox',
+  'auth_verification', 'chat_attachments', 'chat_conversations', 'chat_members', 'chat_messages', 'chat_pins', 'chat_presence', 'chat_reactions', 'chat_typing', 'dashboard_layouts', 'document_audience', 'document_opens', 'document_versions', 'documents', 'email_change_requests', 'hubspot_outbox',
   'hubspot_sync_state', 'invites', 'material_requests', 'notification_prefs', 'notifications', 'partner_checklist', 'partners',
   'regions', 'registration_contacts', 'registration_events', 'registration_messages', 'registration_reminders', 'registrations',
   'staff_regions', 'staff_scopes', 'users',

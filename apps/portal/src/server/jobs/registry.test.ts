@@ -27,15 +27,16 @@ describe('job registry', () => {
       'invite-reminders': '30 5 * * *',
       'pending-digest': '30 4 * * *',
       'application-digest': '35 4 * * *',
+      'chat-digest': '*/5 * * * *',
       'website-intake': '*/5 * * * *',
       'document-purge': '20 3 * * *',
       retention: '40 3 * * *',
     });
   });
 
-  it('names the nine jobs of contracts H.17 plus the two digests and the invite reminder', () => {
+  it('names the nine jobs of contracts H.17 plus the two digests, the chat digest and the invite reminder', () => {
     expect(JOBS.map((j) => j.name).sort()).toEqual(
-      ['application-digest', 'document-purge', 'expiry', 'expiry-reminders', 'hubspot-outbox', 'hubspot-poll', 'hubspot-reconcile', 'invite-reminders', 'pending-digest', 'retention', 'website-intake'],
+      ['application-digest', 'chat-digest', 'document-purge', 'expiry', 'expiry-reminders', 'hubspot-outbox', 'hubspot-poll', 'hubspot-reconcile', 'invite-reminders', 'pending-digest', 'retention', 'website-intake'],
     );
   });
 });

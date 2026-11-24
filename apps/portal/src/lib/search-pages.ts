@@ -18,7 +18,7 @@ const ACCOUNT_PAGE: PageHit = { label: 'Your account', href: ROUTES.partner.acco
  * The "Pages" group of the palette. Static: it is the viewer's own sidebar plus the account page, so it can never
  * list a screen the viewer cannot open. With no query it shows every page; with one it filters by label.
  */
-export function buildPageHits(nav: readonly NavItem[], kind: PortalKind, q: string, limit = 9): PageHit[] {
+export function buildPageHits(nav: readonly NavItem[], kind: PortalKind, q: string, limit = 12): PageHit[] {
   const pages: PageHit[] = nav.map((item) => ({ label: item.label, href: item.href, icon: item.icon }));
   if (kind === 'partner') pages.push(ACCOUNT_PAGE);
   const needle = q.trim().toLowerCase();

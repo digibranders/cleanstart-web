@@ -29,6 +29,7 @@ const NOTIFICATIONS: ReadonlyArray<readonly [NotificationCategory, string, strin
   ["expiry", "Protection ending", "Reminders 14 days and 3 days before a deal's protection ends."],
   ["docs", "New documents", "When CleanStart adds material for your products."],
   ["team", "Team changes", "When a colleague accepts an invite, is removed or has a role change."],
+  ["messages", "Unread messages", "A short email when a chat message sits unread for a while."],
 ];
 
 export function Account({ profile, sessions, today }: AccountProps): React.JSX.Element {

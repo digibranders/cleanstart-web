@@ -53,6 +53,7 @@ import {
   USER_STATUSES,
 } from '@/lib/domain';
 import { DASHBOARD_IDS, type SavedLayout } from '@/lib/dashboard-layout';
+import { CHAT_KINDS, CHAT_MEMBER_ROLES, CHAT_MESSAGE_KINDS, CHAT_REACTION_KEYS, type ChatRefKind } from '@/lib/chat';
 
 /** SQL fragment `col in ('a', 'b')`. Values are our own constants, never user input. */
 const inList = (column: AnyPgColumn, values: readonly string[]): SQL =>
@@ -804,6 +805,164 @@ export const authTwoFactors = pgTable(
   },
   (t) => [index('auth_two_factor_user_idx').on(t.userId)],
 );
+
+
+/* ---------------------------------------------------------------- messages (chat)
+ * Access to a conversation is member_ids (see rls.sql): every child table asks "can I see the conversation?", so no policy loops.
+ * seq counts messages, rev counts every change (new, edit, delete, reaction, pin). Both are taken from the conversation row with
+ * UPDATE ... RETURNING inside the sending transaction, so a poll for "rev > n" never skips a late commit. Reads, delivery, typing
+ * and presence never touch the conversation row. */
+
+export const chatConversations = pgTable(
+  'chat_conversations',
+  {
+    id: id(),
+    kind: text('kind', { enum: CHAT_KINDS }).notNull(),
+    /** The one partner company every non staff member belongs to. Null: a staff only chat. Immutable. */
+    partnerId: uuid('partner_id').references(() => partners.id),
+    title: text('title'),
+    createdBy: uuid('created_by').notNull().references(() => users.id),
+    /** Current members. The access key for row level security; kept in step with chat_members by the repo. */
+    memberIds: uuid('member_ids').array().notNull().default(sql`'{}'::uuid[]`),
+    /** 'low:high' of the two user ids of a direct chat, so a pair has one chat. */
+    directKey: text('direct_key'),
+    lastMsgSeq: bigint('last_msg_seq', { mode: 'number' }).notNull().default(0),
+    rev: bigint('rev', { mode: 'number' }).notNull().default(0),
+    lastMessageAt: ts('last_message_at'),
+    lastPreview: text('last_preview'),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [
+    uniqueIndex('chat_conversations_direct_key').on(t.directKey),
+    index('chat_conversations_members_gin').using('gin', t.memberIds),
+    index('chat_conversations_partner_idx').on(t.partnerId),
+    check('chat_conversations_kind_chk', inList(t.kind, CHAT_KINDS)),
+    check('chat_conversations_title_chk', sql`${t.kind} = 'direct' or (${t.title} is not null and length(btrim(${t.title})) > 0)`),
+    check('chat_conversations_direct_chk', sql`(${t.kind} = 'direct') = (${t.directKey} is not null)`),
+  ],
+);
+
+export const chatMembers = pgTable(
+  'chat_members',
+  {
+    conversationId: uuid('conversation_id').notNull().references(() => chatConversations.id),
+    userId: uuid('user_id').notNull().references(() => users.id),
+    /** Copied when they join, because a partner cannot read every staff user row. */
+    displayName: text('display_name').notNull(),
+    org: text('org').notNull(),
+    isStaff: boolean('is_staff').notNull(),
+    role: text('role', { enum: CHAT_MEMBER_ROLES }).notNull().default('member'),
+    lastReadSeq: bigint('last_read_seq', { mode: 'number' }).notNull().default(0),
+    lastDeliveredSeq: bigint('last_delivered_seq', { mode: 'number' }).notNull().default(0),
+    mutedUntil: ts('muted_until'),
+    /** Last time a digest email covered this chat for this person. */
+    digestSeq: bigint('digest_seq', { mode: 'number' }).notNull().default(0),
+    joinedAt: timestamp('joined_at', { withTimezone: true }).notNull().defaultNow(),
+    leftAt: ts('left_at'),
+  },
+  (t) => [
+    primaryKey({ columns: [t.conversationId, t.userId] }),
+    index('chat_members_user_idx').on(t.userId),
+    check('chat_members_role_chk', inList(t.role, CHAT_MEMBER_ROLES)),
+  ],
+);
+
+export const chatMessages = pgTable(
+  'chat_messages',
+  {
+    id: id(),
+    conversationId: uuid('conversation_id').notNull().references(() => chatConversations.id),
+    seq: bigint('seq', { mode: 'number' }).notNull(),
+    rev: bigint('rev', { mode: 'number' }).notNull(),
+    kind: text('kind', { enum: CHAT_MESSAGE_KINDS }).notNull().default('text'),
+    senderId: uuid('sender_id').references(() => users.id),
+    senderName: text('sender_name').notNull(),
+    senderOrg: text('sender_org').notNull(),
+    body: text('body').notNull().default(''),
+    replyToId: uuid('reply_to_id').references((): AnyPgColumn => chatMessages.id),
+    mentions: uuid('mentions').array().notNull().default(sql`'{}'::uuid[]`),
+    /** [{ kind: 'deal' | 'doc', id }]. Titles are looked up at read time under the reader's own access. */
+    refs: jsonb('refs').$type<Array<{ kind: ChatRefKind; id: string }>>().notNull().default(sql`'[]'::jsonb`),
+    editedAt: ts('edited_at'),
+    deletedAt: ts('deleted_at'),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    uniqueIndex('chat_messages_conv_seq_key').on(t.conversationId, t.seq),
+    index('chat_messages_conv_rev_idx').on(t.conversationId, t.rev),
+    index('chat_messages_body_trgm').using('gin', t.body.op('gin_trgm_ops')),
+    check('chat_messages_kind_chk', inList(t.kind, CHAT_MESSAGE_KINDS)),
+  ],
+);
+
+export const chatAttachments = pgTable(
+  'chat_attachments',
+  {
+    id: id(),
+    conversationId: uuid('conversation_id').notNull().references(() => chatConversations.id),
+    /** The partner whose cap this counts against; null for a staff only chat. */
+    partnerId: uuid('partner_id').references(() => partners.id),
+    /** Null until the message that carries it is sent: a ticket that was never used stays unattached. */
+    messageId: uuid('message_id').references(() => chatMessages.id),
+    uploaderId: uuid('uploader_id').notNull().references(() => users.id),
+    key: text('key').notNull(),
+    name: text('name').notNull(),
+    mime: text('mime').notNull(),
+    size: bigint('size', { mode: 'number' }).notNull(),
+    deletedAt: ts('deleted_at'),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    uniqueIndex('chat_attachments_key_key').on(t.key),
+    index('chat_attachments_message_idx').on(t.messageId),
+    index('chat_attachments_partner_idx').on(t.partnerId),
+    check('chat_attachments_size_chk', sql`${t.size} > 0`),
+  ],
+);
+
+export const chatReactions = pgTable(
+  'chat_reactions',
+  {
+    conversationId: uuid('conversation_id').notNull().references(() => chatConversations.id),
+    messageId: uuid('message_id').notNull().references(() => chatMessages.id),
+    userId: uuid('user_id').notNull().references(() => users.id),
+    emoji: text('emoji').notNull(),
+    userName: text('user_name').notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.messageId, t.userId, t.emoji] }),
+    index('chat_reactions_conv_idx').on(t.conversationId),
+    check('chat_reactions_emoji_chk', inList(t.emoji, CHAT_REACTION_KEYS)),
+  ],
+);
+
+export const chatPins = pgTable(
+  'chat_pins',
+  {
+    conversationId: uuid('conversation_id').notNull().references(() => chatConversations.id),
+    messageId: uuid('message_id').notNull().references(() => chatMessages.id),
+    pinnedBy: uuid('pinned_by').notNull().references(() => users.id),
+    createdAt: createdAt(),
+  },
+  (t) => [primaryKey({ columns: [t.conversationId, t.messageId] })],
+);
+
+export const chatTyping = pgTable(
+  'chat_typing',
+  {
+    conversationId: uuid('conversation_id').notNull().references(() => chatConversations.id),
+    userId: uuid('user_id').notNull().references(() => users.id),
+    at: ts('at').notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.conversationId, t.userId] })],
+);
+
+export const chatPresence = pgTable('chat_presence', {
+  userId: uuid('user_id').primaryKey().references(() => users.id),
+  seenAt: ts('seen_at').notNull().defaultNow(),
+});
 
 /* ---------------------------------------------------------------- inferred row types (server only) */
 

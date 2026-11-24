@@ -67,7 +67,8 @@ BEGIN
     'registrations', 'registration_contacts', 'registration_messages', 'registration_events', 'registration_reminders',
     'documents', 'document_audience', 'document_versions', 'document_opens', 'material_requests', 'email_change_requests',
     'notifications', 'notification_prefs', 'dashboard_layouts', 'audit_log', 'hubspot_outbox', 'hubspot_sync_state',
-    'auth_session', 'auth_account', 'auth_verification', 'auth_two_factor'
+    'auth_session', 'auth_account', 'auth_verification', 'auth_two_factor',
+    'chat_conversations', 'chat_members', 'chat_messages', 'chat_attachments', 'chat_reactions', 'chat_pins', 'chat_typing', 'chat_presence'
   ] LOOP
     EXECUTE format('ALTER TABLE %I ENABLE ROW LEVEL SECURITY', t);
     EXECUTE format('ALTER TABLE %I FORCE ROW LEVEL SECURITY', t);
@@ -238,6 +239,188 @@ CREATE POLICY regions_select ON regions FOR SELECT USING (app_kind() IN ('staff'
 CREATE POLICY regions_insert ON regions FOR INSERT WITH CHECK (app_is_staff());
 CREATE POLICY regions_update ON regions FOR UPDATE USING (app_is_staff()) WITH CHECK (app_is_staff());
 
+-- ---------------------------------------------------------------- messages (chat)
+-- A conversation is visible to its current members (member_ids) and to the system (the digest job). Staff get no blanket access:
+-- a staff user sees a chat only when they are in it. Every child table asks "can I see the conversation?", so no policy refers back to itself.
+
+-- Guards on the conversation row. They run as the caller, so the users they read are only the ones that caller may read:
+-- a partner cannot put a staff user they cannot see (or anyone from another company) into a chat.
+CREATE OR REPLACE FUNCTION portal_chat_conversation_guard() RETURNS trigger LANGUAGE plpgsql AS
+$$
+DECLARE
+  added uuid[];
+  seen integer;
+  wrong integer;
+BEGIN
+  IF TG_OP = 'UPDATE' THEN
+    IF NEW.partner_id IS DISTINCT FROM OLD.partner_id OR NEW.kind <> OLD.kind OR NEW.created_by <> OLD.created_by
+       OR NEW.direct_key IS DISTINCT FROM OLD.direct_key THEN
+      RAISE EXCEPTION 'a chat keeps its company, kind and creator' USING ERRCODE = 'integrity_constraint_violation';
+    END IF;
+    IF NEW.kind = 'direct' AND NEW.member_ids IS DISTINCT FROM OLD.member_ids THEN
+      RAISE EXCEPTION 'a direct chat keeps its two people' USING ERRCODE = 'integrity_constraint_violation';
+    END IF;
+    added := ARRAY(SELECT unnest(NEW.member_ids) EXCEPT SELECT unnest(OLD.member_ids));
+  ELSE
+    IF NEW.kind = 'direct' AND cardinality(NEW.member_ids) <> 2 THEN
+      RAISE EXCEPTION 'a direct chat has exactly two people' USING ERRCODE = 'integrity_constraint_violation';
+    END IF;
+    added := NEW.member_ids;
+  END IF;
+  IF cardinality(NEW.member_ids) > 50 THEN
+    RAISE EXCEPTION 'a chat has at most 50 people' USING ERRCODE = 'integrity_constraint_violation';
+  END IF;
+  IF cardinality(added) > 0 THEN
+    SELECT count(*) INTO seen FROM users u WHERE u.id = ANY (added) AND u.status = 'active';
+    IF seen <> cardinality(added) THEN
+      RAISE EXCEPTION 'every new member must be an active person you can see' USING ERRCODE = 'integrity_constraint_violation';
+    END IF;
+    SELECT count(*) INTO wrong FROM users u
+      WHERE u.id = ANY (added) AND NOT (u.kind = 'staff' OR (NEW.partner_id IS NOT NULL AND u.partner_id = NEW.partner_id));
+    IF wrong > 0 THEN
+      RAISE EXCEPTION 'a chat holds one partner company and CleanStart staff, nobody else' USING ERRCODE = 'integrity_constraint_violation';
+    END IF;
+  END IF;
+  RETURN NEW;
+END
+$$;
+
+DROP TRIGGER IF EXISTS chat_conversation_guard ON chat_conversations;
+CREATE TRIGGER chat_conversation_guard BEFORE INSERT OR UPDATE ON chat_conversations
+  FOR EACH ROW EXECUTE FUNCTION portal_chat_conversation_guard();
+
+-- Only the sender changes what a message says. Anyone in the chat may bump rev (a reaction or a pin touches the row).
+CREATE OR REPLACE FUNCTION portal_chat_message_guard() RETURNS trigger LANGUAGE plpgsql AS
+$$
+BEGIN
+  IF NEW.conversation_id <> OLD.conversation_id OR NEW.seq <> OLD.seq OR NEW.sender_id IS DISTINCT FROM OLD.sender_id
+     OR NEW.created_at <> OLD.created_at OR NEW.kind <> OLD.kind THEN
+    RAISE EXCEPTION 'a message keeps its chat, number, sender and time' USING ERRCODE = 'integrity_constraint_violation';
+  END IF;
+  IF (NEW.body, NEW.refs, NEW.mentions, NEW.edited_at, NEW.deleted_at, NEW.reply_to_id)
+       IS DISTINCT FROM (OLD.body, OLD.refs, OLD.mentions, OLD.edited_at, OLD.deleted_at, OLD.reply_to_id)
+     AND NOT app_is_system() AND OLD.sender_id IS DISTINCT FROM app_user_id() THEN
+    RAISE EXCEPTION 'only the sender can change a message' USING ERRCODE = 'insufficient_privilege';
+  END IF;
+  RETURN NEW;
+END
+$$;
+
+DROP TRIGGER IF EXISTS chat_message_guard ON chat_messages;
+CREATE TRIGGER chat_message_guard BEFORE UPDATE ON chat_messages
+  FOR EACH ROW EXECUTE FUNCTION portal_chat_message_guard();
+
+-- Read and delivery cursors, mute and digest position belong to their own person.
+CREATE OR REPLACE FUNCTION portal_chat_member_guard() RETURNS trigger LANGUAGE plpgsql AS
+$$
+BEGIN
+  IF NEW.conversation_id <> OLD.conversation_id OR NEW.user_id <> OLD.user_id THEN
+    RAISE EXCEPTION 'a membership keeps its chat and person' USING ERRCODE = 'integrity_constraint_violation';
+  END IF;
+  IF NOT app_is_system() AND OLD.user_id IS DISTINCT FROM app_user_id()
+     AND (NEW.last_read_seq, NEW.last_delivered_seq, NEW.muted_until, NEW.digest_seq)
+       IS DISTINCT FROM (OLD.last_read_seq, OLD.last_delivered_seq, OLD.muted_until, OLD.digest_seq) THEN
+    RAISE EXCEPTION 'only the person can change their own read position' USING ERRCODE = 'insufficient_privilege';
+  END IF;
+  RETURN NEW;
+END
+$$;
+
+DROP TRIGGER IF EXISTS chat_member_guard ON chat_members;
+CREATE TRIGGER chat_member_guard BEFORE UPDATE ON chat_members
+  FOR EACH ROW EXECUTE FUNCTION portal_chat_member_guard();
+
+DROP POLICY IF EXISTS chat_conversations_select ON chat_conversations;
+DROP POLICY IF EXISTS chat_conversations_insert ON chat_conversations;
+DROP POLICY IF EXISTS chat_conversations_update ON chat_conversations;
+CREATE POLICY chat_conversations_select ON chat_conversations FOR SELECT USING (app_is_system() OR app_user_id() = ANY (member_ids));
+-- A partner starts chats only in its own company; staff start staff only chats (partner_id null) or one with any partner.
+CREATE POLICY chat_conversations_insert ON chat_conversations FOR INSERT WITH CHECK (
+  app_is_system()
+  OR (
+    created_by = app_user_id() AND app_user_id() = ANY (member_ids)
+    AND (app_kind() = 'staff' OR partner_id = app_partner_id())
+  )
+);
+-- WITH CHECK is open on purpose: a person who leaves is no longer in member_ids afterwards. The guard trigger holds the invariants.
+CREATE POLICY chat_conversations_update ON chat_conversations FOR UPDATE
+  USING (app_is_system() OR app_user_id() = ANY (member_ids)) WITH CHECK (true);
+
+DROP POLICY IF EXISTS chat_members_select ON chat_members;
+DROP POLICY IF EXISTS chat_members_insert ON chat_members;
+DROP POLICY IF EXISTS chat_members_update ON chat_members;
+CREATE POLICY chat_members_select ON chat_members FOR SELECT USING (EXISTS (SELECT 1 FROM chat_conversations c WHERE c.id = chat_members.conversation_id));
+CREATE POLICY chat_members_insert ON chat_members FOR INSERT WITH CHECK (
+  EXISTS (SELECT 1 FROM chat_conversations c WHERE c.id = chat_members.conversation_id AND chat_members.user_id = ANY (c.member_ids))
+);
+CREATE POLICY chat_members_update ON chat_members FOR UPDATE
+  USING (EXISTS (SELECT 1 FROM chat_conversations c WHERE c.id = chat_members.conversation_id))
+  WITH CHECK (EXISTS (SELECT 1 FROM chat_conversations c WHERE c.id = chat_members.conversation_id));
+
+DROP POLICY IF EXISTS chat_messages_select ON chat_messages;
+DROP POLICY IF EXISTS chat_messages_insert ON chat_messages;
+DROP POLICY IF EXISTS chat_messages_update ON chat_messages;
+CREATE POLICY chat_messages_select ON chat_messages FOR SELECT USING (EXISTS (SELECT 1 FROM chat_conversations c WHERE c.id = chat_messages.conversation_id));
+CREATE POLICY chat_messages_insert ON chat_messages FOR INSERT WITH CHECK (
+  (app_is_system() OR sender_id = app_user_id())
+  AND EXISTS (SELECT 1 FROM chat_conversations c WHERE c.id = chat_messages.conversation_id)
+);
+CREATE POLICY chat_messages_update ON chat_messages FOR UPDATE
+  USING (EXISTS (SELECT 1 FROM chat_conversations c WHERE c.id = chat_messages.conversation_id))
+  WITH CHECK (EXISTS (SELECT 1 FROM chat_conversations c WHERE c.id = chat_messages.conversation_id));
+
+DROP POLICY IF EXISTS chat_attachments_select ON chat_attachments;
+DROP POLICY IF EXISTS chat_attachments_insert ON chat_attachments;
+DROP POLICY IF EXISTS chat_attachments_update ON chat_attachments;
+CREATE POLICY chat_attachments_select ON chat_attachments FOR SELECT USING (EXISTS (SELECT 1 FROM chat_conversations c WHERE c.id = chat_attachments.conversation_id));
+CREATE POLICY chat_attachments_insert ON chat_attachments FOR INSERT WITH CHECK (
+  (app_is_system() OR uploader_id = app_user_id())
+  AND EXISTS (SELECT 1 FROM chat_conversations c WHERE c.id = chat_attachments.conversation_id)
+);
+CREATE POLICY chat_attachments_update ON chat_attachments FOR UPDATE
+  USING (EXISTS (SELECT 1 FROM chat_conversations c WHERE c.id = chat_attachments.conversation_id))
+  WITH CHECK (EXISTS (SELECT 1 FROM chat_conversations c WHERE c.id = chat_attachments.conversation_id));
+
+DROP POLICY IF EXISTS chat_reactions_select ON chat_reactions;
+DROP POLICY IF EXISTS chat_reactions_insert ON chat_reactions;
+DROP POLICY IF EXISTS chat_reactions_delete ON chat_reactions;
+CREATE POLICY chat_reactions_select ON chat_reactions FOR SELECT USING (EXISTS (SELECT 1 FROM chat_conversations c WHERE c.id = chat_reactions.conversation_id));
+CREATE POLICY chat_reactions_insert ON chat_reactions FOR INSERT WITH CHECK (
+  user_id = app_user_id() AND EXISTS (SELECT 1 FROM chat_conversations c WHERE c.id = chat_reactions.conversation_id)
+);
+CREATE POLICY chat_reactions_delete ON chat_reactions FOR DELETE USING (user_id = app_user_id());
+
+DROP POLICY IF EXISTS chat_pins_select ON chat_pins;
+DROP POLICY IF EXISTS chat_pins_insert ON chat_pins;
+DROP POLICY IF EXISTS chat_pins_delete ON chat_pins;
+CREATE POLICY chat_pins_select ON chat_pins FOR SELECT USING (EXISTS (SELECT 1 FROM chat_conversations c WHERE c.id = chat_pins.conversation_id));
+CREATE POLICY chat_pins_insert ON chat_pins FOR INSERT WITH CHECK (
+  pinned_by = app_user_id() AND EXISTS (SELECT 1 FROM chat_conversations c WHERE c.id = chat_pins.conversation_id)
+);
+CREATE POLICY chat_pins_delete ON chat_pins FOR DELETE USING (EXISTS (SELECT 1 FROM chat_conversations c WHERE c.id = chat_pins.conversation_id));
+
+DROP POLICY IF EXISTS chat_typing_select ON chat_typing;
+DROP POLICY IF EXISTS chat_typing_insert ON chat_typing;
+DROP POLICY IF EXISTS chat_typing_update ON chat_typing;
+DROP POLICY IF EXISTS chat_typing_delete ON chat_typing;
+CREATE POLICY chat_typing_select ON chat_typing FOR SELECT USING (EXISTS (SELECT 1 FROM chat_conversations c WHERE c.id = chat_typing.conversation_id));
+CREATE POLICY chat_typing_insert ON chat_typing FOR INSERT WITH CHECK (
+  user_id = app_user_id() AND EXISTS (SELECT 1 FROM chat_conversations c WHERE c.id = chat_typing.conversation_id)
+);
+CREATE POLICY chat_typing_update ON chat_typing FOR UPDATE USING (user_id = app_user_id()) WITH CHECK (user_id = app_user_id());
+CREATE POLICY chat_typing_delete ON chat_typing FOR DELETE USING (user_id = app_user_id());
+
+-- Online dots: a person sees the presence of people they share a chat with.
+DROP POLICY IF EXISTS chat_presence_select ON chat_presence;
+DROP POLICY IF EXISTS chat_presence_insert ON chat_presence;
+DROP POLICY IF EXISTS chat_presence_update ON chat_presence;
+CREATE POLICY chat_presence_select ON chat_presence FOR SELECT USING (
+  app_is_system() OR user_id = app_user_id()
+  OR EXISTS (SELECT 1 FROM chat_conversations c WHERE chat_presence.user_id = ANY (c.member_ids))
+);
+CREATE POLICY chat_presence_insert ON chat_presence FOR INSERT WITH CHECK (app_is_system() OR user_id = app_user_id());
+CREATE POLICY chat_presence_update ON chat_presence FOR UPDATE USING (app_is_system() OR user_id = app_user_id()) WITH CHECK (app_is_system() OR user_id = app_user_id());
+
 -- ---------------------------------------------------------------- audit_log and hubspot_outbox
 DROP POLICY IF EXISTS audit_log_insert ON audit_log;
 DROP POLICY IF EXISTS audit_log_select ON audit_log;
@@ -282,5 +465,6 @@ GRANT SELECT, INSERT ON audit_log TO portal_app;
 -- DELETE is granted only where a flow needs it; the policies above further restrict who may use it.
 GRANT DELETE ON
   registrations, registration_contacts, registration_messages, registration_events, registration_reminders,
-  applications, document_versions, document_audience, staff_regions, auth_session, auth_account, auth_verification, auth_two_factor
+  applications, document_versions, document_audience, staff_regions, auth_session, auth_account, auth_verification, auth_two_factor,
+  chat_reactions, chat_pins, chat_typing
 TO portal_app;

@@ -22,6 +22,7 @@ export const ROUTES = {
     team: "/partner/team",
     company: "/partner/company",
     account: "/partner/account",
+    messages: "/partner/messages",
     notifications: "/partner/notifications",
     help: "/partner/help",
   },
@@ -36,6 +37,7 @@ export const ROUTES = {
     regions: "/admin/settings/regions",
     audit: "/admin/audit",
     account: "/admin/account",
+    messages: "/admin/messages",
     notifications: "/admin/notifications",
     help: "/admin/help",
   },
@@ -50,7 +52,7 @@ export interface NavItem {
   /** The permission that shows this item: the same action the page itself checks. */
   action: Action;
   /** Key into the live nav counts, if the item shows a count. */
-  count?: "approvals";
+  count?: "approvals" | "messages";
 }
 
 export const PARTNER_NAV: readonly NavItem[] = [
@@ -58,6 +60,7 @@ export const PARTNER_NAV: readonly NavItem[] = [
   { label: "Deals", href: ROUTES.partner.deals, icon: "deals", action: "registration.read" },
   { label: "Register deal", href: ROUTES.partner.newDeal, icon: "reg", action: "registration.create" },
   { label: "Documents", href: ROUTES.partner.documents, icon: "docs", action: "document.read" },
+  { label: "Messages", href: ROUTES.partner.messages, icon: "send", action: "chat.use", count: "messages" },
   { label: "Program", href: ROUTES.partner.program, icon: "info", action: "partner.read" },
   { label: "Team", href: ROUTES.partner.team, icon: "team", action: "team.read" },
   { label: "Company", href: ROUTES.partner.company, icon: "bld", action: "partner.read" },
@@ -67,6 +70,7 @@ export const PARTNER_NAV: readonly NavItem[] = [
 export const ADMIN_NAV: readonly NavItem[] = [
   { label: "Overview", href: ROUTES.admin.overview, icon: "dash", action: "overview.read_staff" },
   { label: "Deals", href: ROUTES.admin.approvals, icon: "approve", action: "registration.read_queue", count: "approvals" },
+  { label: "Messages", href: ROUTES.admin.messages, icon: "send", action: "chat.use", count: "messages" },
   { label: "Partners", href: ROUTES.admin.partners, icon: "bld", action: "partner.read" },
   { label: "Documents", href: ROUTES.admin.documents, icon: "docs", action: "document.upload" },
   { label: "Reports", href: ROUTES.admin.reports, icon: "chart", action: "report.read" },

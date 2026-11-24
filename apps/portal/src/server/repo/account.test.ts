@@ -37,6 +37,7 @@ describe('getShell, partner viewer', () => {
       partnerRegion: 'middle_east',
       manager: { id: manager.id, name: 'Omar Nasser', email: manager.email, team: 'CleanStart Middle East' },
       waitingApprovals: 0,
+      messagesUnread: 0,
       unreadNotifications: 0,
     });
   });

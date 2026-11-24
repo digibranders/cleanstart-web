@@ -33,6 +33,7 @@ export const NOTIFICATION_PREF_DEFAULTS: Record<NotificationCategory, boolean> =
   expiry: true,
   docs: true,
   team: true,
+  messages: true,
 };
 
 /** Inserts the in-app rows. Call inside withViewer or withSystem. No .returning(). */

@@ -84,6 +84,9 @@ export const ACTIONS = [
   'search.use',
   'notification.read',
   'help.read',
+  // Messages: everyone signed in may chat; only staff and partner admins open a new group.
+  'chat.use',
+  'chat.create_group',
   'integration.read_health',
   'integration.retry_failed',
 ] as const;
@@ -216,6 +219,8 @@ const RULES: Record<Action, Rule> = {
   'search.use': anyone,
   'notification.read': anyone,
   'help.read': anyone,
+  'chat.use': anyone,
+  'chat.create_group': (v) => v.kind === 'staff' || isPartnerAdmin(v),
   'integration.read_health': managerOnly,
   'integration.retry_failed': managerOnly,
 };

@@ -63,6 +63,8 @@ export interface ShellDto {
   /** Staff only: pending registrations in the viewer's scope. Drives the nav count. */
   waitingApprovals: number;
   unreadNotifications: number;
+  /** Unread chat messages outside muted chats. Drives the Messages nav count. */
+  messagesUnread: number;
 }
 
 export interface ProfileDto {

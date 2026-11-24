@@ -86,6 +86,8 @@ const MATRIX: Record<Action, string> = {
   'search.use': 'Y Y Y Y Y Y',
   'notification.read': 'Y Y Y Y Y Y',
   'help.read': 'Y Y Y Y Y Y',
+  'chat.use': 'Y Y Y Y Y Y',
+  'chat.create_group': 'Y - - Y Y Y',
   'integration.read_health': '- - - Y - -',
   'integration.retry_failed': '- - - Y - -',
 };
@@ -207,6 +209,7 @@ describe('allowedActions', () => {
       'search.use',
       'notification.read',
       'help.read',
+      'chat.use',
     ]);
   });
 });

@@ -5,6 +5,9 @@ import { db, type Db, pool } from '@/db/client';
 import {
   accessRequests,
   applications,
+  chatAttachments,
+  chatConversations,
+  chatMessages,
   auditLog,
   authAccounts,
   documentAudience,
@@ -458,6 +461,27 @@ const seedTenant = async (database: Db, name: string): Promise<TenantFixture> =>
       .returning({ id: documentOpens.id }),
     'document open',
   );
+  const conversation = first(
+    await database
+      .insert(chatConversations)
+      .values({ kind: 'group', partnerId: partner.id, title: `${name} chat`, createdBy: sales.id, memberIds: [sales.id], lastMsgSeq: 1, rev: 1 })
+      .returning({ id: chatConversations.id }),
+    'chat',
+  );
+  const chatMessage = first(
+    await database
+      .insert(chatMessages)
+      .values({ conversationId: conversation.id, seq: 1, rev: 1, senderId: sales.id, senderName: sales.name, senderOrg: name, body: `Chat note from ${name}` })
+      .returning({ id: chatMessages.id }),
+    'chat message',
+  );
+  const chatFile = first(
+    await database
+      .insert(chatAttachments)
+      .values({ conversationId: conversation.id, partnerId: partner.id, messageId: chatMessage.id, uploaderId: sales.id, key: `chat/${conversation.id}/seed-${name}.pdf`, name: 'seed.pdf', mime: 'application/pdf', size: 100 })
+      .returning({ id: chatAttachments.id }),
+    'chat file',
+  );
   return {
     partnerId: partner.id,
     viewer: adminViewer,
@@ -471,6 +495,9 @@ const seedTenant = async (database: Db, name: string): Promise<TenantFixture> =>
     accessRequestId: request.id,
     documentId: document.id,
     openId: open.id,
+    conversationId: conversation.id,
+    chatMessageId: chatMessage.id,
+    chatAttachmentId: chatFile.id,
   };
 };
 

@@ -222,7 +222,7 @@ export const OUTBOX_OPS = [
 export type OutboxOp = (typeof OUTBOX_OPS)[number];
 
 /** The five switches on the Account screen. */
-export const NOTIFICATION_CATEGORIES = ['decision', 'stage', 'expiry', 'docs', 'team'] as const;
+export const NOTIFICATION_CATEGORIES = ['decision', 'stage', 'expiry', 'docs', 'team', 'messages'] as const;
 export type NotificationCategory = (typeof NOTIFICATION_CATEGORIES)[number];
 
 export const NOTIFICATION_KINDS = [
@@ -243,6 +243,7 @@ export const NOTIFICATION_KINDS = [
   'team_removed',
   'role_changed',
   'material_request_update',
+  'chat_mention',
 ] as const;
 export type NotificationKind = (typeof NOTIFICATION_KINDS)[number];
 
@@ -268,6 +269,7 @@ export const NOTIFICATION_CATEGORY_OF: Record<NotificationKind, NotificationCate
   team_removed: 'team',
   role_changed: 'team',
   material_request_update: 'docs',
+  chat_mention: 'messages',
 };
 
 export const CHECKLIST_STEPS = ['agreement', 'company', 'team', 'kickoff', 'playbook', 'deal'] as const;

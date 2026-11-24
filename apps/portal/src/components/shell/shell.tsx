@@ -203,7 +203,37 @@ export function Shell({
     }
   };
 
-  const countFor = (item: NavItem): string => (item.count === "approvals" && waiting > 0 ? String(waiting) : "");
+  const [chatUnread, setChatUnread] = useState(shell.messagesUnread);
+  // The Messages badge: refreshed every 30 seconds while the tab is in front, and when it comes back.
+  useEffect(() => {
+    let stopped = false;
+    const poll = async (): Promise<void> => {
+      if (document.visibilityState !== "visible") return;
+      try {
+        const response = await fetch("/api/chat/unread", { cache: "no-store", credentials: "same-origin" });
+        if (!response.ok || stopped) return;
+        const body: { unread?: number } = await response.json();
+        if (typeof body.unread === "number") setChatUnread(body.unread);
+      } catch {
+        // offline: keep the last number
+      }
+    };
+    const timer = setInterval(() => void poll(), 30_000);
+    document.addEventListener("visibilitychange", poll);
+    return () => {
+      stopped = true;
+      clearInterval(timer);
+      document.removeEventListener("visibilitychange", poll);
+    };
+  }, []);
+
+  const countFor = (item: NavItem): string => {
+    if (item.count === "approvals" && waiting > 0) return String(waiting);
+    if (item.count === "messages" && chatUnread > 0) return chatUnread > 99 ? "99+" : String(chatUnread);
+    return "";
+  };
+  const hintFor = (item: NavItem, count: string): string =>
+    item.count === "messages" ? `${count} unread ${chatUnread === 1 ? "message" : "messages"}` : `${count} ${waiting === 1 ? "deal" : "deals"} waiting for review`;
 
   const signOut = async (): Promise<void> => {
     const { error } = await settleAuth(() => authClient.signOut());
@@ -244,7 +274,7 @@ export function Shell({
                     <Icon name={item.icon} />
                     {item.label}
                     {count ? (
-                      <span className="nav-cnt" data-hint={`${count} ${waiting === 1 ? "deal" : "deals"} waiting for review`}>
+                      <span className="nav-cnt" data-hint={hintFor(item, count)}>
                         {count}
                       </span>
                     ) : null}

@@ -29,6 +29,8 @@ export const AUDIT_EVENTS = {
   'application.info_received': { kind: 'partners', action: 'Applicant answered a request for information' },
   'application.invite_reminder_sent': { kind: 'partners', action: 'Sent an unused invite reminder' },
   'partner.created': { kind: 'partners', action: 'Added partner' },
+  'chat.group_created': { kind: 'partners', action: 'Created a chat group' },
+  'chat.members_changed': { kind: 'partners', action: 'Changed chat group members' },
   'partner.manager_changed': { kind: 'partners', action: 'Changed partner manager' },
   'partner.category_changed': { kind: 'partners', action: 'Changed partner category' },
   'partner.renamed': { kind: 'partners', action: 'Renamed partner' },

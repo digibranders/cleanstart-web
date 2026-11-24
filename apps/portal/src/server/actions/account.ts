@@ -44,6 +44,7 @@ const prefsSchema = z.object({
   expiry: z.boolean(),
   docs: z.boolean(),
   team: z.boolean(),
+  messages: z.boolean(),
 }) satisfies z.ZodType<Record<NotificationCategory, boolean>>;
 const sessionSchema = z.object({ sessionId: z.string().uuid() });
 

@@ -27,27 +27,27 @@ const labels = (viewer: PartnerViewer | StaffViewer): string[] => navFor(viewer)
 
 describe("navFor", () => {
   it("gives a partner admin every partner item", () => {
-    expect(labels(partner("partner_admin"))).toEqual(["Overview", "Deals", "Register deal", "Documents", "Program", "Team", "Company", "Help"]);
+    expect(labels(partner("partner_admin"))).toEqual(["Overview", "Deals", "Register deal", "Documents", "Messages", "Program", "Team", "Company", "Help"]);
   });
 
   it("gives partner sales everything except Team", () => {
-    expect(labels(partner("sales"))).toEqual(["Overview", "Deals", "Register deal", "Documents", "Program", "Company", "Help"]);
+    expect(labels(partner("sales"))).toEqual(["Overview", "Deals", "Register deal", "Documents", "Messages", "Program", "Company", "Help"]);
   });
 
   it("gives a technical partner user Documents, Program and Company only", () => {
-    expect(labels(partner("technical"))).toEqual(["Documents", "Program", "Company", "Help"]);
+    expect(labels(partner("technical"))).toEqual(["Documents", "Messages", "Program", "Company", "Help"]);
   });
 
   it("gives a partner manager every admin item", () => {
-    expect(labels(staff("partner_manager"))).toEqual(["Overview", "Deals", "Partners", "Documents", "Reports", "Team", "Regions", "Audit log", "Help"]);
+    expect(labels(staff("partner_manager"))).toEqual(["Overview", "Deals", "Messages", "Partners", "Documents", "Reports", "Team", "Regions", "Audit log", "Help"]);
   });
 
   it("gives staff sales approvals, partners and reports", () => {
-    expect(labels(staff("sales"))).toEqual(["Overview", "Deals", "Partners", "Reports", "Help"]);
+    expect(labels(staff("sales"))).toEqual(["Overview", "Deals", "Messages", "Partners", "Reports", "Help"]);
   });
 
   it("gives marketing Overview only", () => {
-    expect(labels(staff("marketing"))).toEqual(["Overview", "Documents", "Help"]);
+    expect(labels(staff("marketing"))).toEqual(["Overview", "Messages", "Documents", "Help"]);
   });
 
   it("keeps the approvals count key on the approvals item", () => {

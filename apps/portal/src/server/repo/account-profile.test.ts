@@ -26,7 +26,7 @@ describe('getProfile', () => {
       partnerName: viewer.partnerName,
       twoFactorEnabled: false,
       passwordChangedAt: null,
-      notifications: { decision: true, stage: true, expiry: true, docs: true, team: true },
+      notifications: { decision: true, stage: true, expiry: true, docs: true, team: true, messages: true },
     });
   });
 
@@ -39,9 +39,9 @@ describe('getProfile', () => {
   it('shows stored switches over the defaults and never another person\'s', async () => {
     const mine = await asPartner(db, { role: 'sales' });
     const theirs = await asPartner(db, { partnerId: mine.partnerId, role: 'sales' });
-    await withViewer(theirs, (tx) => setNotificationPrefs(tx, theirs, { decision: false, stage: false, expiry: false, docs: true, team: false }));
+    await withViewer(theirs, (tx) => setNotificationPrefs(tx, theirs, { decision: false, stage: false, expiry: false, docs: true, team: false, messages: true }));
     const profile = await withViewer(mine, (tx) => getProfile(tx, mine));
-    expect(profile.notifications).toEqual({ decision: true, stage: true, expiry: true, docs: true, team: true });
+    expect(profile.notifications).toEqual({ decision: true, stage: true, expiry: true, docs: true, team: true, messages: true });
   });
 });
 
@@ -67,12 +67,12 @@ describe('updateProfile', () => {
 describe('setNotificationPrefs', () => {
   it('stores one row per category and overwrites on the next call', async () => {
     const viewer = await asPartner(db, {});
-    const first = await withViewer(viewer, (tx) => setNotificationPrefs(tx, viewer, { decision: false, stage: true, expiry: true, docs: true, team: false }));
-    expect(first).toEqual({ decision: false, stage: true, expiry: true, docs: true, team: false });
-    await withViewer(viewer, (tx) => setNotificationPrefs(tx, viewer, { decision: true, stage: true, expiry: true, docs: true, team: false }));
+    const first = await withViewer(viewer, (tx) => setNotificationPrefs(tx, viewer, { decision: false, stage: true, expiry: true, docs: true, team: false, messages: true }));
+    expect(first).toEqual({ decision: false, stage: true, expiry: true, docs: true, team: false, messages: true });
+    await withViewer(viewer, (tx) => setNotificationPrefs(tx, viewer, { decision: true, stage: true, expiry: true, docs: true, team: false, messages: true }));
     const rows = await db.select().from(notificationPrefs).where(eq(notificationPrefs.userId, viewer.id));
-    expect(rows).toHaveLength(5);
-    expect(Object.fromEntries(rows.map((r) => [r.category, r.email]))).toEqual({ decision: true, stage: true, expiry: true, docs: true, team: false });
+    expect(rows).toHaveLength(6);
+    expect(Object.fromEntries(rows.map((r) => [r.category, r.email]))).toEqual({ decision: true, stage: true, expiry: true, docs: true, team: false, messages: true });
   });
 });
 

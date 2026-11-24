@@ -12,6 +12,7 @@ import type { Tx } from './context';
 import { defineIsolation } from './isolation.registry';
 import { isAllRegions, regionName, scopeLabel } from '@/lib/regions';
 import { staffTeamLabel } from '@/lib/people';
+import { countUnread } from './chat';
 import { listRegions } from './regions';
 import { loadScope, scopeCondition } from '@/server/staff-scope';
 
@@ -38,6 +39,7 @@ async function waitingCount(tx: Tx, viewer: Viewer): Promise<number> {
 export async function getShell(tx: Tx, viewer: Viewer): Promise<ShellDto> {
   const base = { viewerId: viewer.id, viewerName: viewer.name, viewerEmail: viewer.email, kind: viewer.kind };
   const unreadNotifications = await unreadCount(tx, viewer.id);
+  const messagesUnread = await countUnread(tx, viewer, systemClock);
 
   if (viewer.kind === 'staff') {
     const region = isAllRegions(viewer.regions) ? '' : `, ${scopeLabel(viewer.regions, await listRegions(tx))}`;
@@ -49,6 +51,7 @@ export async function getShell(tx: Tx, viewer: Viewer): Promise<ShellDto> {
       manager: null,
       waitingApprovals: await waitingCount(tx, viewer),
       unreadNotifications,
+      messagesUnread,
     };
   }
 
@@ -78,6 +81,7 @@ export async function getShell(tx: Tx, viewer: Viewer): Promise<ShellDto> {
     manager: manager ? { id: manager.id, name: manager.name, email: manager.email, team: staffTeamLabel(await loadScope(tx, manager.id), regionList) } : null,
     waitingApprovals: 0,
     unreadNotifications,
+    messagesUnread,
   };
 }
 
@@ -147,7 +151,7 @@ export const isolation = defineIsolation<keyof typeof exportedFns>({
   updateProfile: { scope: 'tenant', probe: (tx, viewer) => updateProfile(tx, viewer, { name: viewer.name, title: null, phone: null }), expect: 'unchanged' },
   setNotificationPrefs: {
     scope: 'tenant',
-    probe: (tx, viewer) => setNotificationPrefs(tx, viewer, { decision: true, stage: true, expiry: true, docs: false, team: true }),
+    probe: (tx, viewer) => setNotificationPrefs(tx, viewer, { decision: true, stage: true, expiry: true, docs: false, team: true, messages: true }),
     expect: 'unchanged',
   },
   recordPasswordChanged: { scope: 'tenant', probe: (tx, viewer) => recordPasswordChanged(tx, viewer, systemClock), expect: 'unchanged' },

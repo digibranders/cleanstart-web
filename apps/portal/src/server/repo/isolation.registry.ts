@@ -16,6 +16,10 @@ export interface TenantFixture {
   accessRequestId: string;
   documentId: string;
   openId: string;
+  /** A chat of this partner with the sales user as its only member, one message in it and one attached file. */
+  conversationId: string;
+  chatMessageId: string;
+  chatAttachmentId: string;
 }
 
 export interface IsolationContext {

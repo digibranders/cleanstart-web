@@ -85,6 +85,13 @@
       "when": 1795700000000,
       "tag": "0011_dashboard_layouts",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1795800000000,
+      "tag": "0012_messages",
+      "breakpoints": true
     }
   ]
 }
