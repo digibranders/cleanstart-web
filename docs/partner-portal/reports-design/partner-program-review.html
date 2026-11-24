@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Partner Program Review, 26 Aug to 23 Nov 2026</title>
+<!-- Design mock. Every figure is read from the running portal (seed data, 23 Nov 2026), current period 26 Aug to 23 Nov 2026
+     and prior period 28 May to 25 Aug 2026. Fonts load from Google Fonts here only because this is a static mock;
+     the build uses next/font as the rest of the portal does. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+@page { size: A4; margin: 0 }
+* { box-sizing: border-box }
+:root {
+  --ink: #0F0E17; --ink2: #5E5B6E; --muted: #6B687D; --rule: #E4E2EA; --faint: #F4F3F7;
+  --navy: #120E20; --violet: #4B23C8; --violet-d: #2F1590; --violet-m: #5B2FE2; --violet-l: #8A66EA; --violet-xl: #D9CFF7; --violet-wash: #F1EEFB;
+  --prior: #C9C7D3;
+  --accepted: #22A05A; --pending: #D98A00; --rejected: #D23B3B; --won: #2B3CA8;
+  --p-img: #5B2FE2; --p-lib: #1F5BD6; --p-sight: #0E8FB3;
+}
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact }
+body { margin: 0; background: #E9E8EE; color: var(--ink); font-family: Manrope, ui-sans-serif, system-ui, sans-serif; font-size: 12.5px; line-height: 1.55; -webkit-font-smoothing: antialiased }
+.tnum { font-variant-numeric: tabular-nums }
+
+/* screen toolbar, hidden in print */
+.bar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 10px 24px; background: #FFFFFF; border-bottom: 1px solid var(--rule) }
+.bar b { font-size: 13px }
+.bar span.sub { color: var(--muted); font-size: 12px; margin-left: 10px }
+.bar .ctl { display: flex; align-items: center; gap: 10px }
+.seg { display: inline-flex; padding: 2px; border-radius: 7px; background: #F1F0F4; box-shadow: inset 0 0 0 1px #928FA5 }
+.seg button { height: 28px; padding: 0 12px; border: 0; border-radius: 5px; background: transparent; font: inherit; font-size: 12.5px; font-weight: 600; color: #5E5B6E; cursor: pointer }
+.seg button[aria-pressed="true"] { background: #FFFFFF; color: var(--ink); box-shadow: 0 1px 2px rgba(16,14,30,.10) }
+.btn { height: 30px; padding: 0 12px; border-radius: 7px; border: 0; background: var(--violet); color: #FFFFFF; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: inset 0 1px 0 rgba(255,255,255,.14), 0 1px 2px rgba(23,12,70,.2) }
+.btn:hover { background: #3F1CAD }
+button:focus-visible { outline: 2px solid #5B2FE2; outline-offset: 2px }
+
+/* page */
+.sheet { padding: 24px 0 }
+.page { position: relative; width: 210mm; height: 297mm; margin: 0 auto 24px; background: #FFFFFF; overflow: hidden; box-shadow: 0 1px 3px rgba(16,14,30,.10), 0 12px 32px rgba(16,14,30,.10); break-after: page; page-break-after: always }
+.page:last-child { break-after: auto; page-break-after: auto }
+.inner { position: absolute; inset: 0; padding: 15mm 16mm 0 }
+.run { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); padding-bottom: 8px; border-bottom: 1px solid var(--rule) }
+.foot { position: absolute; left: 16mm; right: 16mm; bottom: 10mm; display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); padding-top: 8px; border-top: 1px solid var(--rule) }
+h2.pt { margin: 22px 0 4px; font-size: 24px; line-height: 1.15; letter-spacing: -.02em; font-weight: 700 }
+.lede { margin: 0 0 18px; color: var(--ink2); font-size: 12.5px; max-width: 150mm }
+h3 { margin: 0 0 8px; font-size: 13.5px; letter-spacing: -.005em; font-weight: 700 }
+.cap { font-size: 10.5px; color: var(--muted) }
+.note { font-size: 10.5px; color: var(--muted); margin-top: 6px }
+.t-sec { color: var(--ink2) }
+.block { margin-top: 22px }
+
+/* cover */
+.cover { background: var(--navy); color: #FFFFFF }
+.cover .inner { padding: 16mm }
+.cover .top { display: flex; align-items: center; justify-content: space-between }
+.brandrow { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 15px; letter-spacing: -.01em }
+.brandrow small { font-weight: 500; font-size: 12.5px; color: #8D87A8 }
+.tag { font-size: 10.5px; font-weight: 600; color: #D4C9FF; padding: 3px 9px; border-radius: 99px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.22) }
+.cover h1 { margin: 38mm 0 0; font-size: 58px; line-height: 1.02; font-weight: 600; letter-spacing: -.035em; max-width: 140mm }
+.cover .per { margin: 16px 0 0; font-size: 19px; font-weight: 500; color: #CFC9E6; letter-spacing: -.01em }
+.cover .scope { margin: 4px 0 0; font-size: 13.5px; color: #8D87A8 }
+.art { position: absolute; left: 0; right: 0; top: 150mm }
+.art .row { display: flex; align-items: center; gap: 14px; margin-bottom: 9px }
+.art .bar-c { height: 17mm; border-radius: 0 3mm 3mm 0 }
+.art .fig { font-size: 40px; font-weight: 600; letter-spacing: -.03em; line-height: 1; font-variant-numeric: tabular-nums }
+.art .lab { font-size: 12.5px; color: #B3AECB; line-height: 1.25 }
+.coverfoot { position: absolute; left: 16mm; right: 16mm; bottom: 14mm; display: grid; grid-template-columns: 1.1fr 1fr 1fr; gap: 18px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,.14); font-size: 11px; color: #B3AECB }
+.coverfoot b { display: block; color: #FFFFFF; font-weight: 600; font-size: 12px; margin-bottom: 1px }
+
+/* summary */
+.headline { margin: 20px 0 20px; font-size: 27px; line-height: 1.18; letter-spacing: -.025em; font-weight: 600; max-width: 168mm }
+.kpis { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--ink); border-bottom: 1px solid var(--rule) }
+.kpi { padding: 12px 14px 12px 0; margin-left: 14px; border-left: 1px solid var(--rule); padding-left: 14px; margin-left: 0 }
+.kpi:first-child { border-left: 0; padding-left: 0 }
+.kpi .l { font-size: 11px; font-weight: 600; color: var(--ink2) }
+.kpi .v { font-size: 31px; font-weight: 600; letter-spacing: -.03em; line-height: 1.15; margin: 3px 0 1px; font-variant-numeric: tabular-nums }
+.kpi .d { font-size: 11px; color: var(--ink2); font-variant-numeric: tabular-nums }
+.pair { margin-top: 9px; display: grid; gap: 3px }
+.pair i { display: block; height: 5px; border-radius: 2px }
+.pair .a { background: var(--prior) }
+.pair .b { background: var(--violet) }
+.legend { display: flex; gap: 14px; margin-top: 7px; font-size: 10.5px; color: var(--muted) }
+.legend s { display: inline-block; width: 14px; height: 5px; border-radius: 2px; margin-right: 5px; vertical-align: middle; text-decoration: none }
+dl.find { margin: 0; display: grid; grid-template-columns: 26mm 1fr; border-top: 1px solid var(--ink) }
+dl.find dt, dl.find dd { margin: 0; padding: 10px 0; border-bottom: 1px solid var(--rule) }
+dl.find dt { font-weight: 700; font-size: 12.5px }
+dl.find dd { color: var(--ink2) }
+dl.find dd b { color: var(--ink); font-weight: 600 }
+.attn { margin-top: 20px; padding: 14px 16px; border-radius: 10px; background: #FAFAFB; box-shadow: inset 0 0 0 1px var(--rule) }
+.attn ol { margin: 6px 0 0; padding-left: 18px }
+.attn li { margin: 3px 0; color: var(--ink2) }
+.attn li b { color: var(--ink); font-weight: 600 }
+
+/* tables */
+table { width: 100%; border-collapse: collapse; font-size: 11.5px }
+th { text-align: left; font-size: 10.5px; font-weight: 600; color: var(--muted); padding: 6px 8px; border-bottom: 1px solid var(--ink) }
+td { padding: 7px 8px; border-bottom: 1px solid var(--faint); vertical-align: middle }
+tr:last-child td { border-bottom: 0 }
+th.r, td.r { text-align: right }
+th:first-child, td:first-child { padding-left: 0 }
+th:last-child, td:last-child { padding-right: 0 }
+tfoot td { border-top: 1px solid var(--rule); font-weight: 600 }
+.sw { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 8px; vertical-align: -1px }
+.minibar { display: block; height: 7px; border-radius: 2px; position: relative; min-width: 2px }
+.minibar i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 2px }
+.muted { color: var(--muted) }
+
+/* pipeline */
+.two { display: grid; grid-template-columns: 1.35fr 1fr; gap: 10mm }
+.fun { display: grid; grid-template-columns: 30mm 1fr; row-gap: 22px; align-items: center }
+.fun .name { font-size: 12px; font-weight: 600 }
+.fun .name span { display: block; font-weight: 400; font-size: 10.5px; color: var(--muted) }
+.fb { height: 30px; border-radius: 0 4px 4px 0; display: flex; align-items: center; padding-left: 8px; color: #FFFFFF; font-weight: 700; font-size: 12px; font-variant-numeric: tabular-nums }
+.fp { height: 8px; background: var(--prior); border-radius: 0 2px 2px 0; margin-top: 3px }
+.stack { display: flex; gap: 2px; height: 26px; margin: 8px 0 10px }
+.stack i { display: block; border-radius: 3px }
+.stk { display: grid; gap: 4px; font-size: 11.5px }
+.stk div { display: flex; justify-content: space-between; gap: 8px }
+.stk span.k { display: inline-flex; align-items: center }
+.stk b { font-variant-numeric: tabular-nums; font-weight: 600 }
+
+
+.ps { display: grid; grid-template-columns: 36mm 1fr; row-gap: 12px; align-items: center }
+.ps .nm { font-size: 12px; font-weight: 600 }
+.ps .nm span { display: block; font-weight: 400; font-size: 10.5px; color: var(--muted) }
+.ps .sg { display: flex; gap: 2px; height: 28px }
+.ps .sg i { display: flex; align-items: center; justify-content: center; border-radius: 3px; color: #FFFFFF; font-size: 11.5px; font-weight: 700; font-style: normal; font-variant-numeric: tabular-nums }
+
+/* partners */
+.stat { display: grid; grid-template-columns: 62mm 1fr; gap: 10mm; align-items: end; padding-bottom: 6px }
+.stat .big { font-size: 72px; line-height: .95; letter-spacing: -.045em; font-weight: 600; color: var(--violet) }
+.stat p { margin: 0; color: var(--ink2); font-size: 13px; max-width: 95mm }
+.stat p b { color: var(--ink); font-weight: 600 }
+
+/* decisions */
+.axis { position: relative; margin: 8px 0 0 28mm; height: 0 }
+.tt { display: grid; grid-template-columns: 28mm 1fr; row-gap: 22px; align-items: center; position: relative }
+.tt .nm { font-size: 12px; font-weight: 600 }
+.tt .nm span { display: block; font-weight: 400; font-size: 10.5px; color: var(--muted) }
+.tt .tr { position: relative }
+.tt .tr i { display: flex; align-items: center; height: 20px; border-radius: 0 3px 3px 0; padding-left: 6px; font-size: 10.5px; font-weight: 700; color: #FFFFFF; font-variant-numeric: tabular-nums }
+.tt .tr i.a { background: var(--prior); color: #3A3848; margin-bottom: 4px; height: 16px }
+.tt .tr i.b { background: var(--violet) }
+.ttw { position: relative; padding-top: 20px }
+.tov { position: absolute; left: 28mm; right: 0; top: 0; bottom: -4px; pointer-events: none }
+.target { position: absolute; top: 16px; bottom: 0; width: 0; border-left: 1.5px dashed var(--ink2) }
+.tlab { position: absolute; top: 0; font-size: 10px; color: var(--ink2); white-space: nowrap; transform: translateX(-50%) }
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 10mm }
+.hb { display: grid; grid-template-columns: 1fr; gap: 11px }
+.hb .r1 { display: flex; justify-content: space-between; gap: 10px; font-size: 11.5px; margin-bottom: 4px }
+.hb .r1 b { font-variant-numeric: tabular-nums; font-weight: 600 }
+.hb .t { height: 7px; border-radius: 2px }
+
+/* appendix */
+.def { display: grid; grid-template-columns: 38mm 1fr; border-top: 1px solid var(--ink) }
+.def dt, .def dd { margin: 0; padding: 8px 0; border-bottom: 1px solid var(--faint); font-size: 11.5px }
+.def dt { font-weight: 700 }
+.def dd { color: var(--ink2) }
+.about { margin-top: 20px; padding: 14px 16px; border-radius: 10px; background: #FAFAFB; box-shadow: inset 0 0 0 1px var(--rule); display: grid; grid-template-columns: 1fr 1fr; gap: 10px 18px; font-size: 11.5px }
+.about b { display: block; font-size: 10.5px; color: var(--muted); font-weight: 600 }
+
+[data-edition="shareable"] [data-internal] { display: none !important }
+.embed { background: #FFFFFF }
+.embed .bar { display: none }
+.embed .sheet { padding: 0 }
+.embed .page { margin: 0 auto; box-shadow: none }
+@media print {
+  body { background: #FFFFFF }
+  .bar { display: none }
+  .sheet { padding: 0 }
+  .page { margin: 0; box-shadow: none }
+}
+</style>
+</head>
+<body data-edition="internal">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="mk" x1="12.39" y1="20.14" x2="27.87" y2="20.51" gradientUnits="userSpaceOnUse"><stop stop-color="#9A51FF"/><stop offset="1" stop-color="#2CC1EB"/></linearGradient>
+    <symbol id="mark" viewBox="0 0 27.8 32">
+      <path d="M24.2359 10.3234V22.0554L15.709 27.1983V15.2722L12.3945 17.1973L12.4877 17.2505V31.1486L13.898 31.9969L27.7958 23.8114V8.32319L27.7368 8.28876L24.2359 10.3234Z" fill="url(#mk)"/>
+      <path d="M15.7088 15.219L5.10062 8.92732L14.0283 3.991L24.2326 9.87577V10.3203L27.7335 8.28563L13.8295 0L0 8.32006V23.6079L3.22439 25.5518V11.7695L12.3943 17.1942L15.7088 15.2691V15.219Z" fill="#fff"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="bar">
+  <div><b>Partner Program Review</b><span class="sub">6 pages, A4, 26 Aug to 23 Nov 2026</span></div>
+  <div class="ctl">
+    <span class="cap">Edition</span>
+    <div class="seg" role="group" aria-label="Edition">
+      <button type="button" id="ed-int" aria-pressed="true">Internal</button>
+      <button type="button" id="ed-sh" aria-pressed="false">Shareable</button>
+    </div>
+    <button type="button" class="btn" onclick="window.print()">Print or save PDF</button>
+  </div>
+</div>
+
+<main class="sheet">
+
+<!-- 1 cover -->
+<section class="page cover" aria-label="Cover">
+  <div class="inner">
+    <div class="top">
+      <div class="brandrow"><svg width="22" height="25" aria-hidden="true"><use href="#mark"/></svg><span>CleanStart <small>Partner Portal</small></span></div>
+      <span class="tag" id="cover-tag">Internal</span>
+    </div>
+    <h1>Partner Program Review</h1>
+    <p class="per">26 August to 23 November 2026</p>
+    <p class="scope">India, 7 partners, compared with 28 May to 25 Aug 2026</p>
+
+    <div class="art" aria-label="Deals registered, approved and won this period: 18, 10 and 3">
+      <div class="row"><div class="bar-c" style="width:62%;background:#8A66EA"></div><div><div class="fig">18</div><div class="lab">registered</div></div></div>
+      <div class="row"><div class="bar-c" style="width:34.5%;background:#5B2FE2"></div><div><div class="fig">10</div><div class="lab">approved</div></div></div>
+      <div class="row"><div class="bar-c" style="width:10.3%;background:#D9CFF7"></div><div><div class="fig">3</div><div class="lab">won</div></div></div>
+    </div>
+
+    <div class="coverfoot">
+      <div><b>Prepared by Gaurav Jadhav</b>Partner manager, India</div>
+      <div><b>Generated</b>23 Nov 2026, 14:41 UTC</div>
+      <div><b>Confidential</b><span id="cover-conf">For CleanStart internal use</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 2 summary -->
+<section class="page" aria-label="Summary">
+  <div class="inner">
+    <div class="run"><span>Partner Program Review</span><span>26 Aug to 23 Nov 2026, India</span></div>
+    <h2 class="pt">Summary</h2>
+    <p class="headline">Deal registrations more than doubled to 18. Won value eased to $242K, and <span data-anon="One partner" data-name="Kestrel Systems">Kestrel Systems</span> carried most of it.</p>
+
+    <div class="kpis" role="list">
+      <div class="kpi" role="listitem"><div class="l">Deals registered</div><div class="v">18</div><div class="d">+157% from 7</div>
+        <div class="pair" aria-hidden="true"><i class="a" style="width:38.9%"></i><i class="b" style="width:100%"></i></div></div>
+      <div class="kpi" role="listitem"><div class="l">Registered value</div><div class="v">$1.0M</div><div class="d">+89% from $529.5K</div>
+        <div class="pair" aria-hidden="true"><i class="a" style="width:52.8%"></i><i class="b" style="width:100%"></i></div></div>
+      <div class="kpi" role="listitem"><div class="l">Won value</div><div class="v">$242K</div><div class="d">-10.5% from $270.5K</div>
+        <div class="pair" aria-hidden="true"><i class="a" style="width:100%"></i><i class="b" style="width:89.5%"></i></div></div>
+      <div class="kpi" role="listitem"><div class="l">Median days to decision</div><div class="v">2</div><div class="d">+1 day from 1 day</div>
+        <div class="pair" aria-hidden="true"><i class="a" style="width:50%"></i><i class="b" style="width:100%"></i></div></div>
+    </div>
+    <div class="legend"><span><s style="background:var(--prior)"></s>Last period, 28 May to 25 Aug</span><span><s style="background:var(--violet)"></s>This period</span></div>
+    <p class="note">Value figures count deals with a USD value. 5 of 18 deals this period have none, so values are a floor.</p>
+
+    <div class="block">
+      <h3>What changed</h3>
+      <dl class="find">
+        <dt>Volume</dt><dd><b>18 deals were registered, up from 7.</b> Approval fell from 6 of 7 (86%) to 10 of 18 (56%) while 4 deals still wait for a first decision.</dd>
+        <dt>Value</dt><dd><b>Registered value reached $1.0M, up 89%.</b> Won value was $242K from 3 deals, 10.5% below the $270.5K won from 3 deals last period.</dd>
+        <dt>Conversion</dt><dd><b>The 100% win rate rests on 3 closed deals.</b> Seven approved deals are still open, so treat the rate as early.</dd>
+        <dt>Concentration</dt><dd><b><span data-anon="One partner" data-name="Kestrel Systems">Kestrel Systems</span> registered 10 of 18 deals (56%)</b> and holds $207K of the $242K won (86%).</dd>
+        <dt>Speed</dt><dd><b>Median time to a first decision rose from 1 to 2 days.</b> The slowest tenth took 10.5 days, against 3.1 days last period.</dd>
+      </dl>
+    </div>
+
+    <div class="attn">
+      <h3>Needs attention</h3>
+      <ol>
+        <li><b>Decide the 4 deals still waiting.</b> 3 of them are past the 2 day target.</li>
+        <li><b>Review CleanStart Images.</b> 2 of 7 deals were approved and none has been won.</li>
+        <li data-internal><b>Follow up with 2 partners.</b> Meghdoot Systems has registered no deal since accepting the agreement on 30 Oct. Ironleaf Consulting has not signed in since 2 Aug.</li>
+      </ol>
+    </div>
+  </div>
+  <div class="foot"><span>CleanStart Partner Portal</span><span class="ed">Internal</span><span>Page 2 of 6</span></div>
+</section>
+
+<!-- 3 pipeline -->
+<section class="page" aria-label="Pipeline">
+  <div class="inner">
+    <div class="run"><span>Partner Program Review</span><span>26 Aug to 23 Nov 2026, India</span></div>
+    <h2 class="pt">Pipeline</h2>
+    <p class="lede">Of 18 deals registered, 10 were approved and 3 are won. Clean Libraries converts best. CleanStart Images has the most deals and no wins yet.</p>
+
+    <div class="two">
+      <div>
+        <h3>Funnel, this period against last</h3>
+        <div class="fun" aria-label="Funnel: registered 18 against 7, approved 10 against 6, won 3 against 3">
+          <div class="name">Registered<span>All deals</span></div>
+          <div><div class="fb" style="width:100%;background:#8A66EA">18</div><div class="fp" style="width:38.9%"></div></div>
+          <div class="name">Approved<span>56% of registered</span></div>
+          <div><div class="fb" style="width:55.6%;background:#5B2FE2">10</div><div class="fp" style="width:33.3%"></div></div>
+          <div class="name">Won<span>30% of approved</span></div>
+          <div><div class="fb" style="width:16.7%;background:#2F1590">3</div><div class="fp" style="width:16.7%"></div></div>
+        </div>
+        <div class="legend"><span><s style="background:var(--violet-d)"></s>This period</span><span><s style="background:var(--prior)"></s>Last period: 7 registered, 6 approved, 3 won</span></div>
+      </div>
+      <div>
+        <h3>Where the 18 deals stand</h3>
+        <div class="stack" role="img" aria-label="3 won, 7 approved and open, 4 waiting, 4 rejected">
+          <i style="width:16.7%;background:var(--won)"></i><i style="width:38.9%;background:var(--accepted)"></i><i style="width:22.2%;background:var(--pending)"></i><i style="width:22.2%;background:var(--rejected)"></i>
+        </div>
+        <div class="stk">
+          <div><span class="k"><span class="sw" style="background:var(--won)"></span>Won</span><b>3</b></div>
+          <div><span class="k"><span class="sw" style="background:var(--accepted)"></span>Approved, still open</span><b>7</b></div>
+          <div><span class="k"><span class="sw" style="background:var(--pending)"></span>Waiting for a decision</span><b>4</b></div>
+          <div><span class="k"><span class="sw" style="background:var(--rejected)"></span>Rejected</span><b>4</b></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <h3>How each product's deals ended up</h3>
+      <div class="ps" role="img" aria-label="CleanStart Images: 0 won, 2 approved and open, 5 not approved. Clean Libraries: 2 won, 3 open, 1 not approved. CleanSight: 1 won, 2 open, 2 not approved.">
+        <div class="nm">CleanStart Images<span>7 deals</span></div>
+        <div class="sg" style="width:100%"><i style="width:28.6%;background:var(--accepted)">2</i><i style="width:71.4%;background:#D9D7E2;color:#3A3848">5</i></div>
+        <div class="nm">Clean Libraries<span>6 deals</span></div>
+        <div class="sg" style="width:85.7%"><i style="width:33.3%;background:var(--won)">2</i><i style="width:50%;background:var(--accepted)">3</i><i style="width:16.7%;background:#D9D7E2;color:#3A3848">1</i></div>
+        <div class="nm">CleanSight<span>5 deals</span></div>
+        <div class="sg" style="width:71.4%"><i style="width:20%;background:var(--won)">1</i><i style="width:40%;background:var(--accepted)">2</i><i style="width:40%;background:#D9D7E2;color:#3A3848">2</i></div>
+      </div>
+      <div class="legend"><span><s style="background:var(--won)"></s>Won</span><span><s style="background:var(--accepted)"></s>Approved, still open</span><span><s style="background:#D9D7E2"></s>Not approved: waiting or rejected</span></div>
+    </div>
+
+    <div class="block">
+      <h3>By product</h3>
+      <table>
+        <thead><tr><th>Product</th><th class="r">Deals</th><th class="r">Approved</th><th class="r">Won</th><th class="r">Won value</th><th style="width:44mm">Registered value</th></tr></thead>
+        <tbody>
+          <tr><td><span class="sw" style="background:var(--p-img)"></span>CleanStart Images</td><td class="r tnum">7</td><td class="r tnum">2 <span class="muted">(29%)</span></td><td class="r tnum">0</td><td class="r tnum">$0</td>
+            <td><span class="minibar" style="width:75.3%;background:#DDD3F8"><i style="width:0;background:var(--p-img)"></i></span><span class="cap tnum">$334K</span></td></tr>
+          <tr><td><span class="sw" style="background:var(--p-lib)"></span>Clean Libraries</td><td class="r tnum">6</td><td class="r tnum">5 <span class="muted">(83%)</span></td><td class="r tnum">2</td><td class="r tnum">$97K</td>
+            <td><span class="minibar" style="width:50.7%;background:#CFDDF8"><i style="width:43.1%;background:var(--p-lib)"></i></span><span class="cap tnum">$225K</span></td></tr>
+          <tr><td><span class="sw" style="background:var(--p-sight)"></span>CleanSight</td><td class="r tnum">5</td><td class="r tnum">3 <span class="muted">(60%)</span></td><td class="r tnum">1</td><td class="r tnum">$145K</td>
+            <td><span class="minibar" style="width:100%;background:#C9E8F0"><i style="width:32.7%;background:var(--p-sight)"></i></span><span class="cap tnum">$443.5K</span></td></tr>
+        </tbody>
+        <tfoot><tr><td>All products</td><td class="r tnum">18</td><td class="r tnum">10</td><td class="r tnum">3</td><td class="r tnum">$242K</td><td class="tnum">$1.0M</td></tr></tfoot>
+      </table>
+      <p class="note">The darker part of each bar is the value already won. 5 deals have no USD value and are not in these totals.</p>
+    </div>
+  </div>
+  <div class="foot"><span>CleanStart Partner Portal</span><span class="ed">Internal</span><span>Page 3 of 6</span></div>
+</section>
+
+<!-- 4 partners -->
+<section class="page" aria-label="Partners">
+  <div class="inner">
+    <div class="run"><span>Partner Program Review</span><span>26 Aug to 23 Nov 2026, India</span></div>
+    <h2 class="pt">Partners</h2>
+    <p class="lede">Five partners registered deals this period. Two onboarded partners did not.</p>
+
+    <div class="stat">
+      <div class="big tnum">86%</div>
+      <p>of won value came from <b data-anon="one partner" data-name="Kestrel Systems">Kestrel Systems</b>: $207K of $242K, from 10 of the 18 deals registered.</p>
+    </div>
+
+    <div class="block">
+      <h3>Leaderboard</h3>
+      <table>
+        <thead><tr><th>Partner</th><th class="r">Deals</th><th style="width:34mm"></th><th class="r">Won</th><th class="r">Won value</th></tr></thead>
+        <tbody>
+          <tr><td data-anon="Partner A" data-name="Kestrel Systems">Kestrel Systems</td><td class="r tnum">10</td><td><span class="minibar" style="width:100%;background:var(--violet)"></span></td><td class="r tnum">2</td><td class="r tnum">$207K</td></tr>
+          <tr><td data-anon="Partner B" data-name="Seed partner 08">Seed partner 08</td><td class="r tnum">3</td><td><span class="minibar" style="width:30%;background:var(--violet)"></span></td><td class="r tnum">1</td><td class="r tnum">$35K</td></tr>
+          <tr><td data-anon="Partner C" data-name="Saffron Secure">Saffron Secure</td><td class="r tnum">3</td><td><span class="minibar" style="width:30%;background:var(--violet)"></span></td><td class="r tnum">0</td><td class="r tnum">$0</td></tr>
+          <tr><td data-anon="Partner D" data-name="Seed partner 04">Seed partner 04</td><td class="r tnum">1</td><td><span class="minibar" style="width:10%;background:var(--violet)"></span></td><td class="r tnum">0</td><td class="r tnum">$0</td></tr>
+          <tr><td data-anon="Partner E" data-name="Vyom Digital">Vyom Digital</td><td class="r tnum">1</td><td><span class="minibar" style="width:10%;background:var(--violet)"></span></td><td class="r tnum">0</td><td class="r tnum">$0</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="block" data-internal>
+      <h3>By partner manager</h3>
+      <table>
+        <thead><tr><th>Manager</th><th class="r">Deals</th><th class="r">Won value</th><th class="r">Win rate</th></tr></thead>
+        <tbody>
+          <tr><td>Gaurav Jadhav <span class="muted">India</span></td><td class="r tnum">14</td><td class="r tnum">$207K</td><td class="r tnum">100%</td></tr>
+          <tr><td>Omar Nasser</td><td class="r tnum">4</td><td class="r tnum">$35K</td><td class="r tnum">100%</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="block">
+      <h3>All time, to 23 Nov 2026</h3>
+      <table>
+        <thead><tr><th>Partner</th><th>Category</th><th class="r">Registered</th><th class="r">Accepted</th><th class="r">Accept rate</th><th class="r">Won</th><th class="r">Protected now</th></tr></thead>
+        <tbody>
+          <tr><td data-anon="Partner A" data-name="Kestrel Systems">Kestrel Systems</td><td class="t-sec">Channel partner</td><td class="r tnum">17</td><td class="r tnum">13</td><td class="r tnum">87%</td><td class="r tnum">4</td><td class="r tnum">5</td></tr>
+          <tr><td data-anon="Partner C" data-name="Saffron Secure">Saffron Secure</td><td class="t-sec">Distributor</td><td class="r tnum">6</td><td class="r tnum">3</td><td class="r tnum">60%</td><td class="r tnum">0</td><td class="r tnum">1</td></tr>
+          <tr><td data-anon="Partner B" data-name="Seed partner 08">Seed partner 08</td><td class="t-sec">Channel partner</td><td class="r tnum">4</td><td class="r tnum">2</td><td class="r tnum">67%</td><td class="r tnum">1</td><td class="r tnum">1</td></tr>
+          <tr><td data-anon="Partner E" data-name="Vyom Digital">Vyom Digital</td><td class="t-sec">Channel partner</td><td class="r tnum">4</td><td class="r tnum">3</td><td class="r tnum">75%</td><td class="r tnum">0</td><td class="r tnum">1</td></tr>
+          <tr><td data-anon="Partner D" data-name="Seed partner 04">Seed partner 04</td><td class="t-sec">Channel partner</td><td class="r tnum">2</td><td class="r tnum">1</td><td class="r tnum">50%</td><td class="r tnum">1</td><td class="r tnum">0</td></tr>
+          <tr><td data-anon="Partner F" data-name="Ironleaf Consulting">Ironleaf Consulting</td><td class="t-sec">Channel partner</td><td class="r tnum">0</td><td class="r tnum">0</td><td class="r muted">None yet</td><td class="r tnum">0</td><td class="r tnum">0</td></tr>
+          <tr><td data-anon="Partner G" data-name="Meghdoot Systems">Meghdoot Systems</td><td class="t-sec">Channel partner</td><td class="r tnum">0</td><td class="r tnum">0</td><td class="r muted">None yet</td><td class="r tnum">0</td><td class="r tnum">0</td></tr>
+        </tbody>
+        <tfoot><tr><td>All partners</td><td></td><td class="r tnum">33</td><td class="r tnum">22</td><td class="r tnum">76%</td><td class="r tnum">6</td><td class="r tnum">8</td></tr></tfoot>
+      </table>
+    </div>
+  </div>
+  <div class="foot"><span>CleanStart Partner Portal</span><span class="ed">Internal</span><span>Page 4 of 6</span></div>
+</section>
+
+<!-- 5 decisions and quality -->
+<section class="page" aria-label="Decisions and quality">
+  <div class="inner">
+    <div class="run"><span>Partner Program Review</span><span>26 Aug to 23 Nov 2026, India</span></div>
+    <h2 class="pt">Decisions and quality</h2>
+    <p class="lede">Decisions are slower at the tail. Two of the four rejections were avoidable with a customer lookup before registering.</p>
+
+    <h3>Time to first decision, in days</h3>
+    <div class="ttw" role="img" aria-label="Median 2 days against 1. 90th percentile 10.5 days against 3.1. Target 2 days.">
+      <div class="tt">
+        <div class="nm">Median<span>14 decided, 4 waiting</span></div>
+        <div class="tr"><i class="a" style="width:8.3%">1</i><i class="b" style="width:16.7%">2</i></div>
+        <div class="nm">90th percentile<span>last period 4 decided</span></div>
+        <div class="tr"><i class="a" style="width:25.8%">3.1</i><i class="b" style="width:87.5%">10.5</i></div>
+      </div>
+      <div class="tov" aria-hidden="true"><span class="target" style="left:16.7%"></span><span class="tlab" style="left:16.7%">2 day target</span></div>
+    </div>
+    <div class="legend"><span><s style="background:var(--violet)"></s>This period</span><span><s style="background:var(--prior)"></s>Last period</span></div>
+    <p class="note">Bars count calendar days from registration, or from resubmission after a rejection. The 2 day target counts business days.</p>
+
+    <div class="cols block">
+      <div>
+        <h3>Why deals were rejected</h3>
+        <p class="cap" style="margin:-4px 0 12px">4 of 18 deals (22%). Reasons are grouped for this report.</p>
+        <div class="hb">
+          <div><div class="r1"><span>Customer already has a CleanStart account</span><b>2</b></div><div class="t" style="width:100%;background:var(--rejected)"></div></div>
+          <div><div class="r1"><span>Customer outside the partner territory</span><b>1</b></div><div class="t" style="width:50%;background:var(--rejected)"></div></div>
+          <div><div class="r1"><span>Opportunity could not be confirmed</span><b>1</b></div><div class="t" style="width:50%;background:var(--rejected)"></div></div>
+        </div>
+      </div>
+      <div>
+        <h3>Document engagement</h3>
+        <p class="cap" style="margin:-4px 0 12px">6 of 6 active partners opened at least one document.</p>
+        <div class="hb">
+          <div><div class="r1"><span>Partner sales playbook 2026</span><b>49</b></div><div class="t" style="width:100%;background:var(--violet)"></div></div>
+          <div><div class="r1"><span>Competitive battlecard</span><b>37</b></div><div class="t" style="width:75.5%;background:var(--violet)"></div></div>
+          <div><div class="r1"><span>Clean Libraries solution sheet</span><b>24</b></div><div class="t" style="width:49%;background:var(--violet)"></div></div>
+          <div><div class="r1"><span>CleanSight product walkthrough</span><b>20</b></div><div class="t" style="width:40.8%;background:var(--violet)"></div></div>
+          <div><div class="r1"><span>CleanStart Images datasheet</span><b>20</b></div><div class="t" style="width:40.8%;background:var(--violet)"></div></div>
+        </div>
+        <p class="note">Figures are opens in the period.</p>
+      </div>
+    </div>
+
+    <div class="block" data-internal>
+      <h3>Partners to follow up</h3>
+      <table>
+        <thead><tr><th>Partner</th><th>Reason</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Meghdoot Systems</td><td class="t-sec">Agreement accepted 30 Oct, no deal registered yet</td><td>Onboarding</td></tr>
+          <tr><td>Ironleaf Consulting</td><td class="t-sec">No sign-in since 2 Aug</td><td>Inactive</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="foot"><span>CleanStart Partner Portal</span><span class="ed">Internal</span><span>Page 5 of 6</span></div>
+</section>
+
+<!-- 6 method -->
+<section class="page" aria-label="Method and definitions">
+  <div class="inner">
+    <div class="run"><span>Partner Program Review</span><span>26 Aug to 23 Nov 2026, India</span></div>
+    <h2 class="pt">Method and definitions</h2>
+    <p class="lede">How the figures were produced, so any number in this report can be checked in the portal.</p>
+
+    <dl class="def">
+      <dt>Registered deal</dt><dd>A deal a partner submitted in the period, counted on the day it was submitted.</dd>
+      <dt>Approved</dt><dd>A registered deal accepted by CleanStart. Won deals are also approved.</dd>
+      <dt>Won</dt><dd>A deal marked closed won in HubSpot.</dd>
+      <dt>Win rate</dt><dd>Won deals divided by won plus lost deals. Open deals are left out, so the rate moves as they close.</dd>
+      <dt>Registered value</dt><dd>The sum of USD values on registered deals. Deals with no USD value, or a value in another currency, are counted as deals but add nothing to value.</dd>
+      <dt>Time to decision</dt><dd>Calendar days from registration to the first accept or reject. After a rejection and resubmission the clock restarts at the resubmission. The portal Overview shows an average in business days, so its figure differs from the median here.</dd>
+      <dt>Protected now</dt><dd>Deals currently inside their protection window.</dd>
+      <dt>Comparison</dt><dd>The prior period has the same length and ends the day before this one starts: 28 May to 25 Aug 2026, 90 days.</dd>
+    </dl>
+
+    <div class="about">
+      <div><b>Scope</b>Partners in India, the regions the preparer manages</div>
+      <div><b>Edition</b><span class="ed">Internal</span></div>
+      <div><b>Prepared by</b>Gaurav Jadhav, Partner manager, India</div>
+      <div><b>Generated</b>23 Nov 2026, 14:41 UTC</div>
+      <div><b>Sources</b>CleanStart Partner Portal, HubSpot closed won status</div>
+      <div><b>Comparison</b>28 May to 25 Aug 2026</div>
+    </div>
+
+    <div class="block">
+      <h3>Reading notes</h3>
+      <p class="t-sec" style="margin:0;max-width:160mm">The two partners with no registrations are onboarding or inactive and are listed so the all time totals match the portal. Free-text rejection reasons can name customers, so this report groups them and the full text stays in the portal.</p>
+    </div>
+  </div>
+  <div class="foot"><span>CleanStart Partner Portal</span><span class="ed">Internal</span><span>Page 6 of 6</span></div>
+</section>
+
+</main>
+
+<script>
+(() => {
+  const body = document.body;
+  const swap = (shareable) => {
+    body.dataset.edition = shareable ? 'shareable' : 'internal';
+    document.querySelectorAll('[data-anon]').forEach((el) => { el.textContent = shareable ? el.dataset.anon : el.dataset.name; });
+    document.querySelectorAll('.ed').forEach((el) => { el.textContent = shareable ? 'Shareable edition' : 'Internal'; });
+    document.getElementById('cover-tag').textContent = shareable ? 'Shareable edition' : 'Internal';
+    document.getElementById('cover-conf').textContent = shareable ? 'Partner names and contacts removed' : 'For CleanStart internal use';
+    document.getElementById('ed-int').setAttribute('aria-pressed', String(!shareable));
+    document.getElementById('ed-sh').setAttribute('aria-pressed', String(shareable));
+  };
+  document.getElementById('ed-int').addEventListener('click', () => swap(false));
+  document.getElementById('ed-sh').addEventListener('click', () => swap(true));
+  const q = new URLSearchParams(location.search);
+  if (q.get('edition') === 'shareable') swap(true);
+  if (q.get('embed')) body.classList.add('embed');
+  if (location.hash === '#print') window.addEventListener('load', () => window.print());
+})();
+</script>
+</body>
+</html>

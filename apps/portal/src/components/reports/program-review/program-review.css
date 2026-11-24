@@ -1,0 +1,169 @@
+/* Partner Program Review. Every class is prefixed pr- and sits under .pr, so none of it can touch the portal's own
+   .kpi, .seg, .btn or .bar rules. Page size and print resets live in print-route.css, which only the print route imports. */
+.pr {
+  --ink: #0F0E17; --ink2: #5E5B6E; --muted: #6B687D; --rule: #E4E2EA; --faint: #F4F3F7;
+  --navy: #120E20; --violet: #4B23C8; --violet-d: #2F1590; --prior: #C9C7D3;
+  --accepted: #22A05A; --pending: #D98A00; --rejected: #D23B3B; --won: #2B3CA8; --lost: #7A7790; --expired: #B8B5C6;
+  color: var(--ink);
+  font-family: var(--font-manrope), Manrope, ui-sans-serif, system-ui, sans-serif;
+  font-size: 12.5px;
+  line-height: 1.55;
+  font-variant-numeric: tabular-nums;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.pr *, .pr *::before, .pr *::after { box-sizing: border-box }
+
+/* screen toolbar, never printed */
+.pr-bar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 10px 24px; background: #FFFFFF; border-bottom: 1px solid var(--rule); font-size: 12.5px }
+.pr-bar-t { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap }
+.pr-bar-t b { font-size: 13px }
+.pr-bar-t span { color: var(--muted) }
+.pr-ctl { display: flex; align-items: center; gap: 10px }
+.pr-seg { display: inline-flex; padding: 2px; border-radius: 7px; background: #F1F0F4; box-shadow: inset 0 0 0 1px #928FA5 }
+.pr-seg a { display: inline-flex; align-items: center; height: 28px; padding: 0 12px; border-radius: 5px; font-weight: 600; color: #5E5B6E; text-decoration: none }
+.pr-seg a:hover { text-decoration: none; color: var(--ink) }
+.pr-seg a[aria-current="true"] { background: #FFFFFF; color: var(--ink); box-shadow: 0 1px 2px rgba(16,14,30,.10) }
+.pr-btn { height: 30px; padding: 0 12px; border: 0; border-radius: 7px; background: var(--violet); color: #FFFFFF; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: inset 0 1px 0 rgba(255,255,255,.14), 0 1px 2px rgba(23,12,70,.2) }
+.pr-btn:hover { background: #3F1CAD }
+.pr-bar a:focus-visible, .pr-btn:focus-visible { outline: 2px solid #5B2FE2; outline-offset: 2px }
+.pr-back { color: var(--violet); font-weight: 600; text-decoration: none }
+
+/* page */
+.pr-sheet { padding: 24px 0 }
+.pr-page { position: relative; width: 210mm; height: 297mm; margin: 0 auto 24px; background: #FFFFFF; overflow: hidden; box-shadow: 0 1px 3px rgba(16,14,30,.10), 0 12px 32px rgba(16,14,30,.10); break-after: page; page-break-after: always }
+.pr-page:last-child { break-after: auto; page-break-after: auto }
+.pr-inner { position: absolute; inset: 0; padding: 15mm 16mm 0 }
+.pr-run { display: flex; justify-content: space-between; gap: 12px; font-size: 10px; color: var(--muted); padding-bottom: 8px; border-bottom: 1px solid var(--rule) }
+.pr-foot { position: absolute; left: 16mm; right: 16mm; bottom: 10mm; display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); padding-top: 8px; border-top: 1px solid var(--rule) }
+.pr-pt { margin: 22px 0 4px; font-size: 24px; line-height: 1.15; letter-spacing: -.02em; font-weight: 700 }
+.pr-lede { margin: 0 0 18px; color: var(--ink2); font-size: 12.5px; max-width: 150mm }
+.pr-h { margin: 0 0 8px; font-size: 13.5px; letter-spacing: -.005em; font-weight: 700 }
+.pr-note { margin: 6px 0 0; font-size: 10.5px; color: var(--muted) }
+.pr-cap { margin: -4px 0 12px; font-size: 10.5px; color: var(--muted) }
+.pr-sec { color: var(--ink2) }
+.pr-muted { color: var(--muted) }
+.pr-block { margin-top: 22px }
+.pr-clip { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 62mm }
+
+/* cover */
+.pr-cover { background: var(--navy); color: #FFFFFF }
+.pr-cover .pr-inner { padding: 16mm }
+.pr-top { display: flex; align-items: center; justify-content: space-between }
+.pr-brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 15px; letter-spacing: -.01em }
+.pr-brand small { font-weight: 500; font-size: 12.5px; color: #8D87A8 }
+.pr-tag { font-size: 10.5px; font-weight: 600; color: #D4C9FF; padding: 3px 9px; border-radius: 99px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.22) }
+.pr-title { margin: 38mm 0 0; font-size: 58px; line-height: 1.02; font-weight: 600; letter-spacing: -.035em; max-width: 140mm }
+.pr-per { margin: 16px 0 0; font-size: 19px; font-weight: 500; color: #CFC9E6; letter-spacing: -.01em }
+.pr-scope { margin: 4px 0 0; font-size: 13.5px; color: #8D87A8; max-width: 150mm }
+.pr-art { position: absolute; left: 0; right: 0; top: 150mm }
+.pr-art-row { display: flex; align-items: center; gap: 14px; margin-bottom: 9px }
+.pr-art-bar { height: 17mm; border-radius: 0 3mm 3mm 0; flex: none }
+.pr-fig { font-size: 40px; font-weight: 600; letter-spacing: -.03em; line-height: 1 }
+.pr-lab { font-size: 12.5px; color: #B3AECB; line-height: 1.25 }
+.pr-coverfoot { position: absolute; left: 16mm; right: 16mm; bottom: 14mm; display: grid; grid-template-columns: 1.1fr 1fr 1fr; gap: 18px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,.14); font-size: 11px; color: #B3AECB }
+.pr-coverfoot b { display: block; color: #FFFFFF; font-weight: 600; font-size: 12px; margin-bottom: 1px }
+
+/* summary */
+.pr-headline { margin: 20px 0 20px; font-size: 27px; line-height: 1.18; letter-spacing: -.025em; font-weight: 600; max-width: 168mm }
+.pr-kpis { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--ink); border-bottom: 1px solid var(--rule) }
+.pr-kpi { padding: 12px 14px 12px 14px; border-left: 1px solid var(--rule); min-width: 0 }
+.pr-kpi:first-child { border-left: 0; padding-left: 0 }
+.pr-kl { font-size: 11px; font-weight: 600; color: var(--ink2) }
+.pr-kv { font-size: 31px; font-weight: 600; letter-spacing: -.03em; line-height: 1.15; margin: 3px 0 1px }
+.pr-kd { font-size: 11px; color: var(--ink2) }
+.pr-pair { margin-top: 9px; display: grid; gap: 3px }
+.pr-pair i { display: block; height: 5px; border-radius: 2px }
+.pr-pa { background: var(--prior) }
+.pr-pb { background: var(--violet) }
+.pr-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 7px; font-size: 10.5px; color: var(--muted) }
+.pr-legend s { display: inline-block; width: 14px; height: 5px; border-radius: 2px; margin-right: 5px; vertical-align: middle; text-decoration: none }
+.pr-find { margin: 0; display: grid; grid-template-columns: 26mm 1fr; border-top: 1px solid var(--ink) }
+.pr-find dt, .pr-find dd { margin: 0; padding: 10px 0; border-bottom: 1px solid var(--rule) }
+.pr-find dt { font-weight: 700; font-size: 12.5px }
+.pr-find dd { color: var(--ink2) }
+.pr-find dd b { color: var(--ink); font-weight: 600 }
+.pr-attn { margin-top: 20px; padding: 14px 16px; border-radius: 10px; background: #FAFAFB; box-shadow: inset 0 0 0 1px var(--rule) }
+.pr-attn ol { margin: 6px 0 0; padding-left: 18px }
+.pr-attn li { margin: 3px 0; color: var(--ink2) }
+.pr-attn li b { color: var(--ink); font-weight: 600 }
+
+/* tables */
+.pr-tbl { width: 100%; border-collapse: collapse; font-size: 11.5px }
+.pr-tbl th { text-align: left; font-size: 10.5px; font-weight: 600; color: var(--muted); padding: 6px 8px; border-bottom: 1px solid var(--ink) }
+.pr-tbl td { padding: 7px 8px; border-bottom: 1px solid var(--faint); vertical-align: middle }
+.pr-tbl tbody tr:last-child td { border-bottom: 0 }
+.pr-tbl th.r, .pr-tbl td.r { text-align: right }
+.pr-tbl th:first-child, .pr-tbl td:first-child { padding-left: 0 }
+.pr-tbl th:last-child, .pr-tbl td:last-child { padding-right: 0 }
+.pr-tbl tfoot td { border-top: 1px solid var(--rule); font-weight: 600 }
+.pr-sw { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 8px; vertical-align: -1px }
+.pr-mini { display: block; height: 7px; border-radius: 2px; position: relative; min-width: 2px }
+.pr-mini i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 2px }
+
+/* tone colours, shared by bars, swatches and the stacked status bar */
+.pr-t-won { background: var(--won) }
+.pr-t-lost { background: var(--lost) }
+.pr-t-accepted { background: var(--accepted) }
+.pr-t-expired { background: var(--expired) }
+.pr-t-pending { background: var(--pending) }
+.pr-t-rejected { background: var(--rejected) }
+
+/* pipeline */
+.pr-two { display: grid; grid-template-columns: 1.35fr 1fr; gap: 10mm }
+.pr-fun { display: grid; grid-template-columns: 30mm 1fr; row-gap: 22px; align-items: center }
+.pr-name { font-size: 12px; font-weight: 600 }
+.pr-name span { display: block; font-weight: 400; font-size: 10.5px; color: var(--muted) }
+.pr-fb { height: 30px; min-width: 2px; border-radius: 0 4px 4px 0; display: flex; align-items: center; padding-left: 8px; color: #FFFFFF; font-weight: 700; font-size: 12px }
+.pr-fp { height: 8px; background: var(--prior); border-radius: 0 2px 2px 0; margin-top: 3px }
+.pr-stack { display: flex; gap: 2px; height: 26px; margin: 8px 0 10px }
+.pr-stack i { display: block; border-radius: 3px; min-width: 2px }
+.pr-stk { display: grid; gap: 4px; font-size: 11.5px }
+.pr-stk div { display: flex; justify-content: space-between; gap: 8px }
+.pr-stk span.k { display: inline-flex; align-items: center }
+.pr-stk b { font-weight: 600 }
+.pr-ps { display: grid; grid-template-columns: 36mm 1fr; row-gap: 12px; align-items: center }
+.pr-sg { display: flex; gap: 2px; height: 28px }
+.pr-sg i { display: flex; align-items: center; justify-content: center; min-width: 0; border-radius: 3px; color: #FFFFFF; font-size: 11.5px; font-weight: 700; font-style: normal; overflow: hidden }
+.pr-sg i.rest { background: #D9D7E2; color: #3A3848 }
+
+/* partners */
+.pr-stat { display: grid; grid-template-columns: 62mm 1fr; gap: 10mm; align-items: end; padding-bottom: 6px }
+.pr-big { font-size: 72px; line-height: .95; letter-spacing: -.045em; font-weight: 600; color: var(--violet) }
+.pr-stat p { margin: 0; color: var(--ink2); font-size: 13px; max-width: 95mm }
+.pr-stat p b { color: var(--ink); font-weight: 600 }
+
+/* decisions */
+.pr-ttw { position: relative; padding-top: 20px }
+.pr-tt { display: grid; grid-template-columns: 28mm 1fr; row-gap: 22px; align-items: center }
+.pr-tr i { display: flex; align-items: center; height: 20px; min-width: 18px; border-radius: 0 3px 3px 0; padding-left: 6px; font-size: 10.5px; font-weight: 700; color: #FFFFFF; font-style: normal }
+.pr-tr i.a { background: var(--prior); color: #3A3848; margin-bottom: 4px; height: 16px }
+.pr-tr i.b { background: var(--violet) }
+.pr-tov { position: absolute; left: 28mm; right: 0; top: 0; bottom: -4px; pointer-events: none }
+.pr-target { position: absolute; top: 16px; bottom: 0; width: 0; border-left: 1.5px dashed var(--ink2) }
+.pr-tlab { position: absolute; top: 0; font-size: 10px; color: var(--ink2); white-space: nowrap; transform: translateX(-50%) }
+.pr-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 10mm }
+.pr-hb { display: grid; gap: 11px }
+.pr-r1 { display: flex; justify-content: space-between; gap: 10px; font-size: 11.5px; margin-bottom: 4px }
+.pr-r1 span { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere }
+.pr-r1 b { font-weight: 600 }
+.pr-hb-t { height: 7px; border-radius: 2px; min-width: 2px }
+
+/* method */
+.pr-def { margin: 0; display: grid; grid-template-columns: 38mm 1fr; border-top: 1px solid var(--ink) }
+.pr-def dt, .pr-def dd { margin: 0; padding: 8px 0; border-bottom: 1px solid var(--faint); font-size: 11.5px }
+.pr-def dt { font-weight: 700 }
+.pr-def dd { color: var(--ink2) }
+.pr-about { margin-top: 20px; padding: 14px 16px; border-radius: 10px; background: #FAFAFB; box-shadow: inset 0 0 0 1px var(--rule); display: grid; grid-template-columns: 1fr 1fr; gap: 10px 18px; font-size: 11.5px }
+.pr-about b { display: block; font-size: 10.5px; color: var(--muted); font-weight: 600 }
+
+/* hub preview: a whole page drawn at 32 percent, so it cannot drift from the document */
+.pr-thumb { position: relative; flex: none; width: 254px; height: 359px; overflow: hidden; border-radius: 6px; background: #FFFFFF; box-shadow: 0 1px 3px rgba(16,14,30,.14), 0 8px 20px rgba(16,14,30,.10) }
+.pr-thumb-in { width: 210mm; transform: scale(.32); transform-origin: 0 0; pointer-events: none }
+.pr-thumb .pr-page { margin: 0; box-shadow: none }
+
+@media print {
+  .pr-bar { display: none }
+  .pr-sheet { padding: 0 }
+  .pr-page { margin: 0; box-shadow: none }
+}

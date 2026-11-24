@@ -7,8 +7,10 @@ import {
   leaderboard,
   parseReportRange,
   productBreakdown,
+  previousRange,
   quarterStart,
   type ReportFact,
+  statusCounts,
   summarize,
   winRate,
 } from './report-metrics';
@@ -124,5 +126,20 @@ describe('ranges', () => {
     const empty = buildRangedReport([], { preset: '30d', from: '2026-01-01', to: '2026-01-30' });
     expect(empty.summary.winRate).toBeNull();
     expect(empty.leaderboard).toEqual([]);
+  });
+});
+
+describe('statusCounts', () => {
+  it('counts every status, zero filled, so the parts add up to the deals', () => {
+    const facts = [fact({ status: 'won' }), fact({ status: 'lost' }), fact({ status: 'expired' }), fact({ status: 'pending' }), fact({ status: 'pending' })];
+    expect(statusCounts(facts)).toEqual({ pending: 2, accepted: 0, rejected: 0, expired: 1, won: 1, lost: 1 });
+    expect(statusCounts([])).toEqual({ pending: 0, accepted: 0, rejected: 0, expired: 0, won: 0, lost: 0 });
+    expect(buildRangedReport(facts, { preset: '30d', from: '2026-11-01', to: '2026-11-30' }).statuses.pending).toBe(2);
+  });
+});
+
+describe('previousRange', () => {
+  it('is the same length and ends the day before, across a month and a year', () => {
+    expect(previousRange({ from: '2026-01-01', to: '2026-01-31' })).toEqual({ preset: 'custom', from: '2025-12-01', to: '2025-12-31' });
   });
 });

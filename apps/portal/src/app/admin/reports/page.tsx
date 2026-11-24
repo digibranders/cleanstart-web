@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
+import { CoverPage, SummaryPage } from "@/components/reports/program-review/ProgramReviewPages";
 import { AdminReports } from "@/components/screens/AdminReports";
 import { systemClock } from "@/lib/clock";
+import { parseEdition } from "@/lib/program-review";
 import { parseReportRange } from "@/lib/report-metrics";
 import { requireCan } from "@/server/auth/viewer";
-import { withViewer } from "@/server/repo/context";
-import { getReportInsights } from "@/server/repo/report-insights";
-import { getRangedReport } from "@/server/repo/report-metrics";
-import { getAdminReports } from "@/server/repo/reports";
+import { loadProgramReview } from "@/server/reports/program-review";
 
 export const metadata: Metadata = { title: "Reports" };
 
@@ -17,11 +16,20 @@ export default async function Page({
 }): Promise<React.JSX.Element> {
   const viewer = await requireCan("report.read");
   const today = systemClock.today();
-  const range = parseReportRange(await searchParams, today);
-  const [report, ranged, insights] = await withViewer(viewer, async (tx) => [
-    await getAdminReports(tx, viewer, systemClock),
-    await getRangedReport(tx, viewer, range),
-    await getReportInsights(tx, viewer, range),
-  ] as const);
-  return <AdminReports report={report} ranged={ranged} insights={insights} today={today} />;
+  const params = await searchParams;
+  const range = parseReportRange(params, today);
+  const edition = parseEdition(params.edition);
+  const { data, review } = await loadProgramReview(viewer, range, edition, systemClock);
+  return (
+    <AdminReports
+      review={review}
+      ranged={data.current}
+      insights={data.insights}
+      allTime={data.allTime}
+      today={today}
+      edition={edition}
+      cover={<CoverPage dto={review} />}
+      summary={<SummaryPage dto={review} />}
+    />
+  );
 }

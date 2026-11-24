@@ -1,0 +1,17 @@
+.rh-build { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px; padding: 16px; align-items: start }
+.rh-form { display: flex; flex-direction: column; gap: 16px; min-width: 0 }
+.rh-lbl { display: block; margin-bottom: 6px; font-size: 12px; font-weight: 600; color: #4A4858 }
+.rh-hint { margin: 6px 0 0; font-size: 12px; color: #6B687D }
+.rh-acts { display: flex; gap: 8px; flex-wrap: wrap }
+.rh-prev { display: flex; flex-direction: column; gap: 8px }
+.rh-pages { display: flex; gap: 12px }
+.rh-cap { margin: 0; font-size: 12px; color: #6B687D }
+.rh-list { list-style: none; margin: 0; padding: 0 }
+.rh-list li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 12px; border-top: 1px solid #F0EFF4 }
+.rh-list li:first-child { border-top: 0 }
+.rh-list b { display: block; font-size: 13px; font-weight: 600 }
+.rh-list small { font-size: 12px; color: #6B687D }
+@media (max-width: 900px) {
+  .rh-build { grid-template-columns: minmax(0, 1fr) }
+  .rh-pages { overflow-x: auto }
+}

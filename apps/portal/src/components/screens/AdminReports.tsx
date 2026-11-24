@@ -1,212 +1,146 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { Icon } from '@/components/icon';
-import { FollowUpList } from '@/components/reports/FollowUpList';
-import { RangedReport } from '@/components/reports/RangedReport';
-import { ReportInsights } from '@/components/reports/ReportInsights';
-import { downloadCsv } from '@/components/reports/download-csv';
-import { avatarClass, CATEGORY_BADGE, initialsOf } from '@/components/reports/partner-ui';
-import { Dropdown } from '@/components/ui/dropdown';
-import { useToast } from '@/components/ui/toast';
-import { fmtLong } from '@/lib/dates';
-import { PARTNER_CATEGORY_LABEL } from '@/lib/domain';
 import { useRegions } from '@/components/regions-context';
+import { downloadCsv } from '@/components/partners/csv';
+import { RangeControl } from '@/components/reports/RangeControl';
+import { useToast } from '@/components/ui/toast';
 import type { AdminReportsDto } from '@/lib/dto';
-import {
-  acceptRate,
-  CATEGORY_OPTIONS,
-  filterPartnerRows,
-  partnersToCsv,
-  regionOptions,
-  SORTS,
-  type ReportSort,
-} from '@/lib/report-view';
-import type { RangedReportDto } from '@/lib/report-metrics';
+import { PROGRAM_REVIEW_PATH, type ProgramReviewDto, programReviewQuery, REPORT_EDITIONS, type ReportEdition } from '@/lib/program-review';
+import { buildExports } from '@/lib/report-exports';
 import type { ReportInsightsDto } from '@/lib/report-insights';
+import type { RangedReportDto } from '@/lib/report-metrics';
 import { ROUTES } from '@/lib/routes';
-import { ScrollRegion } from "@/components/ui/scroll-region";
+import './reports-hub.css';
+
+const EDITION_HINT: Record<ReportEdition, string> = {
+  internal: 'Everything, with partner names, managers and follow-ups. For CleanStart staff.',
+  shareable: 'Partner names become letters. Managers, follow-ups and rejection reasons are left out.',
+};
 
 interface AdminReportsProps {
-  report: AdminReportsDto;
+  review: ProgramReviewDto;
   ranged: RangedReportDto;
   insights: ReportInsightsDto;
+  allTime: AdminReportsDto;
   today: string;
+  edition: ReportEdition;
+  /** The first two pages of the document, drawn by the server from the same data as the report itself. */
+  cover: React.ReactNode;
+  summary: React.ReactNode;
 }
 
-export function AdminReports({ report, ranged, insights, today }: AdminReportsProps): React.JSX.Element {
+export function AdminReports({ review, ranged, insights, allTime, today, edition, cover, summary }: AdminReportsProps): React.JSX.Element {
   const toast = useToast();
-  const { regions, name: regionName } = useRegions();
-  const [region, setRegion] = useState<string>('all');
-  const [category, setCategory] = useState<string>('all');
-  const [sort, setSort] = useState<ReportSort>('Most registered');
-
-  const rows = useMemo(
-    () => filterPartnerRows(report.partners, region, category, sort),
-    [report.partners, region, category, sort],
-  );
-  const sum = (pick: (p: AdminReportsDto['partners'][number]) => number): number =>
-    report.partners.reduce((n, p) => n + pick(p), 0);
-  const accepted = sum((p) => p.accepted);
-  const rejected = sum((p) => p.rejected);
-  const rate = acceptRate(accepted, rejected);
-
-  const exportCsv = (): void => {
-    downloadCsv(`partner-report-${today}.csv`, partnersToCsv(rows, regions));
-    toast(`Exported ${rows.length} partners to CSV`);
-  };
+  const { name: regionName } = useRegions();
+  const exports = useMemo(() => buildExports({ ranged, insights, allTime, regionName }), [ranged, insights, allTime, regionName]);
+  const { range } = ranged;
+  const query = (e: ReportEdition, extra?: Record<string, string>): string => programReviewQuery(range, e, extra);
 
   return (
     <div className="wrap">
       <div className="head">
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
           <h1 className="h1">Reports</h1>
-          <span className="h1-sub">Date range figures first, then all time up to {fmtLong(today)}.</span>
-        </div>
-        <div style={{ display: 'flex', gap: 6 }}>
-          <button type="button" className="btn btn-s" onClick={exportCsv}>
-            <Icon name="dl" />
-            Export CSV
-          </button>
+          <span className="h1-sub">Period reports to read, print and send. Live numbers stay on Overview.</span>
         </div>
       </div>
 
-      <div className="dash">
-        <RangedReport report={ranged} today={today} />
-        <ReportInsights insights={insights} />
-      </div>
-
-      <h2 className="h1-sub" style={{ margin: '8px 0 0' }}>All time</h2>
-      <section aria-label="All time summary" className="card kpis">
-        <div className="kpi">
-          <span className="kpi-l">Registered</span>
-          <span className="kpi-v">{report.totalRegistered}</span>
-          <span className="kpi-f">From {report.partners.filter((p) => p.registered > 0).length} partners</span>
-        </div>
-        <div className="kpi">
-          <span className="kpi-l">Accepted</span>
-          <span className="kpi-v">{accepted}</span>
-          <span className="kpi-f">{rate === null ? 'No decisions yet' : `${rate}% accept rate, ${rejected} rejected`}</span>
-        </div>
-        <div className="kpi">
-          <span className="kpi-l">Won</span>
-          <span className="kpi-v">{sum((p) => p.won)}</span>
-          <span className="kpi-f">Closed won in HubSpot</span>
-        </div>
-        <div className="kpi">
-          <span className="kpi-l">Protected now</span>
-          <span className="kpi-v">{sum((p) => p.protectedNow)}</span>
-          <span className="kpi-f">{report.expiringIn14Days} end in the next 14 days</span>
-        </div>
-      </section>
-
-      <section aria-labelledby="pbp" className="card clip">
+      <section aria-labelledby="rb-t" className="card clip">
         <div className="card-h">
-          <h2 id="pbp" className="card-t">
-            Pipeline by partner
+          <h2 id="rb-t" className="card-t">
+            Partner Program Review
           </h2>
-          <span className="card-meta tnum">
-            Showing {rows.length} of {report.totalPartners} partners
-          </span>
+          <span className="card-meta">Scope follows your regions: {review.scope}</span>
         </div>
-        <div className="toolbar">
-          <div className="filters">
-            <label className="sr" htmlFor="rr">
-              Region
-            </label>
-            <Dropdown id="rr" value={region} options={regionOptions(regions)} onChange={setRegion} />
-            <label className="sr" htmlFor="rc">
-              Partner category
-            </label>
-            <Dropdown id="rc" value={category} options={CATEGORY_OPTIONS} onChange={setCategory} />
-            <label className="sr" htmlFor="rs">
-              Sort
-            </label>
-            <Dropdown
-              id="rs"
-              value={sort}
-              options={SORTS}
-              onChange={(v) => setSort(v as ReportSort)}
-            />
+        <div className="rh-build">
+          <div className="rh-form">
+            <div>
+              <span className="rh-lbl">Period</span>
+              <RangeControl range={range} today={today} edition={edition} />
+              <p className="rh-hint tnum">
+                Deals registered {review.period}, compared with {review.priorPeriod}.
+              </p>
+            </div>
+            <div>
+              <span className="rh-lbl" id="rb-ed">
+                Edition
+              </span>
+              <nav className="seg" aria-labelledby="rb-ed">
+                {REPORT_EDITIONS.map((e) => (
+                  <Link
+                    key={e}
+                    href={`${ROUTES.admin.reports}${query(e)}`}
+                    scroll={false}
+                    className={`seg-b${e === edition ? ' seg-on' : ''}`}
+                    aria-current={e === edition ? 'true' : undefined}
+                    style={{ display: 'inline-flex', alignItems: 'center' }}
+                  >
+                    {e === 'internal' ? 'Internal' : 'Shareable'}
+                  </Link>
+                ))}
+              </nav>
+              <p className="rh-hint">{EDITION_HINT[edition]}</p>
+            </div>
+            <div className="rh-acts">
+              {/* Plain anchors, not Link: the print view must load with its own page styles, not through a client navigation. */}
+              <a className="btn btn-p" href={`${PROGRAM_REVIEW_PATH}${query(edition, { autoprint: '1' })}`} target="_blank" rel="noreferrer noopener">
+                <Icon name="dl" />
+                Generate PDF
+              </a>
+              <a className="btn btn-s" href={`${PROGRAM_REVIEW_PATH}${query(edition)}`} target="_blank" rel="noreferrer noopener">
+                Open web view
+              </a>
+            </div>
+          </div>
+          <div className="rh-prev">
+            <div className="rh-pages">
+              <div className="pr pr-thumb" aria-hidden="true">
+                <div className="pr-thumb-in">{cover}</div>
+              </div>
+              <div className="pr pr-thumb" aria-hidden="true">
+                <div className="pr-thumb-in">{summary}</div>
+              </div>
+            </div>
+            <p className="rh-cap">
+              <b>Cover and summary</b> of 6 pages. A4, ready to print or save as PDF.
+            </p>
           </div>
         </div>
-        <ScrollRegion label="Partner report">
-          <table className="tbl">
-            <thead>
-              <tr>
-                <th scope="col">Partner</th>
-                <th scope="col" className="hide-sm">
-                  Category
-                </th>
-                <th scope="col" className="hide-sm">
-                  Region
-                </th>
-                <th scope="col" className="r">
-                  Registered
-                </th>
-                <th scope="col" className="r hide-sm">
-                  Accepted
-                </th>
-                <th scope="col" className="r">
-                  Accept rate
-                </th>
-                <th scope="col" className="r hide-sm">
-                  Won
-                </th>
-                <th scope="col" className="r hide-sm">
-                  Protected now
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((p, i) => (
-                <tr key={p.partnerId}>
-                  <td>
-                    <Link href={`${ROUTES.admin.partners}?selected=${p.partnerId}`} className="cust">
-                      <span className={`av ${avatarClass(i)}`}>{initialsOf(p.name)}</span>
-                      {p.name}
-                    </Link>
-                  </td>
-                  <td className="hide-sm">
-                    <span className={`badge ${CATEGORY_BADGE[p.category]}`}>{PARTNER_CATEGORY_LABEL[p.category]}</span>
-                  </td>
-                  <td className="t-sec hide-sm">{regionName(p.region)}</td>
-                  <td className="tnum r">{p.registered}</td>
-                  <td className="tnum r hide-sm">{p.accepted}</td>
-                  <td
-                    className={`tnum r ${p.rate === null ? 't-muted' : p.rate < 60 ? 't-amber' : ''}`}
-                  >
-                    {p.rate === null ? 'None yet' : `${p.rate}%`}
-                  </td>
-                  <td className="tnum r hide-sm">{p.won}</td>
-                  <td className="tnum r hide-sm">{p.protectedNow}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          {rows.length === 0 ? (
-            <div className="empty">
-              No partners match these filters.{' '}
-              <button
-                type="button"
-                className="btn btn-g"
-                onClick={() => {
-                  setRegion('all');
-                  setCategory('all');
-                }}
-                style={{ height: 24, padding: '0 6px', fontSize: 12 }}
-              >
-                Clear filters
-              </button>
-            </div>
-          ) : null}
-        </ScrollRegion>
       </section>
 
-      <div className="row">
-        <FollowUpList items={report.followUps} />
-      </div>
+      <section aria-labelledby="rx-t" className="card clip">
+        <div className="card-h">
+          <h2 id="rx-t" className="card-t">
+            Data exports
+          </h2>
+          <span className="card-meta">CSV, for your own analysis. Period figures use the period above.</span>
+        </div>
+        <ul className="rh-list">
+          {exports.map((x) => (
+            <li key={x.key}>
+              <div>
+                <b>{x.label}</b>
+                <small>{x.detail}</small>
+              </div>
+              <button
+                type="button"
+                className="btn btn-s"
+                disabled={x.rows.length === 0}
+                onClick={() => {
+                  downloadCsv(x.filename, x.header, x.rows);
+                  toast(`Exported ${x.label.toLowerCase()} to CSV`);
+                }}
+              >
+                <Icon name="dl" />
+                CSV
+              </button>
+            </li>
+          ))}
+        </ul>
+      </section>
     </div>
   );
 }

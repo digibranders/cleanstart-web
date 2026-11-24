@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reports, CleanStart Partner Portal (design mock)</title>
+<!-- Design mock of /admin/reports. It reuses the portal's own tokens (portal.css values, Manrope, violet #4B23C8 as the only accent,
+     colour only for status). Figures are read from the running portal (seed data, 23 Nov 2026). Rows in the sections marked
+     Proposed are sample rows: those sections need new storage (saved reports, schedules). Fonts load from Google Fonts here only
+     because this is a static file; the build uses next/font. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box }
+:root { --ctl-border: #928FA5 }
+body { margin: 0; background: #FAFAFB; font-family: Manrope, ui-sans-serif, system-ui, sans-serif; color: #0F0E17; font-size: 13.5px; -webkit-font-smoothing: antialiased }
+button, input, select { font-family: inherit }
+a { color: #4B23C8; text-decoration: none }
+a:hover { text-decoration: underline }
+.ic { width: 16px; height: 16px; flex: none; fill: currentColor }
+.tnum { font-variant-numeric: tabular-nums }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap }
+
+.app { min-height: 100vh; display: flex }
+.side { width: 228px; flex: none; background: #120E20; border-right: 1px solid #1E1932; padding: 12px 10px; display: flex; flex-direction: column; justify-content: space-between; gap: 20px; position: sticky; top: 0; height: 100vh }
+.brand { display: flex; align-items: center; gap: 9px; padding: 4px 6px }
+.logo { width: 26px; height: 26px; border-radius: 7px; display: grid; place-items: center; background: rgba(255,255,255,.06); box-shadow: inset 0 0 0 1px rgba(255,255,255,.10) }
+.brand-name { font-weight: 700; font-size: 14.5px; letter-spacing: -.01em; color: #FFFFFF }
+.brand-tag { font-size: 12px; color: #8D87A8; font-weight: 500; margin-left: 4px }
+.nav { display: flex; flex-direction: column; gap: 1px; margin-top: 14px }
+.nav a { display: flex; align-items: center; gap: 10px; height: 30px; padding: 0 8px; border-radius: 6px; color: #B3AECB; font-size: 13.5px; font-weight: 500 }
+.nav a .ic { color: #7F7999 }
+.nav a:hover { background: rgba(255,255,255,.05); color: #FFFFFF; text-decoration: none }
+.nav a.on { background: rgba(255,255,255,.08); color: #FFFFFF; box-shadow: inset 0 0 0 1px rgba(255,255,255,.06) }
+.nav a.on .ic { color: #B9A6FF }
+.nav .cnt { margin-left: auto; font-size: 11.5px; font-weight: 700; color: #D4C9FF; background: rgba(124,92,255,.22); border-radius: 5px; padding: 1px 6px }
+.who { display: flex; align-items: center; gap: 10px; padding: 10px 8px 4px; border-top: 1px solid rgba(255,255,255,.08) }
+.who .av { width: 26px; height: 26px; border-radius: 99px; background: #2B3CA8; color: #FFFFFF; display: grid; place-items: center; font-size: 10.5px; font-weight: 700 }
+.who b { display: block; font-size: 13px; color: #FFFFFF; font-weight: 600 }
+.who span { font-size: 11.5px; color: #8D87A8 }
+
+.main { flex: 1; min-width: 0 }
+.top { height: 48px; display: flex; align-items: center; justify-content: flex-end; padding: 0 20px; border-bottom: 1px solid #ECEBF1; background: #FFFFFF }
+.pill { display: flex; align-items: center; gap: 8px; height: 30px; width: 320px; padding: 0 10px; border-radius: 8px; background: #F4F3F7; color: #6B687D; font-size: 12.5px }
+.pill kbd { margin-left: auto; font: inherit; font-size: 11px; background: #FFFFFF; border-radius: 4px; padding: 1px 7px; box-shadow: inset 0 0 0 1px #E2E0E8 }
+.content { padding: 20px }
+.wrap { max-width: 1320px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px }
+.head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap }
+.h1 { margin: 0; font-size: 18px; font-weight: 700; letter-spacing: -.015em }
+.h1-sub { font-size: 12.5px; color: #6B687D }
+.mocknote { font-size: 12px; color: #55536A; background: #FFFFFF; border-radius: 8px; padding: 7px 10px; box-shadow: inset 0 0 0 1px #E2E0E8 }
+
+.card { background: #FFFFFF; border: 1px solid #ECEBF1; border-radius: 10px }
+.card-h { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 12px; border-bottom: 1px solid #F0EFF4 }
+.card-t { margin: 0; font-size: 12.5px; font-weight: 700 }
+.card-meta { font-size: 11.5px; color: #6B687D }
+.badge { display: inline-flex; align-items: center; height: 22px; padding: 0 9px; border-radius: 5px; font-size: 11.5px; font-weight: 600; white-space: nowrap; background: transparent; color: #4A4858; box-shadow: inset 0 0 0 1px #E6E4EC }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 30px; padding: 0 12px; border-radius: 7px; font-size: 13px; font-weight: 600; border: 1px solid transparent; cursor: pointer; white-space: nowrap; text-decoration: none }
+.btn:hover { text-decoration: none }
+.btn .ic { width: 13px; height: 13px }
+.btn-p { background: #4B23C8; color: #FFFFFF; box-shadow: inset 0 1px 0 rgba(255,255,255,.14), 0 1px 2px rgba(23,12,70,.2) }
+.btn-p:hover { background: #3F1CAD; color: #FFFFFF }
+.btn-s { background: #FFFFFF; color: #0F0E17; border-color: #E2E0E8; box-shadow: 0 1px 2px rgba(16,14,30,.04) }
+.btn-s:hover { background: #FAFAFB; color: #0F0E17 }
+.btn-t { height: 26px; padding: 0 6px; background: transparent; color: #4B23C8; font-size: 12.5px }
+.btn-t:hover { background: #F4F2FD }
+:is(.btn, .seg button, .tpl, .fsel):focus-visible { outline: 2px solid #5B2FE2; outline-offset: 2px }
+
+/* builder */
+.build { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr) }
+.form { padding: 16px; display: flex; flex-direction: column; gap: 16px }
+.fld > label, .fld > .lbl { display: block; font-size: 12px; font-weight: 600; color: #5E5B6E; margin-bottom: 6px }
+.hint { font-size: 11.5px; color: #6B687D; margin-top: 6px }
+.tpls { display: grid; gap: 6px }
+.tpl { display: grid; grid-template-columns: 16px 1fr auto; gap: 10px; align-items: start; text-align: left; padding: 9px 10px; border-radius: 8px; background: #FFFFFF; box-shadow: inset 0 0 0 1px #E2E0E8; cursor: pointer; border: 0; font-size: 13px }
+.tpl[aria-checked="true"] { box-shadow: inset 0 0 0 1.5px #4B23C8; background: #FCFBFF }
+.tpl[aria-disabled="true"] { cursor: default; color: #6B687D; background: #FAFAFB }
+.tpl .rd { width: 15px; height: 15px; border-radius: 99px; margin-top: 2px; box-shadow: inset 0 0 0 1.5px #928FA5; background: #FFFFFF }
+.tpl[aria-checked="true"] .rd { box-shadow: inset 0 0 0 4.5px #4B23C8 }
+.tpl b { display: block; font-weight: 600; color: #0F0E17 }
+.tpl[aria-disabled="true"] b { color: #4A4858 }
+.tpl span.d { display: block; font-size: 12px; color: #6B687D }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px }
+.seg { display: inline-flex; padding: 2px; border-radius: 7px; background: #F1F0F4; box-shadow: inset 0 0 0 1px var(--ctl-border) }
+.seg button { height: 28px; padding: 0 12px; border: 0; border-radius: 5px; background: transparent; font-size: 12.5px; font-weight: 600; color: #5E5B6E; cursor: pointer }
+.seg button[aria-pressed="true"] { background: #FFFFFF; color: #0F0E17; box-shadow: 0 1px 2px rgba(16,14,30,.10) }
+.fsel { width: 100%; height: 30px; padding: 0 28px 0 8px; border: 1px solid var(--ctl-border); border-radius: 6px; background: #FCFCFD; font-size: 12.5px; color: #2A2838; appearance: none; background-image: linear-gradient(45deg, transparent 50%, #5E5B6E 50%), linear-gradient(135deg, #5E5B6E 50%, transparent 50%); background-position: calc(100% - 14px) 13px, calc(100% - 10px) 13px; background-size: 4px 4px; background-repeat: no-repeat }
+.acts { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; padding-top: 4px }
+.preview { background: #F7F6FA; border-left: 1px solid #F0EFF4; padding: 16px; display: flex; flex-direction: column; align-items: center; gap: 12px; border-radius: 0 10px 10px 0 }
+.pages { display: flex; gap: 12px; align-items: flex-start; justify-content: center }
+.thumb { position: relative; overflow: hidden; background: #FFFFFF; border-radius: 3px; box-shadow: 0 1px 2px rgba(16,14,30,.12), 0 6px 18px rgba(16,14,30,.10) }
+.thumb iframe { position: absolute; left: 0; top: 0; width: 794px; height: 6800px; border: 0; transform-origin: 0 0; pointer-events: none }
+.pvcap { font-size: 12px; color: #5E5B6E; text-align: center }
+.pvcap b { color: #0F0E17 }
+
+/* tables */
+.tbl { width: 100%; border-collapse: collapse; font-size: 13px }
+.tbl th { text-align: left; font-size: 11.5px; font-weight: 600; color: #6B687D; padding: 7px 10px; border-bottom: 1px solid #F0EFF4; white-space: nowrap }
+.tbl td { padding: 8px 10px; border-bottom: 1px solid #F4F3F7; vertical-align: middle; white-space: nowrap }
+.tbl th:first-child, .tbl td:first-child { padding-left: 12px }
+.tbl th:last-child, .tbl td:last-child { padding-right: 12px }
+.tbl tr:last-child td { border-bottom: 0 }
+.tbl tbody tr:hover td { background: #FCFBFE }
+.tbl .r { text-align: right }
+.tbl .nm { font-weight: 600 }
+.t-sec { color: #5E5B6E }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px }
+.list { margin: 0; padding: 0; list-style: none }
+.list li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 12px; border-bottom: 1px solid #F4F3F7 }
+.list li:last-child { border-bottom: 0 }
+.list b { font-weight: 600 }
+.list small { display: block; font-size: 12px; color: #6B687D }
+.cardfoot { padding: 8px 12px; border-top: 1px solid #F0EFF4 }
+@media (max-width: 1100px) { .build, .two { grid-template-columns: 1fr } .preview { border-left: 0; border-top: 1px solid #F0EFF4; border-radius: 0 0 10px 10px } }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="mk" x1="12.39" y1="20.14" x2="27.87" y2="20.51" gradientUnits="userSpaceOnUse"><stop stop-color="#9A51FF"/><stop offset="1" stop-color="#2CC1EB"/></linearGradient>
+    <symbol id="mark" viewBox="0 0 27.8 32">
+      <path d="M24.2359 10.3234V22.0554L15.709 27.1983V15.2722L12.3945 17.1973L12.4877 17.2505V31.1486L13.898 31.9969L27.7958 23.8114V8.32319L27.7368 8.28876L24.2359 10.3234Z" fill="url(#mk)"/>
+      <path d="M15.7088 15.219L5.10062 8.92732L14.0283 3.991L24.2326 9.87577V10.3203L27.7335 8.28563L13.8295 0L0 8.32006V23.6079L3.22439 25.5518V11.7695L12.3943 17.1942L15.7088 15.2691V15.219Z" fill="#fff"/>
+    </symbol>
+    <symbol id="i-dash" viewBox="0 0 256 256"><path d="M104,42H56A14,14,0,0,0,42,56v48a14,14,0,0,0,14,14h48a14,14,0,0,0,14-14V56A14,14,0,0,0,104,42Zm2,62a2,2,0,0,1-2,2H56a2,2,0,0,1-2-2V56a2,2,0,0,1,2-2h48a2,2,0,0,1,2,2Zm94-62H152a14,14,0,0,0-14,14v48a14,14,0,0,0,14,14h48a14,14,0,0,0,14-14V56A14,14,0,0,0,200,42Zm2,62a2,2,0,0,1-2,2H152a2,2,0,0,1-2-2V56a2,2,0,0,1,2-2h48a2,2,0,0,1,2,2Zm-98,34H56a14,14,0,0,0-14,14v48a14,14,0,0,0,14,14h48a14,14,0,0,0,14-14V152A14,14,0,0,0,104,138Zm2,62a2,2,0,0,1-2,2H56a2,2,0,0,1-2-2V152a2,2,0,0,1,2-2h48a2,2,0,0,1,2,2Zm94-62H152a14,14,0,0,0-14,14v48a14,14,0,0,0,14,14h48a14,14,0,0,0,14-14V152A14,14,0,0,0,200,138Zm2,62a2,2,0,0,1-2,2H152a2,2,0,0,1-2-2V152a2,2,0,0,1,2-2h48a2,2,0,0,1,2,2Z"/></symbol>
+    <symbol id="i-deals" viewBox="0 0 256 256"><path d="M252.51,108.8,227,57.75a14,14,0,0,0-18.78-6.27L182.66,64.26,129.53,50.2a6.1,6.1,0,0,0-3.06,0L73.34,64.26,47.79,51.48A14,14,0,0,0,29,57.75L3.49,108.8a14,14,0,0,0,6.26,18.78L36.9,141.16l55.61,39.72a6,6,0,0,0,2,.94l64,16A6.08,6.08,0,0,0,160,198a6,6,0,0,0,4.24-1.76l55.31-55.31,26.7-13.35a14,14,0,0,0,6.26-18.78Zm-53,35.16-35.8-28.68a6,6,0,0,0-8,.45c-18.65,18.79-39.5,16.42-52.79,7.92a2,2,0,0,1-.94-1.5,1.9,1.9,0,0,1,.51-1.55L146.43,78h33.86l28.41,56.82ZM14.11,115.69a2,2,0,0,1,.11-1.52L39.74,63.11a2,2,0,0,1,1.8-1.1,2,2,0,0,1,.89.21l22.21,11.1L37.32,128l-22.21-11.1A2,2,0,0,1,14.11,115.69Zm144.05,69.67-59.6-14.9L47.66,134.1,76.84,75.75,128,62.21l14.8,3.92a5.92,5.92,0,0,0-3,1.57L94.1,112.05a14,14,0,0,0,2.39,21.72c20.22,12.92,44.75,10.49,63.8-5.89L191,152.5Zm83.73-69.67a2,2,0,0,1-1,1.16L218.68,128,191.36,73.32l22.21-11.1a2,2,0,0,1,1.53-.11,2,2,0,0,1,1.16,1l25.52,51.06A2,2,0,0,1,241.89,115.69Zm-112,101.76a6,6,0,0,1-7.27,4.37L80.89,211.39a5.88,5.88,0,0,1-2-.94L52.52,191.64a6,6,0,1,1,7-9.77L84.91,200l40.61,10.15A6,6,0,0,1,129.88,217.45Z"/></symbol>
+    <symbol id="i-bld" viewBox="0 0 256 256"><path d="M240,210H222V96a14,14,0,0,0-14-14H142V32a14,14,0,0,0-21.77-11.64l-80,53.33A14,14,0,0,0,34,85.34V210H16a6,6,0,0,0,0,12H240a6,6,0,0,0,0-12ZM208,94a2,2,0,0,1,2,2V210H142V94ZM46,85.34a2,2,0,0,1,.89-1.66l80-53.34A2,2,0,0,1,130,32V210H46ZM110,112v16a6,6,0,0,1-12,0V112a6,6,0,0,1,12,0Zm-32,0v16a6,6,0,0,1-12,0V112a6,6,0,0,1,12,0Zm0,56v16a6,6,0,0,1-12,0V168a6,6,0,0,1,12,0Zm32,0v16a6,6,0,0,1-12,0V168a6,6,0,0,1,12,0Z"/></symbol>
+    <symbol id="i-docs" viewBox="0 0 256 256"><path d="M216,74H130L101.73,52.8a14,14,0,0,0-8.4-2.8H40A14,14,0,0,0,26,64V200a14,14,0,0,0,14,14H216.89A13.12,13.12,0,0,0,230,200.89V88A14,14,0,0,0,216,74Zm2,126.89a1.11,1.11,0,0,1-1.11,1.11H40a2,2,0,0,1-2-2V64a2,2,0,0,1,2-2H93.33a2,2,0,0,1,1.2.4L124.4,84.8A6,6,0,0,0,128,86h88a2,2,0,0,1,2,2Z"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 256 256"><path d="M224,202H214V40a6,6,0,0,0-6-6H152a6,6,0,0,0-6,6V82H96a6,6,0,0,0-6,6v42H48a6,6,0,0,0-6,6v66H32a6,6,0,0,0,0,12H224a6,6,0,0,0,0-12ZM158,46h44V202H158ZM102,94h44V202H102ZM54,142H90v60H54Z"/></symbol>
+    <symbol id="i-team" viewBox="0 0 256 256"><path d="M243.6,148.8a6,6,0,0,1-8.4-1.2A53.58,53.58,0,0,0,192,126a6,6,0,0,1,0-12,26,26,0,1,0-25.18-32.5,6,6,0,0,1-11.62-3,38,38,0,1,1,59.91,39.63A65.69,65.69,0,0,1,244.8,140.4,6,6,0,0,1,243.6,148.8ZM189.19,213a6,6,0,0,1-2.19,8.2,5.9,5.9,0,0,1-3,.81,6,6,0,0,1-5.2-3,59,59,0,0,0-101.62,0,6,6,0,1,1-10.38-6A70.1,70.1,0,0,1,103,182.55a46,46,0,1,1,50.1,0A70.1,70.1,0,0,1,189.19,213ZM128,178a34,34,0,1,0-34-34A34,34,0,0,0,128,178ZM70,120a6,6,0,0,0-6-6A26,26,0,1,1,89.18,81.49a6,6,0,1,0,11.62-3,38,38,0,1,0-59.91,39.63A65.69,65.69,0,0,0,11.2,140.4a6,6,0,1,0,9.6,7.2A53.58,53.58,0,0,1,64,126,6,6,0,0,0,70,120Z"/></symbol>
+    <symbol id="i-reg" viewBox="0 0 256 256"><path d="M128,26A102,102,0,1,0,230,128,102.12,102.12,0,0,0,128,26Zm0,192a90,90,0,1,1,90-90A90.1,90.1,0,0,1,128,218Zm46-90a6,6,0,0,1-6,6H134v34a6,6,0,0,1-12,0V134H88a6,6,0,0,1,0-12h34V88a6,6,0,0,1,12,0v34h34A6,6,0,0,1,174,128Z"/></symbol>
+    <symbol id="i-clk" viewBox="0 0 256 256"><path d="M128,26A102,102,0,1,0,230,128,102.12,102.12,0,0,0,128,26Zm0,192a90,90,0,1,1,90-90A90.1,90.1,0,0,1,128,218Zm62-90a6,6,0,0,1-6,6H128a6,6,0,0,1-6-6V72a6,6,0,0,1,12,0v50h50A6,6,0,0,1,190,128Z"/></symbol>
+    <symbol id="i-info" viewBox="0 0 256 256"><path d="M142,176a6,6,0,0,1-6,6,14,14,0,0,1-14-14V128a2,2,0,0,0-2-2,6,6,0,0,1,0-12,14,14,0,0,1,14,14v40a2,2,0,0,0,2,2A6,6,0,0,1,142,176ZM124,94a10,10,0,1,0-10-10A10,10,0,0,0,124,94Zm106,34A102,102,0,1,1,128,26,102.12,102.12,0,0,1,230,128Zm-12,0a90,90,0,1,0-90,90A90.1,90.1,0,0,0,218,128Z"/></symbol>
+    <symbol id="i-search" viewBox="0 0 256 256"><path d="M228.24,219.76l-51.38-51.38a86.15,86.15,0,1,0-8.48,8.48l51.38,51.38a6,6,0,0,0,8.48-8.48ZM38,112a74,74,0,1,1,74,74A74.09,74.09,0,0,1,38,112Z"/></symbol>
+    <symbol id="i-dl" viewBox="0 0 256 256"><path d="M222,144v64a6,6,0,0,1-6,6H40a6,6,0,0,1-6-6V144a6,6,0,0,1,12,0v58H210V144a6,6,0,0,1,12,0Zm-98.24,4.24a6,6,0,0,0,8.48,0l40-40a6,6,0,0,0-8.48-8.48L134,129.51V32a6,6,0,0,0-12,0v97.51L92.24,99.76a6,6,0,0,0-8.48,8.48Z"/></symbol>
+  </defs>
+</svg>
+
+<div class="app">
+  <aside class="side" aria-label="Sidebar">
+    <div>
+      <div class="brand"><span class="logo"><svg width="14" height="16" aria-hidden="true"><use href="#mark"/></svg></span><span class="brand-name">CleanStart</span><span class="brand-tag">Admin</span></div>
+      <nav class="nav" aria-label="Main">
+        <a href="#"><svg class="ic"><use href="#i-dash"/></svg>Overview</a>
+        <a href="#"><svg class="ic"><use href="#i-deals"/></svg>Deals<span class="cnt">3</span></a>
+        <a href="#"><svg class="ic"><use href="#i-bld"/></svg>Partners</a>
+        <a href="#"><svg class="ic"><use href="#i-docs"/></svg>Documents</a>
+        <a href="#" class="on" aria-current="page"><svg class="ic"><use href="#i-chart"/></svg>Reports</a>
+        <a href="#"><svg class="ic"><use href="#i-team"/></svg>Team</a>
+        <a href="#"><svg class="ic"><use href="#i-reg"/></svg>Regions</a>
+        <a href="#"><svg class="ic"><use href="#i-clk"/></svg>Audit log</a>
+        <a href="#"><svg class="ic"><use href="#i-info"/></svg>Help</a>
+      </nav>
+    </div>
+    <div class="who"><span class="av">GJ</span><div><b>Gaurav Jadhav</b><span>Partner manager, India</span></div></div>
+  </aside>
+
+  <div class="main">
+    <header class="top"><div class="pill"><svg class="ic"><use href="#i-search"/></svg>Search partners and deals<kbd>⌘K</kbd></div></header>
+    <main class="content">
+      <div class="wrap">
+        <div class="head">
+          <h1 class="h1">Reports</h1>
+          <span class="h1-sub">Period reports to read, print and send. Live numbers stay on Overview.</span>
+        </div>
+        <p class="mocknote" style="margin:0">Design mock. The web view and PDF always open the 90 day sample. Sections marked Proposed need new storage, and their rows are samples.</p>
+
+        <section class="card" aria-labelledby="b-t">
+          <div class="card-h"><h2 class="card-t" id="b-t">Build a report</h2><span class="card-meta">Scope follows your regions: India</span></div>
+          <div class="build">
+            <div class="form">
+              <div class="fld">
+                <span class="lbl" id="l-type">Report</span>
+                <div class="tpls" role="radiogroup" aria-labelledby="l-type">
+                  <button type="button" class="tpl" role="radio" aria-checked="true"><span class="rd"></span><span><b>Partner Program Review</b><span class="d">Summary, pipeline, partners, decisions and method. 6 pages.</span></span><span class="badge">Recommended</span></button>
+                  <button type="button" class="tpl" role="radio" aria-checked="false" aria-disabled="true"><span class="rd"></span><span><b>Partner scorecard</b><span class="d">One partner: deals, protection and documents. 2 pages.</span></span><span class="badge">Planned</span></button>
+                  <button type="button" class="tpl" role="radio" aria-checked="false" aria-disabled="true"><span class="rd"></span><span><b>Approvals and speed</b><span class="d">Decision times, waiting deals and rejection reasons. 2 pages.</span></span><span class="badge">Planned</span></button>
+                </div>
+              </div>
+
+              <div class="fld">
+                <span class="lbl" id="l-per">Period</span>
+                <div class="seg" role="group" aria-labelledby="l-per" id="per">
+                  <button type="button" data-p="30d" aria-pressed="false">30d</button>
+                  <button type="button" data-p="90d" aria-pressed="true">90d</button>
+                  <button type="button" data-p="365d" aria-pressed="false">365d</button>
+                  <button type="button" data-p="quarter" aria-pressed="false">Quarter</button>
+                  <button type="button" data-p="custom" aria-pressed="false">Custom</button>
+                </div>
+                <p class="hint tnum" id="per-hint">Deals registered 26 Aug to 23 Nov 2026, compared with 28 May to 25 Aug 2026.</p>
+              </div>
+
+              <div class="row2">
+                <div class="fld"><label for="f-reg">Region</label><select class="fsel" id="f-reg"><option>India</option></select></div>
+                <div class="fld"><label for="f-par">Partners</label><select class="fsel" id="f-par"><option>All partners</option><option>Kestrel Systems</option></select></div>
+              </div>
+
+              <div class="fld">
+                <span class="lbl" id="l-ed">Edition</span>
+                <div class="seg" role="group" aria-labelledby="l-ed" id="ed">
+                  <button type="button" data-e="internal" aria-pressed="true">Internal</button>
+                  <button type="button" data-e="shareable" aria-pressed="false">Shareable</button>
+                </div>
+                <p class="hint" id="ed-hint">Everything, with partner names and follow-ups. For CleanStart staff.</p>
+              </div>
+
+              <div class="acts">
+                <a class="btn btn-p" id="go-pdf" href="partner-program-review.html#print" target="_blank" rel="noopener"><svg class="ic"><use href="#i-dl"/></svg>Generate PDF</a>
+                <a class="btn btn-s" id="go-web" href="partner-program-review.html" target="_blank" rel="noopener">Open web view</a>
+                <button type="button" class="btn btn-t">Schedule this report</button>
+              </div>
+            </div>
+
+            <div class="preview" aria-label="Preview">
+              <div class="pages">
+                <div class="thumb" aria-hidden="true" style="width:254px;height:359px"><iframe title="Cover preview" src="partner-program-review.html?embed=1" style="transform:scale(.32)" tabindex="-1"></iframe></div>
+                <div class="thumb" aria-hidden="true" style="width:254px;height:359px"><iframe title="Summary preview" src="partner-program-review.html?embed=1" style="transform:scale(.32) translateY(-1122.5px)" tabindex="-1"></iframe></div>
+              </div>
+              <p class="pvcap"><b>Cover and summary</b> of 6 pages. A4, ready to print or save as PDF.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="card" aria-labelledby="r-t">
+          <div class="card-h"><h2 class="card-t" id="r-t">Recent reports</h2><span class="badge">Proposed</span></div>
+          <table class="tbl">
+            <thead><tr><th>Report</th><th>Period</th><th>Scope</th><th>Edition</th><th>Prepared by</th><th>Generated</th><th class="r"><span class="sr">Actions</span></th></tr></thead>
+            <tbody>
+              <tr><td class="nm">Partner Program Review</td><td class="t-sec tnum">26 Aug to 23 Nov 2026</td><td class="t-sec">India</td><td><span class="badge">Internal</span></td><td class="t-sec">Gaurav Jadhav</td><td class="t-sec tnum">23 Nov 2026</td><td class="r"><a class="btn btn-t" href="partner-program-review.html" target="_blank" rel="noopener">Open</a><button type="button" class="btn btn-t">PDF</button><button type="button" class="btn btn-t">Copy link</button></td></tr>
+              <tr><td class="nm">Partner Program Review</td><td class="t-sec tnum">28 May to 25 Aug 2026</td><td class="t-sec">India</td><td><span class="badge">Shareable</span></td><td class="t-sec">Gaurav Jadhav</td><td class="t-sec tnum">25 Aug 2026</td><td class="r"><button type="button" class="btn btn-t">Open</button><button type="button" class="btn btn-t">PDF</button><button type="button" class="btn btn-t">Copy link</button></td></tr>
+              <tr><td class="nm">Partner scorecard, Kestrel Systems</td><td class="t-sec tnum">26 Aug to 23 Nov 2026</td><td class="t-sec">Kestrel Systems</td><td><span class="badge">Shareable</span></td><td class="t-sec">Omar Nasser</td><td class="t-sec tnum">20 Nov 2026</td><td class="r"><button type="button" class="btn btn-t">Open</button><button type="button" class="btn btn-t">PDF</button><button type="button" class="btn btn-t">Copy link</button></td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <div class="two">
+          <section class="card" aria-labelledby="s-t">
+            <div class="card-h"><h2 class="card-t" id="s-t">Scheduled</h2><span class="badge">Proposed</span></div>
+            <ul class="list">
+              <li><div><b>Partner Program Review, India</b><small>Monthly, first working day. Next run 1 Dec 2026. Sent to 3 people.</small></div><button type="button" class="btn btn-t">Edit</button></li>
+            </ul>
+            <div class="cardfoot"><button type="button" class="btn btn-t">Add schedule</button></div>
+          </section>
+
+          <section class="card" aria-labelledby="x-t">
+            <div class="card-h"><h2 class="card-t" id="x-t">Data exports</h2><span class="card-meta">CSV, for your own analysis</span></div>
+            <ul class="list">
+              <li><b>Partner table</b><button type="button" class="btn btn-s"><svg class="ic"><use href="#i-dl"/></svg>CSV</button></li>
+              <li><b>Partner leaderboard</b><button type="button" class="btn btn-s"><svg class="ic"><use href="#i-dl"/></svg>CSV</button></li>
+              <li><b>Product breakdown</b><button type="button" class="btn btn-s"><svg class="ic"><use href="#i-dl"/></svg>CSV</button></li>
+              <li><b>Time to decision</b><button type="button" class="btn btn-s"><svg class="ic"><use href="#i-dl"/></svg>CSV</button></li>
+            </ul>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+(() => {
+  const ranges = {
+    '30d': ['25 Oct to 23 Nov 2026', '25 Sep to 24 Oct 2026'],
+    '90d': ['26 Aug to 23 Nov 2026', '28 May to 25 Aug 2026'],
+    '365d': ['25 Nov 2025 to 23 Nov 2026', '25 Nov 2024 to 24 Nov 2025'],
+    'quarter': ['1 Oct to 23 Nov 2026', '8 Aug to 30 Sep 2026'],
+  };
+  const group = (id, onPick) => {
+    const root = document.getElementById(id);
+    root.addEventListener('click', (e) => {
+      const b = e.target.closest('button');
+      if (!b) return;
+      root.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      onPick(b);
+    });
+  };
+  group('per', (b) => {
+    const r = ranges[b.dataset.p];
+    document.getElementById('per-hint').textContent = r
+      ? `Deals registered ${r[0]}, compared with ${r[1]}.`
+      : 'Pick the first and last day. The comparison period has the same length and ends the day before.';
+  });
+  group('ed', (b) => {
+    const sh = b.dataset.e === 'shareable';
+    document.getElementById('ed-hint').textContent = sh
+      ? 'Partner names, managers and follow-ups are removed. Safe to send outside CleanStart.'
+      : 'Everything, with partner names and follow-ups. For CleanStart staff.';
+    const q = sh ? '?edition=shareable' : '';
+    document.getElementById('go-web').href = `partner-program-review.html${q}`;
+    document.getElementById('go-pdf').href = `partner-program-review.html${q}#print`;
+  });
+})();
+</script>
+</body>
+</html>

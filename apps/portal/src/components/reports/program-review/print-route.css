@@ -1,0 +1,7 @@
+/* Loaded only by the print route. A global @page rule would otherwise reach every page that imports the document. */
+@page { size: A4; margin: 0 }
+html, body { height: auto }
+body { background: #E9E8EE }
+@media print {
+  body { background: #FFFFFF }
+}

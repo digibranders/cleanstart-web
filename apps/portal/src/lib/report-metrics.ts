@@ -1,4 +1,4 @@
-import { addDays, isRealDay } from './dates';
+import { addDays, daysBetween, isRealDay } from './dates';
 import { isOneOf, PRODUCTS, type Product, type RegistrationStatus } from './domain';
 
 /* ---------------------------------------------------------------- date range (URL state) */
@@ -52,6 +52,13 @@ export function resolveReportRange(preset: ReportPreset, today: string, custom?:
     case 'custom':
       return custom ? { preset, ...custom } : resolveReportRange(DEFAULT_REPORT_PRESET, today);
   }
+}
+
+/** The range of the same length that ends the day before `range` starts. It is always `custom`, because no preset names it. */
+export function previousRange(range: Pick<ReportRange, 'from' | 'to'>): ReportRange {
+  const days = daysBetween(range.from, range.to) + 1;
+  const to = addDays(range.from, -1);
+  return { preset: 'custom', from: addDays(to, -(days - 1)), to };
 }
 
 /** Parses `?range=&from=&to=`. A bad preset, a malformed day or a from after the to falls back to the default preset. */
@@ -211,9 +218,19 @@ export function productBreakdown(facts: readonly ReportFact[]): ProductRow[] {
   });
 }
 
+/** Deals per status, every status present. */
+export type StatusCounts = Record<RegistrationStatus, number>;
+
+export function statusCounts(facts: readonly ReportFact[]): StatusCounts {
+  const counts: StatusCounts = { pending: 0, accepted: 0, rejected: 0, expired: 0, won: 0, lost: 0 };
+  for (const d of facts) counts[d.status] += 1;
+  return counts;
+}
+
 export interface RangedReportDto {
   range: ReportRange;
   summary: ReportSummary;
+  statuses: StatusCounts;
   funnel: FunnelStep[];
   leaderboard: LeaderboardRow[];
   products: ProductRow[];
@@ -221,5 +238,5 @@ export interface RangedReportDto {
 
 export function buildRangedReport(facts: readonly ReportFact[], range: ReportRange): RangedReportDto {
   const own = inRange(facts, range);
-  return { range, summary: summarize(own), funnel: funnel(own), leaderboard: leaderboard(own), products: productBreakdown(own) };
+  return { range, summary: summarize(own), statuses: statusCounts(own), funnel: funnel(own), leaderboard: leaderboard(own), products: productBreakdown(own) };
 }
