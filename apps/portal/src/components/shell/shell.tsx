@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { settleAuth } from "@/lib/auth-call";
 import { authClient } from "@/lib/auth-client";
@@ -13,7 +13,9 @@ import { Icon } from "../icon";
 import { Avatar } from "../ui/badge";
 import { Drawer } from "../ui/overlay";
 import { useToast } from "../ui/toast";
+import { MobileTabs } from "./mobile-tabs";
 import { NotificationsPopover } from "./notifications-popover";
+import { PullToRefresh } from "./pull-to-refresh";
 import { OPEN_SEARCH_EVENT, SearchPalette } from "./search-palette";
 import { Scrim } from "@/components/ui/scrim";
 
@@ -139,6 +141,23 @@ export function Shell({
 
   const activeHref = activeNavHref(nav, pathname);
   const narrow = useNarrow();
+  const router = useRouter();
+  const [docTitle, setDocTitle] = useState<string | null>(null);
+  // The phone's top bar carries the page title like a native app, so the page's own heading is hidden there (but kept for screen readers).
+  // biome-ignore lint/correctness/useExhaustiveDependencies: a new path means a new title
+  useEffect(() => {
+    const read = (): void => setDocTitle(document.title.split(" | ")[0]?.trim() || null);
+    read();
+    const titleEl = document.querySelector("title");
+    if (!titleEl) return;
+    const observer = new MutationObserver(read);
+    observer.observe(titleEl, { childList: true, characterData: true, subtree: true });
+    return () => observer.disconnect();
+  }, [pathname]);
+  const goBack = (): void => {
+    if (window.history.length > 1) router.back();
+    else router.push(pathname.split("/").slice(0, -1).join("/") || "/");
+  };
   const dealName = useDealName(pathname);
   const shortcut = useShortcutHint();
   const nouns = searchNouns(kind, nav);
@@ -149,9 +168,21 @@ export function Shell({
   const underDeals = kind === "partner" && pathname.startsWith(`${ROUTES.partner.deals}/`);
   let crumb: React.JSX.Element;
   if (narrow) {
+    const isRoot = nav.some((item) => item.href === pathname) || pathname.startsWith(ROUTES.partner.welcome);
+    const activeItem = nav.find((item) => item.href === activeHref);
+    const title = underDeals && dealName ? dealName : (docTitle ?? activeItem?.label ?? me.org);
     crumb = (
-      <nav aria-label="Breadcrumb" className="crumb">
-        <b>{me.org}</b>
+      <nav aria-label="Breadcrumb" className="crumb crumb-m">
+        {isRoot ? (
+          <span className="crumb-mark">
+            <Avatar initials={me.orgInitials} logoUrl={me.orgLogoUrl} />
+          </span>
+        ) : (
+          <button type="button" className="ibtn crumb-back" aria-label="Back" onClick={goBack}>
+            <Icon name="caret" className="ic crumb-back-ic" />
+          </button>
+        )}
+        <b className="crumb-title">{title}</b>
       </nav>
     );
   } else if (underDeals) {
@@ -395,7 +426,7 @@ export function Shell({
                 <span className="search-t">{searchLabel}</span>
                 <span className="kbd">{shortcut}</span>
               </button>
-              <div className="pop-wrap">
+              <div className="pop-wrap hide-sm">
                 <button
                   type="button"
                   className="ibtn"
@@ -508,6 +539,8 @@ export function Shell({
             {children}
           </main>
         </div>
+        <PullToRefresh />
+        <MobileTabs nav={nav} activeHref={activeHref} countFor={countFor} moreOpen={menuOpen} onMore={() => setMenuOpen((open) => !open)} />
       </div>
 
       <SearchPalette kind={kind} nav={nav} />

@@ -5,6 +5,7 @@ import {
   CHAT_POLL_INBOX_MS,
   CHAT_POLL_THREAD_HIDDEN_MS,
   CHAT_POLL_THREAD_MS,
+  CHAT_TYPING_POLL_MS,
   type ChatInboxDto,
   type ChatMemberDto,
   type ChatMessageDto,
@@ -176,6 +177,25 @@ export function useThread(conversationId: string | null, myReadSeq: number): Thr
     tick();
     return () => clearTimeout(timer);
   }, [conversationId, state.loading, visible, pollNow]);
+
+  // Typing is asked for on its own, faster loop: a light read, only while the tab is in front.
+  useEffect(() => {
+    if (!conversationId || state.loading || !visible) return;
+    let stopped = false;
+    const tick = async (): Promise<void> => {
+      try {
+        const { typing } = await getJson<{ typing: ThreadState["typing"] }>(`/api/chat/typing?c=${conversationId}`);
+        if (!stopped && idRef.current === conversationId) setState((s) => (s.typing.length === 0 && typing.length === 0 ? s : { ...s, typing }));
+      } catch {
+        // the main poll reports connection problems
+      }
+    };
+    const timer = setInterval(() => void tick(), CHAT_TYPING_POLL_MS);
+    return () => {
+      stopped = true;
+      clearInterval(timer);
+    };
+  }, [conversationId, state.loading, visible]);
 
   const loadOlder = useCallback(async (): Promise<void> => {
     const id = idRef.current;

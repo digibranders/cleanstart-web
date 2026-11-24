@@ -911,6 +911,7 @@ export function RegisterDeal({ mine, managers, partnerName: ownPartnerName, part
                   </div>
                 ) : null}
                 <div
+                  className="stick-b"
                   style={{
                     position: "sticky",
                     bottom: 0,

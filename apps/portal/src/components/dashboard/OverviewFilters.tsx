@@ -54,7 +54,7 @@ export function OverviewFilters({ regionSwitch = false, categorySwitch = false, 
   const regions = offer(state.region);
   const go = (next: Partial<OverviewFilterState>): void => router.replace(overviewHref(pathname, { ...state, ...next }));
   return (
-    <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+    <div className="flt" style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
       <nav className="seg" aria-label="Period">
         {DASHBOARD_PERIODS.map((p) => (
           <Link
@@ -69,7 +69,7 @@ export function OverviewFilters({ regionSwitch = false, categorySwitch = false, 
           </Link>
         ))}
       </nav>
-      <span style={{ display: "inline-flex", gap: 4, alignItems: "center" }}>
+      <span className="flt-dates" style={{ display: "inline-flex", gap: 4, alignItems: "center" }}>
         <DatePicker
           variant="fsel"
           ariaLabel="From date"

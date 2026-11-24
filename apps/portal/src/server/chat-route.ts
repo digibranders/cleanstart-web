@@ -21,7 +21,7 @@ export async function chatRoute(
   const viewer = await getViewer();
   if (!viewer) return json({ error: 'Sign in to continue.' }, 401);
   try {
-    rateLimit(`chat:poll:${viewer.id}`, { limit: 240, windowSeconds: 60 });
+    rateLimit(`chat:poll:${viewer.id}`, { limit: 400, windowSeconds: 60 });
     return json(await handler(viewer, systemClock));
   } catch (error) {
     if (error instanceof RateLimitError) return new Response(JSON.stringify({ error: 'Too many requests.' }), { status: 429, headers: { ...HEADERS, 'Retry-After': String(error.retryAfterSeconds) } });

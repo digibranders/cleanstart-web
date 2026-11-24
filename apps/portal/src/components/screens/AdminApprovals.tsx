@@ -611,7 +611,7 @@ export function AdminApprovals({
         <div
           role="region"
           aria-label="Bulk decision"
-          className="card"
+          className="card stick-b"
           style={{
             position: "sticky",
             bottom: 12,

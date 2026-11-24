@@ -94,6 +94,7 @@ interface MessageProps {
 
 function MessageViewBase({ message, mine, head, showName, tick, tickTitle, actions, highlighted }: MessageProps): React.JSX.Element {
   const [palette, setPalette] = useState(false);
+  const [tools, setTools] = useState(false);
   if (message.kind === "system") {
     return (
       <div className="cx-system" id={`m-${message.id}`}>
@@ -103,7 +104,7 @@ function MessageViewBase({ message, mine, head, showName, tick, tickTitle, actio
   }
   const editable = mine && !message.deleted && Date.now() < canEditUntil(message.createdAt).getTime();
   return (
-    <div className={`cx-msg${mine ? " cx-mine" : ""}${head ? " cx-head" : ""}${highlighted ? " cx-hl" : ""}`} id={`m-${message.id}`}>
+    <div className={`cx-msg${mine ? " cx-mine" : ""}${head ? " cx-head" : ""}${highlighted ? " cx-hl" : ""}`} id={`m-${message.id}`} data-open={tools ? "1" : undefined}>
       {!mine && head ? (
         <span className="cx-av" aria-hidden="true" data-staff={message.senderOrg === "CleanStart" ? "1" : undefined}>
           {initialsOf(message.senderName)}
@@ -154,6 +155,11 @@ function MessageViewBase({ message, mine, head, showName, tick, tickTitle, actio
               {clockLabel(message.createdAt)}
             </time>
             {mine && !message.deleted ? <Ticks state={tick} title={tickTitle} /> : null}
+            {!message.deleted ? (
+              <button type="button" className="cx-more" aria-label="Message actions" aria-expanded={tools} onClick={() => setTools((open) => !open)}>
+                <Icon name="more" small />
+              </button>
+            ) : null}
           </span>
         </div>
         {message.reactions.length > 0 ? (

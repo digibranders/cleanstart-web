@@ -8,6 +8,7 @@ import {
   CHAT_FILE_MAX_BYTES,
   CHAT_MAX_BODY,
   CHAT_MAX_FILES,
+  CHAT_TYPING_SEND_MS,
   type ChatMemberDto,
   type ChatMessageDto,
   type ChatRefDto,
@@ -59,7 +60,6 @@ interface ComposerProps {
   onSearch: (query: string) => void;
 }
 
-const TYPING_EVERY_MS = 3000;
 const pastedName = (file: File, index: number): string => (file.name && file.name !== "image.png" ? file.name : `pasted-${Date.now()}-${index + 1}.${(file.type.split("/")[1] ?? "png").replace("jpeg", "jpg")}`);
 
 const mentionAt = (text: string, caret: number): { start: number; query: string } | null => {
@@ -94,7 +94,7 @@ export const Composer = forwardRef<ComposerHandle, ComposerProps>(function Compo
     const el = area.current;
     if (!el) return;
     el.style.height = "auto";
-    el.style.height = `${Math.min(el.scrollHeight + 2, 180)}px`;
+    el.style.height = `${Math.min(el.scrollHeight, 180)}px`;
   }, []);
 
   // A different chat starts with a clean composer; unsent files of the old one are withdrawn.
@@ -206,7 +206,7 @@ export const Composer = forwardRef<ComposerHandle, ComposerProps>(function Compo
 
   const noteTyping = (): void => {
     const now = Date.now();
-    if (now - typingSent.current < TYPING_EVERY_MS) return;
+    if (now - typingSent.current < CHAT_TYPING_SEND_MS) return;
     typingSent.current = now;
     void setTypingAction({ conversationId });
   };
@@ -461,7 +461,7 @@ export const Composer = forwardRef<ComposerHandle, ComposerProps>(function Compo
       <div className="cx-box">
         <input ref={picker} type="file" multiple accept={CHAT_ACCEPT} hidden onChange={(event) => { addFiles(Array.from(event.target.files ?? [])); event.target.value = ""; }} />
         <button type="button" className="ibtn" aria-label="Attach files" data-hint="Attach files (or paste, or drop)" onClick={() => picker.current?.click()} disabled={Boolean(editing)}>
-          <Icon name="upload" />
+          <Icon name="clip" />
         </button>
         <label className="sr" htmlFor="cx-input">
           Message
@@ -471,7 +471,7 @@ export const Composer = forwardRef<ComposerHandle, ComposerProps>(function Compo
           ref={area}
           rows={1}
           value={text}
-          placeholder="Write a message. Type / for commands, @ to mention."
+          placeholder="Write a message"
           onChange={(event) => {
             setText(event.target.value);
             setCaret(event.target.selectionStart);
@@ -487,7 +487,7 @@ export const Composer = forwardRef<ComposerHandle, ComposerProps>(function Compo
         </button>
       </div>
       <div className="cx-foot" aria-live="polite">
-        {notice ? <span className="cx-err">{notice}</span> : <span>Enter to send, Shift+Enter for a new line</span>}
+        {notice ? <span className="cx-err">{notice}</span> : <span className="cx-hint">Enter to send, Shift+Enter for a new line. Type / for commands, @ to mention.</span>}
         {text.length > CHAT_MAX_BODY - 500 ? <span className={text.length > CHAT_MAX_BODY ? "cx-err" : ""}>{text.length}/{CHAT_MAX_BODY}</span> : null}
       </div>
     </div>

@@ -178,7 +178,7 @@ function Header({ filters, today, asOf, deals, exportKpis }: { filters: Dashboar
         </span>
       </div>
       {deals ? (
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+        <div className="head-act" style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
           <OverviewFilters period={filters.period} from={filters.from} to={filters.to} product={filters.product} />
           {exportKpis}
           <CustomizeButton />

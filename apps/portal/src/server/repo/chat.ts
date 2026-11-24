@@ -612,6 +612,17 @@ export async function pollConversation(tx: Tx, viewer: Viewer, input: { conversa
   };
 }
 
+/** Who is typing in a chat right now (not the viewer). One indexed read, so a thread can ask every second or so. */
+export async function listTyping(tx: Tx, viewer: Viewer, input: { conversationId: string }, clock: Clock): Promise<Array<{ userId: string; name: string }>> {
+  const conversation = await loadConversation(tx, input.conversationId);
+  const rows = await tx
+    .select({ userId: chatTyping.userId, name: chatMembers.displayName })
+    .from(chatTyping)
+    .innerJoin(chatMembers, and(eq(chatMembers.conversationId, chatTyping.conversationId), eq(chatMembers.userId, chatTyping.userId)))
+    .where(and(eq(chatTyping.conversationId, conversation.id), ne(chatTyping.userId, viewer.id), gt(chatTyping.at, new Date(clock.now().getTime() - CHAT_TYPING_SECONDS * 1000))));
+  return rows;
+}
+
 /** Pinned messages of a chat, newest pin first. */
 export async function listPinned(tx: Tx, viewer: Viewer, input: { conversationId: string }): Promise<ChatMessageDto[]> {
   const conversation = await loadConversation(tx, input.conversationId);
@@ -1055,7 +1066,7 @@ const NIL = '00000000-0000-0000-0000-000000000000';
 
 export const isolation = defineIsolation<
   | 'listPeople' | 'openDirect' | 'createGroup' | 'addMembers' | 'removeMember' | 'leaveGroup' | 'completeLeave' | 'renameGroup' | 'listInbox' | 'countUnread'
-  | 'getConversation' | 'loadMessages' | 'pollConversation' | 'listPinned' | 'searchMessages' | 'searchShareables' | 'sendMessage'
+  | 'getConversation' | 'loadMessages' | 'pollConversation' | 'listPinned' | 'listTyping' | 'searchMessages' | 'searchShareables' | 'sendMessage'
   | 'editMessage' | 'deleteMessage' | 'toggleReaction' | 'setPinned' | 'markRead' | 'setMuted' | 'setTyping' | 'createAttachment'
   | 'getAttachment' | 'listPendingAttachments' | 'discardAttachment' | 'partnerChatBytes' | 'claimDigest'
 >({
@@ -1080,6 +1091,7 @@ export const isolation = defineIsolation<
   getConversation: { scope: 'tenant', expect: 'not_found', probe: (tx, viewer, ctx) => getConversation(tx, viewer, { conversationId: ctx.b.conversationId }, probeClock) },
   loadMessages: { scope: 'tenant', expect: 'not_found', probe: (tx, viewer, ctx) => loadMessages(tx, viewer, { conversationId: ctx.b.conversationId }) },
   pollConversation: { scope: 'tenant', expect: 'not_found', probe: (tx, viewer, ctx) => pollConversation(tx, viewer, { conversationId: ctx.b.conversationId, sinceRev: 0 }, probeClock) },
+  listTyping: { scope: 'tenant', expect: 'not_found', probe: (tx, viewer, ctx) => listTyping(tx, viewer, { conversationId: ctx.b.conversationId }, probeClock) },
   listPinned: { scope: 'tenant', expect: 'not_found', probe: (tx, viewer, ctx) => listPinned(tx, viewer, { conversationId: ctx.b.conversationId }) },
   searchMessages: { scope: 'tenant', expect: 'empty', probe: (tx, viewer, ctx) => searchMessages(tx, viewer, { query: 'isolation probe', conversationId: ctx.b.conversationId }) },
   searchShareables: { scope: 'tenant', expect: 'empty', probe: (tx, viewer, ctx) => searchShareables(tx, viewer, { kind: 'deal', query: ctx.b.partnerId }) },

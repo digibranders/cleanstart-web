@@ -10,9 +10,11 @@ export const metadata: Metadata = {
   title: { default: "CleanStart Partner Portal", template: "%s | CleanStart Partner Portal" },
   description: "CleanStart partner portal: deal registration, documents and your team.",
   robots: { index: false, follow: false },
+  appleWebApp: { capable: true, title: "CleanStart", statusBarStyle: "default" },
+  formatDetection: { telephone: false },
 };
 
-export const viewport: Viewport = { width: "device-width", initialScale: 1 };
+export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover", themeColor: "#FFFFFF" };
 
 export default function RootLayout({ children }: { children: React.ReactNode }): React.JSX.Element {
   return (

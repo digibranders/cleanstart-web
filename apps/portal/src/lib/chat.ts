@@ -22,7 +22,10 @@ export const CHAT_PARTNER_STORAGE_BYTES = 2 * 1024 * 1024 * 1024;
 export const CHAT_EDIT_WINDOW_MINUTES = 15;
 export const CHAT_PAGE_SIZE = 40;
 /** A typing line older than this is gone; a presence line older than this means offline. */
-export const CHAT_TYPING_SECONDS = 6;
+export const CHAT_TYPING_SECONDS = 4;
+/** How often an open thread asks only who is typing, and how often the typist's browser says so. */
+export const CHAT_TYPING_POLL_MS = 1200;
+export const CHAT_TYPING_SEND_MS = 2000;
 export const CHAT_ONLINE_SECONDS = 60;
 export const CHAT_DIGEST_AFTER_MINUTES = 15;
 
