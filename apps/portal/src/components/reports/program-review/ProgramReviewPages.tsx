@@ -3,7 +3,19 @@ import './program-review.css';
 
 const TITLE = 'Partner Program Review';
 
-function Page({ label, n, dto, title, children }: { label: string; n: number; dto: ProgramReviewDto; title: string; children: React.ReactNode }): React.JSX.Element {
+function Page({
+  label,
+  n,
+  dto,
+  title,
+  children,
+}: {
+  label: string;
+  n: number;
+  dto: ProgramReviewDto;
+  title: string;
+  children: React.ReactNode;
+}): React.JSX.Element {
   return (
     <section className="pr-page" aria-label={label}>
       <div className="pr-inner">
@@ -18,7 +30,6 @@ function Page({ label, n, dto, title, children }: { label: string; n: number; dt
       </div>
       <div className="pr-foot">
         <span>CleanStart Partner Portal</span>
-        <span>{EDITION_LABEL[dto.edition]}</span>
         <span>
           Page {n} of {PAGE_COUNT}
         </span>
@@ -48,13 +59,26 @@ export function CoverPage({ dto }: { dto: ProgramReviewDto }): React.JSX.Element
           <div className="pr-brand">
             <svg width="22" height="25" viewBox="0 0 27.8 32" aria-hidden="true">
               <defs>
-                <linearGradient id="pr-mk" x1="12.39" y1="20.14" x2="27.87" y2="20.51" gradientUnits="userSpaceOnUse">
+                <linearGradient
+                  id="pr-mk"
+                  x1="12.39"
+                  y1="20.14"
+                  x2="27.87"
+                  y2="20.51"
+                  gradientUnits="userSpaceOnUse"
+                >
                   <stop stopColor="#9A51FF" />
                   <stop offset="1" stopColor="#2CC1EB" />
                 </linearGradient>
               </defs>
-              <path d="M24.2359 10.3234V22.0554L15.709 27.1983V15.2722L12.3945 17.1973L12.4877 17.2505V31.1486L13.898 31.9969L27.7958 23.8114V8.32319L27.7368 8.28876L24.2359 10.3234Z" fill="url(#pr-mk)" />
-              <path d="M15.7088 15.219L5.10062 8.92732L14.0283 3.991L24.2326 9.87577V10.3203L27.7335 8.28563L13.8295 0L0 8.32006V23.6079L3.22439 25.5518V11.7695L12.3943 17.1942L15.7088 15.2691V15.219Z" fill="#fff" />
+              <path
+                d="M24.2359 10.3234V22.0554L15.709 27.1983V15.2722L12.3945 17.1973L12.4877 17.2505V31.1486L13.898 31.9969L27.7958 23.8114V8.32319L27.7368 8.28876L24.2359 10.3234Z"
+                fill="url(#pr-mk)"
+              />
+              <path
+                d="M15.7088 15.219L5.10062 8.92732L14.0283 3.991L24.2326 9.87577V10.3203L27.7335 8.28563L13.8295 0L0 8.32006V23.6079L3.22439 25.5518V11.7695L12.3943 17.1942L15.7088 15.2691V15.219Z"
+                fill="#fff"
+              />
             </svg>
             <span>
               CleanStart <small>Partner Portal</small>
@@ -66,7 +90,11 @@ export function CoverPage({ dto }: { dto: ProgramReviewDto }): React.JSX.Element
         <p className="pr-per">{dto.period}</p>
         <p className="pr-scope">{dto.scopeLine}</p>
 
-        <div className="pr-art" role="img" aria-label={`Deals registered, approved and won this period: ${dto.cover.map((b) => b.value).join(', ')}`}>
+        <div
+          className="pr-art"
+          role="img"
+          aria-label={`Deals registered, approved and won this period: ${dto.cover.map((b) => b.value).join(', ')}`}
+        >
           {dto.cover.map((b) => (
             <div className="pr-art-row" key={b.label}>
               <div className="pr-art-bar" style={{ width: `${b.width}%`, background: b.color }} />
@@ -89,7 +117,9 @@ export function CoverPage({ dto }: { dto: ProgramReviewDto }): React.JSX.Element
           </div>
           <div>
             <b>Confidential</b>
-            {dto.edition === 'shareable' ? 'Partner names and contacts removed' : 'For CleanStart internal use'}
+            {dto.edition === 'shareable'
+              ? 'Partner names and contacts removed'
+              : 'For CleanStart internal use'}
           </div>
         </div>
       </div>
@@ -106,7 +136,7 @@ export function SummaryPage({ dto }: { dto: ProgramReviewDto }): React.JSX.Eleme
         {summary.kpis.map((k) => (
           <div className="pr-kpi" role="listitem" key={k.label}>
             <div className="pr-kl">{k.label}</div>
-            <div className="pr-kv">{k.value}</div>
+            <div className={`pr-kv${k.value === 'None yet' ? ' pr-kv-s' : ''}`}>{k.value}</div>
             <div className="pr-kd">{k.delta}</div>
             <div className="pr-pair" aria-hidden="true">
               <i className="pr-pa" style={{ width: `${k.priorWidth}%` }} />
@@ -115,7 +145,12 @@ export function SummaryPage({ dto }: { dto: ProgramReviewDto }): React.JSX.Eleme
           </div>
         ))}
       </div>
-      <Legend items={[{ color: 'var(--prior)', label: `Last period, ${dto.priorPeriod}` }, { color: 'var(--violet)', label: 'This period' }]} />
+      <Legend
+        items={[
+          { color: 'var(--prior)', label: `Last period, ${dto.priorPeriod}` },
+          { color: 'var(--violet)', label: 'This period' },
+        ]}
+      />
       {summary.valueNote ? <p className="pr-note">{summary.valueNote}</p> : null}
 
       <div className="pr-block">
@@ -132,15 +167,17 @@ export function SummaryPage({ dto }: { dto: ProgramReviewDto }): React.JSX.Eleme
         </dl>
       </div>
 
-      <div className="pr-attn">
-        <h3 className="pr-h">Needs attention</h3>
-        <ol>
-          {summary.attention.map((a) => (
-            <li key={a.lead}>
-              <b>{a.lead}</b> {a.detail}
-            </li>
-          ))}
-        </ol>
+      <div className="pr-block">
+        <div className="pr-attn">
+          <h3 className="pr-h">Needs attention</h3>
+          <ol>
+            {summary.attention.map((a) => (
+              <li key={a.lead}>
+                <b>{a.lead}</b> {a.detail}
+              </li>
+            ))}
+          </ol>
+        </div>
       </div>
     </Page>
   );
@@ -159,11 +196,20 @@ export function PipelinePage({ dto }: { dto: ProgramReviewDto }): React.JSX.Elem
               <FunnelRow key={f.label} row={f} />
             ))}
           </div>
-          <Legend items={[{ color: 'var(--violet-d)', label: 'This period' }, { color: 'var(--prior)', label: p.priorLegend }]} />
+          <Legend
+            items={[
+              { color: 'var(--violet-d)', label: 'This period' },
+              { color: 'var(--prior)', label: p.priorLegend },
+            ]}
+          />
         </div>
         <div>
           <h3 className="pr-h">Where the {dto.deals} deals stand</h3>
-          <div className="pr-stack" role="img" aria-label={p.stack.map((s) => `${s.count} ${s.label.toLowerCase()}`).join(', ')}>
+          <div
+            className="pr-stack"
+            role="img"
+            aria-label={p.stack.map((s) => `${s.count} ${s.label.toLowerCase()}`).join(', ')}
+          >
             {p.stack.map((s) => (
               <i key={s.tone} className={`pr-t-${s.tone}`} style={{ width: `${s.width}%` }} />
             ))}
@@ -184,7 +230,13 @@ export function PipelinePage({ dto }: { dto: ProgramReviewDto }): React.JSX.Elem
 
       <div className="pr-block">
         <h3 className="pr-h">How each product's deals ended up</h3>
-        <div className="pr-ps" role="img" aria-label={p.products.map((x) => `${x.product}: ${x.won} won, ${x.deals - x.approved} not approved`).join('. ')}>
+        <div
+          className="pr-ps"
+          role="img"
+          aria-label={p.products
+            .map((x) => `${x.product}: ${x.won} won, ${x.deals - x.approved} not approved`)
+            .join('. ')}
+        >
           {p.products.map((x) => (
             <ProductBar key={x.product} row={x} />
           ))}
@@ -220,12 +272,16 @@ export function PipelinePage({ dto }: { dto: ProgramReviewDto }): React.JSX.Elem
                 </td>
                 <td className="r">{x.deals}</td>
                 <td className="r">
-                  {x.approved} {x.approvedShare ? <span className="pr-muted">({x.approvedShare})</span> : null}
+                  {x.approved}{' '}
+                  {x.approvedShare ? <span className="pr-muted">({x.approvedShare})</span> : null}
                 </td>
                 <td className="r">{x.won}</td>
                 <td className="r">{x.wonValue}</td>
                 <td>
-                  <span className="pr-mini" style={{ width: `${x.valueWidth}%`, background: '#DDD3F8' }}>
+                  <span
+                    className="pr-mini"
+                    style={{ width: `${x.valueWidth}%`, background: '#DDD3F8' }}
+                  >
                     <i style={{ width: `${x.wonFill}%`, background: x.swatch }} />
                   </span>
                   <span style={{ fontSize: '10.5px', color: 'var(--muted)' }}>{x.totalValue}</span>
@@ -250,7 +306,9 @@ export function PipelinePage({ dto }: { dto: ProgramReviewDto }): React.JSX.Elem
   );
 }
 
-function FunnelRow({ row }: { row: ProgramReviewDto['pipeline']['funnel'][number] }): React.JSX.Element {
+function FunnelRow({
+  row,
+}: { row: ProgramReviewDto['pipeline']['funnel'][number] }): React.JSX.Element {
   return (
     <>
       <div className="pr-name">
@@ -267,7 +325,9 @@ function FunnelRow({ row }: { row: ProgramReviewDto['pipeline']['funnel'][number
   );
 }
 
-function ProductBar({ row }: { row: ProgramReviewDto['pipeline']['products'][number] }): React.JSX.Element {
+function ProductBar({
+  row,
+}: { row: ProgramReviewDto['pipeline']['products'][number] }): React.JSX.Element {
   return (
     <>
       <div className="pr-name">
@@ -313,7 +373,7 @@ export function PartnersPage({ dto }: { dto: ProgramReviewDto }): React.JSX.Elem
 
       <div className="pr-block">
         <h3 className="pr-h">Leaderboard</h3>
-        <table className="pr-tbl">
+        <table className="pr-tbl pr-tight">
           <thead>
             <tr>
               <th>Partner</th>
@@ -331,7 +391,10 @@ export function PartnersPage({ dto }: { dto: ProgramReviewDto }): React.JSX.Elem
                 </td>
                 <td className="r">{r.deals}</td>
                 <td>
-                  <span className="pr-mini" style={{ width: `${r.width}%`, background: 'var(--violet)' }} />
+                  <span
+                    className="pr-mini"
+                    style={{ width: `${r.width}%`, background: 'var(--violet)' }}
+                  />
                 </td>
                 <td className="r">{r.won}</td>
                 <td className="r">{r.wonValue}</td>
@@ -346,13 +409,18 @@ export function PartnersPage({ dto }: { dto: ProgramReviewDto }): React.JSX.Elem
             ) : null}
           </tbody>
         </table>
-        {p.leaderboardMore > 0 ? <p className="pr-note">{p.leaderboardMore} more partners are in the portal.</p> : null}
+        {p.leaderboardMore > 0 ? (
+          <p className="pr-note">
+            {p.leaderboardMore} more {p.leaderboardMore === 1 ? 'partner is' : 'partners are'} in
+            the portal.
+          </p>
+        ) : null}
       </div>
 
       {p.managers && p.managers.length > 0 ? (
         <div className="pr-block">
           <h3 className="pr-h">By partner manager</h3>
-          <table className="pr-tbl">
+          <table className="pr-tbl pr-tight">
             <thead>
               <tr>
                 <th>Manager</th>
@@ -379,7 +447,7 @@ export function PartnersPage({ dto }: { dto: ProgramReviewDto }): React.JSX.Elem
 
       <div className="pr-block">
         <h3 className="pr-h">All time, to {dto.period.split(' to ')[1]}</h3>
-        <table className="pr-tbl">
+        <table className="pr-tbl pr-tight">
           <thead>
             <tr>
               <th>Partner</th>
@@ -418,13 +486,24 @@ export function PartnersPage({ dto }: { dto: ProgramReviewDto }): React.JSX.Elem
             </tr>
           </tfoot>
         </table>
-        {p.allTimeMore > 0 ? <p className="pr-note">{p.allTimeMore} more partners are included in the totals and listed in the portal.</p> : null}
+        {p.allTimeMore > 0 ? (
+          <p className="pr-note">
+            {p.allTimeMore} more {p.allTimeMore === 1 ? 'partner is' : 'partners are'} included in
+            the totals and listed in the portal.
+          </p>
+        ) : null}
       </div>
     </Page>
   );
 }
 
-function HBars({ rows, tone }: { rows: Array<{ label: string; count: number; width: number }>; tone: string }): React.JSX.Element {
+function HBars({
+  rows,
+  tone,
+}: {
+  rows: Array<{ label: string; count: number; width: number }>;
+  tone: string;
+}): React.JSX.Element {
   return (
     <div className="pr-hb">
       {rows.map((r) => (
@@ -447,28 +526,44 @@ export function DecisionsPage({ dto }: { dto: ProgramReviewDto }): React.JSX.Ele
     <Page label="Decisions and quality" n={5} dto={dto} title="Decisions and quality">
       <p className="pr-lede">{d.lede}</p>
 
-      <h3 className="pr-h">Time to first decision, in days</h3>
-      {hasBars ? (
-        <>
-          <div className="pr-ttw" role="img" aria-label={d.bars.map((b) => `${b.label} ${b.current ?? 'none'} days against ${b.prior ?? 'none'}`).join('. ')}>
-            <div className="pr-tt">
-              {d.bars.map((b) => (
-                <DecisionRow key={b.label} bar={b} />
-              ))}
+      <div className="pr-grow">
+        <h3 className="pr-h">Time to first decision, in days</h3>
+        {hasBars ? (
+          <>
+            <div
+              className="pr-ttw"
+              role="img"
+              aria-label={d.bars
+                .map((b) => `${b.label} ${b.current ?? 'none'} days against ${b.prior ?? 'none'}`)
+                .join('. ')}
+            >
+              <div className="pr-tt">
+                {d.bars.map((b) => (
+                  <DecisionRow key={b.label} bar={b} />
+                ))}
+              </div>
+              <div className="pr-tov" aria-hidden="true">
+                <span className="pr-target" style={{ left: `${d.targetLeft}%` }} />
+                <span className="pr-tlab" style={{ left: `${d.targetLeft}%` }}>
+                  Review target
+                </span>
+              </div>
             </div>
-            <div className="pr-tov" aria-hidden="true">
-              <span className="pr-target" style={{ left: `${d.targetLeft}%` }} />
-              <span className="pr-tlab" style={{ left: `${d.targetLeft}%` }}>
-                Review target
-              </span>
-            </div>
-          </div>
-          <Legend items={[{ color: 'var(--violet)', label: 'This period' }, { color: 'var(--prior)', label: d.priorLegend }]} />
-          <p className="pr-note">Bars count calendar days from registration, or from resubmission after a rejection. The review target counts business days.</p>
-        </>
-      ) : (
-        <p className="pr-sec">No deal has had a first decision yet.</p>
-      )}
+            <Legend
+              items={[
+                { color: 'var(--violet)', label: 'This period' },
+                { color: 'var(--prior)', label: d.priorLegend },
+              ]}
+            />
+            <p className="pr-note">
+              Bars count calendar days from registration, or from resubmission after a rejection.
+              The review target counts business days.
+            </p>
+          </>
+        ) : (
+          <p className="pr-sec">No deal has had a first decision yet.</p>
+        )}
+      </div>
 
       <div className="pr-cols pr-block">
         <div>
@@ -515,7 +610,9 @@ export function DecisionsPage({ dto }: { dto: ProgramReviewDto }): React.JSX.Ele
   );
 }
 
-function DecisionRow({ bar }: { bar: ProgramReviewDto['decisions']['bars'][number] }): React.JSX.Element {
+function DecisionRow({
+  bar,
+}: { bar: ProgramReviewDto['decisions']['bars'][number] }): React.JSX.Element {
   return (
     <>
       <div className="pr-name">
@@ -544,7 +641,9 @@ export function MethodPage({ dto }: { dto: ProgramReviewDto }): React.JSX.Elemen
   const { method: m } = dto;
   return (
     <Page label="Method and definitions" n={6} dto={dto} title="Method and definitions">
-      <p className="pr-lede">How the figures were produced, so any number in this report can be checked in the portal.</p>
+      <p className="pr-lede">
+        How the figures were produced, so any number in this report can be checked in the portal.
+      </p>
       <dl className="pr-def">
         {m.definitions.map((d) => (
           <div key={d.term} style={{ display: 'contents' }}>
@@ -553,13 +652,15 @@ export function MethodPage({ dto }: { dto: ProgramReviewDto }): React.JSX.Elemen
           </div>
         ))}
       </dl>
-      <div className="pr-about">
-        {m.about.map((a) => (
-          <div key={a.label}>
-            <b>{a.label}</b>
-            {a.value}
-          </div>
-        ))}
+      <div className="pr-block">
+        <div className="pr-about">
+          {m.about.map((a) => (
+            <div key={a.label}>
+              <b>{a.label}</b>
+              {a.value}
+            </div>
+          ))}
+        </div>
       </div>
       <div className="pr-block">
         <h3 className="pr-h">Reading notes</h3>
@@ -572,7 +673,10 @@ export function MethodPage({ dto }: { dto: ProgramReviewDto }): React.JSX.Elemen
 }
 
 /** The six pages in order. */
-export function ProgramReviewDocument({ dto, toolbar }: { dto: ProgramReviewDto; toolbar?: React.ReactNode }): React.JSX.Element {
+export function ProgramReviewDocument({
+  dto,
+  toolbar,
+}: { dto: ProgramReviewDto; toolbar?: React.ReactNode }): React.JSX.Element {
   return (
     <div className="pr">
       {toolbar}

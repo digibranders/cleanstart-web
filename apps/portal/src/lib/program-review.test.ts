@@ -178,8 +178,8 @@ describe('buildProgramReview', () => {
   it('caps long tables and still totals every partner', () => {
     const many = Array.from({ length: 30 }, (_, i) => ({ ...(allTime.partners[0] as AdminReportsDto['partners'][number]), partnerId: `x${i}`, name: `Partner ${i}`, registered: 1, won: 1, accepted: 1, rejected: 0, protectedNow: 1 }));
     const dto = buildProgramReview(input({ allTime: { ...allTime, partners: many, totalPartners: 30, totalRegistered: 30 } }));
-    expect(dto.partners.allTime).toHaveLength(7);
-    expect(dto.partners.allTimeMore).toBe(23);
+    expect(dto.partners.allTime).toHaveLength(6);
+    expect(dto.partners.allTimeMore).toBe(24);
     expect(dto.partners.allTimeTotals).toMatchObject({ registered: 30, won: 30, protectedNow: 30 });
   });
 });

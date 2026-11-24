@@ -43,9 +43,9 @@ export function partnerLetters(index: number): string {
 export const PAGE_COUNT = 6;
 /** Where the web view and the print view of the review live. Under /admin so the sign in redirect covers it. */
 export const PROGRAM_REVIEW_PATH = '/admin/reports/program-review';
-const LEADERBOARD_ROWS = 6;
-const MANAGER_ROWS = 4;
-const ALL_TIME_ROWS = 7;
+const LEADERBOARD_ROWS = 5;
+const MANAGER_ROWS = 3;
+const ALL_TIME_ROWS = 6;
 const REASON_ROWS = 5;
 const FOLLOW_UP_ROWS = 4;
 
