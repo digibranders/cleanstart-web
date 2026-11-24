@@ -1,0 +1,317 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+
+  --color-cs-navy-0: #151021;
+  --color-cs-navy-1: #10123e;
+  --color-cs-blue-1: #131e8f;
+  --color-cs-purple-1: #471ec0;
+  --color-cs-purple-3: #551ec3;
+  --color-cs-cyan: #2cc1eb;
+  --color-cs-lavender: #dab6f3;
+
+  --container-default: 1440px;
+  --container-prose: 720px;
+}
+
+:root {
+  /* Same role tokens as apps/web (TYPOGRAPHY-SYSTEM.md), trimmed to what this site renders. */
+  --fs-h1: clamp(2rem, 1.5rem + 2.22vw, 3.5rem);
+  --fs-lead: clamp(1.125rem, 0.96rem + 0.83vw, 1.5rem);
+  --fs-body: clamp(1rem, 0.95rem + 0.15vw, 1.0625rem);
+  --fs-body-sm: 0.875rem;
+  --fs-caption: 0.8125rem;
+  --fs-button: 1rem;
+  --fs-input: 1rem;
+  --fs-input-label: 0.875rem;
+}
+
+html {
+  background: #f5f4fb;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  color: #111111;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  text-wrap: balance;
+}
+
+/* Keyboard focus ring for the shared field surface (see field-surface.ts). */
+.cs-field:focus-visible,
+.cs-field-group:has(:focus-visible) {
+  outline: 2px solid #3960f9;
+  outline-offset: 2px;
+}
+
+/* Primary submit button. White on #471EC0 measures about 9:1. Height is the
+   44px WCAG 2.5.8 floor used by every primary CTA on the main site. */
+.ev-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.75rem;
+  padding: 0 1.75rem;
+  border: 0;
+  border-radius: 8px;
+  background: var(--color-cs-purple-1);
+  color: #ffffff;
+  font-family: var(--font-sans);
+  font-size: var(--fs-button);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 200ms ease-out,
+    transform 200ms cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+.ev-btn:hover:not(:disabled) {
+  background: var(--color-cs-purple-3);
+  transform: translateY(-1px);
+}
+
+.ev-btn:active:not(:disabled) {
+  transform: translateY(0);
+  filter: brightness(0.92);
+}
+
+.ev-btn:focus-visible {
+  outline: 2px solid #3960f9;
+  outline-offset: 3px;
+}
+
+.ev-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ev-btn {
+    transition: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Event page atmosphere (v2). Everything here animates transform or opacity only,
+   and is switched off under prefers-reduced-motion.
+   --------------------------------------------------------------------------- */
+.ev-band {
+  position: relative;
+  isolation: isolate;
+  background: #151021;
+  overflow: hidden;
+}
+
+/* Slow violet and cyan light behind the logos. Motivated: it is the "night"
+   the party happens in, and it keeps the dark band from reading as a flat fill. */
+.ev-band::before,
+.ev-band::after {
+  content: "";
+  position: absolute;
+  z-index: -2;
+  width: 70%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.ev-band::before {
+  top: -45%;
+  right: -15%;
+  background: radial-gradient(closest-side, rgba(71, 30, 192, 0.6), rgba(71, 30, 192, 0));
+  animation: ev-drift 22s ease-in-out infinite alternate;
+}
+
+.ev-band::after {
+  bottom: -55%;
+  left: -20%;
+  background: radial-gradient(closest-side, rgba(44, 193, 235, 0.25), rgba(44, 193, 235, 0));
+  animation: ev-drift 28s ease-in-out infinite alternate-reverse;
+}
+
+.ev-stars {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.75;
+  background-image:
+    radial-gradient(1.2px 1.2px at 8% 24%, #fff 98%, transparent),
+    radial-gradient(1px 1px at 19% 68%, #fff 98%, transparent),
+    radial-gradient(1.4px 1.4px at 31% 14%, #fff 98%, transparent),
+    radial-gradient(1px 1px at 44% 82%, #fff 98%, transparent),
+    radial-gradient(1.2px 1.2px at 57% 30%, #fff 98%, transparent),
+    radial-gradient(1px 1px at 68% 72%, #fff 98%, transparent),
+    radial-gradient(1.4px 1.4px at 79% 18%, #fff 98%, transparent),
+    radial-gradient(1px 1px at 88% 56%, #fff 98%, transparent),
+    radial-gradient(1.2px 1.2px at 94% 86%, #fff 98%, transparent);
+  animation: ev-twinkle 6s ease-in-out infinite alternate;
+}
+
+.ev-link {
+  display: block;
+  height: 1px;
+  width: 28px;
+  transform-origin: left center;
+  background: linear-gradient(90deg, rgba(44, 193, 235, 0), #2cc1eb 50%, rgba(171, 140, 255, 0));
+  animation: ev-draw 900ms cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+
+@media (min-width: 640px) {
+  .ev-link {
+    width: 56px;
+  }
+}
+
+/* The ticket: a main body and a stub, each notched where they meet. The mask
+   clips box-shadow, so the shadow lives on the wrapper as a drop-shadow. */
+.ev-pass {
+  filter: drop-shadow(0 24px 40px rgba(60, 30, 150, 0.28));
+}
+
+.ev-pass-main,
+.ev-pass-stub {
+  background: #ffffff;
+}
+
+.ev-pass-main {
+  border-radius: 16px 16px 0 0;
+  -webkit-mask:
+    radial-gradient(12px at 0 100%, #0000 97%, #000) left / 51% 100% no-repeat,
+    radial-gradient(12px at 100% 100%, #0000 97%, #000) right / 51% 100% no-repeat;
+  mask:
+    radial-gradient(12px at 0 100%, #0000 97%, #000) left / 51% 100% no-repeat,
+    radial-gradient(12px at 100% 100%, #0000 97%, #000) right / 51% 100% no-repeat;
+}
+
+.ev-pass-stub {
+  position: relative;
+  border-radius: 0 0 16px 16px;
+  -webkit-mask:
+    radial-gradient(12px at 0 0, #0000 97%, #000) left / 51% 100% no-repeat,
+    radial-gradient(12px at 100% 0, #0000 97%, #000) right / 51% 100% no-repeat;
+  mask:
+    radial-gradient(12px at 0 0, #0000 97%, #000) left / 51% 100% no-repeat,
+    radial-gradient(12px at 100% 0, #0000 97%, #000) right / 51% 100% no-repeat;
+}
+
+.ev-pass-stub::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 18px;
+  right: 18px;
+  border-top: 2px dashed #d9d4ec;
+}
+
+.ev-route-line {
+  position: absolute;
+  left: 5px;
+  width: 0;
+  border-left: 2px dotted rgba(71, 30, 192, 0.55);
+}
+
+.ev-pop {
+  animation: ev-pop 420ms cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+
+@keyframes ev-drift {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-6%, 5%, 0);
+  }
+}
+
+@keyframes ev-twinkle {
+  from {
+    opacity: 0.35;
+  }
+  to {
+    opacity: 0.85;
+  }
+}
+
+@keyframes ev-draw {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+@keyframes ev-pop {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ev-band::before,
+  .ev-band::after,
+  .ev-stars,
+  .ev-link,
+  .ev-pop {
+    animation: none;
+  }
+}
+
+/* Pass band (v3): faint orbit rings behind the title echo the partner link line,
+   and a gradient horizon marks where the dark band meets the card. */
+.ev-rings {
+  position: absolute;
+  z-index: -1;
+  left: 50%;
+  top: 56%;
+  width: min(120vw, 980px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  pointer-events: none;
+}
+
+.ev-rings::before,
+.ev-rings::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  inset: 17%;
+  border: 1px dashed rgba(171, 140, 255, 0.18);
+}
+
+.ev-rings::after {
+  inset: 34%;
+  border: 1px solid rgba(44, 193, 235, 0.14);
+}
+
+.ev-horizon {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(44, 193, 235, 0.7) 30%, rgba(171, 140, 255, 0.7) 70%, transparent);
+}
