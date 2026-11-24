@@ -85,7 +85,7 @@ export function parseDocumentsView(params: Params): DocumentsView {
     product: pick(DOC_PRODUCTS, first(params.product)),
     group: pick(DOC_GROUPS, first(params.group)),
     sort: pick(DOC_SORTS, first(params.sort)) ?? 'new',
-    layout: pick(DOC_VIEWS, first(params.view)) ?? 'list',
+    layout: pick(DOC_VIEWS, first(params.view)) ?? 'cards',
   };
 }
 
@@ -97,7 +97,7 @@ export function documentsViewToQuery(view: DocumentsView): string {
   if (view.product) query.set('product', view.product);
   if (view.group) query.set('group', view.group);
   if (view.sort !== 'new') query.set('sort', view.sort);
-  if (view.layout !== 'list') query.set('view', view.layout);
+  if (view.layout !== 'cards') query.set('view', view.layout);
   const text = query.toString();
   return text ? `?${text}` : '';
 }
@@ -116,6 +116,41 @@ export function sortDocuments<T extends Pick<DocumentDto, 'title' | 'ownOpens'>>
 /** "Today" for a document updated today, otherwise "4 Nov". Replaces the mock's "Just now". */
 export const adminUpdatedLabel = (updatedAt: string, today: string): string =>
   updatedAt.slice(0, 10) === today ? 'Today' : fmtShort(updatedAt);
+
+/* ---------------------------------------------------------------- spotlight and staff attention */
+
+export type AttentionReason = 'expired' | 'draft' | 'unopened';
+export const ATTENTION_NOTE: Record<AttentionReason, string> = {
+  expired: 'Expired, partners no longer see it',
+  draft: 'Draft, partners cannot see it yet',
+  unopened: 'Published, no partner has opened it',
+};
+
+/** Why a staff member should look at a document again, or null when it is live and being used. */
+export function attentionReason(doc: Pick<DocumentDto, 'status' | 'expired' | 'opens'>): AttentionReason | null {
+  if (doc.expired) return 'expired';
+  if (doc.status === 'draft') return 'draft';
+  return (doc.opens ?? 0) === 0 ? 'unopened' : null;
+}
+
+type SpotlightDoc = Pick<DocumentDto, 'updatedAt' | 'opens' | 'ownOpens' | 'status' | 'expired'>;
+const newest = <T extends SpotlightDoc>(docs: readonly T[]): T | null =>
+  docs.reduce<T | null>((best, d) => (best === null || d.updatedAt > best.updatedAt ? d : best), null);
+
+/** The one document the library leads with: staff see the most opened live one, a partner the newest they have not opened. */
+export function pickSpotlight<T extends SpotlightDoc>(docs: readonly T[], staff: boolean, today: string): { doc: T; kicker: string } | null {
+  if (staff) {
+    const live = docs.filter((d) => d.status === 'published' && !d.expired);
+    const top = live.reduce<T | null>((best, d) => ((d.opens ?? 0) > (best?.opens ?? 0) ? d : best), null);
+    if (top && (top.opens ?? 0) > 0) return { doc: top, kicker: 'Most opened' };
+    const latest = newest(live);
+    return latest ? { doc: latest, kicker: 'Latest upload' } : null;
+  }
+  const fresh = newest(docs.filter((d) => isNewDocument(d, today)));
+  if (fresh) return { doc: fresh, kicker: 'New for you' };
+  const latest = newest(docs);
+  return latest ? { doc: latest, kicker: 'Latest update' } : null;
+}
 
 export const audienceTone = (kind: AudienceKind): 'neutral' | 'pending' | 'violet' =>
   kind === 'all' ? 'neutral' : kind === 'named' ? 'pending' : 'violet';

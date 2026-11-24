@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   adminUpdatedLabel,
+  attentionReason,
   audienceInputOf,
   audienceTone,
   draftFromAudience,
@@ -14,6 +15,7 @@ import {
   once,
   parseDocumentsView,
   parsePartnerNames,
+  pickSpotlight,
   sameAudience,
   sortDocuments,
 } from './doc-view';
@@ -120,7 +122,7 @@ describe('library grouping', () => {
 
 describe('library URL filters', () => {
   it('uses the defaults for an empty or hand edited URL', () => {
-    expect(parseDocumentsView({})).toEqual({ q: '', type: null, product: null, group: null, sort: 'new', layout: 'list' });
+    expect(parseDocumentsView({})).toEqual({ q: '', type: null, product: null, group: null, sort: 'new', layout: 'cards' });
     expect(parseDocumentsView({ type: 'nope', product: 'x', group: 'y', sort: 'z', view: 'grid' })).toEqual(parseDocumentsView({}));
   });
   it('reads every filter, takes the first of a repeated one and trims the search text', () => {
@@ -130,8 +132,8 @@ describe('library URL filters', () => {
   });
   it('writes only what differs from the defaults and round trips', () => {
     expect(documentsViewToQuery(parseDocumentsView({}))).toBe('');
-    const view = parseDocumentsView({ q: 'a b', group: 'sales', view: 'cards' });
-    expect(documentsViewToQuery(view)).toBe('?q=a+b&group=sales&view=cards');
+    const view = parseDocumentsView({ q: 'a b', group: 'sales', view: 'list' });
+    expect(documentsViewToQuery(view)).toBe('?q=a+b&group=sales&view=list');
     expect(parseDocumentsView(Object.fromEntries(new URLSearchParams(documentsViewToQuery(view))))).toEqual(view);
   });
   it('counts filters but not the sort or the layout', () => {
@@ -150,5 +152,46 @@ describe('once', () => {
     record();
     record();
     expect(calls).toBe(1);
+  });
+});
+
+describe('staff attention and the spotlight', () => {
+  const doc = (over: Partial<{ updatedAt: string; opens: number | null; ownOpens: number | null; status: 'draft' | 'published'; expired: boolean }>) => ({
+    updatedAt: '2026-11-01T00:00:00.000Z',
+    opens: 5,
+    ownOpens: 0,
+    status: 'published' as const,
+    expired: false,
+    ...over,
+  });
+
+  it('flags expired before draft before unopened, and nothing for a live used document', () => {
+    expect(attentionReason(doc({ expired: true, status: 'draft' }))).toBe('expired');
+    expect(attentionReason(doc({ status: 'draft' }))).toBe('draft');
+    expect(attentionReason(doc({ opens: 0 }))).toBe('unopened');
+    expect(attentionReason(doc({ opens: null }))).toBe('unopened');
+    expect(attentionReason(doc({}))).toBeNull();
+  });
+
+  it('leads staff with the most opened live document and ignores drafts and expired ones', () => {
+    const live = doc({ opens: 40 });
+    const picked = pickSpotlight([doc({ opens: 90, status: 'draft' }), doc({ opens: 70, expired: true }), live, doc({ opens: 3 })], true, '2026-11-10');
+    expect(picked?.doc).toBe(live);
+    expect(picked?.kicker).toBe('Most opened');
+  });
+
+  it('falls back to the newest live upload for staff when nothing was opened, and to null when nothing is live', () => {
+    const latest = doc({ opens: 0, updatedAt: '2026-11-05T00:00:00.000Z' });
+    expect(pickSpotlight([doc({ opens: 0 }), latest], true, '2026-11-10')?.kicker).toBe('Latest upload');
+    expect(pickSpotlight([doc({ status: 'draft' })], true, '2026-11-10')).toBeNull();
+  });
+
+  it('leads a partner with the newest document they have not opened, else the newest', () => {
+    const fresh = doc({ updatedAt: '2026-11-08T00:00:00.000Z', opens: null });
+    const opened = doc({ updatedAt: '2026-11-09T00:00:00.000Z', ownOpens: 2, opens: null });
+    expect(pickSpotlight([opened, fresh], false, '2026-11-10')).toEqual({ doc: fresh, kicker: 'New for you' });
+    const old = doc({ updatedAt: '2026-09-01T00:00:00.000Z', opens: null });
+    expect(pickSpotlight([old, opened], false, '2026-11-20')).toEqual({ doc: opened, kicker: 'Latest update' });
+    expect(pickSpotlight([], false, '2026-11-10')).toBeNull();
   });
 });

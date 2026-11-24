@@ -3,14 +3,14 @@
 import { useSearchParams } from 'next/navigation';
 import { useCallback, useMemo, useState } from 'react';
 import { Icon } from '@/components/icon';
+import { DocCard } from '@/components/documents/DocCard';
+import { DocRail, DocSpotlight, type RailItem } from '@/components/documents/DocSpotlight';
 import { DocumentEditDrawer } from '@/components/documents/DocumentEditDrawer';
 import { DocumentPreview } from '@/components/documents/DocumentPreview';
 import { RequestsInbox, type RequestPerson } from '@/components/documents/RequestsInbox';
 import { UploadDocumentForm } from '@/components/documents/UploadDocumentForm';
-import { CHIP_PRODUCT, TYPE_ICON, TYPE_TONE } from '@/components/documents/doc-style';
-import { adminUpdatedLabel, audienceTone } from '@/components/documents/doc-view';
-import { ActionMenu } from '@/components/ui/action-menu';
-import { Badge, ProductChip } from '@/components/ui/badge';
+import { trackGlow } from '@/components/documents/card-glow';
+import { ATTENTION_NOTE, DOC_GROUP_LABEL, attentionReason, groupDocuments, pickSpotlight } from '@/components/documents/doc-view';
 import { Dropdown } from '@/components/ui/dropdown';
 import { useToast } from '@/components/ui/toast';
 import type { AudiencePartnerDto } from '@/lib/document-upload';
@@ -18,8 +18,7 @@ import type { MaterialRequestDto } from '@/lib/dto';
 import { plural } from '@/lib/dates';
 import { DOC_PRODUCT_LABEL, DOC_PRODUCTS, DOCUMENT_TYPE_LABEL, DOCUMENT_TYPES } from '@/lib/domain';
 import type { DocumentDto } from '@/lib/dto';
-import { audienceLabel, formatLabel } from '@/server/files/rules';
-import { ScrollRegion } from "@/components/ui/scroll-region";
+import { formatLabel } from '@/server/files/rules';
 
 const ANY = 'any';
 const TYPE_FILTER = [
@@ -77,6 +76,16 @@ export function AdminDocuments({
     setProductFilter(ANY);
   };
 
+  const grouped = groupDocuments(rows);
+  const starts = grouped.map((_, i) => grouped.slice(0, i).reduce((n, g) => n + g.docs.length, 0));
+  const filtered = q.trim() !== '' || typeFilter !== ANY || productFilter !== ANY;
+  const feature = !filtered && docs.length >= 4 ? pickSpotlight(docs, true, today) : null;
+  const attention: RailItem[] = feature
+    ? docs.flatMap((doc) => {
+        const reason = doc.id === feature.doc.id ? null : attentionReason(doc);
+        return reason ? [{ doc, note: ATTENTION_NOTE[reason] }] : [];
+      })
+    : [];
   const opensTotal = docs.reduce((n, d) => n + (d.opens ?? 0), 0);
   const editing = editingId ? (docs.find((d) => d.id === editingId) ?? null) : null;
   const viewing = viewingId ? (docs.find((d) => d.id === viewingId) ?? null) : null;
@@ -168,109 +177,60 @@ export function AdminDocuments({
               <Dropdown ariaLabel="Product" value={productFilter} options={PRODUCT_FILTER} onChange={setProductFilter} />
             </div>
           </div>
-          <ScrollRegion label="Document library">
-            <table className="tbl">
-              <thead>
-                <tr>
-                  <th scope="col">Document</th>
-                  <th scope="col" className="hide-sm">
-                    Product
-                  </th>
-                  <th scope="col">Who can open it</th>
-                  <th scope="col" className="r hide-sm">
-                    Updated
-                  </th>
-                  <th scope="col" className="r">
-                    Opens
-                  </th>
-                  <th scope="col" className="r hide-sm">
-                    Opened by
-                  </th>
-                  <th scope="col" className="r hide-sm">
-                    Last opened
-                  </th>
-                  <th scope="col" className="r">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((d) => (
-                  <tr key={d.id}>
-                    <td style={{ whiteSpace: 'normal', minWidth: 150 }}>
-                      <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <span className={`li-ic ${TYPE_TONE[d.type]}`}>
-                          <Icon name={TYPE_ICON[d.type]} />
-                        </span>
-                        <span className="li-t">
-                          <button
-                            type="button"
-                            className="linkbtn li-n"
-                            style={{ fontSize: 13 }}
-                            onClick={() => openDocument(d)}
-                          >
-                            {d.title}
-                          </button>
-                          <span className="li-s">
-                            {DOCUMENT_TYPE_LABEL[d.type]}, {formatLabel(d)}
-                          </span>
-                          {d.summary ? <span className="li-s">{d.summary}</span> : null}
-                        </span>
-                      </span>
-                    </td>
-                    <td className="hide-sm">
-                      <ProductChip product={CHIP_PRODUCT[d.product]} />
-                    </td>
-                    <td>
-                      <Badge tone={audienceTone(d.audience.kind)}>{audienceLabel(d.audience)}</Badge>
-                      {d.status === 'draft' ? (
-                        <>
-                          {' '}
-                          <Badge tone="pending">Draft</Badge>
-                        </>
-                      ) : null}
-                      {d.expired ? (
-                        <>
-                          {' '}
-                          <Badge tone="expired">Expired</Badge>
-                        </>
-                      ) : null}
-                    </td>
-                    <td className="tnum r t-sec hide-sm">{adminUpdatedLabel(d.updatedAt, today)}</td>
-                    <td className="tnum r">{d.opens ?? 0}</td>
-                    <td className="tnum r t-sec hide-sm">{plural(d.partnerCount ?? 0, 'partner')}</td>
-                    <td className="tnum r t-sec hide-sm">{d.lastOpenedAt ? adminUpdatedLabel(d.lastOpenedAt, today) : 'Never'}</td>
-                    <td className="r">
-                      <ActionMenu
-                        label="Actions"
-                        ariaLabel={`Actions for ${d.title}`}
-                        items={[
-                          { label: d.type === 'video' ? 'Watch' : 'Open', onSelect: () => openDocument(d) },
-                          { label: 'Download', onSelect: () => download(d) },
-                          { label: 'Edit', onSelect: () => setEditingId(d.id) },
-                        ]}
+          {docs.length === 0 ? (
+            <div className="empty">No documents yet. Upload the first one.</div>
+          ) : rows.length === 0 ? (
+            <div className="empty">
+              No documents match these filters.{' '}
+              <button type="button" className="btn btn-g" onClick={clear} style={{ height: 24, padding: '0 6px', fontSize: 12 }}>
+                Clear filters
+              </button>
+            </div>
+          ) : (
+            <div className="dsections" onPointerMove={trackGlow}>
+              {feature ? (
+                <div className={`dfeature${attention.length === 0 ? ' dfeature-solo' : ''}`}>
+                  <DocSpotlight
+                    doc={feature.doc}
+                    kicker={feature.kicker}
+                    isNew={false}
+                    onOpen={openDocument}
+                    actions={
+                      <>
+                        <button type="button" className="btn btn-s btn-lg" onClick={() => openDocument(feature.doc)}>
+                          {feature.doc.type === 'video' ? 'Watch' : 'Open'}
+                        </button>
+                        <button type="button" className="btn btn-g btn-lg" onClick={() => setEditingId(feature.doc.id)}>
+                          Edit
+                        </button>
+                      </>
+                    }
+                  />
+                  {attention.length > 0 ? <DocRail title="Needs attention" items={attention.slice(0, 4)} onSelect={(d) => setEditingId(d.id)} /> : null}
+                </div>
+              ) : null}
+              {grouped.map((g, gi) => (
+                <section key={g.group} aria-label={DOC_GROUP_LABEL[g.group]}>
+                  <h2 className="dgroup">
+                    {DOC_GROUP_LABEL[g.group]} <span className="cnt">{g.docs.length}</span>
+                  </h2>
+                  <div className="dcards">
+                    {g.docs.map((d, i) => (
+                      <DocCard
+                        key={d.id}
+                        doc={d}
+                        isNew={false}
+                        index={(starts[gi] ?? 0) + i}
+                        onOpen={openDocument}
+                        onDownload={download}
+                        staff={{ today, onEdit: (x) => setEditingId(x.id) }}
                       />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            {docs.length === 0 ? (
-              <div className="empty">No documents yet. Upload the first one.</div>
-            ) : rows.length === 0 ? (
-              <div className="empty">
-                No documents match these filters.{' '}
-                <button
-                  type="button"
-                  className="btn btn-g"
-                  onClick={clear}
-                  style={{ height: 24, padding: '0 6px', fontSize: 12 }}
-                >
-                  Clear filters
-                </button>
-              </div>
-            ) : null}
-          </ScrollRegion>
+                    ))}
+                  </div>
+                </section>
+              ))}
+            </div>
+          )}
         </section>
       </div>
 

@@ -3,6 +3,8 @@
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState, useTransition } from 'react';
 import { DocCard } from '@/components/documents/DocCard';
+import { DocRail, DocSpotlight } from '@/components/documents/DocSpotlight';
+import { trackGlow } from '@/components/documents/card-glow';
 import { MyRequests } from '@/components/documents/MyRequests';
 import { DocumentPreview } from '@/components/documents/DocumentPreview';
 import { RequestMaterialDialog } from '@/components/documents/RequestMaterialDialog';
@@ -20,6 +22,7 @@ import {
   groupDocuments,
   hasDocumentFilters,
   isNewDocument,
+  pickSpotlight,
 } from '@/components/documents/doc-view';
 import { Icon } from '@/components/icon';
 import { Badge, ProductChip } from '@/components/ui/badge';
@@ -37,8 +40,8 @@ const PRODUCT_FILTER = [{ value: ANY, label: 'All products' }, ...DOC_PRODUCTS.m
 const TYPE_FILTER = [{ value: ANY, label: 'All types' }, ...DOCUMENT_TYPES.map((t) => ({ value: t, label: DOCUMENT_TYPE_LABEL[t] }))];
 const SORT_OPTIONS = DOC_SORTS.map((s) => ({ value: s, label: DOC_SORT_LABEL[s] }));
 const LAYOUTS: ReadonlyArray<{ value: DocLibraryLayout; label: string }> = [
-  { value: 'list', label: 'List' },
   { value: 'cards', label: 'Cards' },
+  { value: 'list', label: 'List' },
 ];
 const SEARCH_DEBOUNCE_MS = 350;
 
@@ -85,6 +88,15 @@ export function Documents({
   const matched = Object.values(counts).reduce((sum, n) => sum + n, 0);
   const filtered = hasDocumentFilters(view);
   const grouped = groupDocuments(docs);
+  const starts = grouped.map((_, i) => grouped.slice(0, i).reduce((n, g) => n + g.docs.length, 0));
+  const feature = view.layout === 'cards' && !filtered && docs.length >= 4 ? pickSpotlight(docs, false, today) : null;
+  const recent = feature
+    ? [...docs]
+        .filter((d) => d.id !== feature.doc.id)
+        .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
+        .slice(0, 3)
+        .map((doc) => ({ doc, note: `${isNewDocument(doc, today) ? 'New, ' : ''}${fmtLong(doc.updatedAt)}` }))
+    : [];
   const viewing = viewingId ? (docs.find((d) => d.id === viewingId) ?? null) : null;
   const closeView = useCallback((): void => setViewingId(null), []);
   const closeRequest = useCallback((): void => setRequestOpen(false), []);
@@ -227,8 +239,25 @@ export function Documents({
             )}
           </div>
         ) : view.layout === 'cards' ? (
-          <div className="dsections">
-            {grouped.map((g) => (
+          <div className="dsections" onPointerMove={trackGlow}>
+            {feature ? (
+              <div className="dfeature">
+                <DocSpotlight
+                  doc={feature.doc}
+                  kicker={feature.kicker}
+                  isNew={isNewDocument(feature.doc, today)}
+                  onOpen={(d) => setViewingId(d.id)}
+                  actions={
+                    <button type="button" className="btn btn-p btn-lg" onClick={() => (feature.doc.type === 'video' ? setViewingId(feature.doc.id) : download(feature.doc))}>
+                      <Icon name={feature.doc.type === 'video' ? 'play' : 'dl'} />
+                      {feature.doc.type === 'video' ? 'Watch' : 'Download'}
+                    </button>
+                  }
+                />
+                <DocRail title="Recently updated" items={recent} onSelect={(d) => setViewingId(d.id)} />
+              </div>
+            ) : null}
+            {grouped.map((g, gi) => (
               <section key={g.group} aria-label={DOC_GROUP_LABEL[g.group]}>
                 {view.group === null ? (
                   <h2 className="dgroup">
@@ -236,8 +265,8 @@ export function Documents({
                   </h2>
                 ) : null}
                 <div className="dcards">
-                  {g.docs.map((d) => (
-                    <DocCard key={d.id} doc={d} isNew={isNewDocument(d, today)} onOpen={(x) => setViewingId(x.id)} onDownload={download} />
+                  {g.docs.map((d, i) => (
+                    <DocCard key={d.id} doc={d} isNew={isNewDocument(d, today)} index={(starts[gi] ?? 0) + i} onOpen={(x) => setViewingId(x.id)} onDownload={download} />
                   ))}
                 </div>
               </section>
@@ -313,57 +342,28 @@ export function Documents({
             </h2>
             <span className="card-meta">On cleanstart.com, no sign-in needed</span>
           </div>
-          <ScrollRegion label="Public datasheets">
-            <table className="tbl">
-              <thead>
-                <tr>
-                  <th scope="col">Name</th>
-                  <th scope="col" className="r hide-sm">
-                    Updated
-                  </th>
-                  <th scope="col" className="r">
-                    <span className="sr">Action</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {publicDatasheets.map((d) => (
-                  <tr key={d.id}>
-                    <td style={{ whiteSpace: 'normal', minWidth: 'min(320px, 40vw)' }}>
-                      <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <span className="li-ic tone-blue">
-                          <Icon name="file" />
-                        </span>
-                        <span className="li-t">
-                          <a
-                            className="linkbtn li-n"
-                            style={{ fontSize: 13 }}
-                            href={d.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            {d.title}
-                          </a>
-                          {d.summary ? <span className="li-s">{d.summary}</span> : null}
-                        </span>
-                      </span>
-                    </td>
-                    <td className="tnum r t-sec hide-sm">{d.updatedAt ? fmtLong(d.updatedAt) : ''}</td>
-                    <td className="r">
-                      <a
-                        className="btn btn-s"
-                        href={d.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Open on cleanstart.com
-                      </a>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </ScrollRegion>
+          <div className="dcards dcards-sm" onPointerMove={trackGlow}>
+            {publicDatasheets.map((d, i) => (
+              <a
+                key={d.id}
+                className="dlink"
+                style={{ '--i': Math.min(i, 11) } as React.CSSProperties}
+                href={d.url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <span className="li-ic tone-blue">
+                  <Icon name="file" />
+                </span>
+                <span className="li-t">
+                  <span className="dlink-t">{d.title}</span>
+                  {d.summary ? <span className="li-s">{d.summary}</span> : null}
+                  {d.updatedAt ? <span className="li-s tnum">Updated {fmtLong(d.updatedAt)}</span> : null}
+                </span>
+                <span className="dlink-go">Open</span>
+              </a>
+            ))}
+          </div>
         </section>
       ) : null}
 

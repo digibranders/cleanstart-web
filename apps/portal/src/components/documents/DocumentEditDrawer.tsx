@@ -1,21 +1,20 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useId, useRef, useState } from 'react';
 import { AudiencePicker } from '@/components/documents/AudiencePicker';
-import { DocumentDetailSections } from '@/components/documents/DocumentDetailSections';
+import { DocumentActivity, DocumentVersions, useDocumentDetail } from '@/components/documents/DocumentDetailSections';
 import { DocumentMediaSection } from '@/components/documents/DocumentMediaSection';
+import { TYPE_ICON } from '@/components/documents/doc-style';
 import {
   adminUpdatedLabel,
   type AudienceDraft,
   audienceInputOf,
-  audienceTone,
   draftFromAudience,
   draftToInput,
   sameAudience,
 } from '@/components/documents/doc-view';
 import { uploadFile } from '@/components/documents/upload-client';
 import { Icon } from '@/components/icon';
-import { Badge } from '@/components/ui/badge';
 import { DatePicker } from '@/components/ui/date-picker';
 import { Dropdown } from '@/components/ui/dropdown';
 import { Drawer } from '@/components/ui/overlay';
@@ -38,7 +37,8 @@ import {
   replaceDocumentFileAction,
   updateDocumentAction,
 } from '@/server/actions/documents';
-import { audienceLabel, formatLabel, UPLOAD_ACCEPT } from '@/server/files/rules';
+import { fmtLong } from '@/lib/dates';
+import { formatLabel, UPLOAD_ACCEPT } from '@/server/files/rules';
 
 const TYPE_OPTIONS = DOCUMENT_TYPES.map((t) => ({ value: t, label: DOCUMENT_TYPE_LABEL[t] }));
 const DOCUMENT_STATUS_OPTIONS: ReadonlyArray<{ value: DocumentStatus; label: string }> = [
@@ -46,6 +46,15 @@ const DOCUMENT_STATUS_OPTIONS: ReadonlyArray<{ value: DocumentStatus; label: str
   { value: 'draft', label: 'Draft' },
 ];
 const PRODUCT_OPTIONS = DOC_PRODUCTS.map((p) => ({ value: p, label: DOC_PRODUCT_LABEL[p] }));
+const SUMMARY_MAX = 300;
+
+const TABS = [
+  { id: 'details', label: 'Details' },
+  { id: 'file', label: 'File' },
+  { id: 'activity', label: 'Activity' },
+] as const;
+type TabId = (typeof TABS)[number]['id'];
+type Confirm = 'delete' | 'discard' | null;
 
 export function DocumentEditDrawer({
   doc,
@@ -59,7 +68,9 @@ export function DocumentEditDrawer({
   onClose: () => void;
 }): React.JSX.Element {
   const toast = useToast();
-  const [confirming, setConfirming] = useState(false);
+  const [confirming, setConfirming] = useState<Confirm>(null);
+  const [tab, setTab] = useState<TabId>('details');
+  const tabsId = useId();
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -73,6 +84,7 @@ export function DocumentEditDrawer({
   const [fileRefresh, setFileRefresh] = useState(0);
   const titleRef = useRef<HTMLInputElement>(null);
   const [draft, setDraft] = useState<AudienceDraft>(() => draftFromAudience(doc.audience));
+  const detail = useDocumentDetail(doc.id, fileRefresh);
 
   const audience = draftToInput(draft, partners);
   const fieldError =
@@ -86,6 +98,23 @@ export function DocumentEditDrawer({
     expiresOn !== (doc.expiresAt ? doc.expiresAt.slice(0, 10) : '') ||
     !audience.ok ||
     !sameAudience(audience.audience, audienceInputOf(doc.audience));
+
+  const reset = (): void => {
+    setTitle(doc.title);
+    setDocType(doc.type);
+    setProduct(doc.product);
+    setSummary(doc.summary ?? '');
+    setStatus(doc.status);
+    setExpiresOn(doc.expiresAt ? doc.expiresAt.slice(0, 10) : '');
+    setDraft(draftFromAudience(doc.audience));
+    setError(null);
+  };
+  // Escape, the X and a click outside all land here, so unsaved edits are never dropped without asking.
+  const requestClose = (): void => {
+    if (changed && !busy) setConfirming('discard');
+    else onClose();
+  };
+  const titleBlank = title.trim() === '';
 
   const save = async (): Promise<void> => {
     if (busy) return;
@@ -153,7 +182,7 @@ export function DocumentEditDrawer({
     const result = await deleteDocumentAction({ id: doc.id });
     setBusy(false);
     if (!result.ok) {
-      setConfirming(false);
+      setConfirming(null);
       setError(result.error.message);
       return;
     }
@@ -161,217 +190,276 @@ export function DocumentEditDrawer({
     toast(`Deleted ${doc.title}`);
   };
 
+  const dangerFooter =
+    confirming === 'delete' ? (
+      <>
+        <p className="hint ded-fmsg" role="alert">
+          Delete {doc.title}? Partners lose access at once. The file is kept for 30 days, then removed.
+        </p>
+        <button type="button" className="btn btn-s" onClick={() => setConfirming(null)} disabled={busy}>
+          Keep it
+        </button>
+        <button type="button" className="btn btn-dd" onClick={() => void remove()} disabled={busy}>
+          Delete document
+        </button>
+      </>
+    ) : confirming === 'discard' ? (
+      <>
+        <p className="hint ded-fmsg" role="alert">
+          You have unsaved changes. Close without saving them?
+        </p>
+        <button type="button" className="btn btn-s" onClick={() => setConfirming(null)}>
+          Keep editing
+        </button>
+        <button type="button" className="btn btn-d" onClick={onClose}>
+          Discard and close
+        </button>
+      </>
+    ) : null;
+
+  const isVideo = doc.type === 'video';
   return (
     <Drawer
       open
-      onClose={onClose}
+      onClose={requestClose}
       initialFocus={titleRef}
+      className="drawer-doc"
+      lead={
+        <span className="dthumb" data-product={doc.product} aria-hidden="true">
+          <Icon name={TYPE_ICON[doc.type]} />
+        </span>
+      }
       title={doc.title}
       subtitle={`${DOCUMENT_TYPE_LABEL[doc.type]}, ${formatLabel(doc)}`}
       footer={
-        confirming ? (
+        dangerFooter ?? (
           <>
+            {changed ? (
+              <span className="ded-dirty" role="status">
+                Unsaved changes
+              </span>
+            ) : null}
+            {changed ? (
+              <button type="button" className="btn btn-g" onClick={reset} disabled={busy}>
+                Discard changes
+              </button>
+            ) : null}
             <button
               type="button"
-              className="btn btn-s"
-              onClick={() => setConfirming(false)}
-              disabled={busy}
-            >
-              Keep it
-            </button>
-            <button
-              type="button"
-              className="btn btn-dd"
-              onClick={() => void remove()}
-              disabled={busy}
-            >
-              Delete document
-            </button>
-          </>
-        ) : (
-          <>
-            <button
-              type="button"
-              className="btn btn-d"
-              onClick={() => setConfirming(true)}
-              style={{ marginRight: 'auto' }}
-              disabled={busy}
-            >
-              <Icon name="trash" />
-              Delete
-            </button>
-            <label className="btn btn-s" style={{ cursor: busy ? 'default' : 'pointer' }}>
-              {progress === null ? 'Replace file' : `Uploading ${progress}%`}
-              <input
-                type="file"
-                className="sr"
-                accept={UPLOAD_ACCEPT}
-                disabled={busy}
-                onChange={(e) => {
-                  const picked = e.target.files?.[0];
-                  e.target.value = '';
-                  if (picked) void replace(picked);
-                }}
-              />
-            </label>
-            <button
-              type="button"
-              className="btn btn-p"
+              className={`btn ${changed ? 'btn-p' : 'btn-s'}`}
               onClick={() => (changed ? void save() : onClose())}
               disabled={busy}
             >
-              {changed ? 'Save changes' : 'Close'}
+              {changed ? (busy ? 'Saving' : 'Save changes') : 'Close'}
             </button>
           </>
         )
       }
     >
-      <dl className="dl">
-        <dt>Who can open it</dt>
-        <dd>
-          <Badge tone={audienceTone(doc.audience.kind)}>{audienceLabel(doc.audience)}</Badge>
-        </dd>
-        <dt>Status</dt>
-        <dd>
-          {doc.status === 'draft' ? <Badge tone="pending">Draft</Badge> : <Badge tone="accepted">Published</Badge>}{' '}
-          {doc.expired ? <Badge tone="expired">Expired</Badge> : null}
-        </dd>
-        <dt>Updated</dt>
-        <dd>{adminUpdatedLabel(doc.updatedAt, today)}</dd>
-        <dt>Opens</dt>
-        <dd className="tnum">
-          {doc.opens ?? 0}, by people at {doc.partnerCount ?? 0} partners
-        </dd>
-      </dl>
-      <div className="fg">
-        <label htmlFor="ed-title" className="lbl">
-          Title
-        </label>
-        <input
-          id="ed-title"
-          ref={titleRef}
-          className={`field${title.trim() === '' ? ' field-err' : ''}`}
-          type="text"
-          value={title}
-          disabled={busy}
-          onChange={(e) => setTitle(e.target.value)}
-          aria-invalid={title.trim() === '' ? true : undefined}
-        />
-      </div>
-      <div className="grid2" style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
-        <div className="fg">
-          <label htmlFor="ed-type" className="lbl">
-            Type
-          </label>
-          <Dropdown
-            id="ed-type"
-            variant="field"
-            value={docType}
-            options={TYPE_OPTIONS}
-            onChange={(v) => {
-              if (isOneOf(DOCUMENT_TYPES, v)) setDocType(v);
-            }}
-          />
-        </div>
-        <div className="fg">
-          <label htmlFor="ed-product" className="lbl">
-            Product
-          </label>
-          <Dropdown
-            id="ed-product"
-            variant="field"
-            value={product}
-            options={PRODUCT_OPTIONS}
-            onChange={(v) => {
-              if (isOneOf(DOC_PRODUCTS, v)) setProduct(v);
-            }}
-          />
-        </div>
-      </div>
-      <div className="fg">
-        <label htmlFor="ed-summary" className="lbl">
-          Summary
-        </label>
-        <textarea
-          id="ed-summary"
-          className="field"
-          rows={2}
-          maxLength={300}
-          value={summary}
-          disabled={busy}
-          onChange={(e) => setSummary(e.target.value)}
-        />
-      </div>
-      <div className="grid2" style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
-        <div className="fg">
-          <span id="ed-status" className="lbl">
-            Status
-          </span>
-          <div className="seg" role="group" aria-labelledby="ed-status" style={{ alignSelf: 'flex-start' }}>
-            {DOCUMENT_STATUS_OPTIONS.map((o) => (
-              <button
-                key={o.value}
-                type="button"
-                className={`seg-b${o.value === status ? ' seg-on' : ''}`}
-                aria-pressed={o.value === status}
-                disabled={busy}
-                onClick={() => setStatus(o.value)}
-              >
-                {o.label}
-              </button>
-            ))}
-          </div>
-          {status === 'draft' ? <span className="hint">Partners cannot see a draft. Publishing tells the partners it reaches.</span> : null}
-        </div>
-        <div className="fg">
-          <label htmlFor="ed-expires" className="lbl">
-            Hide from partners on
-          </label>
-          <DatePicker id="ed-expires" value={expiresOn} disabled={busy} clearable onChange={setExpiresOn} />
-          <span className="hint">{expiresOn === '' ? 'Optional. Leave empty for no expiry.' : 'From that day partners no longer see it. You still do, marked Expired.'}</span>
-        </div>
-      </div>
-      <AudiencePicker
-        idPrefix="ed"
-        draft={draft}
-        onChange={setDraft}
-        error={audience.ok ? null : audience.error}
-        disabled={busy}
-      />
-      <div className="fg">
-        <label htmlFor="ed-note" className="lbl">
-          Change note for the next file you replace it with
-        </label>
-        <input
-          id="ed-note"
-          className="field"
-          type="text"
-          maxLength={300}
-          value={changeNote}
-          disabled={busy}
-          placeholder="What is different in the new file"
-          onChange={(e) => setChangeNote(e.target.value)}
-        />
-      </div>
-      {doc.type === 'video' ? <DocumentMediaSection doc={doc} onChanged={() => setFileRefresh((n) => n + 1)} /> : null}
-      <DocumentDetailSections documentId={doc.id} refreshKey={fileRefresh} canRestore={!busy} onChanged={() => setFileRefresh((n) => n + 1)} />
-      <div className="note note-violet">
-        <Icon name="lock" />
-        <span>
-          Partners get a short-lived link each time they open it. Replacing the file keeps this link
-          and the open count.
-        </span>
-      </div>
-      {confirming ? (
-        <div className="note note-amber" role="alert">
-          <span>Delete {doc.title}? Partners lose access at once. The file is kept for 30 days, then removed.</span>
-        </div>
-      ) : null}
       {error ? (
-        <div className="note note-amber" role="alert">
+        <div className="note note-amber ded-error" role="alert">
           <span>{error}</span>
         </div>
       ) : null}
+      <div
+        className="tabs ded-tabs"
+        role="tablist"
+        aria-label="Document sections"
+        onKeyDown={(e) => {
+          const at = TABS.findIndex((t) => t.id === tab);
+          const next = e.key === 'ArrowRight' ? at + 1 : e.key === 'ArrowLeft' ? at - 1 : null;
+          if (next === null) return;
+          e.preventDefault();
+          const target = TABS[(next + TABS.length) % TABS.length];
+          if (!target) return;
+          setTab(target.id);
+          document.getElementById(`${tabsId}-t-${target.id}`)?.focus();
+        }}
+      >
+        {TABS.map((t) => (
+          <button
+            key={t.id}
+            id={`${tabsId}-t-${t.id}`}
+            type="button"
+            role="tab"
+            aria-selected={tab === t.id}
+            aria-controls={`${tabsId}-p-${t.id}`}
+            tabIndex={tab === t.id ? 0 : -1}
+            className={`tab${tab === t.id ? ' tab-on' : ''}`}
+            onClick={() => setTab(t.id)}
+          >
+            {t.label}
+            {t.id === 'activity' ? <span className="cnt">{doc.opens ?? 0}</span> : null}
+          </button>
+        ))}
+      </div>
+
+      <div id={`${tabsId}-p-details`} role="tabpanel" aria-labelledby={`${tabsId}-t-details`} className="ded-panel" hidden={tab !== 'details'}>
+        {doc.expired ? (
+          <div className="note note-amber">
+            <span>Expired{doc.expiresAt ? ` on ${fmtLong(doc.expiresAt)}` : ''}. Partners no longer see it. Clear the date under Visibility to bring it back.</span>
+          </div>
+        ) : null}
+        <div className="fg">
+          <label htmlFor="ed-title" className="lbl">
+            Title
+          </label>
+          <input
+            id="ed-title"
+            ref={titleRef}
+            className={`field${titleBlank ? ' field-err' : ''}`}
+            type="text"
+            value={title}
+            disabled={busy}
+            onChange={(e) => setTitle(e.target.value)}
+            aria-invalid={titleBlank ? true : undefined}
+            aria-describedby={titleBlank ? 'ed-title-err' : undefined}
+          />
+          {titleBlank ? (
+            <span id="ed-title-err" className="err">
+              Give the document a title.
+            </span>
+          ) : null}
+        </div>
+        <div className="grid2" style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+          <div className="fg">
+            <label htmlFor="ed-type" className="lbl">
+              Type
+            </label>
+            <Dropdown
+              id="ed-type"
+              variant="field"
+              value={docType}
+              options={TYPE_OPTIONS}
+              onChange={(v) => {
+                if (isOneOf(DOCUMENT_TYPES, v)) setDocType(v);
+              }}
+            />
+          </div>
+          <div className="fg">
+            <label htmlFor="ed-product" className="lbl">
+              Product
+            </label>
+            <Dropdown
+              id="ed-product"
+              variant="field"
+              value={product}
+              options={PRODUCT_OPTIONS}
+              onChange={(v) => {
+                if (isOneOf(DOC_PRODUCTS, v)) setProduct(v);
+              }}
+            />
+          </div>
+        </div>
+        <div className="fg">
+          <label htmlFor="ed-summary" className="lbl">
+            Summary
+          </label>
+          <textarea id="ed-summary" className="field" rows={3} maxLength={SUMMARY_MAX} value={summary} disabled={busy} onChange={(e) => setSummary(e.target.value)} aria-describedby="ed-summary-n" />
+          <span id="ed-summary-n" className="hint tnum" style={{ alignSelf: 'flex-end' }}>
+            {summary.length} of {SUMMARY_MAX}
+          </span>
+        </div>
+
+        <h3 className="dsec-h">Visibility</h3>
+        <div className="grid2" style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+          <div className="fg">
+            <span id="ed-status" className="lbl">
+              Status
+            </span>
+            <div className="seg" role="group" aria-labelledby="ed-status" style={{ alignSelf: 'flex-start' }}>
+              {DOCUMENT_STATUS_OPTIONS.map((o) => (
+                <button key={o.value} type="button" className={`seg-b${o.value === status ? ' seg-on' : ''}`} aria-pressed={o.value === status} disabled={busy} onClick={() => setStatus(o.value)}>
+                  {o.label}
+                </button>
+              ))}
+            </div>
+            <span className="hint">{status === 'draft' ? 'Partners cannot see a draft. Publishing tells the partners it reaches.' : 'Visible to the partners chosen below.'}</span>
+          </div>
+          <div className="fg">
+            <label htmlFor="ed-expires" className="lbl">
+              Hide from partners on
+            </label>
+            <DatePicker id="ed-expires" value={expiresOn} disabled={busy} clearable onChange={setExpiresOn} />
+            <span className="hint">{expiresOn === '' ? 'Optional. Leave empty for no expiry.' : 'From that day partners no longer see it. You still do, marked Expired.'}</span>
+          </div>
+        </div>
+        <AudiencePicker idPrefix="ed" draft={draft} onChange={setDraft} error={audience.ok ? null : audience.error} disabled={busy} />
+
+        <div className="ded-danger">
+          <span className="li-t">
+            <span className="li-n">Delete this document</span>
+            <span className="li-s">Partners lose access at once. The file is kept for 30 days.</span>
+          </span>
+          <button type="button" className="btn btn-d" onClick={() => setConfirming('delete')} disabled={busy}>
+            <Icon name="trash" />
+            Delete
+          </button>
+        </div>
+      </div>
+
+      <div id={`${tabsId}-p-file`} role="tabpanel" aria-labelledby={`${tabsId}-t-file`} className="ded-panel" hidden={tab !== 'file'}>
+        <div className="dfile">
+          <span className="dthumb dthumb-lg" data-product={doc.product} aria-hidden="true">
+            <Icon name={TYPE_ICON[doc.type]} />
+          </span>
+          <span className="li-t">
+            <span className="li-n" style={{ overflowWrap: 'anywhere' }}>
+              {doc.originalName}
+            </span>
+            <span className="li-s">
+              {formatLabel(doc)}, version {doc.version}, updated {adminUpdatedLabel(doc.updatedAt, today)}
+            </span>
+          </span>
+        </div>
+        <div className="fg">
+          <label htmlFor="ed-note" className="lbl">
+            What is different in the new file
+          </label>
+          <input id="ed-note" className="field" type="text" maxLength={300} value={changeNote} disabled={busy} placeholder="Optional. Shown in the file history" onChange={(e) => setChangeNote(e.target.value)} />
+          <span className="hint">Replacing the file keeps this link and the open count. Partners get a short-lived link each time they open it.</span>
+        </div>
+        <div className="ded-replace">
+          <label className={`btn btn-s${busy ? ' btn-off' : ''}`} style={{ cursor: busy ? 'default' : 'pointer' }}>
+            <Icon name="upload" />
+            {progress === null ? 'Replace file' : `Uploading ${progress}%`}
+            <input
+              type="file"
+              className="sr"
+              accept={UPLOAD_ACCEPT}
+              disabled={busy}
+              onChange={(e) => {
+                const picked = e.target.files?.[0];
+                e.target.value = '';
+                if (picked) void replace(picked);
+              }}
+            />
+          </label>
+          {progress !== null ? (
+            <progress className="dprog" max={100} value={progress} aria-label="Upload progress" />
+          ) : null}
+        </div>
+        {isVideo ? <DocumentMediaSection doc={doc} onChanged={() => setFileRefresh((n) => n + 1)} /> : null}
+        <DocumentVersions documentId={doc.id} state={detail} canRestore={!busy} onChanged={() => setFileRefresh((n) => n + 1)} />
+      </div>
+
+      <div id={`${tabsId}-p-activity`} role="tabpanel" aria-labelledby={`${tabsId}-t-activity`} className="ded-panel" hidden={tab !== 'activity'}>
+        <dl className="dstats">
+          <div>
+            <dt>Opens</dt>
+            <dd>{doc.opens ?? 0}</dd>
+          </div>
+          <div>
+            <dt>Partners</dt>
+            <dd>{doc.partnerCount ?? 0}</dd>
+          </div>
+          <div>
+            <dt>Last opened</dt>
+            <dd className={doc.lastOpenedAt ? undefined : 'dstat-warn'}>{doc.lastOpenedAt ? adminUpdatedLabel(doc.lastOpenedAt, today) : 'Never'}</dd>
+          </div>
+        </dl>
+        <DocumentActivity state={detail} />
+      </div>
     </Drawer>
   );
 }
