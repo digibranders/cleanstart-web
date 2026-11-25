@@ -161,3 +161,18 @@ describe('renderEmail — Outlook and dark mode', () => {
     expect(html).not.toContain('social-icons/cleanstart-logo.png');
   });
 });
+
+describe('renderEmail — image block', () => {
+  const withImage = (src: string): string =>
+    renderEmail({ ...base, blocks: [{ kind: 'image', src, alt: 'Hosted by A, B' }] });
+
+  it('renders a full-width picture with escaped alt text', () => {
+    const out = withImage('https://cms.example.com/banner.png');
+    expect(out).toContain('<img src="https://cms.example.com/banner.png" width="520" alt="Hosted by A, B"');
+  });
+
+  it('drops an image whose url is not http or https', () => {
+    expect(withImage('javascript:alert(1)')).not.toContain('javascript:');
+    expect(withImage('data:image/png;base64,AAAA')).not.toContain('data:image');
+  });
+});

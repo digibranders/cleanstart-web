@@ -4,6 +4,7 @@ import {
   buildDealRegistrationNotificationEmail,
 } from '../deal-registrations/notification-email';
 import { buildPartnerAdminEmail, buildPartnerApplicantEmail } from '../partners/partner-emails';
+import { buildEventRegistrationAlertEmail } from './event-emails';
 import {
   buildContactConfirmationEmail,
   buildDemoConfirmationEmail,
@@ -181,6 +182,32 @@ export const EMAIL_TEMPLATES: readonly EmailTemplateEntry[] = [
         ...DEAL_SAMPLE,
         dealId: '12345',
         portalId: '245478611',
+      }),
+  },
+  {
+    key: 'event-registration-alert',
+    form: 'event-registration (any event on events.cleanstart.com)',
+    audience: 'internal',
+    sentFrom: 'lib/lead-handlers/event-alert.ts',
+    sample: () =>
+      buildEventRegistrationAlertEmail({
+        eventTitle: 'New Year Networking Event',
+        registrant: 'Asha Rao',
+        affiliation: 'CISO, Northwind',
+        rows: [
+          ['Full Name', 'Asha Rao'],
+          ['Designation', 'CISO'],
+          ['Company Name', 'Northwind'],
+          ['Phone Number', '+919820012345'],
+          ['Cab Required', 'Yes'],
+          ['Pick up location', 'Bandra Kurla Complex'],
+          ['Drop location', 'Taj Lands End, Bandra'],
+        ],
+        submittedAt: '25 Nov 2026, 12:20 pm IST',
+        total: 12,
+        cmsUrl: 'https://cms.cleanstart.com/admin/collections/eventPages/1',
+        bannerUrl: 'https://cms.cleanstart.com/api/eventPages/banner/new-year-networking-event',
+        hostNames: ['CleanStart', 'Upwind', 'Cosmos One'],
       }),
   },
   {

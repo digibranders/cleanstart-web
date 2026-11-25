@@ -1,5 +1,6 @@
 import { companyFromDomainHandler } from './company-from-domain';
 import { confirmationHandler } from './confirmation';
+import { eventAlertHandler } from './event-alert';
 import { hubspotHandler } from './hubspot';
 import { notificationHandler } from './notification';
 import { registerSecondaryHandler } from './registry';
@@ -32,9 +33,10 @@ export const registerLeadHandlers = (): void => {
   registerSecondaryHandler(hubspotHandler);
   registerSecondaryHandler(confirmationHandler);
   registerSecondaryHandler(notificationHandler);
+  registerSecondaryHandler(eventAlertHandler);
 };
 
-export { companyFromDomainHandler, confirmationHandler, hubspotHandler, notificationHandler };
+export { companyFromDomainHandler, confirmationHandler, eventAlertHandler, hubspotHandler, notificationHandler };
 export { hubspotGdprDeleteByEmail } from './hubspot';
 export {
   registerSecondaryHandler,
