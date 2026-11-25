@@ -91,6 +91,8 @@ import { VideoLengthCell as VideoLengthCell_4ae28695c16ecdf12c15a176eb6e0774 } f
 import { VideoStateCell as VideoStateCell_70d255ecab4ca7e768a3cff708566031 } from '@/payload/admin/components/VideoStateCell.tsx'
 import { GateFormLabel as GateFormLabel_c191dd670871074ae1a1cea086f78af8 } from '@/payload/admin/components/GateFormLabel.tsx'
 import { DateField as DateField_a74145b29e7a0acd050f8f68af83aab6 } from '@/payload/admin/components/fields/DateField.tsx'
+import { UploadField as UploadField_9a37057695692a15b6c8aaeb6d981611 } from '@/payload/admin/components/fields/UploadField.tsx'
+import { EventRegistrationsPanel as EventRegistrationsPanel_8f9d9e3aa2d1d44882af6b67cefe8404 } from '@/payload/admin/components/events/EventRegistrationsPanel.tsx'
 import { JoinField as JoinField_bd3b4cc9a58da6642d24527d78f5c3b6 } from '@/payload/admin/components/fields/JoinField.tsx'
 import { MediaSelfChrome as MediaSelfChrome_14d24e8b41ad83caf3d5514c2c38fc56 } from '@/payload/admin/components/MediaSelfChrome.tsx'
 import { MediaSizeWarningField as MediaSizeWarningField_0c9614c3c830a18c245bf1df52fd2eb2 } from '@/payload/admin/components/MediaSizeWarningField.tsx'
@@ -254,6 +256,8 @@ export const importMap = {
   "@/payload/admin/components/VideoStateCell.tsx#VideoStateCell": VideoStateCell_70d255ecab4ca7e768a3cff708566031,
   "@/payload/admin/components/GateFormLabel.tsx#GateFormLabel": GateFormLabel_c191dd670871074ae1a1cea086f78af8,
   "@/payload/admin/components/fields/DateField.tsx#DateField": DateField_a74145b29e7a0acd050f8f68af83aab6,
+  "@/payload/admin/components/fields/UploadField.tsx#UploadField": UploadField_9a37057695692a15b6c8aaeb6d981611,
+  "@/payload/admin/components/events/EventRegistrationsPanel.tsx#EventRegistrationsPanel": EventRegistrationsPanel_8f9d9e3aa2d1d44882af6b67cefe8404,
   "@/payload/admin/components/fields/JoinField.tsx#JoinField": JoinField_bd3b4cc9a58da6642d24527d78f5c3b6,
   "@/payload/admin/components/MediaSelfChrome.tsx#MediaSelfChrome": MediaSelfChrome_14d24e8b41ad83caf3d5514c2c38fc56,
   "@/payload/admin/components/MediaSizeWarningField.tsx#MediaSizeWarningField": MediaSizeWarningField_0c9614c3c830a18c245bf1df52fd2eb2,

@@ -14,6 +14,7 @@ import { EmailAssets } from './EmailAssets';
 import { EmailSignatures } from './EmailSignatures';
 import { SignatureTemplates } from './SignatureTemplates';
 import { Events } from './Events';
+import { EventPages } from './EventPages';
 import { Forms } from './Forms';
 import { Guides } from './Guides';
 import { Departments } from './Departments';
@@ -110,6 +111,7 @@ const collections: { name: string; config: CollectionConfig }[] = [
   { name: 'Forms', config: Forms },
   { name: 'Guides', config: Guides },
   { name: 'Departments', config: Departments },
+  { name: 'EventPages', config: EventPages },
   { name: 'Industries', config: Industries },
   { name: 'Regions', config: Regions },
   { name: 'PressTypes', config: PressTypes },
