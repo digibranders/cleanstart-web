@@ -6,7 +6,12 @@ import { CLEANSTART } from "@/lib/brand";
 
 export function EventView({ event }: { event: SiteEvent }): React.ReactElement {
   return (
-    <EventShell logos={<LogoBar partners={[CLEANSTART, ...event.partners]} />} title={event.title}>
+    <EventShell
+      logos={<LogoBar partners={[CLEANSTART, ...event.partners]} />}
+      title={event.title}
+      dateLabel={event.dateLabel}
+      venue={event.venue}
+    >
       {event.registrationOpen ? (
         <EventRegistrationForm event={event} />
       ) : (
