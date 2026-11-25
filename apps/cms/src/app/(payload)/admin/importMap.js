@@ -147,6 +147,7 @@ import { ShortcutHelpDialog as ShortcutHelpDialog_988ed8f20aac11621cac715bd9040a
 import { ToastBus as ToastBus_3cc1e6b1b31508834b30aa83c9f20cc4 } from '../../../payload/admin/components/ToastBus.tsx'
 import { CmsLoginFooter as CmsLoginFooter_67c5b820b6d3bc2ad13ebd4c41435e40 } from '../../../payload/admin/components/auth/CmsLoginFooter.tsx'
 import { UserMenu as UserMenu_8a2f404b3fa17e34974bf49ed5367371 } from '../../../payload/admin/components/UserMenu.tsx'
+import { EventRegistrationsNavLink as EventRegistrationsNavLink_a029fa003ace08bcfeba9caeea9af885 } from '../../../payload/admin/components/EventRegistrationsNavLink.tsx'
 import { NavOpenOnDesktop as NavOpenOnDesktop_21bf36b0db39df18e02fc9fdb6b1a47e } from '../../../payload/admin/components/NavOpenOnDesktop.tsx'
 import { DocSidebarResizer as DocSidebarResizer_cb8d71363ce9ac2087ce9e8e5b3cebe2 } from '../../../payload/admin/components/DocSidebarResizer.tsx'
 import { CmsLoginHero as CmsLoginHero_32623b867969588592e72c90b3b4967a } from '../../../payload/admin/components/auth/CmsLoginHero.tsx'
@@ -314,6 +315,7 @@ export const importMap = {
   "./payload/admin/components/ToastBus.tsx#ToastBus": ToastBus_3cc1e6b1b31508834b30aa83c9f20cc4,
   "./payload/admin/components/auth/CmsLoginFooter.tsx#CmsLoginFooter": CmsLoginFooter_67c5b820b6d3bc2ad13ebd4c41435e40,
   "./payload/admin/components/UserMenu.tsx#UserMenu": UserMenu_8a2f404b3fa17e34974bf49ed5367371,
+  "./payload/admin/components/EventRegistrationsNavLink.tsx#EventRegistrationsNavLink": EventRegistrationsNavLink_a029fa003ace08bcfeba9caeea9af885,
   "./payload/admin/components/NavOpenOnDesktop.tsx#NavOpenOnDesktop": NavOpenOnDesktop_21bf36b0db39df18e02fc9fdb6b1a47e,
   "./payload/admin/components/DocSidebarResizer.tsx#DocSidebarResizer": DocSidebarResizer_cb8d71363ce9ac2087ce9e8e5b3cebe2,
   "./payload/admin/components/auth/CmsLoginHero.tsx#CmsLoginHero": CmsLoginHero_32623b867969588592e72c90b3b4967a,

@@ -7,10 +7,6 @@ import { useCallback, useEffect, useState, type ReactElement } from 'react';
 
 import { Logo } from '../Logo';
 
-const hasRole = (user: unknown, roles: readonly string[]): boolean =>
-  Array.isArray((user as { roles?: unknown })?.roles) &&
-  (user as { roles: string[] }).roles.some((role) => roles.includes(role));
-
 const isAdmin = (user: unknown): boolean =>
   Array.isArray((user as { roles?: unknown })?.roles) &&
   (user as { roles: string[] }).roles.includes('admin');
@@ -47,7 +43,6 @@ export const SidebarHeader = (): ReactElement => {
   const { user } = useAuth();
   const isDashboard = pathname === '/admin' || pathname === '/admin/';
   const isCache = pathname.startsWith('/admin/cache');
-  const isEventRegistrations = pathname.startsWith('/admin/event-registrations');
   // Analytics + Content insights nav links are hidden. To re-enable, uncomment
   // these two consts and the matching <Link> blocks in the render below.
   // const isAnalytics = pathname.startsWith('/admin/analytics');
@@ -142,30 +137,6 @@ export const SidebarHeader = (): ReactElement => {
         </svg>
         <span>Dashboard</span>
       </Link>
-
-      {/* Event registrations: one click from anywhere, for the teams that run events. */}
-      {hasRole(user, ['admin', 'editor', 'events']) && (
-        <Link
-          href="/admin/event-registrations"
-          className={
-            isEventRegistrations
-              ? 'cs-sidebar-dashboard cs-sidebar-dashboard--active'
-              : 'cs-sidebar-dashboard'
-          }
-          aria-current={isEventRegistrations ? 'page' : undefined}
-        >
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false">
-            <path
-              d="M2 4.5A1.5 1.5 0 0 1 3.5 3h9A1.5 1.5 0 0 1 14 4.5V6a2 2 0 0 0 0 4v1.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 11.5V10a2 2 0 0 0 0-4V4.5Z"
-              stroke="currentColor"
-              strokeWidth="1.4"
-              strokeLinejoin="round"
-            />
-            <path d="M10 3.5v9" stroke="currentColor" strokeWidth="1.4" strokeDasharray="1.6 1.6" />
-          </svg>
-          <span>Registrations</span>
-        </Link>
-      )}
 
       {/* Cache — admin-only ISR purge controls. Sits in the sticky header as a
           first-class destination directly below Dashboard, styled identically. */}

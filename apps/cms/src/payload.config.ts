@@ -313,6 +313,7 @@ export default buildConfig({
       ],
       afterNavLinks: [
         './payload/admin/components/UserMenu.tsx#UserMenu',
+        './payload/admin/components/EventRegistrationsNavLink.tsx#EventRegistrationsNavLink',
         // Mounted here (inside the nav) rather than in `actions` so the
         // sidebar auto-collapse policy runs on every admin page — the
         // custom document-edit chrome (CmsEditView) doesn't render the

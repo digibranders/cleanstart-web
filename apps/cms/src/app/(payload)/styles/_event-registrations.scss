@@ -1,142 +1,80 @@
-// Event Registrations page. Builds on the shared .cs-analytics head and empty primitives.
+// Event Registrations page. Layout, table, pagination and empty states reuse
+// the shared .cs-list primitives; only the event switcher and row bits live here.
 .cs-event-regs {
-  &__actions {
-    display: flex;
-    gap: 8px;
-  }
-
   &__error {
     color: var(--theme-error-500);
+    margin: 0 0 var(--cs-space-3);
+  }
+
+  &__note {
+    margin: 0 0 var(--cs-space-3);
+    font-size: 13px;
+    color: var(--theme-text-soft);
+  }
+
+  &__select {
+    height: 36px;
+    padding: 0 var(--cs-space-3);
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: var(--cs-radius-input);
+    background: var(--theme-elevation-50);
+    color: var(--theme-text);
+    font-size: 13px;
+    cursor: pointer;
+
+    &:focus-visible {
+      border-color: var(--cs-cyan-500);
+      box-shadow: var(--cs-shadow-input-focus);
+      outline: none;
+    }
   }
 
   &__events {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    margin: 0 0 20px;
-    padding: 0;
-    list-style: none;
+    gap: var(--cs-space-2);
+    margin-bottom: var(--cs-space-4);
   }
 
   &__event {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 2px;
-    min-width: 200px;
-    padding: 10px 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--cs-space-2);
+    height: 32px;
+    padding: 0 var(--cs-space-3);
     border: 1px solid var(--theme-elevation-150);
-    border-radius: 8px;
-    background: var(--theme-elevation-0);
-    color: var(--theme-text);
-    text-align: left;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--theme-text-soft);
+    font-size: 13px;
+    font-weight: 500;
     cursor: pointer;
+    transition:
+      background-color var(--cs-motion-micro),
+      color var(--cs-motion-micro),
+      border-color var(--cs-motion-micro);
+
+    &:hover {
+      background: var(--cs-tint-brand-soft);
+      color: var(--theme-text);
+    }
 
     &--active {
-      border-color: var(--theme-text);
-      background: var(--theme-elevation-50);
-    }
-  }
-
-  &__event-title {
-    font-size: 14px;
-    font-weight: 600;
-  }
-
-  &__event-meta {
-    font-size: 12px;
-    color: var(--theme-elevation-600);
-  }
-
-  &__kpis {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 32px;
-    margin-bottom: 20px;
-
-    > div {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-  }
-
-  &__kpi-value {
-    font-size: 32px;
-    font-weight: 700;
-    line-height: 1.1;
-    font-feature-settings: 'tnum' 1;
-
-    &--small {
-      font-size: 16px;
-      line-height: 2;
-    }
-  }
-
-  &__kpi-label {
-    font-size: 12px;
-    color: var(--theme-elevation-600);
-  }
-
-  &__filters {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    gap: 12px;
-    margin-bottom: 16px;
-
-    label {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      font-size: 12px;
-      color: var(--theme-elevation-600);
-    }
-
-    input,
-    select {
-      min-width: 200px;
-      padding: 6px 8px;
-      border: 1px solid var(--theme-elevation-150);
-      border-radius: 4px;
-      background: var(--theme-input-bg, var(--theme-elevation-0));
+      border-color: var(--cs-cyan-500);
+      background: var(--cs-tint-brand-medium);
       color: var(--theme-text);
-      font-size: 13px;
     }
 
-    select {
-      min-width: 120px;
+    &:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--cs-tint-focus-ring);
     }
   }
 
-  &__count {
-    margin-left: auto;
+  &__event-count {
     font-size: 12px;
-    color: var(--theme-elevation-600);
-  }
-
-  &__table-wrap {
-    overflow-x: auto;
-  }
-
-  &__table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-
-    th {
-      padding: 8px 12px;
-      text-align: left;
-      white-space: nowrap;
-      color: var(--theme-elevation-600);
-      font-weight: 600;
-    }
-
-    td {
-      padding: 10px 12px;
-      border-top: 1px solid var(--theme-elevation-100);
-      vertical-align: top;
-    }
+    color: var(--theme-text-soft);
+    font-feature-settings: 'tnum' 1;
   }
 
   &__nowrap {
@@ -145,16 +83,8 @@
 
   &__row-actions {
     display: flex;
-    gap: 6px;
+    gap: var(--cs-space-2);
     justify-content: flex-end;
     white-space: nowrap;
-  }
-
-  &__pager {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-top: 16px;
-    font-size: 13px;
   }
 }

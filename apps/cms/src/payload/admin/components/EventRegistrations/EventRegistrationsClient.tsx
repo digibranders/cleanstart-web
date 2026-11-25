@@ -153,185 +153,227 @@ export function EventRegistrationsClient(): ReactElement {
     }
   };
 
+  const showRows = rows.length > 0;
+  const emptyTitle =
+    data && data.entries.length === 0 ? 'No registrations yet' : 'No matching registrations';
+  const emptySub =
+    data && data.entries.length === 0
+      ? 'People who register for this event will be listed here.'
+      : 'No registrations match the current search or filter.';
+  const rangeStart = filtered.length === 0 ? 0 : (current - 1) * PAGE_SIZE + 1;
+  const rangeEnd = Math.min(current * PAGE_SIZE, filtered.length);
+
   return (
-    <div className="cs-analytics cs-event-regs">
-      <header className="cs-analytics__head">
-        <h1>Event registrations</h1>
-        {selected ? (
-          <div className="cs-event-regs__actions">
-            <Link className="cs-btn cs-btn--subtle" href={`/admin/collections/eventPages/${selected.id}`}>
-              Edit event
-            </Link>
-            <button type="button" className="cs-btn cs-btn--subtle" onClick={() => void exportCsv()} disabled={busy || !data?.total}>
-              Export CSV
-            </button>
+    <div className="cs-list cs-event-regs">
+      <div className="cs-list__gutter">
+        <header className="cs-list__header">
+          <div className="cs-list__heading">
+            <div className="cs-list__title-row">
+              <h1 className="cs-list__title">Registrations</h1>
+              {selected ? (
+                <span className="cs-list-badge">
+                  <span className="cs-list-badge__chip cs-list-badge__chip--total">
+                    {data?.total ?? selected.total} registered
+                  </span>
+                  {cabCount !== null ? (
+                    <span className="cs-list-badge__chip cs-list-badge__chip--published">{cabCount} need a cab</span>
+                  ) : null}
+                </span>
+              ) : null}
+            </div>
+            <div className="cs-list__description">
+              {selected?.latestAt ? `Latest registration ${when(selected.latestAt)}` : 'Who signed up for each event.'}
+            </div>
           </div>
+          {selected ? (
+            <div className="cs-list__controls">
+              <label className="cs-list__search">
+                <input
+                  type="search"
+                  className="cs-list__search-input"
+                  aria-label="Search registrations"
+                  value={query}
+                  placeholder="Search name, company or phone"
+                  onChange={(e) => {
+                    setQuery(e.target.value);
+                    setPage(1);
+                  }}
+                />
+              </label>
+              {hasCab ? (
+                <select
+                  className="cs-event-regs__select"
+                  aria-label="Cab required"
+                  value={cab}
+                  onChange={(e) => {
+                    setCab(e.target.value as CabFilter);
+                    setPage(1);
+                  }}
+                >
+                  <option value="all">Cab: all</option>
+                  <option value="yes">Cab: yes</option>
+                  <option value="no">Cab: no</option>
+                </select>
+              ) : null}
+              <button type="button" className="cs-btn cs-btn--subtle" onClick={() => void exportCsv()} disabled={busy || !data?.total}>
+                Export CSV
+              </button>
+              <Link className="cs-btn cs-btn--primary" href={`/admin/collections/eventPages/${selected.id}`}>
+                Edit event
+              </Link>
+            </div>
+          ) : null}
+        </header>
+
+        {error ? (
+          <p role="alert" className="cs-event-regs__error">
+            {error}
+          </p>
         ) : null}
-      </header>
 
-      {error ? (
-        <p role="alert" className="cs-event-regs__error">
-          {error}
-        </p>
-      ) : null}
-      {!events && !error ? <div className="cs-analytics__empty">Loading events…</div> : null}
-      {events && events.length === 0 ? (
-        <div className="cs-analytics__empty">
-          No events yet. <Link href="/admin/collections/eventPages/create">Create one</Link> to start taking registrations.
-        </div>
-      ) : null}
-
-      {events && events.length > 0 ? (
-        <>
-          <ul className="cs-event-regs__events" aria-label="Events">
+        {events && events.length > 1 ? (
+          <div className="cs-event-regs__events" role="tablist" aria-label="Events">
             {events.map((event) => {
               const active = String(event.id) === selectedId;
               return (
-                <li key={event.id}>
-                  <button
-                    type="button"
-                    className={active ? 'cs-event-regs__event cs-event-regs__event--active' : 'cs-event-regs__event'}
-                    aria-pressed={active}
-                    onClick={() => pick(event.id)}
-                  >
-                    <span className="cs-event-regs__event-title">{event.title}</span>
-                    <span className="cs-event-regs__event-meta">
-                      {event.total} registered{event.status === 'published' ? '' : ' (draft)'}
-                    </span>
-                  </button>
-                </li>
+                <button
+                  key={event.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={active}
+                  className={active ? 'cs-event-regs__event cs-event-regs__event--active' : 'cs-event-regs__event'}
+                  onClick={() => pick(event.id)}
+                >
+                  {event.title}
+                  <span className="cs-event-regs__event-count">{event.total}</span>
+                </button>
               );
             })}
-          </ul>
+          </div>
+        ) : null}
 
-          {selected ? (
-            <>
-              <div className="cs-event-regs__kpis">
-                <div>
-                  <span className="cs-event-regs__kpi-value">{data?.total ?? selected.total}</span>
-                  <span className="cs-event-regs__kpi-label">registered</span>
+        {!events && !error ? (
+          <section className="cs-list__table cs-list__table--empty">
+            <div className="cs-list__empty">
+              <span className="cs-list__empty-title">Loading events</span>
+            </div>
+          </section>
+        ) : null}
+        {events && events.length === 0 ? (
+          <section className="cs-list__table cs-list__table--empty">
+            <div className="cs-list__empty">
+              <span className="cs-list__empty-title">No events yet</span>
+              <span className="cs-list__empty-sub">Create an event to start taking registrations.</span>
+              <Link href="/admin/collections/eventPages/create">Create event</Link>
+            </div>
+          </section>
+        ) : null}
+
+        {selected ? (
+          <>
+            {data?.truncated ? (
+              <p className="cs-event-regs__note">
+                Showing the newest {data.entries.length} of {data.total}. Export the CSV for the full list.
+              </p>
+            ) : null}
+            <section className={`cs-list__table${showRows ? '' : ' cs-list__table--empty'}`} aria-label="Registrations">
+              {!data && !error ? (
+                <div className="cs-list__empty">
+                  <span className="cs-list__empty-title">Loading registrations</span>
                 </div>
-                {cabCount !== null ? (
-                  <div>
-                    <span className="cs-event-regs__kpi-value">{cabCount}</span>
-                    <span className="cs-event-regs__kpi-label">need a cab</span>
+              ) : null}
+              {data && !showRows ? (
+                <div className="cs-list__empty">
+                  <span className="cs-list__empty-title">{emptyTitle}</span>
+                  <span className="cs-list__empty-sub">{emptySub}</span>
+                </div>
+              ) : null}
+              {showRows ? (
+                <table className="table">
+                  <thead>
+                    <tr>
+                      <th>Submitted</th>
+                      {columns.filter(showColumn).map((c) => (
+                        <th key={c.name}>{c.label}</th>
+                      ))}
+                      <th aria-label="Actions" />
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rows.map((entry) => (
+                      <tr key={entry.id}>
+                        <td className="cs-event-regs__nowrap">{when(entry.createdAt)}</td>
+                        {columns.filter(showColumn).map((c) => (
+                          <td key={c.name}>{cell(entry.fields[c.name])}</td>
+                        ))}
+                        <td className="cs-event-regs__row-actions">
+                          {confirming === entry.id ? (
+                            <>
+                              <button
+                                type="button"
+                                className="cs-btn cs-btn--danger"
+                                disabled={busy}
+                                onClick={() => void remove(entry.id)}
+                              >
+                                Delete for good
+                              </button>
+                              <button type="button" className="cs-btn cs-btn--subtle" onClick={() => setConfirming(null)}>
+                                Keep
+                              </button>
+                            </>
+                          ) : (
+                            <button type="button" className="cs-btn cs-btn--subtle" onClick={() => setConfirming(entry.id)}>
+                              Delete
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : null}
+            </section>
+
+            {data && filtered.length > 0 ? (
+              <nav className="cs-list__pagination" aria-label="Pagination">
+                <span className="cs-list__pagination-count">
+                  <strong>
+                    {rangeStart.toLocaleString()}-{rangeEnd.toLocaleString()}
+                  </strong>{' '}
+                  of {filtered.length.toLocaleString()}
+                </span>
+                {pages > 1 ? (
+                  <div className="cs-list__pagination-controls">
+                    <div className="cs-list__pagination-pages">
+                      <button
+                        type="button"
+                        className="cs-btn cs-btn--subtle"
+                        disabled={current <= 1}
+                        onClick={() => setPage(current - 1)}
+                        aria-label="Previous page"
+                      >
+                        ‹ Prev
+                      </button>
+                      <span className="cs-list__page-info">
+                        Page {current} of {pages}
+                      </span>
+                      <button
+                        type="button"
+                        className="cs-btn cs-btn--subtle"
+                        disabled={current >= pages}
+                        onClick={() => setPage(current + 1)}
+                        aria-label="Next page"
+                      >
+                        Next ›
+                      </button>
+                    </div>
                   </div>
                 ) : null}
-                <div>
-                  <span className="cs-event-regs__kpi-value cs-event-regs__kpi-value--small">
-                    {selected.latestAt ? when(selected.latestAt) : 'None yet'}
-                  </span>
-                  <span className="cs-event-regs__kpi-label">latest registration</span>
-                </div>
-              </div>
-
-              <div className="cs-event-regs__filters">
-                <label>
-                  Search
-                  <input
-                    type="search"
-                    value={query}
-                    placeholder="Name, company or phone"
-                    onChange={(e) => {
-                      setQuery(e.target.value);
-                      setPage(1);
-                    }}
-                  />
-                </label>
-                {hasCab ? (
-                  <label>
-                    Cab required
-                    <select
-                      value={cab}
-                      onChange={(e) => {
-                        setCab(e.target.value as CabFilter);
-                        setPage(1);
-                      }}
-                    >
-                      <option value="all">All</option>
-                      <option value="yes">Yes</option>
-                      <option value="no">No</option>
-                    </select>
-                  </label>
-                ) : null}
-                <span className="cs-event-regs__count">
-                  {filtered.length} of {data?.entries.length ?? 0} shown
-                </span>
-              </div>
-
-              {!data && !error ? <div className="cs-analytics__empty">Loading registrations…</div> : null}
-              {data?.truncated ? (
-                <div className="cs-analytics__empty">Showing the newest {data.entries.length} of {data.total}. Export the CSV for the full list.</div>
-              ) : null}
-              {data && data.entries.length === 0 ? <div className="cs-analytics__empty">No registrations yet.</div> : null}
-              {data && data.entries.length > 0 && filtered.length === 0 ? (
-                <div className="cs-analytics__empty">No registrations match those filters.</div>
-              ) : null}
-
-              {rows.length > 0 ? (
-                <div className="cs-event-regs__table-wrap">
-                  <table className="cs-event-regs__table">
-                    <thead>
-                      <tr>
-                        <th>Submitted</th>
-                        {columns.filter(showColumn).map((c) => (
-                          <th key={c.name}>{c.label}</th>
-                        ))}
-                        <th aria-label="Actions" />
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {rows.map((entry) => (
-                        <tr key={entry.id}>
-                          <td className="cs-event-regs__nowrap">{when(entry.createdAt)}</td>
-                          {columns.filter(showColumn).map((c) => (
-                            <td key={c.name}>{cell(entry.fields[c.name])}</td>
-                          ))}
-                          <td className="cs-event-regs__row-actions">
-                            {confirming === entry.id ? (
-                              <>
-                                <button
-                                  type="button"
-                                  className="cs-btn cs-btn--danger"
-                                  disabled={busy}
-                                  onClick={() => void remove(entry.id)}
-                                >
-                                  Delete for good
-                                </button>
-                                <button type="button" className="cs-btn cs-btn--subtle" onClick={() => setConfirming(null)}>
-                                  Keep
-                                </button>
-                              </>
-                            ) : (
-                              <button type="button" className="cs-btn cs-btn--subtle" onClick={() => setConfirming(entry.id)}>
-                                Delete
-                              </button>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ) : null}
-
-              {pages > 1 ? (
-                <div className="cs-event-regs__pager">
-                  <button type="button" className="cs-btn cs-btn--subtle" disabled={current <= 1} onClick={() => setPage(current - 1)}>
-                    Previous
-                  </button>
-                  <span>
-                    Page {current} of {pages}
-                  </span>
-                  <button type="button" className="cs-btn cs-btn--subtle" disabled={current >= pages} onClick={() => setPage(current + 1)}>
-                    Next
-                  </button>
-                </div>
-              ) : null}
-            </>
-          ) : null}
-        </>
-      ) : null}
+              </nav>
+            ) : null}
+          </>
+        ) : null}
+      </div>
     </div>
   );
 }
