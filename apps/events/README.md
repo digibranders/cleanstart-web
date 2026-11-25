@@ -1,31 +1,28 @@
 # @cleanstart/events
 
-Registration pages for CleanStart events (events.cleanstart.com). One page per event at `/<slug>`, co-branded with partner logos. Submissions go to the CMS lead API and are stored in the CMS database.
+events.cleanstart.com. One registration page per event, co-branded with partner logos. Events and their registration forms are managed in the CMS; registrations are saved there as leads.
 
-## Add an event
+## Add an event (no code)
 
-1. Add an entry to `src/content/events.ts` (slug, title, `formSlug`, `partners`).
-2. Put partner logos in `public/logos/` and set `logo` (and `logoWidth`) on the partner. The logo bar sits on a dark band, so use white or light versions. Without a `logo` the partner name is set as a text wordmark.
-3. Create the matching row in the CMS `forms` collection (below).
+In the CMS, open **Marketing > Event Registrations > Create new**:
 
-## CMS `forms` row for `new-year-networking`
+- Title and slug (the slug is the URL: `events.cleanstart.com/<slug>`).
+- Partners: name, website and a logo for each co-host. CleanStart is added automatically as the first logo. Upload logos that read on a dark background (white or light). Without one the name is shown as text.
+- Optional date label, venue and description.
+- Registration form: leave empty for the default form (`event-registration`), or pick another form from **Forms** for different questions. Fields can show only when another answer matches (for example pick up and drop only when a cab is needed).
+- Set **Status** to Published. Changes show on the site within a minute.
 
-| name | type | required | condition |
-|---|---|---|---|
-| `full_name` | text | yes | |
-| `designation` | text | yes | |
-| `company` | text | yes | |
-| `phone` | tel | yes | |
-| `cab_required` | select (`yes`, `no`) | yes | |
-| `pickup_location` | text | yes | show when `cab_required` is `yes` |
-| `drop_location` | text | yes | show when `cab_required` is `yes` |
+Open an event to see who registered, and to export the list as CSV.
 
-Field names must match exactly (see `API_FIELD` in `src/lib/event-form.ts`). The form has no email field, so the CMS falls back to no email on the lead. HubSpot relay and duplicate detection need an email; leave HubSpot unticked for this form.
+## How it fits together
 
-## CMS and Turnstile setup
+- The site reads published events from `GET {CMS}/api/eventPages/site` and `/site/<slug>`, which also return the event's form definition.
+- Registrations post to `{CMS}/api/leads/submit` with `source: event:<slug>`. That tag is what the CMS uses to count and list an event's registrations.
+- The CMS allows the origin through `LEAD_SUBMIT_ALLOWED_ORIGINS`, and Cloudflare Turnstile protects the form.
 
-- Add `https://events.cleanstart.com` to `LEAD_SUBMIT_ALLOWED_ORIGINS` on the CMS droplet. Without it every submit is refused with a 403.
-- Add the hostname to the Turnstile widget and set `NEXT_PUBLIC_TURNSTILE_SITE_KEY`.
+## First-time setup in an environment
+
+Run `apps/cms/scripts/seed-event-form.ts` once to create the default form and the first event (see its header for how to run it against production).
 
 ## Local
 
@@ -33,4 +30,4 @@ Field names must match exactly (see `API_FIELD` in `src/lib/event-form.ts`). The
 pnpm --filter @cleanstart/events dev   # http://localhost:3005
 ```
 
-Copy `.env.example` to `.env.local`. The CMS must be running at `NEXT_PUBLIC_CMS_URL` for submits to succeed.
+Copy `.env.example` to `.env.local`. The CMS must be running at `NEXT_PUBLIC_CMS_URL`, with this site's origin in its `LEAD_SUBMIT_ALLOWED_ORIGINS`.

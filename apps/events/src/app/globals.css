@@ -315,3 +315,44 @@ h3 {
   pointer-events: none;
   background: linear-gradient(90deg, transparent, rgba(44, 193, 235, 0.7) 30%, rgba(171, 140, 255, 0.7) 70%, transparent);
 }
+
+/* Events listing (v6): cards echo the main site's event card. The whole card is
+   one link, stretched from the Register button. A transform or filter on that
+   link makes it the containing block of its own overlay, so the overlay shrinks
+   to the button and the cursor flickers. Hence the card button never transforms. */
+.ev-card {
+  cursor: pointer;
+  box-shadow: 0 4px 24px rgba(60, 30, 150, 0.1);
+  transition: box-shadow 220ms ease-out;
+}
+
+.ev-card:hover {
+  box-shadow: 0 12px 32px -12px rgba(60, 30, 150, 0.22);
+}
+
+.ev-card .ev-btn:hover:not(:disabled),
+.ev-card .ev-btn:active:not(:disabled) {
+  transform: none;
+  filter: none;
+}
+
+.ev-card .ev-btn:hover:not(:disabled) {
+  background: var(--color-cs-purple-3);
+}
+
+.ev-card:focus-within {
+  outline: 2px solid #3960f9;
+  outline-offset: 3px;
+}
+
+.ev-rings--right {
+  left: 80%;
+  top: 40%;
+  width: min(95vw, 860px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ev-card {
+    transition: none;
+  }
+}
