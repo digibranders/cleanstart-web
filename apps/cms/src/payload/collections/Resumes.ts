@@ -4,7 +4,7 @@ import { ValidationError } from 'payload';
 import { isAdminEditorOrHr } from '../access';
 import { ALLOWED_MIME_TYPES, RESUME_MIME_TYPES, checkUploadSize } from '../lib/upload-limits';
 
-type ApplicantSummary = { name: string; email: string; jobTitle: string };
+type ApplicantSummary = { name: string; email: string };
 
 // shortcut: one query per resume row (10 per admin page), no sorting on these columns; add a stored `application` relation if the list needs to sort or filter by applicant.
 const lookupApplicant = async (
@@ -27,7 +27,6 @@ const lookupApplicant = async (
     ? {
         name: [app.firstName, app.lastName].filter(Boolean).join(' '),
         email: app.email ?? '',
-        jobTitle: app.jobTitleSnapshot,
       }
     : null;
   cache[cacheKey] = summary;
@@ -64,9 +63,12 @@ export const Resumes: CollectionConfig = {
   admin: {
     group: 'Recruiting',
     useAsTitle: 'filename',
-    defaultColumns: ['filename', 'applicantName', 'applicantEmail', 'applicantJobTitle', 'createdAt'],
+    defaultColumns: ['filename', 'applicantName', 'applicantEmail', 'job', 'createdAt'],
     description: 'Applicant resumes (private). Access-controlled — never public.',
     hidden: false,
+    components: {
+      beforeListTable: ['@/payload/admin/components/JobFilter.tsx#JobFilter'],
+    },
   },
   access: {
     read: isAdminEditorOrHr,
@@ -101,7 +103,14 @@ export const Resumes: CollectionConfig = {
   fields: [
     applicantField('applicantName', 'Applicant', 'name'),
     applicantField('applicantEmail', 'Email', 'email'),
-    applicantField('applicantJobTitle', 'Job applied for', 'jobTitle'),
+    {
+      name: 'job',
+      label: 'Job applied for',
+      type: 'relationship',
+      relationTo: 'jobs',
+      index: true,
+      admin: { readOnly: true, description: 'Set when the application is submitted.' },
+    },
   ],
   timestamps: true,
 };

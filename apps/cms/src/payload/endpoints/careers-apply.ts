@@ -264,7 +264,7 @@ export const careersApplyEndpoint: Endpoint = {
     try {
       const created = await req.payload.create({
         collection: 'resumes',
-        data: {},
+        data: { job: job.id },
         file: { data: buffer, mimetype: file.type, name: file.name || 'resume', size: file.size },
         overrideAccess: true,
       });
@@ -287,7 +287,7 @@ export const careersApplyEndpoint: Endpoint = {
         coverBuffer = Buffer.from(await coverFile.arrayBuffer());
         const created = await req.payload.create({
           collection: 'resumes',
-          data: {},
+          data: { job: job.id },
           file: {
             data: coverBuffer,
             mimetype: coverFile.type,

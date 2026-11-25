@@ -6687,6 +6687,12 @@ export interface CareerApplication {
  */
 export interface Resume {
   id: number;
+  applicantName?: string | null;
+  applicantEmail?: string | null;
+  /**
+   * Set when the application is submitted.
+   */
+  job?: (number | null) | Job;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -14008,6 +14014,9 @@ export interface CareerApplicationsSelect<T extends boolean = true> {
  * via the `definition` "resumes_select".
  */
 export interface ResumesSelect<T extends boolean = true> {
+  applicantName?: T;
+  applicantEmail?: T;
+  job?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;

@@ -2615,3 +2615,38 @@
     color: var(--theme-text);
   }
 }
+
+// Job filter — beforeListTable on Applications and Resumes.
+.cs-job-filter {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin-bottom: 1rem;
+}
+
+.cs-job-filter__label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--theme-elevation-600, rgba(0, 0, 0, 0.6));
+}
+
+.cs-job-filter__select {
+  min-width: 18rem;
+  max-width: 100%;
+  height: 2.25rem;
+  padding: 0 0.75rem;
+  font: inherit;
+  font-size: 0.875rem;
+  color: var(--theme-text);
+  background: var(--theme-input-bg, var(--theme-elevation-50));
+  border: 1px solid var(--theme-elevation-150, rgba(0, 0, 0, 0.15));
+  border-radius: 4px;
+  cursor: pointer;
+  &:focus-visible { outline: 2px solid var(--theme-elevation-400); outline-offset: 1px; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.cs-job-filter__error {
+  font-size: 0.75rem;
+  color: var(--theme-error-500);
+}

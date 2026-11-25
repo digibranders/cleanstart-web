@@ -28,6 +28,9 @@ export const CareerApplications: CollectionConfig = {
       'jobLocationSnapshot',
       'createdAt',
     ],
+    components: {
+      beforeListTable: ['@/payload/admin/components/JobFilter.tsx#JobFilter'],
+    },
     description: 'Job applications (append-only). Resumes are stored privately and emailed to HR.',
   },
   access: {
