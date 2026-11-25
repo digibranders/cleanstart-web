@@ -18,7 +18,16 @@ export const CareerApplications: CollectionConfig = {
   admin: {
     group: 'Recruiting',
     useAsTitle: 'email',
-    defaultColumns: ['job', 'firstName', 'lastName', 'email', 'emailDelivery', 'createdAt'],
+    defaultColumns: [
+      'jobTitleSnapshot',
+      'firstName',
+      'lastName',
+      'email',
+      'phone',
+      'location',
+      'jobLocationSnapshot',
+      'createdAt',
+    ],
     description: 'Job applications (append-only). Resumes are stored privately and emailed to HR.',
   },
   access: {
