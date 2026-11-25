@@ -212,3 +212,52 @@ describe('validateFields — tel', () => {
     expect(validateFields([tel({ required: false })], { phone: '' }).ok).toBe(true);
   });
 });
+
+describe('validateFields — conditions', () => {
+  const cab: FormFieldDef = {
+    name: 'cab',
+    type: 'select',
+    label: 'Cab',
+    required: true,
+    options: [
+      { label: 'Yes', value: 'yes' },
+      { label: 'No', value: 'no' },
+    ],
+  };
+  const pickup = (mode?: 'all' | 'any'): FormFieldDef =>
+    text({
+      name: 'pickup',
+      label: 'Pick up',
+      conditions: { mode: mode ?? 'all', rules: [{ fieldName: 'cab', operator: 'equals', value: 'yes' }] },
+    });
+
+  it('requires a conditional field when its rule matches', () => {
+    const result = validateFields([cab, pickup()], { cab: 'yes' });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.issues[0]?.fieldName).toBe('pickup');
+  });
+
+  it('skips a conditional field when its rule does not match', () => {
+    expect(validateFields([cab, pickup()], { cab: 'no' }).ok).toBe(true);
+  });
+
+  it('treats a field with no rules as always visible', () => {
+    const plain = text({ name: 'who', conditions: { mode: 'all', rules: [] } });
+    expect(validateFields([plain], {}).ok).toBe(false);
+  });
+
+  it('supports any-of rules and notEquals', () => {
+    const field = text({
+      name: 'why',
+      conditions: {
+        mode: 'any',
+        rules: [
+          { fieldName: 'cab', operator: 'equals', value: 'maybe' },
+          { fieldName: 'cab', operator: 'notEquals', value: 'no' },
+        ],
+      },
+    });
+    expect(validateFields([cab, field], { cab: 'no' }).ok).toBe(true);
+    expect(validateFields([cab, field], { cab: 'yes' }).ok).toBe(false);
+  });
+});

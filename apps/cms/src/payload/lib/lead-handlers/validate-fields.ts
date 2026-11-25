@@ -32,6 +32,16 @@ export type FormFieldDef = {
    * deliberately accept a personal address.
    */
   requireBusinessEmail?: boolean | null;
+  /**
+   * "Show this field only when" rules. A field whose rules do not match the
+   * submitted values is hidden in the form, so it is not validated here either.
+   */
+  conditions?: {
+    mode?: 'all' | 'any' | null;
+    rules?:
+      | { fieldName?: string | null; operator?: string | null; value?: string | null }[]
+      | null;
+  } | null;
 };
 
 export type FieldIssue = {
@@ -70,6 +80,26 @@ const patternOk = (value: string, rawPattern: string | null | undefined): true |
   return re.test(value) ? true : 'does not match the required format';
 };
 
+const ruleMatches = (
+  rule: { fieldName?: string | null; operator?: string | null; value?: string | null },
+  values: Record<string, unknown>,
+): boolean => {
+  const actual = String(values[rule.fieldName ?? ''] ?? '');
+  const expected = rule.value ?? '';
+  if (rule.operator === 'notEquals') return actual !== expected;
+  if (rule.operator === 'contains') return actual.includes(expected);
+  return actual === expected;
+};
+
+/** A field with no rules is always visible; `mode` defaults to all rules must match. */
+const isFieldVisible = (def: FormFieldDef, values: Record<string, unknown>): boolean => {
+  const rules = def.conditions?.rules ?? [];
+  if (rules.length === 0) return true;
+  return def.conditions?.mode === 'any'
+    ? rules.some((rule) => ruleMatches(rule, values))
+    : rules.every((rule) => ruleMatches(rule, values));
+};
+
 export const validateFields = (
   defs: FormFieldDef[],
   values: Record<string, unknown>,
@@ -78,6 +108,7 @@ export const validateFields = (
 
   for (const def of defs) {
     if (!def?.name) continue;
+    if (!isFieldVisible(def, values)) continue;
     const value = values[def.name];
     const label = labelOrName(def);
 
