@@ -1,11 +1,11 @@
 import type { MetadataRoute } from "next";
 
-import { EVENTS } from "@/content/events";
+import { getEvents } from "@/lib/cms";
 import { SITE_URL } from "@/lib/site";
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  return [
-    { url: SITE_URL },
-    ...EVENTS.map((event) => ({ url: `${SITE_URL}/${event.slug}` })),
-  ];
+export const dynamic = "force-dynamic";
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const events = await getEvents();
+  return [{ url: SITE_URL }, ...events.map((event) => ({ url: `${SITE_URL}/${event.slug}` }))];
 }
