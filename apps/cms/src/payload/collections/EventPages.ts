@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload';
 
-import { isAdminEditorOrEvents } from '../access';
+import { isAdminEditorOrEvents, publishedOrAuthenticated } from '../access';
 import { eventPagesEndpoints } from '../endpoints/event-pages';
 import { slugField } from '../fields/slug';
 import { eventLeadSource } from '../lib/event-pages/site';
@@ -20,14 +20,14 @@ export const EventPages: CollectionConfig = {
   labels: { singular: 'Event', plural: 'Event Registrations' },
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'status', 'registrationCount', 'updatedAt'],
+    defaultColumns: ['title', '_status', 'registrationCount', 'updatedAt'],
     group: 'Marketing',
     description:
       'Events on events.cleanstart.com. Open an event to edit its page and see who registered.',
   },
   access: {
     // Anonymous reads (the events site) only ever see published events.
-    read: ({ req: { user } }) => (user ? true : { status: { equals: 'published' } }),
+    read: publishedOrAuthenticated,
     create: isAdminEditorOrEvents,
     update: isAdminEditorOrEvents,
     delete: isAdminEditorOrEvents,
@@ -36,17 +36,6 @@ export const EventPages: CollectionConfig = {
   fields: [
     { name: 'title', type: 'text', required: true },
     slugField({ source: 'title' }),
-    {
-      name: 'status',
-      type: 'select',
-      required: true,
-      defaultValue: 'draft',
-      options: [
-        { label: 'Draft', value: 'draft' },
-        { label: 'Published', value: 'published' },
-      ],
-      admin: { position: 'sidebar', description: 'Only published events appear on events.cleanstart.com.' },
-    },
     {
       name: 'registrationOpen',
       type: 'checkbox',
@@ -116,5 +105,7 @@ export const EventPages: CollectionConfig = {
       },
     },
   ],
+  // Draft and Publish buttons, like the other content collections.
+  versions: { drafts: true, maxPerDoc: 25 },
   timestamps: true,
 };

@@ -1,5 +1,8 @@
 {
   "slug": "eventPages",
+  "versions": {
+    "drafts": true
+  },
   "timestamps": true,
   "fields": [
     {
@@ -12,19 +15,6 @@
       "name": "slug",
       "required": true,
       "unique": true
-    },
-    {
-      "type": "select",
-      "name": "status",
-      "required": true,
-      "options": [
-        {
-          "value": "draft"
-        },
-        {
-          "value": "published"
-        }
-      ]
     },
     {
       "type": "checkbox",

@@ -117,7 +117,7 @@ const ensureEvent = async (payload: Awaited<ReturnType<typeof getPayload>>): Pro
     data: {
       title: 'New Year Networking Event',
       slug: EVENT_SLUG,
-      status: 'published',
+      _status: 'published',
       registrationOpen: true,
       description:
         'Register for the New Year Networking Event hosted by CleanStart, Upwind and Cosmos One.',

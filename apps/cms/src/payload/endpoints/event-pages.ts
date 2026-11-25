@@ -69,7 +69,7 @@ const siteList: Endpoint = {
   handler: async (req) => {
     const res = await req.payload.find({
       collection: 'eventPages',
-      where: { status: { equals: 'published' } },
+      where: { _status: { equals: 'published' } },
       sort: '-createdAt',
       limit: 100,
       depth: 1,
@@ -91,7 +91,7 @@ const siteOne: Endpoint = {
     if (typeof slug !== 'string') return json({ error: 'not_found' }, 404);
     const res = await req.payload.find({
       collection: 'eventPages',
-      where: { and: [{ slug: { equals: slug } }, { status: { equals: 'published' } }] },
+      where: { and: [{ slug: { equals: slug } }, { _status: { equals: 'published' } }] },
       limit: 1,
       depth: 1,
       overrideAccess: true,
