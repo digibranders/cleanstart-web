@@ -5199,10 +5199,6 @@ export interface EventPage {
    */
   slug: string;
   /**
-   * Only published events appear on events.cleanstart.com.
-   */
-  status: 'draft' | 'published';
-  /**
    * Untick to show the page but stop taking registrations.
    */
   registrationOpen?: boolean | null;
@@ -5245,6 +5241,7 @@ export interface EventPage {
   registrationForm?: (number | null) | Form;
   updatedAt: string;
   createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -11487,7 +11484,6 @@ export interface EventsSelect<T extends boolean = true> {
 export interface EventPagesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
-  status?: T;
   registrationOpen?: T;
   registrationCount?: T;
   description?: T;
@@ -11504,6 +11500,7 @@ export interface EventPagesSelect<T extends boolean = true> {
   registrationForm?: T;
   updatedAt?: T;
   createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
