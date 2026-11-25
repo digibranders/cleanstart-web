@@ -156,6 +156,8 @@ const banner: Endpoint = {
 };
 
 const PAGE_SIZE = 200;
+/** The registrations page filters and pages in the browser, so it loads one event in full up to this many. */
+const MAX_PAGES = 25;
 
 type Entry = { id: number; createdAt: string; fields: Record<string, unknown> };
 
@@ -173,6 +175,45 @@ const loadRegistrations = async (req: PayloadRequest) => {
   return { event: { id, title: String(event.title ?? ''), slug: event.slug }, columns };
 };
 
+/** Admin: every event with its registration count and latest registration, for the registrations page. */
+const summary: Endpoint = {
+  path: '/summary',
+  method: 'get',
+  handler: async (req) => {
+    if (!canManage(req)) return json({ ok: false, error: 'forbidden' }, 403);
+    const res = await req.payload.find({
+      collection: 'eventPages',
+      sort: '-createdAt',
+      limit: 200,
+      depth: 0,
+      draft: true,
+      overrideAccess: true,
+    });
+    const events = await Promise.all(
+      res.docs.map(async (doc) => {
+        const source = eventLeadSource(String(doc.slug ?? ''));
+        const latest = await req.payload.find({
+          collection: 'leads',
+          where: { source: { equals: source } },
+          sort: '-createdAt',
+          limit: 1,
+          depth: 0,
+          overrideAccess: true,
+        });
+        return {
+          id: doc.id,
+          title: String(doc.title ?? ''),
+          slug: String(doc.slug ?? ''),
+          status: doc._status ?? 'draft',
+          total: latest.totalDocs,
+          latestAt: latest.docs[0]?.createdAt ?? null,
+        };
+      }),
+    );
+    return json({ ok: true, events });
+  },
+};
+
 /** Admin: one event's entries, newest first. */
 const registrations: Endpoint = {
   path: '/:id/registrations',
@@ -181,22 +222,52 @@ const registrations: Endpoint = {
     if (!canManage(req)) return json({ ok: false, error: 'forbidden' }, 403);
     const loaded = await loadRegistrations(req);
     if (!loaded) return json({ ok: false, error: 'not_found' }, 404);
-    const page = Math.max(1, Number.parseInt(new URL(req.url ?? '', 'http://internal').searchParams.get('page') ?? '1', 10) || 1);
-    const res = await req.payload.find({
+    const entries: Entry[] = [];
+    let total = 0;
+    for (let page = 1; page <= MAX_PAGES; page += 1) {
+      const res = await req.payload.find({
+        collection: 'leads',
+        where: { source: { equals: eventLeadSource(loaded.event.slug) } },
+        sort: '-createdAt',
+        limit: PAGE_SIZE,
+        page,
+        depth: 0,
+        overrideAccess: true,
+      });
+      total = res.totalDocs;
+      for (const lead of res.docs) {
+        entries.push({ id: lead.id, createdAt: lead.createdAt, fields: (lead.fields ?? {}) as Record<string, unknown> });
+      }
+      if (!res.hasNextPage) break;
+    }
+    return json({ ok: true, ...loaded, entries, total, truncated: total > entries.length });
+  },
+};
+
+/**
+ * Admin: remove one registration (a test entry or a duplicate). Only a lead
+ * that belongs to this event can be removed here. The Leads collection's own
+ * delete hook writes the audit row.
+ */
+const deleteRegistration: Endpoint = {
+  path: '/:id/registrations/:leadId',
+  method: 'delete',
+  handler: async (req) => {
+    if (!canManage(req)) return json({ ok: false, error: 'forbidden' }, 403);
+    const loaded = await loadRegistrations(req);
+    if (!loaded) return json({ ok: false, error: 'not_found' }, 404);
+    const leadId = Number.parseInt(String(req.routeParams?.leadId ?? ''), 10);
+    if (!Number.isFinite(leadId)) return json({ ok: false, error: 'invalid_lead' }, 400);
+    const found = await req.payload.find({
       collection: 'leads',
-      where: { source: { equals: eventLeadSource(loaded.event.slug) } },
-      sort: '-createdAt',
-      limit: PAGE_SIZE,
-      page,
+      where: { and: [{ id: { equals: leadId } }, { source: { equals: eventLeadSource(loaded.event.slug) } }] },
+      limit: 1,
       depth: 0,
       overrideAccess: true,
     });
-    const entries: Entry[] = res.docs.map((lead) => ({
-      id: lead.id,
-      createdAt: lead.createdAt,
-      fields: (lead.fields ?? {}) as Record<string, unknown>,
-    }));
-    return json({ ok: true, ...loaded, entries, total: res.totalDocs, page, hasNextPage: res.hasNextPage });
+    if (found.docs.length === 0) return json({ ok: false, error: 'not_found' }, 404);
+    await req.payload.delete({ collection: 'leads', id: leadId, req, overrideAccess: true });
+    return json({ ok: true });
   },
 };
 
@@ -271,4 +342,12 @@ const registrationsCsv: Endpoint = {
   },
 };
 
-export const eventPagesEndpoints: Endpoint[] = [siteList, siteOne, banner, registrations, registrationsCsv];
+export const eventPagesEndpoints: Endpoint[] = [
+  siteList,
+  siteOne,
+  banner,
+  summary,
+  registrations,
+  deleteRegistration,
+  registrationsCsv,
+];

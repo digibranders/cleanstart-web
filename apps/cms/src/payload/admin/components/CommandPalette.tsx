@@ -53,6 +53,12 @@ const NAV_TARGETS: Array<Omit<Action, 'group'>> = [
     href: '/admin/lead-attribution',
     icon: 'collection',
   },
+  {
+    id: 'nav-event-registrations',
+    label: 'Event registrations',
+    href: '/admin/event-registrations',
+    icon: 'collection',
+  },
   { id: 'nav-redirects', label: 'Redirects', href: '/admin/collections/redirects', icon: 'collection' },
   { id: 'nav-auditLog', label: 'Audit log', href: '/admin/collections/audit-log', icon: 'collection' },
   { id: 'nav-users', label: 'Users', href: '/admin/collections/users', icon: 'collection' },
