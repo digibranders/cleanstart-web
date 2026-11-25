@@ -11,9 +11,12 @@
  * No `hubspotFormGuid` and no CRM handlers: the form has no email, which the
  * HubSpot relay needs. Leads are stored in the CMS database only.
  *
- * The event page is created without partner logos: uploading media is an
- * editor's job, and the events site shows each partner's name as text until one
- * is uploaded. Open the event in the CMS (Marketing > Event Registrations).
+ * Partner logos: set EVENT_LOGO_DIR to a folder holding upwind.svg and
+ * cosmos-one.svg (apps/events/public/logos has them) and the script uploads them
+ * to Media and attaches them to the event's partners. Without it the events
+ * site shows each partner's name as text until an editor uploads a logo in the
+ * CMS (Marketing > Event Registrations). Partners that already have a logo are
+ * left alone, so a re-run is safe.
  *
  * Goes through payload.create so the collection hooks run as an editor's save
  * would. The row is published: the lead endpoint refuses a draft form.
@@ -22,6 +25,8 @@
  * Run from apps/cms with the env file loaded:
  *   pnpm exec tsx --env-file=.env scripts/seed-event-form.ts
  */
+import path from 'node:path';
+
 import { getPayload } from 'payload';
 
 import payloadConfig from '../src/payload.config.ts';
@@ -96,7 +101,7 @@ const ensureForm = async (payload: Awaited<ReturnType<typeof getPayload>>): Prom
   console.log(`Created forms/${SLUG} (id ${created.id}).`);
 };
 
-const ensureEvent = async (payload: Awaited<ReturnType<typeof getPayload>>): Promise<void> => {
+const ensureEvent = async (payload: Awaited<ReturnType<typeof getPayload>>): Promise<number> => {
   const existing = await payload.find({
     collection: 'eventPages',
     where: { slug: { equals: EVENT_SLUG } },
@@ -105,7 +110,7 @@ const ensureEvent = async (payload: Awaited<ReturnType<typeof getPayload>>): Pro
   });
   if (existing.docs[0]) {
     console.log(`eventPages/${EVENT_SLUG} already exists (id ${existing.docs[0].id}).`);
-    return;
+    return existing.docs[0].id;
   }
   const created = await payload.create({
     collection: 'eventPages',
@@ -123,12 +128,49 @@ const ensureEvent = async (payload: Awaited<ReturnType<typeof getPayload>>): Pro
     },
   });
   console.log(`Created eventPages/${EVENT_SLUG} (id ${created.id}).`);
+  return created.id;
+};
+
+const LOGO_FILES: Readonly<Record<string, string>> = {
+  Upwind: 'upwind.svg',
+  'Cosmos One': 'cosmos-one.svg',
+};
+
+const attachLogos = async (
+  payload: Awaited<ReturnType<typeof getPayload>>,
+  eventId: number,
+): Promise<void> => {
+  const dir = process.env.EVENT_LOGO_DIR;
+  if (!dir) {
+    console.log('EVENT_LOGO_DIR not set: partner logos not attached.');
+    return;
+  }
+  const event = await payload.findByID({ collection: 'eventPages', id: eventId, depth: 0 });
+  let changed = false;
+  const partners = [];
+  for (const partner of event.partners ?? []) {
+    const file = LOGO_FILES[partner.name];
+    if (partner.logo || !file) {
+      partners.push(partner);
+      continue;
+    }
+    const media = await payload.create({
+      collection: 'media',
+      data: { alt: `${partner.name} logo`, folder: 'web/event' },
+      filePath: path.join(dir, file),
+    });
+    partners.push({ ...partner, logo: media.id });
+    changed = true;
+    console.log(`Uploaded ${file} as media/${media.id}.`);
+  }
+  if (changed) await payload.update({ collection: 'eventPages', id: eventId, data: { partners } });
 };
 
 const run = async (): Promise<void> => {
   const payload = await getPayload({ config: payloadConfig });
   await ensureForm(payload);
-  await ensureEvent(payload);
+  const eventId = await ensureEvent(payload);
+  await attachLogos(payload, eventId);
   process.exit(0);
 };
 
