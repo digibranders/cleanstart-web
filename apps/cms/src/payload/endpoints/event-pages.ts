@@ -8,6 +8,7 @@ import {
   toSiteEvent,
   type SiteEvent,
 } from '../lib/event-pages/site';
+import { composeEventBanner } from '../lib/event-pages/banner';
 import { extractRequestMeta } from '../lib/request-meta';
 
 const json = (data: unknown, status = 200): Response =>
@@ -99,6 +100,58 @@ const siteOne: Endpoint = {
     const doc = res.docs[0] as unknown as Record<string, unknown> | undefined;
     const event = doc ? await toSite(req, doc, loadDefaultForm(req)) : null;
     return event ? json({ event }) : json({ error: 'not_found' }, 404);
+  },
+};
+
+const EVENTS_SITE = (process.env.EVENTS_SITE_URL ?? 'https://events.cleanstart.com').replace(/\/$/u, '');
+
+const fetchImage = async (url: string): Promise<Buffer | null> => {
+  try {
+    const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
+    if (!res.ok) return null;
+    const bytes = Buffer.from(await res.arrayBuffer());
+    return bytes.length <= 2_000_000 ? bytes : null;
+  } catch {
+    return null;
+  }
+};
+
+/**
+ * Public: the event's co-branding strip as one PNG, for its emails. Email
+ * clients do not show SVG, so the partner logos are composed into a picture
+ * here. Only published events have one, and a logo that cannot be fetched is
+ * left out and the result is not cached, so the next request retries it.
+ */
+const banner: Endpoint = {
+  path: '/banner/:slug',
+  method: 'get',
+  handler: async (req) => {
+    const slug = req.routeParams?.slug;
+    if (typeof slug !== 'string') return json({ error: 'not_found' }, 404);
+    const res = await req.payload.find({
+      collection: 'eventPages',
+      where: { and: [{ slug: { equals: slug } }, { _status: { equals: 'published' } }] },
+      limit: 1,
+      depth: 1,
+      overrideAccess: true,
+    });
+    const doc = res.docs[0] as unknown as Record<string, unknown> | undefined;
+    const event = doc ? await toSite(req, doc, loadDefaultForm(req)) : null;
+    if (!event) return json({ error: 'not_found' }, 404);
+
+    const urls = [`${EVENTS_SITE}/logos/cleanstart.png`, ...event.partners.flatMap((p) => (p.logoUrl ? [p.logoUrl] : []))];
+    const fetched = await Promise.all(urls.map(fetchImage));
+    const logos = fetched.filter((logo): logo is Buffer => logo !== null);
+    if (logos.length === 0) return json({ error: 'no_logos' }, 404);
+
+    const png = await composeEventBanner(logos);
+    return new Response(new Uint8Array(png), {
+      status: 200,
+      headers: {
+        'content-type': 'image/png',
+        'cache-control': logos.length === urls.length ? 'public, max-age=3600' : 'no-store',
+      },
+    });
   },
 };
 
@@ -218,4 +271,4 @@ const registrationsCsv: Endpoint = {
   },
 };
 
-export const eventPagesEndpoints: Endpoint[] = [siteList, siteOne, registrations, registrationsCsv];
+export const eventPagesEndpoints: Endpoint[] = [siteList, siteOne, banner, registrations, registrationsCsv];

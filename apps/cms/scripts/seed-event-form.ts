@@ -11,6 +11,11 @@
  * No `hubspotFormGuid` and no CRM handlers: the form has no email, which the
  * HubSpot relay needs. Leads are stored in the CMS database only.
  *
+ * Alert recipients: set EVENT_NOTIFY_EMAILS (comma separated) and the default
+ * form's "Notify recipients" list is filled with them when it is empty. Those
+ * addresses get an email per registration (lib/lead-handlers/event-alert.ts); an
+ * existing list is never overwritten, so edit it in the CMS afterwards.
+ *
  * Partner logos: set EVENT_LOGO_DIR to a folder holding upwind.svg and
  * cosmos-one.svg (apps/events/public/logos has them) and the script uploads them
  * to Media and attaches them to the event's partners. Without it the events
@@ -39,7 +44,7 @@ const onlyWhenCab = {
   rules: [{ fieldName: 'cab_required', operator: 'equals' as const, value: 'yes' }],
 };
 
-const ensureForm = async (payload: Awaited<ReturnType<typeof getPayload>>): Promise<void> => {
+const ensureForm = async (payload: Awaited<ReturnType<typeof getPayload>>): Promise<number> => {
   const existing = await payload.find({
     collection: 'forms',
     where: { slug: { equals: SLUG } },
@@ -54,7 +59,7 @@ const ensureForm = async (payload: Awaited<ReturnType<typeof getPayload>>): Prom
     } else {
       console.log(`forms/${SLUG} already exists (id ${found.id}).`);
     }
-    return;
+    return found.id;
   }
 
   const created = await payload.create({
@@ -99,6 +104,32 @@ const ensureForm = async (payload: Awaited<ReturnType<typeof getPayload>>): Prom
     },
   });
   console.log(`Created forms/${SLUG} (id ${created.id}).`);
+  return created.id;
+};
+
+const ensureRecipients = async (
+  payload: Awaited<ReturnType<typeof getPayload>>,
+  formId: number,
+): Promise<void> => {
+  const emails = (process.env.EVENT_NOTIFY_EMAILS ?? '')
+    .split(',')
+    .map((email) => email.trim())
+    .filter((email) => email.length > 0);
+  if (emails.length === 0) {
+    console.log('EVENT_NOTIFY_EMAILS not set: alert recipients unchanged.');
+    return;
+  }
+  const form = await payload.findByID({ collection: 'forms', id: formId, depth: 0 });
+  if ((form.notifyTo ?? []).length > 0) {
+    console.log(`forms/${SLUG} already has ${form.notifyTo?.length} notify recipient(s). Left as is.`);
+    return;
+  }
+  await payload.update({
+    collection: 'forms',
+    id: formId,
+    data: { notifyTo: emails.map((email) => ({ email })) },
+  });
+  console.log(`Set ${emails.length} notify recipient(s) on forms/${SLUG}.`);
 };
 
 const ensureEvent = async (payload: Awaited<ReturnType<typeof getPayload>>): Promise<number> => {
@@ -168,7 +199,8 @@ const attachLogos = async (
 
 const run = async (): Promise<void> => {
   const payload = await getPayload({ config: payloadConfig });
-  await ensureForm(payload);
+  const formId = await ensureForm(payload);
+  await ensureRecipients(payload, formId);
   const eventId = await ensureEvent(payload);
   await attachLogos(payload, eventId);
   process.exit(0);

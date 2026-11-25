@@ -100,6 +100,8 @@ export type EmailBlock =
   | { kind: 'button'; label: string; url: string }
   /** Tinted aside for a caveat, e.g. a link expiry. */
   | { kind: 'note'; text: string }
+  /** A full-width picture, e.g. an event's co-branding strip. Always give it alt text. */
+  | { kind: 'image'; src: string; alt: string }
   | { kind: 'divider' };
 
 const paragraph = (text: string, muted = false): string =>
@@ -139,6 +141,14 @@ const button = (label: string, url: string): string => {
   </table>`;
 };
 
+const image = (src: string, alt: string): string => {
+  const url = safeUrl(src);
+  if (!url) return '';
+  return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:0 0 20px;">
+    <tr><td><img src="${escapeHtml(url)}" width="520" alt="${escapeHtml(alt)}" style="display:block;width:100%;max-width:520px;height:auto;border:0;outline:none;border-radius:12px;-ms-interpolation-mode:bicubic;"></td></tr>
+  </table>`;
+};
+
 const note = (text: string): string =>
   `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:0 0 20px;">
     <tr><td bgcolor="${BRAND.canvas}" style="padding:14px 16px;border-radius:8px;font-family:${FONT};font-size:14px;line-height:1.5;color:${BRAND.muted};">${escapeHtml(text)}</td></tr>
@@ -159,6 +169,8 @@ const renderBlock = (block: EmailBlock): string => {
       return button(block.label, block.url);
     case 'note':
       return note(block.text);
+    case 'image':
+      return image(block.src, block.alt);
     case 'divider':
       return divider();
   }
