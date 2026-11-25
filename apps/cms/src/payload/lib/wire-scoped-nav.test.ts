@@ -75,7 +75,7 @@ describe('isHiddenForScopedNav', () => {
 
   it('shows an events-only user their events collections and hides the rest', () => {
     const events = userWith('events');
-    for (const slug of ['events', 'webinars', 'webinarTypes', 'podcastEpisodes']) {
+    for (const slug of ['events', 'eventPages', 'webinars', 'webinarTypes', 'podcastEpisodes']) {
       expect(isHiddenForScopedNav(slug, events)).toBe(false);
     }
     for (const slug of ['blogs', 'jobs', 'resumes', 'leads', 'users']) {
@@ -135,6 +135,7 @@ describe('scopedCollectionSlugsForUser', () => {
     ]);
     expect(scopedCollectionSlugsForUser(userWith('events'))).toEqual([
       'events',
+      'eventPages',
       'webinars',
       'webinarTypes',
       'podcastEpisodes',
