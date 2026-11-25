@@ -156,6 +156,7 @@ import { CmsAccountView as CmsAccountView_e25882c99036df42ce1493c03452d7e3 } fro
 import { AnalyticsView as AnalyticsView_9809f757f325208f1f22c259e380c7d4 } from '../../../payload/admin/components/Analytics/AnalyticsView.tsx'
 import { ContentInsightsView as ContentInsightsView_4f64082482f4a971d7f1f3adfd127137 } from '../../../payload/admin/components/ContentInsights/ContentInsightsView.tsx'
 import { LeadAttributionView as LeadAttributionView_09cce16329a31c9c0551fcad8db287ed } from '../../../payload/admin/components/LeadAttribution/LeadAttributionView.tsx'
+import { EventRegistrationsView as EventRegistrationsView_be5a5d9b23c169cb0ab92fa28028bde9 } from '../../../payload/admin/components/EventRegistrations/EventRegistrationsView.tsx'
 import { CacheView as CacheView_53dd99c40bf5dfa0411c06d06a42a42b } from '../../../payload/admin/components/cache/CacheView.tsx'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 import { PointField as PointField_dc800e7ca3d2eb7ea39fd4bc6138c687 } from '@/payload/admin/components/fields/PointField.tsx'
@@ -321,6 +322,7 @@ export const importMap = {
   "./payload/admin/components/Analytics/AnalyticsView.tsx#AnalyticsView": AnalyticsView_9809f757f325208f1f22c259e380c7d4,
   "./payload/admin/components/ContentInsights/ContentInsightsView.tsx#ContentInsightsView": ContentInsightsView_4f64082482f4a971d7f1f3adfd127137,
   "./payload/admin/components/LeadAttribution/LeadAttributionView.tsx#LeadAttributionView": LeadAttributionView_09cce16329a31c9c0551fcad8db287ed,
+  "./payload/admin/components/EventRegistrations/EventRegistrationsView.tsx#EventRegistrationsView": EventRegistrationsView_be5a5d9b23c169cb0ab92fa28028bde9,
   "./payload/admin/components/cache/CacheView.tsx#CacheView": CacheView_53dd99c40bf5dfa0411c06d06a42a42b,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1,
   "@/payload/admin/components/fields/PointField.tsx#PointField": PointField_dc800e7ca3d2eb7ea39fd4bc6138c687,

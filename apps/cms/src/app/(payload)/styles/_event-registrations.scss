@@ -1,0 +1,160 @@
+// Event Registrations page. Builds on the shared .cs-analytics head and empty primitives.
+.cs-event-regs {
+  &__actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  &__error {
+    color: var(--theme-error-500);
+  }
+
+  &__events {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 20px;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__event {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    min-width: 200px;
+    padding: 10px 14px;
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: 8px;
+    background: var(--theme-elevation-0);
+    color: var(--theme-text);
+    text-align: left;
+    cursor: pointer;
+
+    &--active {
+      border-color: var(--theme-text);
+      background: var(--theme-elevation-50);
+    }
+  }
+
+  &__event-title {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  &__event-meta {
+    font-size: 12px;
+    color: var(--theme-elevation-600);
+  }
+
+  &__kpis {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+    margin-bottom: 20px;
+
+    > div {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+  }
+
+  &__kpi-value {
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.1;
+    font-feature-settings: 'tnum' 1;
+
+    &--small {
+      font-size: 16px;
+      line-height: 2;
+    }
+  }
+
+  &__kpi-label {
+    font-size: 12px;
+    color: var(--theme-elevation-600);
+  }
+
+  &__filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 12px;
+    margin-bottom: 16px;
+
+    label {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--theme-elevation-600);
+    }
+
+    input,
+    select {
+      min-width: 200px;
+      padding: 6px 8px;
+      border: 1px solid var(--theme-elevation-150);
+      border-radius: 4px;
+      background: var(--theme-input-bg, var(--theme-elevation-0));
+      color: var(--theme-text);
+      font-size: 13px;
+    }
+
+    select {
+      min-width: 120px;
+    }
+  }
+
+  &__count {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--theme-elevation-600);
+  }
+
+  &__table-wrap {
+    overflow-x: auto;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+
+    th {
+      padding: 8px 12px;
+      text-align: left;
+      white-space: nowrap;
+      color: var(--theme-elevation-600);
+      font-weight: 600;
+    }
+
+    td {
+      padding: 10px 12px;
+      border-top: 1px solid var(--theme-elevation-100);
+      vertical-align: top;
+    }
+  }
+
+  &__nowrap {
+    white-space: nowrap;
+  }
+
+  &__row-actions {
+    display: flex;
+    gap: 6px;
+    justify-content: flex-end;
+    white-space: nowrap;
+  }
+
+  &__pager {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 16px;
+    font-size: 13px;
+  }
+}

@@ -361,6 +361,12 @@ export default buildConfig({
             './payload/admin/components/LeadAttribution/LeadAttributionView.tsx#LeadAttributionView',
           path: '/lead-attribution',
         },
+        // Registrations for the events on events.cleanstart.com: pick an event, search, delete, export.
+        eventRegistrations: {
+          Component:
+            './payload/admin/components/EventRegistrations/EventRegistrationsView.tsx#EventRegistrationsView',
+          path: '/event-registrations',
+        },
         // On-demand ISR cache purge — global + custom path/tag (admin-only).
         cache: {
           Component: './payload/admin/components/cache/CacheView.tsx#CacheView',
