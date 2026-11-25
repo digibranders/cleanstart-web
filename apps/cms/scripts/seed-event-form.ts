@@ -1,14 +1,19 @@
 #!/usr/bin/env -S node --no-warnings --experimental-strip-types
 /**
- * Create the `new-year-networking` row in the `forms` collection, the form
- * behind events.cleanstart.com/new-year-networking-event.
+ * Create what events.cleanstart.com needs to start: the default event form
+ * (`event-registration` in the `forms` collection) and the first event page,
+ * "New Year Networking Event". Events use the default form unless they pick
+ * another one in the CMS.
  *
- * The field names are a contract with apps/events (`API_FIELD` in
- * src/lib/event-form.ts). Pick up and drop are required only when
- * `cab_required` is "yes", through the field-level `conditions` group.
+ * Pick up and drop are required only when `cab_required` is "yes", through the
+ * field-level `conditions` group (which the lead validator honours).
  *
  * No `hubspotFormGuid` and no CRM handlers: the form has no email, which the
  * HubSpot relay needs. Leads are stored in the CMS database only.
+ *
+ * The event page is created without partner logos: uploading media is an
+ * editor's job, and the events site shows each partner's name as text until one
+ * is uploaded. Open the event in the CMS (Marketing > Event Registrations).
  *
  * Goes through payload.create so the collection hooks run as an editor's save
  * would. The row is published: the lead endpoint refuses a draft form.
@@ -21,16 +26,15 @@ import { getPayload } from 'payload';
 
 import payloadConfig from '../src/payload.config.ts';
 
-const SLUG = 'new-year-networking';
+const SLUG = 'event-registration';
+const EVENT_SLUG = 'new-year-networking-event';
 
 const onlyWhenCab = {
   mode: 'all' as const,
   rules: [{ fieldName: 'cab_required', operator: 'equals' as const, value: 'yes' }],
 };
 
-const run = async (): Promise<void> => {
-  const payload = await getPayload({ config: payloadConfig });
-
+const ensureForm = async (payload: Awaited<ReturnType<typeof getPayload>>): Promise<void> => {
   const existing = await payload.find({
     collection: 'forms',
     where: { slug: { equals: SLUG } },
@@ -40,26 +44,22 @@ const run = async (): Promise<void> => {
   const found = existing.docs[0];
   if (found) {
     if (found._status !== 'published') {
-      await payload.update({
-        collection: 'forms',
-        id: found.id,
-        data: { _status: 'published' },
-      });
+      await payload.update({ collection: 'forms', id: found.id, data: { _status: 'published' } });
       console.log(`Published forms/${SLUG} (id ${found.id}).`);
     } else {
-      console.log(`forms/${SLUG} already exists (id ${found.id}). Nothing to do.`);
+      console.log(`forms/${SLUG} already exists (id ${found.id}).`);
     }
-    process.exit(0);
+    return;
   }
 
   const created = await payload.create({
     collection: 'forms',
     data: {
       _status: 'published',
-      name: 'New Year Networking Event',
+      name: 'Event Registration',
       slug: SLUG,
       description:
-        'Registration for the New Year Networking Event (CleanStart, Upwind, Cosmos One). Posted from events.cleanstart.com. No email field, so no HubSpot relay.',
+        'Default registration form for events on events.cleanstart.com. No email field, so no HubSpot relay.',
       submitLabel: 'Register',
       fields: [
         { name: 'full_name', type: 'text', label: 'Full Name', required: true },
@@ -94,6 +94,41 @@ const run = async (): Promise<void> => {
     },
   });
   console.log(`Created forms/${SLUG} (id ${created.id}).`);
+};
+
+const ensureEvent = async (payload: Awaited<ReturnType<typeof getPayload>>): Promise<void> => {
+  const existing = await payload.find({
+    collection: 'eventPages',
+    where: { slug: { equals: EVENT_SLUG } },
+    limit: 1,
+    depth: 0,
+  });
+  if (existing.docs[0]) {
+    console.log(`eventPages/${EVENT_SLUG} already exists (id ${existing.docs[0].id}).`);
+    return;
+  }
+  const created = await payload.create({
+    collection: 'eventPages',
+    data: {
+      title: 'New Year Networking Event',
+      slug: EVENT_SLUG,
+      status: 'published',
+      registrationOpen: true,
+      description:
+        'Register for the New Year Networking Event hosted by CleanStart, Upwind and Cosmos One.',
+      partners: [
+        { name: 'Upwind', url: 'https://www.upwind.io' },
+        { name: 'Cosmos One', url: 'https://www.cosmos.one' },
+      ],
+    },
+  });
+  console.log(`Created eventPages/${EVENT_SLUG} (id ${created.id}).`);
+};
+
+const run = async (): Promise<void> => {
+  const payload = await getPayload({ config: payloadConfig });
+  await ensureForm(payload);
+  await ensureEvent(payload);
   process.exit(0);
 };
 

@@ -32,6 +32,7 @@ import { Guides } from './payload/collections/Guides';
 import { Industries } from './payload/collections/Industries';
 import { ResourceTypes } from './payload/collections/ResourceTypes';
 import { Departments } from './payload/collections/Departments';
+import { EventPages } from './payload/collections/EventPages';
 import { Regions } from './payload/collections/Regions';
 import { PressTypes } from './payload/collections/PressTypes';
 import { WebinarTypes } from './payload/collections/WebinarTypes';
@@ -404,6 +405,7 @@ export default buildConfig({
     LegalDocuments,
     Resources,
     Events,
+    EventPages,
     Webinars,
     PodcastEpisodes,
     Jobs,

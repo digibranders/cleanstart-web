@@ -69,6 +69,7 @@ import * as migration_20261026_120000_add_missing_job_log_task_slugs from './202
 import * as migration_20261031_100000_add_videos from './20261031_100000_add_videos';
 import * as migration_20261102_120000_advisories_cta_picks from './20261102_120000_advisories_cta_picks';
 import * as migration_20261123_100000_departments_editable from './20261123_100000_departments_editable';
+import * as migration_20261125_100000_add_event_pages from './20261125_100000_add_event_pages';
 
 export const migrations = [
   {
@@ -400,5 +401,10 @@ export const migrations = [
     up: migration_20261123_100000_departments_editable.up,
     down: migration_20261123_100000_departments_editable.down,
     name: '20261123_100000_departments_editable',
+  },
+  {
+    up: migration_20261125_100000_add_event_pages.up,
+    down: migration_20261125_100000_add_event_pages.down,
+    name: '20261125_100000_add_event_pages',
   },
 ];

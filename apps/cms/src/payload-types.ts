@@ -78,6 +78,7 @@ export interface Config {
     legalDocuments: LegalDocument;
     resources: Resource;
     events: Event;
+    eventPages: EventPage;
     webinars: Webinar;
     podcastEpisodes: PodcastEpisode;
     jobs: Job;
@@ -138,6 +139,7 @@ export interface Config {
     legalDocuments: LegalDocumentsSelect<false> | LegalDocumentsSelect<true>;
     resources: ResourcesSelect<false> | ResourcesSelect<true>;
     events: EventsSelect<false> | EventsSelect<true>;
+    eventPages: EventPagesSelect<false> | EventPagesSelect<true>;
     webinars: WebinarsSelect<false> | WebinarsSelect<true>;
     podcastEpisodes: PodcastEpisodesSelect<false> | PodcastEpisodesSelect<true>;
     jobs: JobsSelect<false> | JobsSelect<true>;
@@ -701,7 +703,6 @@ export interface Media {
    * Photographer / source attribution.
    */
   credit?: string | null;
-  prefix?: string | null;
   /**
    * Smart-crop focal point as percentages (0–100). Drives OG-image and 1:1 thumbnail crops.
    */
@@ -709,6 +710,7 @@ export interface Media {
     x?: number | null;
     y?: number | null;
   };
+  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -5184,6 +5186,67 @@ export interface Event {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Events on events.cleanstart.com. Open an event to edit its page and see who registered.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "eventPages".
+ */
+export interface EventPage {
+  id: number;
+  title: string;
+  /**
+   * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
+   */
+  slug: string;
+  /**
+   * Only published events appear on events.cleanstart.com.
+   */
+  status: 'draft' | 'published';
+  /**
+   * Untick to show the page but stop taking registrations.
+   */
+  registrationOpen?: boolean | null;
+  /**
+   * Registrations received so far.
+   */
+  registrationCount?: number | null;
+  /**
+   * One or two sentences. Used for the page description in search and link previews.
+   */
+  description?: string | null;
+  /**
+   * Shown on the event card, for example "15 January 2027".
+   */
+  dateLabel?: string | null;
+  /**
+   * Shown on the event card.
+   */
+  venue?: string | null;
+  /**
+   * Co-hosts shown after the CleanStart logo, in this order. Upload a logo that reads on a dark background (white or light).
+   */
+  partners?:
+    | {
+        name: string;
+        /**
+         * The partner's website. The logo links to it.
+         */
+        url: string;
+        /**
+         * SVG or PNG. Without one the name is shown as text.
+         */
+        logo?: (number | null) | Media;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Leave empty to use the default event form (event-registration). Pick another form from Forms for different questions.
+   */
+  registrationForm?: (number | null) | Form;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "webinars".
  */
@@ -6627,6 +6690,7 @@ export interface CareerApplication {
  */
 export interface Resume {
   id: number;
+  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -9033,6 +9097,7 @@ export interface EmailAsset {
    * Where this asset is used, e.g. "Signature logo (rendered at 140px wide)".
    */
   usage?: string | null;
+  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -9883,6 +9948,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'events';
         value: number | Event;
+      } | null)
+    | ({
+        relationTo: 'eventPages';
+        value: number | EventPage;
       } | null)
     | ({
         relationTo: 'webinars';
@@ -11415,6 +11484,31 @@ export interface EventsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "eventPages_select".
+ */
+export interface EventPagesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  status?: T;
+  registrationOpen?: T;
+  registrationCount?: T;
+  description?: T;
+  dateLabel?: T;
+  venue?: T;
+  partners?:
+    | T
+    | {
+        name?: T;
+        url?: T;
+        logo?: T;
+        id?: T;
+      };
+  registrationForm?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "webinars_select".
  */
 export interface WebinarsSelect<T extends boolean = true> {
@@ -11901,13 +11995,13 @@ export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   caption?: T;
   credit?: T;
-  prefix?: T;
   focalPoint?:
     | T
     | {
         x?: T;
         y?: T;
       };
+  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -13782,6 +13876,7 @@ export interface SignatureTemplatesSelect<T extends boolean = true> {
 export interface EmailAssetsSelect<T extends boolean = true> {
   alt?: T;
   usage?: T;
+  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -13919,6 +14014,7 @@ export interface CareerApplicationsSelect<T extends boolean = true> {
  * via the `definition` "resumes_select".
  */
 export interface ResumesSelect<T extends boolean = true> {
+  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;

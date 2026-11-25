@@ -59,6 +59,7 @@ export const isAdminEditorOrEvents: Access = ({ req: { user } }) =>
 /** Collections the departmental `events` role owns; also drives its restricted admin nav. */
 export const EVENTS_COLLECTION_SLUGS = [
   'events',
+  'eventPages',
   'webinars',
   'webinarTypes',
   'podcastEpisodes',
