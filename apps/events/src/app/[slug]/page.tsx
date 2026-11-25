@@ -2,13 +2,14 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { EventView } from "@/components/event/EventView";
-import { REVALIDATE_SECONDS, getEvent } from "@/lib/cms";
+import { getEvent } from "@/lib/cms";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
-export const revalidate = REVALIDATE_SECONDS;
+// Next needs this as a literal; it matches REVALIDATE_SECONDS in lib/cms.ts.
+export const revalidate = 60;
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const event = await getEvent((await params).slug);
