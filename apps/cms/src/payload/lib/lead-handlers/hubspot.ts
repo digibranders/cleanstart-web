@@ -227,6 +227,11 @@ export const hubspotHandler: LeadHandler = {
       fields,
       context: {
         pageUri: submission.source ?? '',
+        // Links the submission to the visitor HubSpot's tracking code already
+        // knows (page views, original source). Absent when the visitor was not
+        // tracked, which is the case for anyone who declined the cookie banner.
+        ...(submission.hubspotUtk ? { hutk: submission.hubspotUtk } : {}),
+        ...(submission.pageName ? { pageName: submission.pageName } : {}),
         // Without this HubSpot flags the submission as missing an IP and its
         // form analytics and geo fall back to nothing.
         ...(submission.ip ? { ipAddress: submission.ip } : {}),

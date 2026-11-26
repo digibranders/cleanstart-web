@@ -42,6 +42,10 @@ export type LeadSubmission = {
   ip: string | undefined;
   userAgent: string | undefined;
   consent: LeadSubmissionConsent | undefined;
+  /** `hubspotutk` cookie, present only when the visitor was tracked by HubSpot. */
+  hubspotUtk?: string | undefined;
+  /** Title of the page the form was submitted from. */
+  pageName?: string | undefined;
 };
 
 export type LeadHandlerContext = {

@@ -30,6 +30,27 @@ describe('submitLeadBodySchema', () => {
     expect(() => submitLeadBodySchema.parse({ ...minValid, fields: 'a=b' })).toThrow();
   });
 
+  it('accepts a 32-character hex hutk and a page name in the context', () => {
+    const out = submitLeadBodySchema.parse({
+      ...minValid,
+      context: { hutk: '0123456789abcdef0123456789ABCDEF', pageName: 'Book a Demo' },
+    });
+    expect(out.context?.hutk).toBe('0123456789abcdef0123456789ABCDEF');
+  });
+
+  it('rejects a hutk that is not 32 hex characters', () => {
+    expect(() => submitLeadBodySchema.parse({ ...minValid, context: { hutk: 'not-a-token' } })).toThrow();
+    expect(() =>
+      submitLeadBodySchema.parse({ ...minValid, context: { hutk: '0123456789abcdef0123456789abcdef0' } }),
+    ).toThrow();
+  });
+
+  it('caps the page name length', () => {
+    expect(() =>
+      submitLeadBodySchema.parse({ ...minValid, context: { pageName: 'a'.repeat(300) } }),
+    ).toThrow();
+  });
+
   it('caps source URL length', () => {
     const big = 'a'.repeat(3000);
     expect(() => submitLeadBodySchema.parse({ ...minValid, source: big })).toThrow();

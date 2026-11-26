@@ -82,6 +82,15 @@ export const submitLeadBodySchema = z
     context: z
       .object({
         resourceId: z.union([z.string().min(1), z.number().int().positive()]).optional(),
+        // The `hubspotutk` cookie value. HubSpot uses it to tie the form
+        // submission to the visitor's browsing history. It is a 32-character
+        // hex string, so anything else is rejected rather than forwarded.
+        hutk: z
+          .string()
+          .regex(/^[a-f0-9]{32}$/i)
+          .optional(),
+        // document.title of the page the form sat on.
+        pageName: z.string().max(256).optional(),
       })
       .optional(),
   })

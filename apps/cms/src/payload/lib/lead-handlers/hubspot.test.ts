@@ -73,6 +73,33 @@ describe('hubspotHandler (Forms API)', () => {
     expect(sent.legalConsentOptions).toBeDefined();
   });
 
+  it('sends hutk and pageName in the context when the visitor was tracked', async () => {
+    const fetchSpy = vi.fn().mockResolvedValue({ ok: true, status: 200, json: async () => ({}) });
+    vi.stubGlobal('fetch', fetchSpy);
+    const utk = '0123456789abcdef0123456789abcdef';
+    await hubspotHandler.run(
+      { ...submission, hubspotUtk: utk, pageName: 'Book a Demo | CleanStart' },
+      ctx('guid-1'),
+    );
+    const [, init] = fetchSpy.mock.calls[0] ?? [];
+    const sent = JSON.parse((init as RequestInit).body as string);
+    expect(sent.context).toMatchObject({
+      pageUri: 'https://cleanstart.com/contact',
+      hutk: utk,
+      pageName: 'Book a Demo | CleanStart',
+    });
+  });
+
+  it('leaves hutk out of the context for an untracked visitor', async () => {
+    const fetchSpy = vi.fn().mockResolvedValue({ ok: true, status: 200, json: async () => ({}) });
+    vi.stubGlobal('fetch', fetchSpy);
+    await hubspotHandler.run(submission, ctx('guid-1'));
+    const [, init] = fetchSpy.mock.calls[0] ?? [];
+    const sent = JSON.parse((init as RequestInit).body as string);
+    expect(sent.context).not.toHaveProperty('hutk');
+    expect(sent.context).not.toHaveProperty('pageName');
+  });
+
   interface SentBody {
     legalConsentOptions: {
       consent: {

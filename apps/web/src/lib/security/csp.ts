@@ -37,6 +37,16 @@ const APOLLO_INTENT = 'https://aplo-evnt.com';
 // through c.bing.com by both fetch and pixel.
 const CLARITY = 'https://*.clarity.ms';
 const CLARITY_SYNC = 'https://c.bing.com';
+// HubSpot tracking code, fired from GTM on the Targeting consent category:
+// the loader is js-na2.hs-scripts.com, which pulls the analytics library from
+// js-na2.hs-analytics.net, and page views beacon to track-na2.hubspot.com.
+// Deliberately not allowed: hscollectedforms.net (would scrape our own forms
+// and double-create contacts), hs-banner.com (we run our own cookie banner),
+// hsadspixel.net and usemessages.com (no ads or chat in use). Add a host here
+// only together with the HubSpot feature that needs it.
+const HUBSPOT_LOADER = 'https://*.hs-scripts.com';
+const HUBSPOT_ANALYTICS = 'https://*.hs-analytics.net';
+const HUBSPOT_TRACK = 'https://*.hubspot.com';
 // Privacy-preserving YouTube player used by the podcast page, Knowledge Hub
 // lessons, and the Clean Libraries hero video. Without an explicit `frame-src`
 // these iframes fall back to `default-src 'self'` and are blocked outright the
@@ -102,6 +112,8 @@ export function buildCsp({
     APOLLO_SCRIPTS,
     LEADFEEDER,
     CLARITY,
+    HUBSPOT_LOADER,
+    HUBSPOT_ANALYTICS,
   ];
 
   const styleSrc = ["'self'", "'unsafe-inline'"];
@@ -125,6 +137,8 @@ export function buildCsp({
     APOLLO,
     CLARITY,
     CLARITY_SYNC,
+    // HubSpot page-view pixel.
+    HUBSPOT_TRACK,
     // YouTube poster frames — see YOUTUBE_THUMBS.
     YOUTUBE_THUMBS,
   ];
@@ -154,6 +168,8 @@ export function buildCsp({
     APOLLO_INTENT,
     CLARITY,
     CLARITY_SYNC,
+    HUBSPOT_ANALYTICS,
+    HUBSPOT_TRACK,
   ];
   if (!isProduction) {
     // Local dev: web (3010/3001) calls the CMS at localhost:3000 for

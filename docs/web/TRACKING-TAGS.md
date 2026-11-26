@@ -42,6 +42,8 @@ GTM owns the tags. Code owns four things GTM cannot do safely:
 | Microsoft Clarity | `yy0yvdkhu6` | GTM: Custom HTML on `cs_consent_update` | `cs_consent_performance` is true |
 | Apollo.io | `691b73cb5443850011f553d1` | GTM: Custom HTML on `cs_consent_update` | `cs_consent_targeting` is true, plus a GTM `ad_storage` consent check |
 | Leadfeeder / Dealfront | `kn9Eq4RXRqJ8RlvP` | GTM: Custom HTML on `cs_consent_update` | `cs_consent_targeting` is true, plus a GTM `ad_storage` consent check |
+| HubSpot tracking code | Portal `245478611` (NA2) | GTM: Custom HTML, tag `HubSpot tracking code`, on `cs_consent_update` | `cs_consent_targeting` is true, plus a GTM `ad_storage` consent check |
+| HubSpot page view on route change | same portal | GTM: Custom HTML, tag `HubSpot page view on route change`, on the `page_view` event | Every client-side navigation, same consent check. The tracking code only records the first page of a visit, so each route change pushes `setPath` and `trackPageView` to `_hsq`. |
 
 ### Why the gated tags don't fire on "All Pages"
 
@@ -112,6 +114,7 @@ installs, removes or re-points a tag, with the PR that carried the docs.
 
 | Date | Change | Where | PR |
 |---|---|---|---|
+| 2026-11-26 | HubSpot tracking code added to GTM (two tags) and its script and beacon hosts to the CSP. Form submissions now send the `hubspotutk` cookie and page title to HubSpot. Consent category: Targeting, a team decision that can move to Performance by changing the trigger on tag 14. The container is not live until someone imports and publishes it. | `docs/web/gtm/cleanstart-container.json`, `lib/security/csp.ts`, `lib/leads/hubspot-context.ts` | |
 | 2026-10-15 | Apollo.io `aplo-evnt.com` added to CSP `connect-src`. The tracker's intent_pixel calls had been blocked since the GTM migration, so the script loaded but reported no visitor intent. | Code (`csp.ts`) | #302 |
 | 2026-10-15 | Microsoft Clarity `yy0yvdkhu6` installed as a Custom HTML tag on `CE - consent performance granted`, once per page. No code change: the CSP hosts were already allow-listed. | GTM container version 3 | #301 |
 | 2026-09-21 | GA4, Apollo.io and Leadfeeder moved out of React components into GTM container `GTM-TBDDZW9K`. Added the Google tag, nine GA4 event tags, the `cs_consent_update` consent event and its triggers. Deleted `Ga4HeadScript`, `ApolloScript`, `LeadfeederScript` and their id resolvers. | Code + GTM container version 2 | #271 |

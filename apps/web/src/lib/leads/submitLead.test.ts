@@ -123,3 +123,38 @@ describe("submitLead", () => {
     });
   });
 });
+
+describe("submitLead HubSpot context", () => {
+  const UTK = "0123456789abcdef0123456789abcdef";
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("sends the hubspotutk cookie and the page title when the visitor was tracked", async () => {
+    vi.stubGlobal("document", { cookie: `x=1; hubspotutk=${UTK}`, title: "Book a Demo | CleanStart" });
+    fetchMock.mockResolvedValue(jsonResponse({ ok: true }));
+    await submitLead(input);
+    const init = (fetchMock.mock.calls[0] ?? [])[1] as RequestInit;
+    expect(JSON.parse(init.body as string).context).toEqual({
+      hutk: UTK,
+      pageName: "Book a Demo | CleanStart",
+    });
+  });
+
+  it("sends no hutk when the cookie is absent", async () => {
+    vi.stubGlobal("document", { cookie: "x=1", title: "Contact | CleanStart" });
+    fetchMock.mockResolvedValue(jsonResponse({ ok: true }));
+    await submitLead(input);
+    const init = (fetchMock.mock.calls[0] ?? [])[1] as RequestInit;
+    expect(JSON.parse(init.body as string).context).toEqual({ pageName: "Contact | CleanStart" });
+  });
+
+  it("keeps the resource id alongside the HubSpot context", async () => {
+    vi.stubGlobal("document", { cookie: `hubspotutk=${UTK}`, title: "" });
+    fetchMock.mockResolvedValue(jsonResponse({ ok: true }));
+    await submitLead({ ...input, context: { resourceId: 11 } });
+    const init = (fetchMock.mock.calls[0] ?? [])[1] as RequestInit;
+    expect(JSON.parse(init.body as string).context).toEqual({ resourceId: 11, hutk: UTK });
+  });
+});

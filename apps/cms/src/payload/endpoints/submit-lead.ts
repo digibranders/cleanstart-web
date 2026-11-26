@@ -387,6 +387,8 @@ export const submitLeadEndpoint: Endpoint = {
       ip,
       userAgent,
       consent: consentWithPolicy,
+      ...(data.context?.hutk ? { hubspotUtk: data.context.hutk } : {}),
+      ...(data.context?.pageName ? { pageName: data.context.pageName } : {}),
     };
 
     try {

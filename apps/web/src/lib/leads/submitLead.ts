@@ -15,6 +15,7 @@
  * treat `{ ok: true }` as success and surface `error` only when `ok` is false.
  */
 import type { AttributionSubmission } from "@/lib/attribution/types";
+import { readHubspotContext } from "./hubspot-context";
 
 const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL ?? "http://localhost:3000";
 
@@ -60,6 +61,7 @@ export interface SubmitLeadInput {
   context?: { resourceId: string | number };
 }
 
+
 /** A signed, short-lived download link for a gated resource. */
 export interface LeadDownload {
   /** Always absolute, pointing at the CMS. */
@@ -96,6 +98,7 @@ const absoluteCmsUrl = (url: string): string =>
 
 export async function submitLead(input: SubmitLeadInput): Promise<SubmitLeadResult> {
   try {
+    const context = { ...input.context, ...readHubspotContext() };
     const res = await fetch(`${CMS_URL}/api/leads/submit`, {
       method: "POST",
       credentials: "include",
@@ -112,7 +115,7 @@ export async function submitLead(input: SubmitLeadInput): Promise<SubmitLeadResu
         ...(input.attribution?.attribution
           ? { attribution: input.attribution.attribution }
           : {}),
-        ...(input.context ? { context: input.context } : {}),
+        ...(Object.keys(context).length > 0 ? { context } : {}),
       }),
     });
     const json = (await res.json().catch(() => null)) as SubmitLeadResult | null;

@@ -13,13 +13,12 @@ once published. If you change the container in the UI, export it again
 
 | Entity | Count | Notes |
 |---|---|---|
-| Tags | 12 | 1 Google tag (GA4 `G-S6T47D7PZR`), 9 GA4 event tags, Apollo.io, Leadfeeder |
+| Tags | 15 | 1 Google tag (GA4 `G-S6T47D7PZR`), 9 GA4 event tags, Apollo.io, Leadfeeder, Microsoft Clarity, 2 HubSpot tags |
 | Triggers | 11 | 9 Custom Event triggers matching `lib/analytics/track.ts`, 2 consent triggers |
 | Variables | 17 | One Data Layer Variable per event parameter, plus 2 consent flags |
 
-Microsoft Clarity is **not** included: it needs a Clarity project id that did
-not exist when this was written. Add it as described in
-`docs/web/TRACKING-TAGS.md`, triggered on `CE - consent performance granted`.
+HubSpot is two tags: `HubSpot tracking code` (portal `245478611`, Targeting
+consent) and `HubSpot page view on route change` (every `page_view` event).
 
 ## How to import
 
