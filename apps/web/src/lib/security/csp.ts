@@ -40,12 +40,18 @@ const CLARITY_SYNC = 'https://c.bing.com';
 // HubSpot tracking code, fired from GTM on the Targeting consent category:
 // the loader is js-na2.hs-scripts.com, which pulls the analytics library from
 // js-na2.hs-analytics.net, and page views beacon to track-na2.hubspot.com.
+// hs-banner.com carries HubSpot's consent module. The portal's cookie banner
+// setting makes the tracker wait for that module before it sets any cookie, so
+// without it HubSpot only ever tracks anonymously. The GTM loader tag tells it
+// consent was granted (`setHubSpotConsent`) before HubSpot loads, which keeps
+// HubSpot's own banner from showing; the module also posts to its own host.
 // Deliberately not allowed: hscollectedforms.net (would scrape our own forms
-// and double-create contacts), hs-banner.com (we run our own cookie banner),
-// hsadspixel.net and usemessages.com (no ads or chat in use). Add a host here
-// only together with the HubSpot feature that needs it.
+// and double-create contacts), hsadspixel.net and usemessages.com (no ads or
+// chat in use). Add a host here only together with the HubSpot feature that
+// needs it.
 const HUBSPOT_LOADER = 'https://*.hs-scripts.com';
 const HUBSPOT_ANALYTICS = 'https://*.hs-analytics.net';
+const HUBSPOT_CONSENT = 'https://*.hs-banner.com';
 const HUBSPOT_TRACK = 'https://*.hubspot.com';
 // Privacy-preserving YouTube player used by the podcast page, Knowledge Hub
 // lessons, and the Clean Libraries hero video. Without an explicit `frame-src`
@@ -114,6 +120,7 @@ export function buildCsp({
     CLARITY,
     HUBSPOT_LOADER,
     HUBSPOT_ANALYTICS,
+    HUBSPOT_CONSENT,
   ];
 
   const styleSrc = ["'self'", "'unsafe-inline'"];
@@ -169,6 +176,7 @@ export function buildCsp({
     CLARITY,
     CLARITY_SYNC,
     HUBSPOT_ANALYTICS,
+    HUBSPOT_CONSENT,
     HUBSPOT_TRACK,
   ];
   if (!isProduction) {

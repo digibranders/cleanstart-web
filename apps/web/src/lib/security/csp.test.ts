@@ -110,12 +110,13 @@ describe('buildCsp', () => {
     expect(d['connect-src']).toContain('https://*.hubspot.com');
   });
 
-  it('does not allow the HubSpot form collector or banner scripts', () => {
-    // The collector would scrape our own forms and double-create contacts; the
-    // banner would compete with our cookie banner.
+  it('allows the HubSpot consent module but not the form collector', () => {
+    // Without the consent module HubSpot never sets its visitor cookie. The
+    // collector would scrape our own forms and double-create contacts.
     const d = parse(buildCsp(base));
+    expect(d['script-src']).toContain('https://*.hs-banner.com');
+    expect(d['connect-src']).toContain('https://*.hs-banner.com');
     expect(d['script-src']).not.toContain('hscollectedforms.net');
-    expect(d['script-src']).not.toContain('hs-banner.com');
   });
 
   it('allows the Microsoft Clarity hosts in connect-src and img-src', () => {

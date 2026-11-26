@@ -42,7 +42,7 @@ GTM owns the tags. Code owns four things GTM cannot do safely:
 | Microsoft Clarity | `yy0yvdkhu6` | GTM: Custom HTML on `cs_consent_update` | `cs_consent_performance` is true |
 | Apollo.io | `691b73cb5443850011f553d1` | GTM: Custom HTML on `cs_consent_update` | `cs_consent_targeting` is true, plus a GTM `ad_storage` consent check |
 | Leadfeeder / Dealfront | `kn9Eq4RXRqJ8RlvP` | GTM: Custom HTML on `cs_consent_update` | `cs_consent_targeting` is true, plus a GTM `ad_storage` consent check |
-| HubSpot tracking code | Portal `245478611` (NA2) | GTM: Custom HTML, tag `HubSpot tracking code`, on `cs_consent_update` | `cs_consent_targeting` is true, plus a GTM `ad_storage` consent check |
+| HubSpot tracking code | Portal `245478611` (NA2) | GTM: Custom HTML, tag `HubSpot tracking code`, on `cs_consent_update` | `cs_consent_targeting` is true, plus a GTM `ad_storage` consent check. Pushes `setHubSpotConsent` (analytics and advertisement true) to `_hsp` before loading, because the portal's cookie banner setting makes HubSpot wait for that signal before it sets cookies. |
 | HubSpot page view on route change | same portal | GTM: Custom HTML, tag `HubSpot page view on route change`, on the `page_view` event | Every client-side navigation, same consent check. The tracking code only records the first page of a visit, so each route change pushes `setPath` and `trackPageView` to `_hsq`. |
 
 ### Why the gated tags don't fire on "All Pages"
