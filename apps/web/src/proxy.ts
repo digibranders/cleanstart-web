@@ -29,6 +29,7 @@ const PRODUCTION_HOST = "www.cleanstart.com";
 const APEX_HOST = "cleanstart.com";
 
 const DRAFT_BYPASS_COOKIE = "__prerender_bypass";
+const MISSING_PAGE_PATH = "/__missing-page";
 
 // Section landing pages that intentionally have no standalone index — each
 // permanently redirects to its canonical first document. The redirect is issued
@@ -189,13 +190,11 @@ export async function proxy(request: NextRequest, event: NextFetchEvent) {
   if (request.method === "GET" && !isDraftMode && !isPreviewPath) {
     const exists = await detailRouteExists(nextUrl.pathname);
     if (!exists) {
-      return new NextResponse(
-        '<!doctype html><html lang="en"><head><meta charset="utf-8" /><title>Not found</title><meta name="robots" content="noindex" /></head><body><p>This page could not be found.</p></body></html>',
-        {
-          status: 404,
-          headers: { "content-type": "text/html; charset=utf-8" },
-        },
-      );
+      // Rewrite to a path no route owns so Next renders the designed
+      // `app/not-found.tsx` with a real 404 status, instead of a bare body.
+      return NextResponse.rewrite(new URL(MISSING_PAGE_PATH, nextUrl.origin), {
+        status: 404,
+      });
     }
   }
 
