@@ -56,7 +56,7 @@ export function GuideDetailContent({
           {/* ── LEFT: Table of Contents (sticky below header) ── */}
           <aside className="hidden lg:block shrink-0" style={{ width: "260px" }}>
             <div
-              className="sticky"
+              className="sticky scrollbar-premium"
               style={{ top: "96px", maxHeight: "calc(100vh - 112px)", overflowY: "auto" }}
             >
               <TableOfContents toc={tableOfContents} />
@@ -108,7 +108,7 @@ function TableOfContents({ toc }: { toc?: TocEntry[] | null | undefined }): Reac
           (e): e is RenderedTocEntry =>
             !!e?.text && typeof e.level === "number" && e.level >= 2 && e.level <= 4,
         )
-        .map((e) => ({ ...e, slug: slugifyText(e.text) })),
+        .map((e) => ({ ...e, slug: e.anchor || slugifyText(e.text) })),
     [toc],
   );
 
@@ -285,7 +285,7 @@ function MobileTableOfContents({
         )
         .map((e) => ({
           text: e.text,
-          slug: slugifyText(e.text),
+          slug: e.anchor || slugifyText(e.text),
           level: e.level,
         })),
     [toc],
