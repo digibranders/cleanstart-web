@@ -1,0 +1,77 @@
+[
+ {
+  "coll": "blogs",
+  "slug": "machine-speed-vs-human-speed",
+  "videoUrl": "https://storage.googleapis.com/cleanstart-academy-videos/01-understand/fundamentals/machine-speed-vs-human-speed.mp4"
+ },
+ {
+  "coll": "blogs",
+  "slug": "the-layered-security-problem",
+  "videoUrl": "https://storage.googleapis.com/cleanstart-academy-videos/01-understand/security-fundamentals/the-layered-security-problem.mp4"
+ },
+ {
+  "coll": "blogs",
+  "slug": "the-illusion-of-the-single-artifact",
+  "videoUrl": "https://storage.googleapis.com/cleanstart-academy-videos/01-understand/security-fundamentals/the-illusion-of-the-single-artifact.mp4"
+ },
+ {
+  "coll": "guides",
+  "slug": "containers-vs-virtual-machines",
+  "videoUrl": "https://storage.googleapis.com/cleanstart-academy-videos/01-understand/fundamentals/containers-vs-virtual-machines.mp4"
+ },
+ {
+  "coll": "guides",
+  "slug": "docker-vs-oci-specification",
+  "videoUrl": "https://storage.googleapis.com/cleanstart-academy-videos/01-understand/fundamentals/docker-and-oci-specification.mp4"
+ },
+ {
+  "coll": "guides",
+  "slug": "containers-and-linux-kernel",
+  "videoUrl": "https://storage.googleapis.com/cleanstart-academy-videos/01-understand/fundamentals/how-containers-interact-with-the-kernel.mp4"
+ },
+ {
+  "coll": "guides",
+  "slug": "container-registries-compared",
+  "videoUrl": "https://storage.googleapis.com/cleanstart-academy-videos/01-understand/fundamentals/container-registries-compared.mp4"
+ },
+ {
+  "coll": "guides",
+  "slug": "linux-packages-apk-apt-rpm",
+  "videoUrl": "https://storage.googleapis.com/cleanstart-academy-videos/01-understand/fundamentals/linux-packages-explained.mp4"
+ },
+ {
+  "coll": "guides",
+  "slug": "standard-vs-distroless-images",
+  "videoUrl": "https://storage.googleapis.com/cleanstart-academy-videos/01-understand/fundamentals/standard-vs-distroless-images.mp4"
+ },
+ {
+  "coll": "guides",
+  "slug": "pre-build-security",
+  "videoUrl": "https://storage.googleapis.com/cleanstart-academy-videos/01-understand/fundamentals/prebuild-stage-security.mp4"
+ },
+ {
+  "coll": "guides",
+  "slug": "container-images-in-cicd",
+  "videoUrl": "https://storage.googleapis.com/cleanstart-academy-videos/01-understand/fundamentals/container-images-in-cicd.mp4"
+ },
+ {
+  "coll": "guides",
+  "slug": "kubernetes-manifests",
+  "videoUrl": "https://storage.googleapis.com/cleanstart-academy-videos/01-understand/fundamentals/kubernetes-manifests-and-deployments.mp4"
+ },
+ {
+  "coll": "guides",
+  "slug": "ai-ml-container-stack",
+  "videoUrl": "https://storage.googleapis.com/cleanstart-academy-videos/01-understand/fundamentals/ai-ml-container-stack-explained.mp4"
+ },
+ {
+  "coll": "guides",
+  "slug": "learning-path-fips",
+  "videoUrl": "https://storage.googleapis.com/cleanstart-academy-videos/01-understand/learning-paths/fips-federal-compliance.mp4"
+ },
+ {
+  "coll": "guides",
+  "slug": "learning-path-vulnerable-to-verified",
+  "videoUrl": "https://storage.googleapis.com/cleanstart-academy-videos/01-understand/learning-paths/from-vulnerable-to-verified.mp4"
+ }
+]
