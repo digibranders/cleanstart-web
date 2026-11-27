@@ -8,7 +8,7 @@ import {
 describe("sectionIndexHref", () => {
   it("resolves a section landing path to its canonical document", () => {
     expect(sectionIndexHref("/knowledge-hub")).toBe(
-      "/knowledge-hub/vex-documents",
+      "/knowledge-hub/images-and-containers",
     );
     expect(sectionIndexHref("/legal")).toBe(
       "/legal/additional-third-party-terms",

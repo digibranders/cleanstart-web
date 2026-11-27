@@ -9,7 +9,7 @@
  * map is what stops the two drifting apart.
  */
 export const SECTION_INDEX_REDIRECTS: Record<string, string> = {
-  "/knowledge-hub": "/knowledge-hub/vex-documents",
+  "/knowledge-hub": "/knowledge-hub/images-and-containers",
   "/legal": "/legal/additional-third-party-terms",
 };
 

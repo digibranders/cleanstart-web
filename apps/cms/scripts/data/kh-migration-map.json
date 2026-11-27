@@ -1,0 +1,418 @@
+[
+ {
+  "oldSlug": "machine-speed-vs-human-speed",
+  "coll": "blogs",
+  "newSlug": "machine-speed-vs-human-speed",
+  "seoTitle": "Machine Speed vs Human Speed: The Widening Security Gap",
+  "seoDescription": "Code ships in minutes, but security review still takes days. See why the gap keeps widening and how automation can close it while humans keep final approval.",
+  "category": 4
+ },
+ {
+  "oldSlug": "the-layered-security-problem",
+  "coll": "blogs",
+  "newSlug": "the-layered-security-problem",
+  "seoTitle": "The Layered Security Problem in Containers",
+  "seoDescription": "Container security fails when layers are treated alone. See how vulnerabilities flow from source to build, registry and runtime, and why one fix is not enough.",
+  "category": 5
+ },
+ {
+  "oldSlug": "library-cve-maintainer-dependency",
+  "coll": "blogs",
+  "newSlug": "library-cve-maintainer-dependency",
+  "seoTitle": "The Library CVE Problem: Trusting Maintainers",
+  "seoDescription": "Your containers run code from maintainers you have never met. See how unpaid upkeep, patch delays and transitive risk drive library CVE exposure.",
+  "category": 1
+ },
+ {
+  "oldSlug": "the-illusion-of-the-single-artifact",
+  "coll": "blogs",
+  "newSlug": "the-illusion-of-the-single-artifact",
+  "seoTitle": "The Illusion of the Single Artifact",
+  "seoDescription": "A container image looks like one file but is a stack of layers with hidden dependencies. See why one flaw can break everything and why scanners miss part of it.",
+  "category": 5
+ },
+ {
+  "oldSlug": "the-remediation-trap",
+  "coll": "blogs",
+  "newSlug": "the-remediation-trap",
+  "seoTitle": "The Remediation Trap: Why Your CVE Fix Takes Months",
+  "seoDescription": "A critical CVE is patched upstream in days, yet your containers stay exposed for months. See the four-stage delay chain behind slow remediation.",
+  "category": 5
+ },
+ {
+  "oldSlug": "shai-hulud-npm-attack",
+  "coll": "blogs",
+  "newSlug": "shai-hulud-npm-attack",
+  "seoTitle": "Case Study: The Shai-Hulud NPM Attack",
+  "seoDescription": "A case study of a typosquatting attack on npm users: how a fake lodash package worked, how layered detection caught it and what the alerts teach teams.",
+  "category": 6
+ },
+ {
+  "oldSlug": "vex-documents",
+  "coll": "guides",
+  "newSlug": "vex-documents",
+  "seoTitle": "How to Use VEX Documents to Suppress Non-Exploitable CVEs",
+  "seoDescription": "Cut CVE alert fatigue with VEX. Learn the VEX formats, how to write statements for non-exploitable findings and how to plug VEX into your CI/CD pipeline.",
+  "category": null
+ },
+ {
+  "oldSlug": "automated-attestation",
+  "coll": "guides",
+  "newSlug": "automated-attestation",
+  "seoTitle": "Automated Attestation for Software Factories",
+  "seoDescription": "Design an automated attestation pipeline for a software factory. See how signed attestations stop tampering, map to SLSA levels and fit your build architecture.",
+  "category": null
+ },
+ {
+  "oldSlug": "attestation-based",
+  "coll": "guides",
+  "newSlug": "attestation-based-admission-policies",
+  "seoTitle": "What Are Attestation-Based Admission Policies?",
+  "seoDescription": "Signatures alone prove little. Learn how in-toto attestations and Kyverno admission policies verify build evidence before Kubernetes lets an image run.",
+  "category": null
+ },
+ {
+  "oldSlug": "runtime-evidence",
+  "coll": "guides",
+  "newSlug": "kubernetes-runtime-evidence",
+  "seoTitle": "Collecting Runtime Evidence From K8s Pods With eBPF",
+  "seoDescription": "Collect runtime evidence from Kubernetes pods with eBPF. See prerequisites, performance trade-offs and how to turn kernel events into audit-ready signals.",
+  "category": null
+ },
+ {
+  "oldSlug": "containers-vs-virtual-machines",
+  "coll": "guides",
+  "newSlug": "containers-vs-virtual-machines",
+  "seoTitle": "Containers vs Virtual Machines: Key Differences",
+  "seoDescription": "A VM boots a full operating system; a container shares the host kernel. Compare architecture, isolation, security, performance and density side by side.",
+  "category": null
+ },
+ {
+  "oldSlug": "docker-and-oci-specification",
+  "coll": "guides",
+  "newSlug": "docker-vs-oci-specification",
+  "seoTitle": "Docker and the OCI Specification Explained",
+  "seoDescription": "How Docker's format became the OCI standard. Learn the image, runtime and distribution specs, and why OCI compliance keeps your containers portable.",
+  "category": null
+ },
+ {
+  "oldSlug": "how-containers-interact-with-the-kernel",
+  "coll": "guides",
+  "newSlug": "containers-and-linux-kernel",
+  "seoTitle": "How Containers Interact With the Linux Kernel",
+  "seoDescription": "Containers are isolated processes, not mini VMs. See how namespaces, cgroups v2, capabilities and seccomp work together and what it means for security.",
+  "category": null
+ },
+ {
+  "oldSlug": "container-registries-compared",
+  "coll": "guides",
+  "newSlug": "container-registries-compared",
+  "seoTitle": "Container Registries Compared: Top Options",
+  "seoDescription": "Compare Docker Hub, ECR, GCR, ACR, Harbor and more. Learn what a registry does, how public, cloud and self-hosted options differ, and how to choose one.",
+  "category": null
+ },
+ {
+  "oldSlug": "linux-packages-explained",
+  "coll": "guides",
+  "newSlug": "linux-packages-apk-apt-rpm",
+  "seoTitle": "Linux Packages in Containers: APK, APT and RPM",
+  "seoDescription": "How APK, APT and RPM packages work inside container images. Learn package formats, what package managers do, how verification works and why build time matters.",
+  "category": null
+ },
+ {
+  "oldSlug": "standard-vs-distroless-images",
+  "coll": "guides",
+  "newSlug": "standard-vs-distroless-images",
+  "seoTitle": "Standard vs Distroless Images: Pros and Cons",
+  "seoDescription": "Standard images ship far more than your app needs. Compare attack surface, debugging trade-offs and dev image variants to decide when distroless fits.",
+  "category": null
+ },
+ {
+  "oldSlug": "prebuild-stage-security",
+  "coll": "guides",
+  "newSlug": "pre-build-security",
+  "seoTitle": "Pre-Build Stage Security: Securing Your Chain",
+  "seoDescription": "Attackers strike before your build starts. Secure source repositories, dependencies, base images and lockfiles so compromised inputs never reach the compiler.",
+  "category": null
+ },
+ {
+  "oldSlug": "container-images-in-cicd",
+  "coll": "guides",
+  "newSlug": "container-images-in-cicd",
+  "seoTitle": "Container Images in CI/CD: Source to Production",
+  "seoDescription": "Your pipeline now produces container images, not binaries. Learn pipeline architecture, build practice, tagging strategies and the registry as artifact store.",
+  "category": null
+ },
+ {
+  "oldSlug": "kubernetes-manifests-and-deployments",
+  "coll": "guides",
+  "newSlug": "kubernetes-manifests",
+  "seoTitle": "Kubernetes Manifests and Deployment Files Guide",
+  "seoDescription": "A complete guide to Kubernetes manifests. Learn core resource types, deployment anatomy, pod spec options and how labels, selectors and annotations connect.",
+  "category": null
+ },
+ {
+  "oldSlug": "helm-fundamentals",
+  "coll": "guides",
+  "newSlug": "helm",
+  "seoTitle": "Helm Fundamentals for Kubernetes Users",
+  "seoDescription": "Learn Helm, the package manager for Kubernetes. Cover core concepts, chart structure, installing charts and how templating simplifies complex deployments.",
+  "category": null
+ },
+ {
+  "oldSlug": "ai-ml-container-stack-explained",
+  "coll": "guides",
+  "newSlug": "ai-ml-container-stack",
+  "seoTitle": "The AI/ML Container Stack Explained",
+  "seoDescription": "Models, frameworks and runners each add risk to AI containers. See how the three layers combine and which hardening practices apply to AI workloads.",
+  "category": null
+ },
+ {
+  "oldSlug": "foundations-container-security",
+  "coll": "guides",
+  "newSlug": "learning-path-container-security",
+  "seoTitle": "Learning Path: Container Security Foundations",
+  "seoDescription": "A structured learning path covering container fundamentals, threats and hardening. Follow the modules to build a working foundation in container security.",
+  "category": null
+ },
+ {
+  "oldSlug": "fips-federal-compliance",
+  "coll": "guides",
+  "newSlug": "learning-path-fips",
+  "seoTitle": "Learning Path: FIPS and Federal Compliance",
+  "seoDescription": "A learning path for teams selling to government. Covers the federal compliance landscape, FIPS 140-3 cryptography and DISA STIG compliance for containers.",
+  "category": null
+ },
+ {
+  "oldSlug": "from-vulnerable-to-verified",
+  "coll": "guides",
+  "newSlug": "learning-path-vulnerable-to-verified",
+  "seoTitle": "Learning Path: From Vulnerable to Verified Containers",
+  "seoDescription": "Move from unsigned, unscanned images to a verified supply chain. This learning path covers assessment, quick wins and image hardening, step by step.",
+  "category": null
+ },
+ {
+  "oldSlug": "hardening-supply-chain",
+  "coll": "guides",
+  "newSlug": "learning-path-supply-chain",
+  "seoTitle": "Learning Path: Hardening Your Software Supply Chain",
+  "seoDescription": "Defend every stage of your build. This learning path covers supply chain fundamentals, SBOMs, VEX contextualization and the controls that stop upstream attacks.",
+  "category": null
+ },
+ {
+  "oldSlug": "securing-ai-ml-workloads",
+  "coll": "guides",
+  "newSlug": "learning-path-ai-ml",
+  "seoTitle": "Learning Path: Securing AI/ML Workloads in Containers",
+  "seoDescription": "ML workloads face threats traditional apps do not. This learning path covers data poisoning, ML data protection and model integrity inside containers.",
+  "category": null
+ },
+ {
+  "oldSlug": "what-is-a-package-manager",
+  "coll": "guides",
+  "newSlug": "package-manager",
+  "seoTitle": "What Is a Package Manager?",
+  "seoDescription": "What a package manager does and why it matters for security. Learn common managers, direct vs transitive dependencies, lock files and dependency trees.",
+  "category": null
+ },
+ {
+  "oldSlug": "what-is-a-software-library",
+  "coll": "guides",
+  "newSlug": "software-library",
+  "seoTitle": "What Is a Software Library (Dependency)?",
+  "seoDescription": "Libraries, packages and modules explained. Learn why libraries exist, how they are organized by language and why they widen your supply chain attack surface.",
+  "category": null
+ },
+ {
+  "oldSlug": "what-are-transitive-dependencies",
+  "coll": "guides",
+  "newSlug": "transitive-dependencies",
+  "seoTitle": "What Are Transitive Dependencies?",
+  "seoDescription": "You declare a few libraries; your build pulls in hundreds. See how transitive dependencies form, how to visualize the tree and why depth creates security risk.",
+  "category": null
+ },
+ {
+  "oldSlug": "what-is-provenance",
+  "coll": "guides",
+  "newSlug": "provenance",
+  "seoTitle": "What Is Build Provenance?",
+  "seoDescription": "Provenance records where an artifact came from and how it was built. Learn the in-toto framework, provenance vs attestation and how to generate provenance.",
+  "category": null
+ },
+ {
+  "oldSlug": "what-is-slsa",
+  "coll": "guides",
+  "newSlug": "slsa",
+  "seoTitle": "What Is SLSA? Supply-Chain Levels Explained",
+  "seoDescription": "SLSA is a framework for proving where software came from. Learn the levels, build integrity components and why SLSA provenance matters for containers.",
+  "category": null
+ },
+ {
+  "oldSlug": "what-is-vex",
+  "coll": "guides",
+  "newSlug": "vex",
+  "seoTitle": "What Is VEX? Vulnerability Exploitability eXchange",
+  "seoDescription": "VEX tells you which CVEs are actually exploitable in your product. Learn the four statement types, the OpenVEX format and how VEX differs from CVE and CVSS.",
+  "category": null
+ },
+ {
+  "oldSlug": "what-are-reproducible-builds",
+  "coll": "guides",
+  "newSlug": "reproducible-builds",
+  "seoTitle": "What Are Reproducible Builds?",
+  "seoDescription": "Reproducible builds let you confirm an image matches audited source. See why builds differ, how to achieve reproducibility and which standards guide the effort.",
+  "category": null
+ },
+ {
+  "oldSlug": "what-is-opa",
+  "coll": "guides",
+  "newSlug": "opa",
+  "seoTitle": "What Is OPA? Open Policy Agent Explained",
+  "seoDescription": "Open Policy Agent enforces security policy as code. Learn how OPA works, the Rego policy language and how Gatekeeper applies OPA rules inside Kubernetes.",
+  "category": null
+ },
+ {
+  "oldSlug": "what-is-compliance-as-code",
+  "coll": "guides",
+  "newSlug": "compliance-as-code",
+  "seoTitle": "What Is Compliance-as-Code?",
+  "seoDescription": "Replace yearly audit scrambles with continuous checks. Learn the three layers of compliance-as-code and how to map frameworks to automated, testable controls.",
+  "category": null
+ },
+ {
+  "oldSlug": "dev-vs-prod-images",
+  "coll": "guides",
+  "newSlug": "dev-vs-prod-images",
+  "seoTitle": "Development vs Production Images: Complete Separation",
+  "seoDescription": "Keep build tools out of production. Learn the specs for development and production images, the build pipeline between them and the multi-stage build pattern.",
+  "category": null
+ },
+ {
+  "oldSlug": "zero-trust-supply-chain",
+  "coll": "guides",
+  "newSlug": "zero-trust-supply-chain",
+  "seoTitle": "Zero-Trust Supply Chain: Principles and Implementation",
+  "seoDescription": "Apply zero trust to software delivery. Learn the four pillars, the complete verification flow, implementation details and the policies that enforce each step.",
+  "category": null
+ },
+ {
+  "oldSlug": "ai-container-attack-surface",
+  "coll": "guides",
+  "newSlug": "ai-container-attack-surface",
+  "seoTitle": "AI Container Attack Surface: 5 Key Vectors",
+  "seoDescription": "Five attack vectors that standard images cannot block in AI containers: shell access, path traversal, poisoned dependencies, model corruption and audit gaps.",
+  "category": null
+ },
+ {
+  "oldSlug": "build-stage-security",
+  "coll": "guides",
+  "newSlug": "build-stage-security",
+  "seoTitle": "Build Stage Security: Inside the Build Process",
+  "seoDescription": "The build is where attackers inject code and tamper with compilers. Learn build isolation, injection risks, hermetic builds and multi-stage separation.",
+  "category": null
+ },
+ {
+  "oldSlug": "code-buildtime-lowlevel-security",
+  "coll": "guides",
+  "newSlug": "code-build-time-low-level-security",
+  "seoTitle": "Code, Build-Time and Low-Level Security Explained",
+  "seoDescription": "Image scanning misses the deepest risks. See how code flaws, build-time trust gaps and low-level system libraries create exposure that scanners cannot see.",
+  "category": null
+ },
+ {
+  "oldSlug": "vulnerability-across-all-layers",
+  "coll": "guides",
+  "newSlug": "vulnerability-propagation-across-layers",
+  "seoTitle": "How Vulnerabilities Propagate Across Layers",
+  "seoDescription": "A published vulnerability travels from a maintainer's repository to your running container. Follow its timeline and transitive spread.",
+  "category": null
+ },
+ {
+  "oldSlug": "container-security-maturity-model",
+  "coll": "guides",
+  "newSlug": "container-security-maturity-model",
+  "seoTitle": "Container Security Maturity Model",
+  "seoDescription": "A four-tier maturity model for container security, from reactive patching and minimal images to signed provenance and source-built, verified images.",
+  "category": null
+ },
+ {
+  "oldSlug": "network-policies",
+  "coll": "guides",
+  "newSlug": "kubernetes-network-policies",
+  "seoTitle": "Network Policies for Container Security",
+  "seoDescription": "Kubernetes allows all pod traffic by default. Learn how to apply a default-deny baseline, per-app policies, DNS rules and monitoring exceptions.",
+  "category": null
+ },
+ {
+  "oldSlug": "fips-faq",
+  "coll": "guides",
+  "newSlug": "fips-faq",
+  "seoTitle": "FIPS 140-3: Frequently Asked Questions",
+  "seoDescription": "Answers on when FIPS applies, how to implement it, technical details, compliance questions and troubleshooting for FIPS 140-3 in container environments.",
+  "category": null
+ },
+ {
+  "oldSlug": "fips-language-implementations",
+  "coll": "guides",
+  "newSlug": "fips-programming-languages",
+  "seoTitle": "FIPS Support in Programming Languages",
+  "seoDescription": "How to use FIPS-validated cryptography in Go, Java, Python and Node.js. Compare language-specific approaches and what each runtime needs to stay compliant.",
+  "category": null
+ },
+ {
+  "oldSlug": "post-quantum-cryptography",
+  "coll": "guides",
+  "newSlug": "post-quantum-cryptography",
+  "seoTitle": "Post-Quantum Cryptography for Container Images",
+  "seoDescription": "Prepare container images for the quantum threat. Learn the NIST post-quantum standards, why a hybrid approach is recommended and how to implement hybrid TLS.",
+  "category": null
+ },
+ {
+  "oldSlug": "stig-hardening",
+  "coll": "guides",
+  "newSlug": "disa-stig",
+  "seoTitle": "DISA STIG: Military-Grade Container Hardening",
+  "seoDescription": "Apply DISA STIG controls to containers. Compare STIG with CIS, review container and application controls, and start from a STIG-aligned Dockerfile template.",
+  "category": null
+ },
+ {
+  "oldSlug": "openscap-reference",
+  "coll": "guides",
+  "newSlug": "openscap",
+  "seoTitle": "OpenSCAP: Automated Compliance Assessment and Hardening",
+  "seoDescription": "Scan container images against CIS and STIG with OpenSCAP. Learn what it does, how to install it and how to run CIS Docker Benchmark and STIG scans.",
+  "category": null
+ },
+ {
+  "oldSlug": "supply-chain-incident-playbook",
+  "coll": "guides",
+  "newSlug": "supply-chain-incident-response",
+  "seoTitle": "Supply Chain Security Incident Response Playbook",
+  "seoDescription": "A phase-by-phase playbook for supply chain incidents: scope, severity classification, triage, containment, eradication and recovery, with clear time targets.",
+  "category": null
+ },
+ {
+  "oldSlug": "cyclonedx-sbom",
+  "coll": "guides",
+  "newSlug": "cyclonedx",
+  "seoTitle": "CycloneDX SBOM: Supply Chain Security",
+  "seoDescription": "Generate CycloneDX SBOMs for container images. Learn why SBOMs matter, how CycloneDX compares with SPDX, the JSON schema and practical generation examples.",
+  "category": null
+ },
+ {
+  "oldSlug": "provenance-chaining",
+  "coll": "guides",
+  "newSlug": "provenance-chaining",
+  "seoTitle": "End-to-End Provenance Chaining: Source to Deployment",
+  "seoDescription": "Link provenance from source to deployment. See how source, build and SBOM attestations chain into one unbroken, verifiable record across a multi-stage pipeline.",
+  "category": null
+ },
+ {
+  "oldSlug": "in-toto-attestation",
+  "coll": "guides",
+  "newSlug": "in-toto",
+  "seoTitle": "In-Toto Attestation: Supply Chain Link Verification",
+  "seoDescription": "Use in-toto to verify every step of your supply chain. Learn core concepts, how to generate attestations for build steps and how to create and verify layouts.",
+  "category": null
+ }
+]
