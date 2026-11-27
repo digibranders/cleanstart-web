@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { RenderLexical, slugifyText } from "@/lib/renderLexical";
 import type { LexicalRoot, TocEntry, BlogImage } from "@/lib/blog";
 import { LessonVideo } from "@/components/sections/_shared/LessonVideo";
@@ -168,6 +168,22 @@ function TableOfContents({ toc }: { toc?: TocEntry[] | null | undefined }): Reac
     };
   }, [entries]);
 
+  const navRef = useRef<HTMLElement>(null);
+
+  // Keep the highlighted entry inside the TOC's own scroll box as the reader
+  // moves down the article. Adjusts the box only, never the page scroll.
+  useEffect(() => {
+    const nav = navRef.current;
+    const box = nav?.parentElement;
+    const active = nav?.querySelector<HTMLElement>('[data-toc-active="true"]');
+    if (!box || !active) return;
+    const a = active.getBoundingClientRect();
+    const b = box.getBoundingClientRect();
+    const pad = 12;
+    if (a.top < b.top + pad) box.scrollTop -= b.top + pad - a.top;
+    else if (a.bottom > b.bottom - pad) box.scrollTop += a.bottom - (b.bottom - pad);
+  }, [activeId]);
+
   if (!entries.length) return null;
 
   const scrollToEntry = (slug: string): void => {
@@ -186,7 +202,7 @@ function TableOfContents({ toc }: { toc?: TocEntry[] | null | undefined }): Reac
   };
 
   return (
-    <nav aria-label="Table of contents">
+    <nav ref={navRef} aria-label="Table of contents">
       <p
         className="text-xs font-bold uppercase tracking-[0.06em]"
         style={{
@@ -205,6 +221,7 @@ function TableOfContents({ toc }: { toc?: TocEntry[] | null | undefined }): Reac
           return (
             <li
               key={entry.id ?? `${entry.slug}-${i}`}
+              data-toc-active={isActive}
               style={{
                 borderLeft: `2px solid ${isActive ? "#4a3bf1" : "rgba(17,17,17,0.1)"}`,
                 transition: "border-color 0.2s",
