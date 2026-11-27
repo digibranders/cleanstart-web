@@ -19,6 +19,8 @@ function feedHref(s: FeedSource): string {
   switch (s.type) {
     case "BLOG":
       return `/blogs/${s.slug}`;
+    case "GUIDE":
+      return `/guide/${s.slug}`;
     case "NEWS":
       return `/news/${s.slug}`;
     case "RESOURCE":

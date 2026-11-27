@@ -1,5 +1,6 @@
 import { cache } from 'react';
 import { getBlogs } from '@/lib/blog';
+import { getGuides } from '@/lib/guides';
 import { getNews } from '@/lib/news';
 import { getResources } from '@/lib/resources';
 import { getWebinars } from '@/lib/webinars';
@@ -7,7 +8,7 @@ import { getWebinars } from '@/lib/webinars';
 export const LATEST_UPDATES_TAG = 'resources-latest-updates';
 
 export type FeedSource = {
-  type: 'BLOG' | 'NEWS' | 'RESOURCE' | 'WEBINAR';
+  type: 'BLOG' | 'GUIDE' | 'NEWS' | 'RESOURCE' | 'WEBINAR';
   slug: string;
   title: string;
   publishedAt: string;
@@ -18,6 +19,7 @@ export type FeedSource = {
 
 type Sources = {
   blogs: FeedSource[];
+  guides?: FeedSource[];
   news: FeedSource[];
   resources: FeedSource[];
   webinars: FeedSource[];
@@ -61,6 +63,7 @@ export function mergeAndRankFeed(sources: Sources, now: Date = new Date()): Feed
   // Pass 1: newest item from each category.
   const diverse: FeedSource[] = [
     newest(sources.blogs),
+    newest(sources.guides ?? []),
     newest(sources.news),
     newest(sources.resources),
     newest(futureWebinars),
@@ -78,6 +81,7 @@ export function mergeAndRankFeed(sources: Sources, now: Date = new Date()): Feed
   const used = new Set(sortedDiverse.map(dedupKey));
   const remaining = [
     ...sources.blogs,
+    ...(sources.guides ?? []),
     ...sources.news,
     ...sources.resources,
     ...futureWebinars,
@@ -90,11 +94,25 @@ export function mergeAndRankFeed(sources: Sources, now: Date = new Date()): Feed
 
 export const fetchLatestUpdates = cache(async (): Promise<FeedSource[]> => {
   try {
-    const [blogs, news, resources, webinars] = await Promise.all([
+    const [blogs, guides, news, resources, webinars] = await Promise.all([
       getBlogs({ limit: 4 }).then((r) =>
         (r.docs ?? []).map((d): FeedSource => {
           const out: FeedSource = {
             type: 'BLOG',
+            slug: d.slug,
+            title: d.title,
+            publishedAt: d.publishedAt ?? '',
+          };
+          if (typeof d.readingMinutes === 'number') {
+            out.readMinutes = d.readingMinutes;
+          }
+          return out;
+        }),
+      ),
+      getGuides({ limit: 4 }).then((r) =>
+        (r.docs ?? []).map((d): FeedSource => {
+          const out: FeedSource = {
+            type: 'GUIDE',
             slug: d.slug,
             title: d.title,
             publishedAt: d.publishedAt ?? '',
@@ -137,7 +155,7 @@ export const fetchLatestUpdates = cache(async (): Promise<FeedSource[]> => {
         }),
       ),
     ]);
-    return mergeAndRankFeed({ blogs, news, resources, webinars });
+    return mergeAndRankFeed({ blogs, guides, news, resources, webinars });
   } catch {
     return [];
   }

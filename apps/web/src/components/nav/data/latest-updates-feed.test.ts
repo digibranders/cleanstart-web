@@ -109,3 +109,19 @@ describe('mergeAndRankFeed — diversity-first ranking', () => {
     expect(out.map((x) => x.slug)).toEqual(['newer', 'n1', 'r1']);
   });
 });
+
+describe('mergeAndRankFeed - guides', () => {
+  it('lets a fresh guide take a slot as its own category', () => {
+    const out = mergeAndRankFeed(
+      {
+        blogs: [src('BLOG', 'b1', '2026-05-25')],
+        guides: [src('GUIDE', 'g1', '2026-05-30')],
+        news: [src('NEWS', 'n1', '2026-05-22')],
+        resources: [src('RESOURCE', 'r1', '2026-05-18')],
+        webinars: [],
+      },
+      now,
+    );
+    expect(out.map((x) => x.slug)).toEqual(['g1', 'b1', 'n1']);
+  });
+});
