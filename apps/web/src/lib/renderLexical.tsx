@@ -232,7 +232,7 @@ function renderNode(node: LexicalNode, key: string): React.ReactNode {
       const tag = rawTag === "h1" ? "h2" : rawTag;
       const children = renderNodes(hNode.children ?? [], key);
       const textContent = extractText(hNode.children ?? []);
-      const id = slugifyText(textContent);
+      const id = uniqueHeadingId(slugifyText(textContent));
       return React.createElement(tag, { key, id, className: `article-${tag}` }, children);
     }
 
@@ -476,6 +476,18 @@ interface RenderLexicalProps {
   wrapperClassName?: string;
 }
 
+// Repeated heading text gets `-2`, `-3`, ... exactly like the CMS table of
+// contents (lexical-extract.ts), so TOC links and scroll-spy hit one heading
+// each. Rendering is synchronous, so one counter per RenderLexical call is safe.
+let headingIdCounts: Map<string, number> | null = null;
+
+function uniqueHeadingId(base: string): string {
+  if (!headingIdCounts) return base;
+  const seen = headingIdCounts.get(base) ?? 0;
+  headingIdCounts.set(base, seen + 1);
+  return seen === 0 ? base : `${base}-${seen + 1}`;
+}
+
 export function RenderLexical({
   content,
   className = "",
@@ -490,11 +502,14 @@ export function RenderLexical({
   while (end > 0 && isEmptyParagraph(nodes[end - 1])) end--;
   if (end === 0) return null;
 
-  return (
-    <div className={`${wrapperClassName} ${className}`}>
-      {renderNodes(nodes.slice(0, end), "root")}
-    </div>
-  );
+  headingIdCounts = new Map();
+  let rendered: React.ReactNode;
+  try {
+    rendered = renderNodes(nodes.slice(0, end), "root");
+  } finally {
+    headingIdCounts = null;
+  }
+  return <div className={`${wrapperClassName} ${className}`}>{rendered}</div>;
 }
 
 function isEmptyParagraph(node: LexicalNode | undefined): boolean {

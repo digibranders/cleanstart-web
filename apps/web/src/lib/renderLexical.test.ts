@@ -303,3 +303,31 @@ describe("trailing empty paragraphs", () => {
     expect(render(p(), p())).toBe("");
   });
 });
+
+describe("RenderLexical heading ids", () => {
+  const heading = (text: string): LexicalNode =>
+    ({
+      type: "heading",
+      tag: "h2",
+      version: 1,
+      children: [{ type: "text", text, format: 0, version: 1 }],
+    }) as LexicalNode;
+
+  it("numbers repeated headings like the CMS table of contents, per render", () => {
+    const content = {
+      root: {
+        type: "root",
+        direction: null,
+        format: "",
+        indent: 0,
+        version: 1,
+        children: [heading("Implementation example"), heading("Other"), heading("Implementation example")],
+      },
+    } as LexicalRoot;
+    const render = (): string => renderToStaticMarkup(createElement(RenderLexical, { content }));
+    const html = render();
+    expect(html).toContain('id="implementation-example"');
+    expect(html).toContain('id="implementation-example-2"');
+    expect(render()).toBe(html);
+  });
+});
