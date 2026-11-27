@@ -186,6 +186,7 @@ export async function renderGuideDetail({
         <GuideDetailContent
           body={highlightedBody}
           tableOfContents={guide.tableOfContents}
+          videoUrl={guide.videoUrl}
         />
 
         {validFaqs.length > 0 ? <GuideDetailFAQ faqs={validFaqs} /> : null}

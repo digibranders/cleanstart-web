@@ -71,6 +71,7 @@ import * as migration_20261102_120000_advisories_cta_picks from './20261102_1200
 import * as migration_20261123_100000_departments_editable from './20261123_100000_departments_editable';
 import * as migration_20261125_100000_add_event_pages from './20261125_100000_add_event_pages';
 import * as migration_20261125_130000_event_pages_drafts from './20261125_130000_event_pages_drafts';
+import * as migration_20261127_100000_guides_blogs_video_url from './20261127_100000_guides_blogs_video_url';
 
 export const migrations = [
   {
@@ -412,5 +413,10 @@ export const migrations = [
     up: migration_20261125_130000_event_pages_drafts.up,
     down: migration_20261125_130000_event_pages_drafts.down,
     name: '20261125_130000_event_pages_drafts',
+  },
+  {
+    up: migration_20261127_100000_guides_blogs_video_url.up,
+    down: migration_20261127_100000_guides_blogs_video_url.down,
+    name: '20261127_100000_guides_blogs_video_url',
   },
 ];

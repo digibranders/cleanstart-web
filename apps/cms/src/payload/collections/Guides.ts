@@ -57,6 +57,14 @@ export const Guides: CollectionConfig = {
       },
     },
     {
+      name: 'videoUrl',
+      type: 'text',
+      admin: {
+        description:
+          'Optional lesson video (direct MP4 URL). When set, a "Watch the Lesson" player renders above the article body.',
+      },
+    },
+    {
       name: 'coverTitle',
       type: 'text',
       maxLength: 80,

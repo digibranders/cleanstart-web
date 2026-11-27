@@ -236,6 +236,7 @@ export type BlogFaqItem = {
 };
 
 export type BlogDetail = Blog & {
+  videoUrl?: string | null;
   body?: LexicalRoot | null;
   tableOfContents?: TocEntry[] | null;
   relatedPosts?: Blog[] | null;

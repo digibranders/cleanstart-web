@@ -4,15 +4,18 @@ import type React from "react";
 import { useState, useEffect, useMemo } from "react";
 import { RenderLexical, slugifyText } from "@/lib/renderLexical";
 import type { LexicalRoot, TocEntry } from "@/lib/guides";
+import { LessonVideo } from "@/components/sections/_shared/LessonVideo";
 
 interface GuideDetailContentProps {
   body?: LexicalRoot | null | undefined;
   tableOfContents?: TocEntry[] | null | undefined;
+  videoUrl?: string | null | undefined;
 }
 
 export function GuideDetailContent({
   body,
   tableOfContents,
+  videoUrl,
 }: GuideDetailContentProps): React.ReactElement {
   return (
     <section className="relative w-full bg-white overflow-x-clip" data-section="GuideDetailContent">
@@ -66,6 +69,8 @@ export function GuideDetailContent({
             <div className="lg:hidden mb-8">
               <MobileTableOfContents toc={tableOfContents} />
             </div>
+
+            {videoUrl ? <LessonVideo src={videoUrl} className="mb-8" /> : null}
 
             <div className="article-body">
               <RenderLexical content={body} />

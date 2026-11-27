@@ -4,6 +4,7 @@ import type React from "react";
 import { useState, useEffect, useMemo } from "react";
 import { RenderLexical, slugifyText } from "@/lib/renderLexical";
 import type { LexicalRoot, TocEntry, BlogImage } from "@/lib/blog";
+import { LessonVideo } from "@/components/sections/_shared/LessonVideo";
 
 interface BlogDetailContentProps {
   body?: LexicalRoot | null | undefined;
@@ -11,6 +12,7 @@ interface BlogDetailContentProps {
   heroImage?: BlogImage | undefined;
   /** Optional third column at xl+, sticky beside the article (the blog CTA rail). */
   rail?: React.ReactNode;
+  videoUrl?: string | null | undefined;
 }
 
 export function BlogDetailContent({
@@ -18,6 +20,7 @@ export function BlogDetailContent({
   tableOfContents,
   heroImage: _heroImage,
   rail,
+  videoUrl,
 }: BlogDetailContentProps): React.ReactElement {
   return (
     <section className="relative w-full bg-white overflow-x-clip" data-section="BlogDetailContent">
@@ -77,6 +80,8 @@ export function BlogDetailContent({
             <div className="lg:hidden mb-8">
               <MobileTableOfContents toc={tableOfContents} />
             </div>
+
+            {videoUrl ? <LessonVideo src={videoUrl} className="mb-8" /> : null}
 
             <div className="article-body" data-article-body>
               <RenderLexical content={body} />

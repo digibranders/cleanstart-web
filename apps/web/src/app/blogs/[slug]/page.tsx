@@ -209,6 +209,7 @@ export async function renderBlogDetail({
           body={highlightedBody}
           tableOfContents={post.tableOfContents}
           heroImage={post.heroImage}
+          videoUrl={post.videoUrl}
           rail={<BlogCtaLadder ctas={ctas} readingMinutes={post.readingMinutes ?? undefined} />}
         />
         <BlogCtaBottomBar ctas={ctas} layout="ladder" className="xl:hidden" />

@@ -269,6 +269,10 @@ export interface Blog {
    * Drives the SEO description fallback. Aim for ≤ 160 characters.
    */
   abstract?: string | null;
+  /**
+   * Optional lesson video (direct MP4 URL). When set, a "Watch the Lesson" player renders above the article body.
+   */
+  videoUrl?: string | null;
   heroImage?: (number | null) | Media;
   body?: {
     root: {
@@ -3225,6 +3229,10 @@ export interface Guide {
    * Drives the SEO description fallback and listing-card lede. Aim for ≤ 160 characters.
    */
   abstract?: string | null;
+  /**
+   * Optional lesson video (direct MP4 URL). When set, a "Watch the Lesson" player renders above the article body.
+   */
+  videoUrl?: string | null;
   /**
    * Title shown on the guide's auto-generated cover (listing / related cards) and its social-share image. Leave blank to derive it from the document title. Keep it short — long titles are clipped on the cover.
    */
@@ -10146,6 +10154,7 @@ export interface BlogsSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   abstract?: T;
+  videoUrl?: T;
   heroImage?: T;
   body?: T;
   faqs?:
@@ -10671,6 +10680,7 @@ export interface GuidesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   abstract?: T;
+  videoUrl?: T;
   coverTitle?: T;
   body?: T;
   faqs?:

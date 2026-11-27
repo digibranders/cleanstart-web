@@ -57,6 +57,14 @@ export const Blogs: CollectionConfig = {
         description: `Drives the SEO description fallback. Aim for ≤ ${ABSTRACT_CHAR_HINT} characters.`,
       },
     },
+    {
+      name: 'videoUrl',
+      type: 'text',
+      admin: {
+        description:
+          'Optional lesson video (direct MP4 URL). When set, a "Watch the Lesson" player renders above the article body.',
+      },
+    },
     mediaUploadField({
       name: 'heroImage',
       folderHint: 'web/blog',

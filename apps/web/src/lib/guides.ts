@@ -22,6 +22,7 @@ export type Guide = {
   slug: string;
   abstract?: string | null;
   coverTitle?: string | null;
+  videoUrl?: string | null;
   authors?: BlogAuthor[] | null;
   publishedAt?: string | null;
   contentUpdatedAt?: string | null;
