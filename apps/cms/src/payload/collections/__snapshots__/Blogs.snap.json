@@ -21,6 +21,10 @@
       "name": "abstract"
     },
     {
+      "type": "text",
+      "name": "videoUrl"
+    },
+    {
       "type": "upload",
       "name": "heroImage",
       "relationTo": "media"
